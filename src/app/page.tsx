@@ -5,20 +5,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Star, Users, Bot, Mail, BarChartBig, Brain, TrendingUp, Menu, X, 
+  Star, Users, Bot, Mail, BarChartBig, Brain, TrendingUp,
   Zap, Target, DollarSign, Clock, Shield, MessageSquare, Sparkles, 
   BarChart3, Globe, Smartphone, ArrowRight, CheckCircle2,
   LineChart, Rocket, Heart, Crown, Building2, Briefcase, Video,
   FileText, Database, CalendarDays, ClipboardCheck, Users2, Lock,
-  Server, Key, Infinity, IndianRupee, Layers, ExternalLink
+  Server, Key, Infinity, IndianRupee, Layers, ExternalLink, X
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { PricingSection } from '@/components/pricing/pricing-section';
 import { SupportedCurrency } from '@/lib/geo-detection';
+import { PublicNavbar } from '@/components/layout/public-navbar';
 
 export default function HomePage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('problems');
   const [currency, setCurrency] = useState<SupportedCurrency | undefined>(undefined);
 
@@ -205,60 +205,11 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-            <Bot className="h-7 w-7" />
-            OmniFlow
-          </Link>
-          <nav className="hidden lg:flex gap-6 items-center">
-            <Link href="#digital-card" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
-              <Smartphone className="w-4 h-4" />
-              Free Digital Card
-            </Link>
-            <Link href="#features" className="text-sm font-medium hover:text-primary transition-colors">Features</Link>
-            <Link href="#ecommerce-integrations" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-2">
-              <span>Integrations</span>
-              <Badge className="bg-blue-600 text-white text-xs">10+</Badge>
-            </Link>
-            <Link href="#benefits" className="text-sm font-medium hover:text-primary transition-colors">Benefits</Link>
-            <Link href="#comparison" className="text-sm font-medium hover:text-primary transition-colors">Compare</Link>
-            <Link href="/pricing" className="text-sm font-medium hover:text-primary transition-colors">Pricing</Link>
-            <Link href="/login" className="text-sm font-medium text-primary hover:underline">Sign In</Link>
-            <Button asChild size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              <Link href="/signup">Get Started Free</Link>
-            </Button>
-          </nav>
-          <div className="lg:hidden">
-            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
-          </div>
-        </div>
-        {/* Mobile Menu */}
-        <div className={cn("lg:hidden border-t", isMenuOpen ? "block" : "hidden")}>
-          <div className="container mx-auto px-4 pt-2 pb-4 space-y-3">
-            <Link href="#digital-card" className="flex items-center gap-2 text-base font-medium hover:text-primary text-orange-600" onClick={() => setIsMenuOpen(false)}>
-              <Smartphone className="w-4 h-4" />
-              Free Digital Card
-            </Link>
-            <Link href="#features" className="block text-base font-medium hover:text-primary" onClick={() => setIsMenuOpen(false)}>Features</Link>
-            <Link href="#ecommerce-integrations" className="flex items-center gap-2 text-base font-medium hover:text-primary" onClick={() => setIsMenuOpen(false)}>
-              <span>Integrations</span>
-              <Badge className="bg-blue-600 text-white text-xs">10+</Badge>
-            </Link>
-            <Link href="#benefits" className="block text-base font-medium hover:text-primary" onClick={() => setIsMenuOpen(false)}>Benefits</Link>
-            <Link href="#comparison" className="block text-base font-medium hover:text-primary" onClick={() => setIsMenuOpen(false)}>Compare</Link>
-            <Link href="/pricing" className="block text-base font-medium hover:text-primary" onClick={() => setIsMenuOpen(false)}>Pricing</Link>
-            <Link href="/login" className="block text-base font-medium hover:text-primary" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
-            <Button asChild className="w-full bg-gradient-to-r from-blue-600 to-purple-600"><Link href="/signup">Get Started Free</Link></Button>
-          </div>
-        </div>
-      </header>
+      <PublicNavbar />
 
       <main>
         {/* Hero Section */}
-        <section className="relative py-20 lg:py-32 px-4 overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/20 dark:via-purple-950/20 dark:to-pink-950/20">
+        <section className="relative py-20 lg:py-32 px-4 overflow-hidden bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 dark:from-violet-950/20 dark:via-purple-950/20 dark:to-pink-950/20">
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="text-center max-w-4xl mx-auto space-y-8">
@@ -267,7 +218,7 @@ export default function HomePage() {
                 AI-First Sales & Marketing Automation for SMEs
               </Badge>
               
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 dark:from-violet-400 dark:via-purple-400 dark:to-pink-400">
                 Stop Juggling 10 Tools.
                 <br />
                 Start Growing Your Business.
@@ -278,7 +229,7 @@ export default function HomePage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-                <Button asChild size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all">
+                <Button asChild size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all">
                   <Link href="/signup">
                     Start Free 14-Day Trial <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
@@ -399,7 +350,7 @@ export default function HomePage() {
               <p className="text-2xl font-bold mb-4">
                 The result? <span className="text-primary">3x more leads, 50% less time, 80% lower costs.</span>
               </p>
-              <Button asChild size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600">
+              <Button asChild size="lg" className="bg-gradient-to-r from-violet-600 to-purple-600">
                 <Link href="/signup">Start Saving Today — Free Trial <ArrowRight className="ml-2" /></Link>
               </Button>
             </div>
@@ -428,7 +379,7 @@ export default function HomePage() {
             </div>
 
             {/* Key Value Proposition */}
-            <Card className="border-4 border-gradient-to-r from-orange-400 to-amber-400 bg-gradient-to-br from-orange-100/50 to-amber-100/50 dark:from-orange-950/30 dark:to-amber-950/30 mb-12 shadow-2xl">
+            <Card className="border-4 border-orange-300 dark:border-orange-700 bg-gradient-to-br from-orange-100/50 to-amber-100/50 dark:from-orange-950/30 dark:to-amber-950/30 mb-12 shadow-2xl">
               <CardContent className="pt-8 pb-8">
                 <div className="grid md:grid-cols-2 gap-8 items-center">
                   <div className="space-y-6">
@@ -485,7 +436,7 @@ export default function HomePage() {
                   </div>
                   <div className="flex gap-2 flex-wrap justify-center">
                     <Badge className="bg-green-500">English FREE</Badge>
-                    <Badge className="bg-blue-500">14-Day Premium Trial</Badge>
+                    <Badge className="bg-violet-500">14-Day Premium Trial</Badge>
                     <Badge className="bg-purple-500">109+ Languages Pro</Badge>
                   </div>
                 </div>
@@ -588,10 +539,10 @@ export default function HomePage() {
         </section>
 
         {/* Why Pay Us Section - Orchestration Value */}
-        <section className="py-20 px-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/30 dark:via-indigo-950/30 dark:to-purple-950/30">
+        <section className="py-20 px-4 bg-gradient-to-br from-violet-50 via-indigo-50 to-purple-50 dark:from-violet-950/30 dark:via-indigo-950/30 dark:to-purple-950/30">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
-              <Badge variant="default" className="mb-4 bg-blue-600">The Real Question</Badge>
+              <Badge variant="default" className="mb-4 bg-violet-600">The Real Question</Badge>
               <h2 className="text-3xl md:text-5xl font-bold mb-6">
                 "Why Pay You When I Can Use Free Tools?"
               </h2>
@@ -886,7 +837,7 @@ export default function HomePage() {
         </section>
 
         {/* E-Commerce Integrations Section */}
-        <section id="ecommerce-integrations" className="py-20 px-4 bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 dark:from-blue-950/20 dark:via-cyan-950/20 dark:to-teal-950/20">
+        <section id="ecommerce-integrations" className="py-20 px-4 bg-gradient-to-br from-violet-50 via-cyan-50 to-teal-50 dark:from-violet-950/20 dark:via-cyan-950/20 dark:to-teal-950/20">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <Badge variant="default" className="mb-4 bg-cyan-600">
@@ -1463,7 +1414,7 @@ export default function HomePage() {
               ].map((benefit, i) => (
                 <Card key={i} className="text-center hover:shadow-lg transition-shadow">
                   <CardHeader>
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
                       <benefit.icon className="w-8 h-8 text-white" />
                     </div>
                     <CardTitle className="text-lg">{benefit.title}</CardTitle>
@@ -1631,15 +1582,15 @@ export default function HomePage() {
                   Legend: ✓ Included | ○ Limited/Add-on | ✗ Not available | 🔨 Coming soon<br/>
                   *3 Email options: Brevo (300/day free), Sender.net (2,500/month free), or SMTP (your own server)
                 </p>
-                <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 max-w-4xl mx-auto">
-                  <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                <div className="bg-violet-50 dark:bg-violet-950/20 border border-violet-200 dark:border-violet-800 rounded-lg p-4 max-w-4xl mx-auto">
+                  <p className="text-sm font-medium text-violet-900 dark:text-violet-100">
                     <strong>OmniFlow's Unique Advantages:</strong> (1) Zero-markup messaging saves $200-400/mo vs GoHighLevel, 
                     (2) Unlimited AI with BYOK while competitors charge $97-450/mo extra, 
                     (3) Unique Digital Cards with AI voice chatbot (109+ languages on Pro), 
                     (4) Same features at 67-90% lower cost than HubSpot/GoHighLevel.
                   </p>
                 </div>
-                <Button asChild size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600">
+                <Button asChild size="lg" className="bg-gradient-to-r from-violet-600 to-purple-600">
                   <Link href="/signup">
                     Start Free 14-Day Trial <ArrowRight className="ml-2" />
                   </Link>
@@ -1733,9 +1684,9 @@ export default function HomePage() {
                     <p className="text-sm text-muted-foreground">MSG91, Gupshup, AiSensy, WMart CPaaS + more</p>
                   </CardContent>
                 </Card>
-                <Card className="border-2 border-blue-500/30 bg-blue-50/50 dark:bg-blue-950/20">
+                <Card className="border-2 border-violet-500/30 bg-violet-50/50 dark:bg-violet-950/20">
                   <CardContent className="pt-6 text-center">
-                    <Shield className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                    <Shield className="w-8 h-8 text-violet-600 mx-auto mb-2" />
                     <p className="font-bold text-lg">DLT Compliance Built-in</p>
                     <p className="text-sm text-muted-foreground">TRAI template management, auto sender ID</p>
                   </CardContent>
@@ -1962,7 +1913,7 @@ export default function HomePage() {
         />
 
         {/* Final CTA Section */}
-        <section className="py-20 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <section className="py-20 px-4 bg-gradient-to-r from-violet-600 to-purple-600 text-white">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <h2 className="text-3xl md:text-5xl font-bold">
               Ready to Transform Your Business?

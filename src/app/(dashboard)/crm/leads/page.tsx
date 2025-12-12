@@ -3,6 +3,9 @@ import { getPaginatedLeadsForCompany } from '@/lib/crm/lead-data';
 import { getUserFromServerSession } from '@/lib/firebase-admin';
 import { getPlanMetadata } from '@/lib/plan-helpers-server';
 
+// Force dynamic rendering - this page uses cookies for auth
+export const dynamic = 'force-dynamic';
+
 const INITIAL_PAGE_SIZE = 50;
 
 export default async function LeadsTablePage() {

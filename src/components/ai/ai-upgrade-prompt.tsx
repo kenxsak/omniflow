@@ -38,8 +38,8 @@ const UPGRADE_RECOMMENDATIONS = {
       '3 team members'
     ],
     icon: Zap,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50'
+    color: 'text-violet-600',
+    bgColor: 'bg-violet-50'
   },
   starter: {
     suggestedPlan: 'Pro',
@@ -236,10 +236,10 @@ export function AIOperationCostPreview({
   const usagePercent = Math.round(((creditsLimit - creditsRemaining + creditsRequired) / creditsLimit) * 100);
 
   return (
-    <Card className="border-blue-200 bg-blue-50">
+    <Card className="border-violet-200 bg-violet-50">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
-          <Zap className="h-4 w-4 text-blue-600" />
+          <Zap className="h-4 w-4 text-violet-600" />
           AI Credit Cost
         </CardTitle>
       </CardHeader>

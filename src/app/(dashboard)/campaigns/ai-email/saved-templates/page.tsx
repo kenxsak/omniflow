@@ -425,35 +425,37 @@ export default function SavedEmailTemplatesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="outline" size="icon" asChild>
-          <Link href="/campaigns/ai-email">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div className="flex-1">
-          <PageTitle 
-            title="Saved Email Templates" 
-            description="Reuse your email designs without consuming AI credits"
-          />
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Button variant="outline" size="icon" asChild className="shrink-0">
+            <Link href="/campaigns/ai-email">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <div className="flex-1 min-w-0">
+            <PageTitle 
+              title="Saved Email Templates" 
+              description="Reuse your email designs without consuming AI credits"
+            />
+          </div>
         </div>
-        <Button onClick={loadTemplates} variant="outline">
-          <RefreshCw className="mr-2 h-4 w-4" />
+        <Button onClick={loadTemplates} variant="outline" size="sm" className="w-full sm:w-auto sm:ml-auto">
+          <RefreshCw className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
           Refresh
         </Button>
       </div>
 
       {templates.length === 0 ? (
         <Card>
-          <CardContent className="py-12">
+          <CardContent className="py-8 sm:py-12">
             <div className="text-center">
-              <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-lg font-semibold">No Saved Templates</p>
-              <p className="text-sm text-muted-foreground mt-2">
+              <FileText className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />
+              <p className="text-base sm:text-lg font-semibold">No Saved Templates</p>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-2">
                 Save your AI-generated emails as templates to reuse them later.
               </p>
-              <Button asChild className="mt-4" variant="accent">
+              <Button asChild className="mt-4" variant="accent" size="sm">
                 <Link href="/campaigns/ai-email">
                   Create Email Campaign
                 </Link>
@@ -462,34 +464,34 @@ export default function SavedEmailTemplatesPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {templates.map((template) => (
             <Card key={template.id} className="flex flex-col">
-              <CardHeader>
+              <CardHeader className="p-3 sm:p-6">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <CardTitle className="text-base truncate">{template.name}</CardTitle>
-                    <CardDescription className="mt-1 line-clamp-2">
+                    <CardTitle className="text-sm sm:text-base truncate">{template.name}</CardTitle>
+                    <CardDescription className="mt-1 line-clamp-2 text-xs sm:text-sm">
                       {template.description || template.subject}
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="flex-1">
-                <div className="space-y-3">
+              <CardContent className="flex-1 p-3 sm:p-6 pt-0 sm:pt-0">
+                <div className="space-y-2 sm:space-y-3">
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Subject Line</p>
-                    <p className="text-sm truncate">{template.subject}</p>
+                    <p className="text-[10px] sm:text-xs font-medium text-muted-foreground mb-1">Subject Line</p>
+                    <p className="text-xs sm:text-sm truncate">{template.subject}</p>
                   </div>
                   
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-3 sm:gap-4 text-[10px] sm:text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
-                      <Send className="h-3 w-3" />
+                      <Send className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                       <span>{template.sendCount} sends</span>
                     </div>
                     {template.lastSentAt && (
                       <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
+                        <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                         <span>Last: {format(new Date(template.lastSentAt), 'MMM dd')}</span>
                       </div>
                     )}
@@ -498,7 +500,7 @@ export default function SavedEmailTemplatesPage() {
                   {template.tags && template.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       {template.tags.slice(0, 3).map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
+                        <Badge key={tag} variant="secondary" className="text-[10px] sm:text-xs">
                           {tag}
                         </Badge>
                       ))}
@@ -506,35 +508,38 @@ export default function SavedEmailTemplatesPage() {
                   )}
                 </div>
               </CardContent>
-              <CardFooter className="border-t pt-4">
+              <CardFooter className="border-t pt-3 sm:pt-4 p-3 sm:p-6">
                 <div className="flex justify-between w-full gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => openPreview(template)}
+                    className="text-xs h-7 sm:h-8 px-2 sm:px-3"
                   >
-                    <Eye className="h-4 w-4 mr-1" />
-                    Preview
+                    <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    <span className="hidden xs:inline">Preview</span>
                   </Button>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5 sm:gap-2">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDelete(template.id)}
                       disabled={deletingId === template.id}
+                      className="h-7 w-7 sm:h-8 sm:w-8 p-0"
                     >
                       {deletingId === template.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                       ) : (
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                       )}
                     </Button>
                     <Button
                       variant="accent"
                       size="sm"
                       onClick={() => openSendDialog(template)}
+                      className="text-xs h-7 sm:h-8 px-2 sm:px-3"
                     >
-                      <Send className="h-4 w-4 mr-1" />
+                      <Send className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                       Send
                     </Button>
                   </div>

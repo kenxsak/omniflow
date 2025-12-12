@@ -3,6 +3,9 @@ import { getCompanyIdFromToken } from '@/lib/firebase-admin';
 import { cookies } from 'next/headers';
 import { CrmWrapper } from './crm-wrapper';
 
+// Force dynamic rendering - this page uses cookies for auth
+export const dynamic = 'force-dynamic';
+
 async function getCompanyId() {
   try {
     const cookieStore = await cookies();
@@ -10,8 +13,8 @@ async function getCompanyId() {
     if (!authToken) return null;
 
     return await getCompanyIdFromToken(authToken);
-  } catch (error) {
-    console.error('Error verifying auth token in CRM page:', error);
+  } catch {
+    // Auth check failed - user not logged in
     return null;
   }
 }

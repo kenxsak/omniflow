@@ -157,10 +157,10 @@ export default function CreateDigitalCardPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
+    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-6xl">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Create Digital Card</h1>
-        <p className="text-muted-foreground mt-2">
+        <h1 className="text-2xl sm:text-3xl font-bold">Create Digital Card</h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
           Create your digital business card - a beautiful landing page for your business
         </p>
       </div>
@@ -178,15 +178,19 @@ export default function CreateDigitalCardPage() {
         </Alert>
       )}
 
-      <Tabs defaultValue="basic" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="basic">Basic Info</TabsTrigger>
-          <TabsTrigger value="contact">Contact</TabsTrigger>
-          <TabsTrigger value="links">Links</TabsTrigger>
-          <TabsTrigger value="social">Social Media</TabsTrigger>
-          <TabsTrigger value="lead-capture">Lead Capture</TabsTrigger>
-          <TabsTrigger value="branding">Branding</TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="basic" className="space-y-4 sm:space-y-6">
+        <div className="sticky top-14 sm:top-16 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 bg-background/95 backdrop-blur-sm border-b">
+          <div className="overflow-x-auto scrollbar-hide">
+            <TabsList className="inline-flex w-max min-w-full sm:grid sm:w-full sm:grid-cols-6 gap-1 p-1">
+              <TabsTrigger value="basic" className="px-2 sm:px-3 text-[11px] sm:text-sm">Basic</TabsTrigger>
+              <TabsTrigger value="contact" className="px-2 sm:px-3 text-[11px] sm:text-sm">Contact</TabsTrigger>
+              <TabsTrigger value="links" className="px-2 sm:px-3 text-[11px] sm:text-sm">Links</TabsTrigger>
+              <TabsTrigger value="social" className="px-2 sm:px-3 text-[11px] sm:text-sm">Social</TabsTrigger>
+              <TabsTrigger value="lead-capture" className="px-2 sm:px-3 text-[11px] sm:text-sm">Leads</TabsTrigger>
+              <TabsTrigger value="branding" className="px-2 sm:px-3 text-[11px] sm:text-sm">Brand</TabsTrigger>
+            </TabsList>
+          </div>
+        </div>
 
         <TabsContent value="basic">
           <Card>

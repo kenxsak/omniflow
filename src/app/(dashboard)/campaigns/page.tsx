@@ -7,11 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { 
-  PlusCircle, Mail, MessageSquare, MessageCircle, 
-  Calendar, Users, Send, Clock, CheckCircle, XCircle,
-  Eye, Loader2, ChevronDown, FileText, Sparkles, Edit3
-} from 'lucide-react';
+import { Animated, StaggerContainer, StaggerItem, AnimatedCounter } from '@/components/ui/animated';
+import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
@@ -70,24 +67,24 @@ export default function CampaignsPage() {
     switch (status.toLowerCase()) {
       case 'sent':
       case 'completed':
-        return <Badge className="bg-green-500"><CheckCircle className="h-3 w-3 mr-1" />Sent</Badge>;
+        return <Badge variant="success" size="sm"><Icon icon="solar:checkmark-circle-linear" className="h-3 w-3 mr-1" />Sent</Badge>;
       case 'sending':
       case 'processing':
-        return <Badge className="bg-blue-500"><Clock className="h-3 w-3 mr-1" />Sending</Badge>;
+        return <Badge variant="info" size="sm"><Icon icon="solar:clock-circle-linear" className="h-3 w-3 mr-1" />Sending</Badge>;
       case 'failed':
-        return <Badge variant="destructive"><XCircle className="h-3 w-3 mr-1" />Failed</Badge>;
+        return <Badge variant="destructive" size="sm"><Icon icon="solar:close-circle-linear" className="h-3 w-3 mr-1" />Failed</Badge>;
       case 'draft':
-        return <Badge variant="outline"><Clock className="h-3 w-3 mr-1" />Draft</Badge>;
+        return <Badge variant="outline" size="sm"><Icon icon="solar:clock-circle-linear" className="h-3 w-3 mr-1" />Draft</Badge>;
       default:
-        return <Badge variant="secondary">{status}</Badge>;
+        return <Badge variant="secondary" size="sm">{status}</Badge>;
     }
   };
 
   const allCampaigns = useMemo(() => {
     return [
-      ...emailCampaigns.map(c => ({ ...c, type: 'email' as const, icon: Mail })),
-      ...smsCampaigns.map(c => ({ ...c, type: 'sms' as const, icon: MessageSquare })),
-      ...whatsappCampaigns.map(c => ({ ...c, type: 'whatsapp' as const, icon: MessageCircle })),
+      ...emailCampaigns.map(c => ({ ...c, type: 'email' as const, icon: 'solar:letter-linear' })),
+      ...smsCampaigns.map(c => ({ ...c, type: 'sms' as const, icon: 'solar:chat-square-linear' })),
+      ...whatsappCampaigns.map(c => ({ ...c, type: 'whatsapp' as const, icon: 'solar:chat-round-dots-linear' })),
     ].sort((a, b) => {
       const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
       const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
@@ -102,13 +99,15 @@ export default function CampaignsPage() {
   const renderCampaignTable = (campaigns: typeof allCampaigns) => {
     if (campaigns.length === 0) {
       return (
-        <div className="text-center py-12">
-          <Send className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <p className="text-muted-foreground">No campaigns yet. Create your first campaign!</p>
-          <Button asChild className="mt-4" variant="accent">
-            <Link href="/campaigns/create">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Create Campaign
+        <div className="text-center py-8 sm:py-12">
+          <div className="h-12 w-12 sm:h-16 sm:w-16 mx-auto rounded-full bg-muted flex items-center justify-center mb-4">
+            <Icon icon="solar:paper-plane-linear" className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
+          </div>
+          <p className="text-sm sm:text-base text-muted-foreground mb-4">No campaigns yet. Create your first campaign!</p>
+          <Button asChild variant="gradient">
+            <Link href="/campaigns/ai-email">
+              <Icon icon="solar:magic-stick-3-linear" className="mr-2 h-4 w-4" />
+              Create with AI
             </Link>
           </Button>
         </div>
@@ -120,79 +119,88 @@ export default function CampaignsPage() {
 
     return (
       <>
-        <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Channel</TableHead>
-              <TableHead>Campaign Name</TableHead>
-              <TableHead>Recipients</TableHead>
-              <TableHead>Sent Via</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {displayedCampaigns.map((campaign, index) => {
-              const Icon = campaign.icon;
-              const createdDate = campaign.createdAt?.toDate 
-                ? campaign.createdAt.toDate() 
-                : new Date(campaign.createdAt || Date.now());
-              
-              return (
-                <TableRow key={`${campaign.type}-${campaign.id || index}`}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Icon className="h-4 w-4" />
-                      <span className="capitalize">{campaign.type}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                      {campaign.name}
-                      {campaign.type === 'email' && (campaign as any).isAIGenerated && (
-                        <Badge variant="secondary" className="text-xs px-1.5 py-0 h-5 bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-300">
-                          <Sparkles className="h-3 w-3 mr-0.5" />
-                          AI
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Users className="h-3 w-3" />
-                      {campaign.recipientCount || 0}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {campaign.type === 'email' && (
-                      <Badge variant="outline" className="text-xs">
-                        {(campaign as any).provider === 'brevo' ? 'Brevo' : 
-                         (campaign as any).provider === 'sender' ? 'Sender.net' : 
-                         campaign.status?.includes('Brevo') ? 'Brevo' :
-                         campaign.status?.includes('Sender') ? 'Sender.net' : '-'}
-                      </Badge>
-                    )}
-                    {campaign.type !== 'email' && '-'}
-                  </TableCell>
-                  <TableCell>{getStatusBadge(campaign.status)}</TableCell>
-                  <TableCell>{format(createdDate, 'MMM dd, yyyy')}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <div className="min-w-[600px] sm:min-w-0 px-4 sm:px-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">Channel</TableHead>
+                  <TableHead>Campaign</TableHead>
+                  <TableHead className="hidden sm:table-cell">Recipients</TableHead>
+                  <TableHead className="hidden md:table-cell">Provider</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="hidden sm:table-cell">Created</TableHead>
+                  <TableHead className="text-right w-[60px]">View</TableHead>
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+              </TableHeader>
+              <TableBody>
+                {displayedCampaigns.map((campaign, index) => {
+                  const campaignIcon = campaign.icon;
+                  const createdDate = campaign.createdAt?.toDate 
+                    ? campaign.createdAt.toDate() 
+                    : new Date(campaign.createdAt || Date.now());
+                  
+                  return (
+                    <TableRow key={`${campaign.type}-${campaign.id || index}`} className="group">
+                      <TableCell>
+                        <div className="flex items-center gap-1.5">
+                          <div className="h-7 w-7 rounded-lg bg-muted flex items-center justify-center">
+                            <Icon icon={campaignIcon} className="h-3.5 w-3.5" />
+                          </div>
+                          <span className="capitalize text-xs hidden xs:inline">{campaign.type}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-xs sm:text-sm line-clamp-1">{campaign.name}</span>
+                          {campaign.type === 'email' && (campaign as any).isAIGenerated && (
+                            <Badge variant="purple" size="sm">
+                              <Icon icon="solar:magic-stick-3-linear" className="h-2.5 w-2.5 mr-0.5" />
+                              AI
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="sm:hidden text-[10px] text-muted-foreground mt-0.5">
+                          {(campaign as any).recipientCount || 0} recipients • {format(createdDate, 'MMM dd')}
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <div className="flex items-center gap-1 text-xs">
+                          <Icon icon="solar:users-group-two-rounded-linear" className="h-3 w-3 text-muted-foreground" />
+                          {(campaign as any).recipientCount || 0}
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {campaign.type === 'email' && (
+                          <Badge variant="outline" size="sm">
+                            {(campaign as any).provider === 'brevo' ? 'Brevo' : 
+                             (campaign as any).provider === 'sender' ? 'Sender' : 
+                             campaign.status?.includes('Brevo') ? 'Brevo' :
+                             campaign.status?.includes('Sender') ? 'Sender' : '-'}
+                          </Badge>
+                        )}
+                        {campaign.type !== 'email' && <span className="text-muted-foreground">-</span>}
+                      </TableCell>
+                      <TableCell>{getStatusBadge(campaign.status)}</TableCell>
+                      <TableCell className="hidden sm:table-cell text-xs text-muted-foreground">
+                        {format(createdDate, 'MMM dd, yyyy')}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="icon-sm" className="opacity-60 group-hover:opacity-100">
+                          <Icon icon="solar:eye-linear" className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
         </div>
         {hasMore && (
           <div className="flex justify-center py-4 border-t">
-            <Button variant="outline" onClick={loadMoreCampaigns}>
-              <ChevronDown className="h-4 w-4 mr-2" />
+            <Button variant="outline" size="sm" onClick={loadMoreCampaigns}>
+              <Icon icon="solar:alt-arrow-down-linear" className="h-4 w-4 mr-2" />
               Load More ({campaigns.length - displayCount} remaining)
             </Button>
           </div>
@@ -202,156 +210,181 @@ export default function CampaignsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <PageTitle 
-          title="Campaigns" 
-          description="Send messages to your contacts via Email, SMS, or WhatsApp"
-        />
-        <div className="flex gap-2 flex-wrap">
-          <Button asChild variant="outline" size="lg">
-            <Link href="/campaigns/compose-email">
-              <Edit3 className="mr-2 h-4 w-4" />
-              Compose Email
-            </Link>
-          </Button>
-          <Button asChild variant="accent" size="lg">
-            <Link href="/campaigns/ai-email">
-              <Sparkles className="mr-2 h-4 w-4" />
-              AI Email Studio
-            </Link>
-          </Button>
-        </div>
-      </div>
-      <ContextualHelpButton pageId="email-campaigns" />
-
-      <div className="grid gap-3 md:grid-cols-4 mb-2">
-        <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-1">
-          <Link href="/campaigns/compose-email">
-            <Edit3 className="h-5 w-5 mb-1" />
-            <span className="text-sm font-medium">Write Email</span>
-            <span className="text-xs text-muted-foreground">No AI credits needed</span>
-          </Link>
-        </Button>
-        <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-1">
-          <Link href="/campaigns/ai-email">
-            <Sparkles className="h-5 w-5 mb-1" />
-            <span className="text-sm font-medium">AI Email Studio</span>
-            <span className="text-xs text-muted-foreground">Generate with AI</span>
-          </Link>
-        </Button>
-        <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-1">
-          <Link href="/campaigns/templates">
-            <FileText className="h-5 w-5 mb-1" />
-            <span className="text-sm font-medium">Templates</span>
-            <span className="text-xs text-muted-foreground">Ready-to-use designs</span>
-          </Link>
-        </Button>
-        <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-1">
-          <Link href="/campaigns/ai-email/saved-templates">
-            <Mail className="h-5 w-5 mb-1" />
-            <span className="text-sm font-medium">Saved Templates</span>
-            <span className="text-xs text-muted-foreground">Your saved emails</span>
-          </Link>
-        </Button>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Campaigns</CardTitle>
-            <Send className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{allCampaigns.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Email Campaigns</CardTitle>
-            <Mail className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{emailCampaigns.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">SMS + WhatsApp</CardTitle>
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{smsCampaigns.length + whatsappCampaigns.length}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Your Campaigns</CardTitle>
-              <CardDescription>View and manage all your messaging campaigns</CardDescription>
-            </div>
-            <Button asChild variant="outline" size="sm">
-              <Link href="/campaign-jobs">
-                <Clock className="mr-2 h-4 w-4" />
-                View Delivery Status
+    <div className="space-y-4 sm:space-y-6">
+      <Animated animation="fadeDown">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <PageTitle 
+            title="Campaigns" 
+            description="Send messages via Email, SMS, or WhatsApp"
+          />
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
+              <Link href="/campaigns/compose-email">
+                <Icon icon="solar:pen-new-square-linear" className="mr-1.5 h-4 w-4" />
+                <span className="hidden xs:inline">Compose</span>
+              </Link>
+            </Button>
+            <Button asChild variant="gradient" size="sm" className="flex-1 sm:flex-none">
+              <Link href="/campaigns/ai-email">
+                <Icon icon="solar:magic-stick-3-linear" className="mr-1.5 h-4 w-4" />
+                AI Studio
               </Link>
             </Button>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-              <TabsTrigger value="all">All ({allCampaigns.length})</TabsTrigger>
-              <TabsTrigger value="email">Email ({emailCampaigns.length})</TabsTrigger>
-              <TabsTrigger value="sms">SMS ({smsCampaigns.length})</TabsTrigger>
-              <TabsTrigger value="whatsapp">WhatsApp ({whatsappCampaigns.length})</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="all" className="mt-6">
-              {isLoading ? (
-                <div className="flex justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </Animated>
+
+      <ContextualHelpButton pageId="email-campaigns" />
+
+      {/* Quick Actions */}
+      <Animated animation="fadeUp">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+          {[
+            { href: '/campaigns/compose-email', icon: 'solar:pen-new-square-linear', title: 'Write Email', desc: 'No AI credits' },
+            { href: '/campaigns/ai-email', icon: 'solar:magic-stick-3-linear', title: 'AI Studio', desc: 'Generate with AI' },
+            { href: '/campaigns/templates', icon: 'solar:document-text-linear', title: 'Templates', desc: 'Ready designs' },
+            { href: '/campaigns/ai-email/saved-templates', icon: 'solar:letter-linear', title: 'Saved', desc: 'Your templates' },
+          ].map((item, i) => (
+            <Link 
+              key={item.href}
+              href={item.href}
+              className="group flex flex-col items-center gap-1 p-3 sm:p-4 rounded-xl border bg-card hover:border-primary/30 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
+            >
+              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-muted group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                <Icon icon={item.icon} className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+              <span className="text-xs sm:text-sm font-medium text-center">{item.title}</span>
+              <span className="text-[10px] sm:text-xs text-muted-foreground text-center hidden xs:block">{item.desc}</span>
+            </Link>
+          ))}
+        </div>
+      </Animated>
+
+      {/* Stats */}
+      <StaggerContainer className="grid grid-cols-3 gap-2 sm:gap-4">
+        <StaggerItem>
+          <Card className="card-gradient-blue">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Total</CardTitle>
+              <Icon icon="solar:paper-plane-linear" className="h-4 w-4 text-blue-600" />
+            </CardHeader>
+            <CardContent className="p-3 sm:p-4 pt-0">
+              <div className="text-lg sm:text-2xl font-bold text-blue-700 dark:text-blue-300">
+                {isLoading ? <Icon icon="solar:refresh-circle-linear" className="h-5 w-5 animate-spin" /> : <AnimatedCounter value={allCampaigns.length} />}
+              </div>
+            </CardContent>
+          </Card>
+        </StaggerItem>
+        <StaggerItem>
+          <Card className="card-gradient-purple">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Email</CardTitle>
+              <Icon icon="solar:letter-linear" className="h-4 w-4 text-purple-600" />
+            </CardHeader>
+            <CardContent className="p-3 sm:p-4 pt-0">
+              <div className="text-lg sm:text-2xl font-bold text-purple-700 dark:text-purple-300">
+                {isLoading ? <Icon icon="solar:refresh-circle-linear" className="h-5 w-5 animate-spin" /> : <AnimatedCounter value={emailCampaigns.length} />}
+              </div>
+            </CardContent>
+          </Card>
+        </StaggerItem>
+        <StaggerItem>
+          <Card className="card-gradient-green">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">SMS/WA</CardTitle>
+              <Icon icon="solar:chat-square-linear" className="h-4 w-4 text-emerald-600" />
+            </CardHeader>
+            <CardContent className="p-3 sm:p-4 pt-0">
+              <div className="text-lg sm:text-2xl font-bold text-emerald-700 dark:text-emerald-300">
+                {isLoading ? <Icon icon="solar:refresh-circle-linear" className="h-5 w-5 animate-spin" /> : <AnimatedCounter value={smsCampaigns.length + whatsappCampaigns.length} />}
+              </div>
+            </CardContent>
+          </Card>
+        </StaggerItem>
+      </StaggerContainer>
+
+      {/* Campaign List */}
+      <Animated animation="fadeUp">
+        <Card>
+          <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <CardTitle className="text-base sm:text-lg">Your Campaigns</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">View and manage all campaigns</CardDescription>
+              </div>
+              <Button asChild variant="outline" size="sm">
+                <Link href="/campaign-jobs" className="flex items-center gap-1.5">
+                  <Icon icon="solar:clock-circle-linear" className="h-3.5 w-3.5" />
+                  <span className="hidden xs:inline">Delivery Status</span>
+                  <span className="xs:hidden">Status</span>
+                </Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
+              <div className="sticky top-14 sm:top-16 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 bg-background/95 backdrop-blur-sm border-b">
+                <div className="overflow-x-auto scrollbar-hide">
+                  <TabsList className="w-max sm:w-full grid grid-cols-4 h-auto gap-1 p-1">
+                    <TabsTrigger value="all" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">
+                      All <span className="hidden xs:inline ml-1">({allCampaigns.length})</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="email" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">
+                      Email <span className="hidden xs:inline ml-1">({emailCampaigns.length})</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="sms" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">
+                      SMS <span className="hidden xs:inline ml-1">({smsCampaigns.length})</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="whatsapp" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">
+                      WA <span className="hidden xs:inline ml-1">({whatsappCampaigns.length})</span>
+                    </TabsTrigger>
+                  </TabsList>
                 </div>
-              ) : (
-                renderCampaignTable(allCampaigns)
-              )}
-            </TabsContent>
-            
-            <TabsContent value="email" className="mt-6">
-              {isLoading ? (
-                <div className="flex justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : (
-                renderCampaignTable(allCampaigns.filter(c => c.type === 'email'))
-              )}
-            </TabsContent>
-            
-            <TabsContent value="sms" className="mt-6">
-              {isLoading ? (
-                <div className="flex justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : (
-                renderCampaignTable(allCampaigns.filter(c => c.type === 'sms'))
-              )}
-            </TabsContent>
-            
-            <TabsContent value="whatsapp" className="mt-6">
-              {isLoading ? (
-                <div className="flex justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : (
-                renderCampaignTable(allCampaigns.filter(c => c.type === 'whatsapp'))
-              )}
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+              </div>
+              
+              <TabsContent value="all" className="mt-4 sm:mt-6">
+                {isLoading ? (
+                  <div className="flex justify-center py-8 sm:py-12">
+                    <Icon icon="solar:refresh-circle-linear" className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  renderCampaignTable(allCampaigns)
+                )}
+              </TabsContent>
+              
+              <TabsContent value="email" className="mt-4 sm:mt-6">
+                {isLoading ? (
+                  <div className="flex justify-center py-8 sm:py-12">
+                    <Icon icon="solar:refresh-circle-linear" className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  renderCampaignTable(allCampaigns.filter(c => c.type === 'email'))
+                )}
+              </TabsContent>
+              
+              <TabsContent value="sms" className="mt-4 sm:mt-6">
+                {isLoading ? (
+                  <div className="flex justify-center py-8 sm:py-12">
+                    <Icon icon="solar:refresh-circle-linear" className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  renderCampaignTable(allCampaigns.filter(c => c.type === 'sms'))
+                )}
+              </TabsContent>
+              
+              <TabsContent value="whatsapp" className="mt-4 sm:mt-6">
+                {isLoading ? (
+                  <div className="flex justify-center py-8 sm:py-12">
+                    <Icon icon="solar:refresh-circle-linear" className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  renderCampaignTable(allCampaigns.filter(c => c.type === 'whatsapp'))
+                )}
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </Animated>
     </div>
   );
 }

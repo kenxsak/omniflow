@@ -517,14 +517,16 @@ export default function WhatsAppDiagnosticsPage() {
       </div>
 
       <Tabs defaultValue={activeProvider} onValueChange={setActiveProvider}>
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 gap-2 h-auto">
+        <div className="w-full overflow-hidden">
+          <div className="overflow-x-auto scrollbar-hide pb-1">
+            <TabsList className="inline-flex w-max min-w-full sm:grid sm:w-full sm:grid-cols-4 lg:grid-cols-7 gap-1 h-auto p-1">
           {providers.map(provider => {
             const status = getProviderStatus(provider.id);
             return (
               <TabsTrigger
                 key={provider.id}
                 value={provider.id}
-                className="flex flex-col gap-1 h-auto py-2 relative"
+                className="flex flex-col gap-1 h-auto py-1.5 sm:py-2 px-2 sm:px-3 relative text-[10px] sm:text-xs"
               >
                 <span className="text-xs font-medium">{provider.name}</span>
                 {status === 'success' && (
@@ -545,7 +547,9 @@ export default function WhatsAppDiagnosticsPage() {
               </TabsTrigger>
             );
           })}
-        </TabsList>
+            </TabsList>
+          </div>
+        </div>
 
         {providers.map(provider => (
           <TabsContent key={provider.id} value={provider.id} className="space-y-4">

@@ -21,7 +21,7 @@ export default function ApiPage() {
             </p>
 
             <div className="grid gap-6 mb-12">
-              <Card className="border-2 border-blue-500/30">
+              <Card className="border-2 border-violet-500/30">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
                     <Code2 className="w-8 h-8 text-primary flex-shrink-0 mt-1" />

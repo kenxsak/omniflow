@@ -154,10 +154,10 @@ export default function TestMSG91SMSPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Info Alert */}
-              <Alert className="border-blue-200 bg-blue-50">
-                <Info className="h-4 w-4 text-blue-600" />
-                <AlertTitle className="text-blue-900">MSG91 SMS Routes</AlertTitle>
-                <AlertDescription className="text-blue-800">
+              <Alert className="border-violet-200 bg-violet-50">
+                <Info className="h-4 w-4 text-violet-600" />
+                <AlertTitle className="text-violet-900">MSG91 SMS Routes</AlertTitle>
+                <AlertDescription className="text-violet-800">
                   Test both transactional SMS (OTP, confirmations) and promotional SMS (marketing offers) before
                   sending bulk campaigns.
                 </AlertDescription>

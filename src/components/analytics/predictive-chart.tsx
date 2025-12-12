@@ -120,7 +120,7 @@ export default function PredictiveChart({ analytics, historicalLeads }: Predicti
         
         {/* Forecasts */}
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+          <div className="p-4 bg-violet-50 dark:bg-violet-950/20 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               {getTrendIcon(leadForecast.next3Months.trend)}
               <h4 className="font-semibold">Lead Forecast</h4>

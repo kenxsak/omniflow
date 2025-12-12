@@ -263,9 +263,9 @@ export default function TemplatesPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="outline" size="icon" asChild>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+        <Button variant="outline" size="icon" asChild className="shrink-0 w-fit">
           <Link href="/campaigns">
             <ArrowLeft className="h-4 w-4" />
             <span className="sr-only">Back to Campaigns</span>
@@ -273,7 +273,7 @@ export default function TemplatesPage() {
         </Button>
         <div className="flex-1">
           <PageTitle icon={FileText}>Ready-to-Use Templates</PageTitle>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-muted-foreground text-xs sm:text-sm mt-1 sm:mt-2">
             Copy templates for Email, SMS &amp; WhatsApp campaigns. Customize with your details and send!
           </p>
         </div>
@@ -281,73 +281,76 @@ export default function TemplatesPage() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="email" className="flex items-center gap-2">
-            <Mail className="h-4 w-4" />
-            Email
+          <TabsTrigger value="email" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
+            <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span>Email</span>
           </TabsTrigger>
-          <TabsTrigger value="sms" className="flex items-center gap-2">
-            <MessageSquare className="h-4 w-4" />
-            SMS
+          <TabsTrigger value="sms" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
+            <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span>SMS</span>
           </TabsTrigger>
-          <TabsTrigger value="whatsapp" className="flex items-center gap-2">
-            <MessageCircle className="h-4 w-4" />
-            WhatsApp
+          <TabsTrigger value="whatsapp" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
+            <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline">WhatsApp</span>
+            <span className="xs:hidden">WA</span>
           </TabsTrigger>
         </TabsList>
 
         {/* Email Tab */}
-        <TabsContent value="email" className="mt-6 space-y-4">
-          <div className="flex gap-2 flex-wrap">
+        <TabsContent value="email" className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">
+          <div className="flex gap-1.5 sm:gap-2 flex-wrap">
             {emailCategories.map((category) => (
               <Button
                 key={category.value}
                 variant={selectedCategory === category.value ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedCategory(category.value)}
+                className="text-xs sm:text-sm px-2 sm:px-3 h-7 sm:h-8"
               >
                 {category.label}
               </Button>
             ))}
           </div>
 
-          <div className="grid gap-4">
+          <div className="grid gap-3 sm:gap-4">
             {filteredEmailTemplates.map((template) => (
               <Card key={template.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-base">{template.name}</CardTitle>
-                      <CardDescription className="mt-1">{template.description}</CardDescription>
+                <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-sm sm:text-base">{template.name}</CardTitle>
+                      <CardDescription className="mt-1 text-xs sm:text-sm">{template.description}</CardDescription>
                     </div>
-                    <Badge className={getCategoryColor(template.category)} variant="secondary">
+                    <Badge className={`${getCategoryColor(template.category)} text-[10px] sm:text-xs shrink-0`} variant="secondary">
                       {template.category}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-2 sm:space-y-3 p-3 sm:p-6 pt-0 sm:pt-0">
                   <div>
-                    <p className="text-xs font-semibold mb-1">Subject Line:</p>
-                    <div className="bg-muted p-2 rounded text-sm">{template.subject}</div>
+                    <p className="text-[10px] sm:text-xs font-semibold mb-1">Subject Line:</p>
+                    <div className="bg-muted p-1.5 sm:p-2 rounded text-xs sm:text-sm">{template.subject}</div>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold mb-1">Email Body:</p>
-                    <div className="bg-muted p-3 rounded max-h-40 overflow-y-auto">
-                      <pre className="text-xs whitespace-pre-wrap font-mono">{template.body}</pre>
+                    <p className="text-[10px] sm:text-xs font-semibold mb-1">Email Body:</p>
+                    <div className="bg-muted p-2 sm:p-3 rounded max-h-32 sm:max-h-40 overflow-y-auto">
+                      <pre className="text-[10px] sm:text-xs whitespace-pre-wrap font-mono">{template.body}</pre>
                     </div>
                   </div>
                   <Button
                     onClick={() => handleCopyTemplate(`Subject: ${template.subject}\n\n${template.body}`, template.id)}
-                    className="w-full"
+                    className="w-full text-xs sm:text-sm"
+                    size="sm"
                     variant={copiedId === template.id ? 'default' : 'outline'}
                   >
                     {copiedId === template.id ? (
                       <>
-                        <Check className="mr-2 h-4 w-4" />
+                        <Check className="mr-1.5 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                         Copied!
                       </>
                     ) : (
                       <>
-                        <Copy className="mr-2 h-4 w-4" />
+                        <Copy className="mr-1.5 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                         Copy Template
                       </>
                     )}
@@ -359,76 +362,77 @@ export default function TemplatesPage() {
         </TabsContent>
 
         {/* SMS Tab */}
-        <TabsContent value="sms" className="mt-6 space-y-4">
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription>
+        <TabsContent value="sms" className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">
+          <Alert className="py-2 sm:py-3">
+            <Info className="h-3 w-3 sm:h-4 sm:w-4" />
+            <AlertDescription className="text-xs sm:text-sm">
               <strong>Two SMS Formats:</strong> DLT (TRAI-approved) and Quick SMS (no approval needed)
             </AlertDescription>
           </Alert>
 
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-1.5 sm:gap-2 flex-wrap">
             {smsCategories.map((category) => (
               <Button
                 key={category.value}
                 variant={selectedCategory === category.value ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedCategory(category.value)}
+                className="text-xs sm:text-sm px-2 sm:px-3 h-7 sm:h-8"
               >
                 {category.label}
               </Button>
             ))}
           </div>
 
-          <div className="grid gap-4">
+          <div className="grid gap-3 sm:gap-4">
             {filteredSMSTemplates.map((template) => (
               <Card key={template.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-base">{template.name}</CardTitle>
-                      <CardDescription className="mt-1">{template.description}</CardDescription>
+                <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-sm sm:text-base">{template.name}</CardTitle>
+                      <CardDescription className="mt-1 text-xs sm:text-sm">{template.description}</CardDescription>
                     </div>
-                    <Badge className={getCategoryColor(template.category)} variant="secondary">
+                    <Badge className={`${getCategoryColor(template.category)} text-[10px] sm:text-xs shrink-0`} variant="secondary">
                       {template.category}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-2 sm:space-y-3 p-3 sm:p-6 pt-0 sm:pt-0">
                   <div>
-                    <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 mb-1">DLT Format:</p>
-                    <div className="bg-amber-50 dark:bg-amber-950 p-2 rounded text-xs border border-amber-200 dark:border-amber-800">
+                    <p className="text-[10px] sm:text-xs font-semibold text-amber-700 dark:text-amber-300 mb-1">DLT Format:</p>
+                    <div className="bg-amber-50 dark:bg-amber-950 p-1.5 sm:p-2 rounded text-[10px] sm:text-xs border border-amber-200 dark:border-amber-800">
                       <pre className="whitespace-pre-wrap font-mono">{template.dltFormat}</pre>
                     </div>
                     <Button
                       onClick={() => handleCopyTemplate(template.dltFormat, `${template.id}-dlt`, 'DLT')}
                       size="sm"
-                      className="mt-2 w-full"
+                      className="mt-2 w-full text-xs"
                       variant={copiedId === `${template.id}-dlt` ? 'default' : 'outline'}
                     >
                       {copiedId === `${template.id}-dlt` ? (
-                        <> <Check className="mr-2 h-3 w-3" /> Copied! </>
+                        <> <Check className="mr-1.5 h-3 w-3" /> Copied! </>
                       ) : (
-                        <> <Copy className="mr-2 h-3 w-3" /> Copy DLT </>
+                        <> <Copy className="mr-1.5 h-3 w-3" /> Copy DLT </>
                       )}
                     </Button>
                   </div>
 
                   <div>
-                    <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-1">Quick SMS:</p>
-                    <div className="bg-blue-50 dark:bg-blue-950 p-2 rounded text-xs border border-blue-200 dark:border-blue-800">
+                    <p className="text-[10px] sm:text-xs font-semibold text-blue-700 dark:text-blue-300 mb-1">Quick SMS:</p>
+                    <div className="bg-blue-50 dark:bg-blue-950 p-1.5 sm:p-2 rounded text-[10px] sm:text-xs border border-blue-200 dark:border-blue-800">
                       <pre className="whitespace-pre-wrap font-mono">{template.quickSMSFormat}</pre>
                     </div>
                     <Button
                       onClick={() => handleCopyTemplate(template.quickSMSFormat, `${template.id}-quick`, 'Quick SMS')}
                       size="sm"
-                      className="mt-2 w-full"
+                      className="mt-2 w-full text-xs"
                       variant={copiedId === `${template.id}-quick` ? 'default' : 'outline'}
                     >
                       {copiedId === `${template.id}-quick` ? (
-                        <> <Check className="mr-2 h-3 w-3" /> Copied! </>
+                        <> <Check className="mr-1.5 h-3 w-3" /> Copied! </>
                       ) : (
-                        <> <Copy className="mr-2 h-3 w-3" /> Copy Quick SMS </>
+                        <> <Copy className="mr-1.5 h-3 w-3" /> Copy Quick SMS </>
                       )}
                     </Button>
                   </div>
@@ -439,58 +443,60 @@ export default function TemplatesPage() {
         </TabsContent>
 
         {/* WhatsApp Tab */}
-        <TabsContent value="whatsapp" className="mt-6 space-y-4">
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription>
+        <TabsContent value="whatsapp" className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">
+          <Alert className="py-2 sm:py-3">
+            <Info className="h-3 w-3 sm:h-4 sm:w-4" />
+            <AlertDescription className="text-xs sm:text-sm">
               <strong>Meta Approval Required:</strong> Submit to your WhatsApp BSP provider (WATI, AiSensy, MSG91, etc.)
             </AlertDescription>
           </Alert>
 
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-1.5 sm:gap-2 flex-wrap">
             {waCategories.map((category) => (
               <Button
                 key={category.value}
                 variant={selectedCategory === category.value ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedCategory(category.value)}
+                className="text-xs sm:text-sm px-2 sm:px-3 h-7 sm:h-8"
               >
                 {category.label}
               </Button>
             ))}
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
             {filteredWhatsAppTemplates.map((template) => (
               <Card key={template.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-base">{template.name}</CardTitle>
-                      <CardDescription className="mt-1">{template.description}</CardDescription>
+                <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-sm sm:text-base">{template.name}</CardTitle>
+                      <CardDescription className="mt-1 text-xs sm:text-sm">{template.description}</CardDescription>
                     </div>
-                    <Badge className={getCategoryColor(template.category)} variant="secondary">
+                    <Badge className={`${getCategoryColor(template.category)} text-[10px] sm:text-xs shrink-0`} variant="secondary">
                       {template.category}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="bg-muted p-3 rounded max-h-40 overflow-y-auto">
-                    <pre className="text-xs whitespace-pre-wrap font-mono">{template.message}</pre>
+                <CardContent className="space-y-2 sm:space-y-3 p-3 sm:p-6 pt-0 sm:pt-0">
+                  <div className="bg-muted p-2 sm:p-3 rounded max-h-32 sm:max-h-40 overflow-y-auto">
+                    <pre className="text-[10px] sm:text-xs whitespace-pre-wrap font-mono">{template.message}</pre>
                   </div>
                   <Button
                     onClick={() => handleCopyTemplate(template.message, template.id)}
-                    className="w-full"
+                    className="w-full text-xs sm:text-sm"
+                    size="sm"
                     variant={copiedId === template.id ? 'default' : 'outline'}
                   >
                     {copiedId === template.id ? (
                       <>
-                        <Check className="mr-2 h-4 w-4" />
+                        <Check className="mr-1.5 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                         Copied!
                       </>
                     ) : (
                       <>
-                        <Copy className="mr-2 h-4 w-4" />
+                        <Copy className="mr-1.5 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                         Copy Template
                       </>
                     )}

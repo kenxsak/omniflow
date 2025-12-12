@@ -68,7 +68,7 @@ export function EnterpriseActivityCard() {
       case 'release':
         return <Unlock className="h-3 w-3 text-green-500" />;
       case 'create':
-        return <UserPlus className="h-3 w-3 text-blue-500" />;
+        return <UserPlus className="h-3 w-3 text-violet-500" />;
       case 'update':
         return <FileEdit className="h-3 w-3 text-purple-500" />;
       case 'assign':

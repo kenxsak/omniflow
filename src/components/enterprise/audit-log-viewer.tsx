@@ -16,7 +16,7 @@ import { format, formatDistanceToNow } from 'date-fns';
 
 const actionColors: Record<string, string> = {
   create: 'bg-green-100 text-green-800',
-  update: 'bg-blue-100 text-blue-800',
+  update: 'bg-violet-100 text-violet-800',
   delete: 'bg-red-100 text-red-800',
   view: 'bg-gray-100 text-gray-800',
   assign: 'bg-purple-100 text-purple-800',
@@ -30,7 +30,7 @@ const actionColors: Record<string, string> = {
 };
 
 const severityColors: Record<string, string> = {
-  info: 'border-blue-500',
+  info: 'border-violet-500',
   warning: 'border-yellow-500',
   critical: 'border-red-500',
 };

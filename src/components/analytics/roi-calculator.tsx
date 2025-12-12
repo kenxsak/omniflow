@@ -121,10 +121,10 @@ export default function ROICalculator() {
           
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
-              <DollarSign className="h-4 w-4 text-blue-500" />
+              <DollarSign className="h-4 w-4 text-violet-500" />
               <span className="text-xs font-medium text-muted-foreground">ROAS</span>
             </div>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-violet-600">
               {roas.toFixed(2)}x
             </div>
           </div>

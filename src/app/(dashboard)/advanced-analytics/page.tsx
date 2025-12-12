@@ -7,7 +7,7 @@
  * for marketing efforts.
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import PageTitle from '@/components/ui/page-title';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -16,8 +16,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Download, RefreshCw, TrendingUp, Info, Calendar } from 'lucide-react';
+import { Download, RefreshCw, TrendingUp, Info, Calendar, BarChart3, Target, Sparkles, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Animated, AnimatedCounter } from '@/components/ui/animated';
+import gsap from 'gsap';
 import type {
   AnalyticsPeriod,
   ConversionFunnel,
@@ -201,9 +203,23 @@ export default function AdvancedAnalyticsPage() {
     }
   };
   
+  const statsRef = useRef<HTMLDivElement>(null);
+
+  // GSAP animation for stats - instant
+  useEffect(() => {
+    if (statsRef.current && metrics) {
+      const cards = statsRef.current.querySelectorAll('.stat-card');
+      gsap.fromTo(
+        cards,
+        { opacity: 0, y: 10, scale: 0.98 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.25, stagger: 0, ease: 'power2.out' }
+      );
+    }
+  }, [metrics]);
+
   if (!appUser || !company) {
     return (
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto py-8 px-4">
         <Alert>
           <Info className="h-4 w-4" />
           <AlertDescription>Please log in to view analytics</AlertDescription>
@@ -213,40 +229,73 @@ export default function AdvancedAnalyticsPage() {
   }
   
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <PageTitle
-            title="Advanced Analytics"
-            description="Business intelligence, conversion tracking, and ROI calculations"
-          />
-        </div>
-        <div className="flex items-center gap-3">
-          <Select value={period} onValueChange={handlePeriodChange}>
-            <SelectTrigger className="w-[180px]">
-              <Calendar className="mr-2 h-4 w-4" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7days">Last 7 Days</SelectItem>
-              <SelectItem value="30days">Last 30 Days</SelectItem>
-              <SelectItem value="90days">Last 90 Days</SelectItem>
-              <SelectItem value="12months">Last 12 Months</SelectItem>
-            </SelectContent>
-          </Select>
+      <Animated animation="fadeUp">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Advanced Analytics
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Business intelligence, conversion tracking, and ROI calculations
+              </p>
+            </div>
+            
+            {/* Desktop Actions */}
+            <div className="hidden lg:flex items-center gap-3">
+              <Select value={period} onValueChange={handlePeriodChange}>
+                <SelectTrigger className="w-[180px]">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7days">Last 7 Days</SelectItem>
+                  <SelectItem value="30days">Last 30 Days</SelectItem>
+                  <SelectItem value="90days">Last 90 Days</SelectItem>
+                  <SelectItem value="12months">Last 12 Months</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Button onClick={handleRefresh} variant="outline" disabled={isRefreshing}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              
+              <Button onClick={handleExport} variant="default" disabled={!metrics} className="bg-gradient-to-r from-primary to-accent hover:opacity-90">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </div>
+          </div>
           
-          <Button onClick={handleRefresh} variant="outline" disabled={isRefreshing}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
-          
-          <Button onClick={handleExport} variant="default" disabled={!metrics}>
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
+          {/* Mobile Actions */}
+          <div className="flex lg:hidden gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            <Select value={period} onValueChange={handlePeriodChange}>
+              <SelectTrigger className="w-[140px] h-9 text-xs flex-shrink-0">
+                <Calendar className="mr-1.5 h-3.5 w-3.5" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7days">Last 7 Days</SelectItem>
+                <SelectItem value="30days">Last 30 Days</SelectItem>
+                <SelectItem value="90days">Last 90 Days</SelectItem>
+                <SelectItem value="12months">Last 12 Months</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Button onClick={handleRefresh} variant="outline" size="sm" disabled={isRefreshing} className="flex-shrink-0 h-9">
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
+            
+            <Button onClick={handleExport} size="sm" disabled={!metrics} className="flex-shrink-0 h-9 bg-gradient-to-r from-primary to-accent">
+              <Download className="h-4 w-4 mr-1.5" />
+              Export
+            </Button>
+          </div>
         </div>
-      </div>
+      </Animated>
       
       {/* Alerts */}
       {metrics && metrics.alerts.length > 0 && (
@@ -274,29 +323,39 @@ export default function AdvancedAnalyticsPage() {
       ) : (
         <>
           {/* Tabs */}
-          <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="funnel">Funnel</TabsTrigger>
-              <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-              <TabsTrigger value="predictions">Predictions</TabsTrigger>
-              <TabsTrigger value="attribution">Attribution</TabsTrigger>
-            </TabsList>
+          <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
+            <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+              <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-5 h-auto p-1">
+                <TabsTrigger value="overview" className="text-xs sm:text-sm px-3 py-2">Overview</TabsTrigger>
+                <TabsTrigger value="funnel" className="text-xs sm:text-sm px-3 py-2">Funnel</TabsTrigger>
+                <TabsTrigger value="campaigns" className="text-xs sm:text-sm px-3 py-2">Campaigns</TabsTrigger>
+                <TabsTrigger value="predictions" className="text-xs sm:text-sm px-3 py-2">Predictions</TabsTrigger>
+                <TabsTrigger value="attribution" className="text-xs sm:text-sm px-3 py-2">Attribution</TabsTrigger>
+              </TabsList>
+            </div>
             
             {/* Overview Tab */}
-            <TabsContent value="overview" className="space-y-6">
+            <TabsContent value="overview" className="space-y-4 sm:space-y-6">
               {/* Key Metrics Cards */}
               {metrics && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardDescription>Total Leads</CardDescription>
-                      <CardTitle className="text-3xl">{metrics.kpis.totalLeads}</CardTitle>
+                <div ref={statsRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                  <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-primary/50 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6 relative">
+                      <div className="flex items-center justify-between">
+                        <CardDescription className="text-xs sm:text-sm">Total Leads</CardDescription>
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <Target className="w-4 h-4 text-primary" />
+                        </div>
+                      </div>
+                      <CardTitle className="text-xl sm:text-2xl lg:text-3xl">
+                        <AnimatedCounter value={metrics.kpis.totalLeads} />
+                      </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-3 sm:p-6 pt-0 relative">
                       {metrics.periodComparison.leadsGrowth !== 0 && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <TrendingUp className={`h-4 w-4 ${metrics.periodComparison.leadsGrowth > 0 ? 'text-green-500' : 'text-red-500'}`} />
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm">
+                          <TrendingUp className={`h-3 w-3 sm:h-4 sm:w-4 ${metrics.periodComparison.leadsGrowth > 0 ? 'text-green-500' : 'text-red-500'}`} />
                           <span className={metrics.periodComparison.leadsGrowth > 0 ? 'text-green-600' : 'text-red-600'}>
                             {metrics.periodComparison.leadsGrowth > 0 ? '+' : ''}{metrics.periodComparison.leadsGrowth.toFixed(1)}%
                           </span>
@@ -305,15 +364,21 @@ export default function AdvancedAnalyticsPage() {
                     </CardContent>
                   </Card>
                   
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardDescription>Total Revenue</CardDescription>
-                      <CardTitle className="text-3xl">{formatCurrency(metrics.kpis.totalRevenue)}</CardTitle>
+                  <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-green-500/50 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6 relative">
+                      <div className="flex items-center justify-between">
+                        <CardDescription className="text-xs sm:text-sm">Total Revenue</CardDescription>
+                        <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
+                          <DollarSign className="w-4 h-4 text-green-500" />
+                        </div>
+                      </div>
+                      <CardTitle className="text-lg sm:text-xl lg:text-2xl truncate">{formatCurrency(metrics.kpis.totalRevenue)}</CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-3 sm:p-6 pt-0 relative">
                       {metrics.periodComparison.revenueGrowth !== 0 && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <TrendingUp className={`h-4 w-4 ${metrics.periodComparison.revenueGrowth > 0 ? 'text-green-500' : 'text-red-500'}`} />
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm">
+                          <TrendingUp className={`h-3 w-3 sm:h-4 sm:w-4 ${metrics.periodComparison.revenueGrowth > 0 ? 'text-green-500' : 'text-red-500'}`} />
                           <span className={metrics.periodComparison.revenueGrowth > 0 ? 'text-green-600' : 'text-red-600'}>
                             {metrics.periodComparison.revenueGrowth > 0 ? '+' : ''}{metrics.periodComparison.revenueGrowth.toFixed(1)}%
                           </span>
@@ -322,25 +387,37 @@ export default function AdvancedAnalyticsPage() {
                     </CardContent>
                   </Card>
                   
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardDescription>Overall ROI</CardDescription>
-                      <CardTitle className="text-3xl">{formatPercentage(metrics.kpis.overallROI, 0)}</CardTitle>
+                  <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-blue-500/50 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6 relative">
+                      <div className="flex items-center justify-between">
+                        <CardDescription className="text-xs sm:text-sm">Overall ROI</CardDescription>
+                        <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                          <BarChart3 className="w-4 h-4 text-blue-500" />
+                        </div>
+                      </div>
+                      <CardTitle className="text-xl sm:text-2xl lg:text-3xl">{formatPercentage(metrics.kpis.overallROI, 0)}</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <Badge variant={metrics.kpis.overallROI >= 200 ? 'default' : 'secondary'}>
+                    <CardContent className="p-3 sm:p-6 pt-0 relative">
+                      <Badge variant={metrics.kpis.overallROI >= 200 ? 'default' : 'secondary'} className="text-xs">
                         {metrics.kpis.overallROI >= 200 ? 'Excellent' : 'Good'}
                       </Badge>
                     </CardContent>
                   </Card>
                   
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardDescription>Marketing Spend</CardDescription>
-                      <CardTitle className="text-3xl">{formatCurrency(metrics.kpis.totalMarketingSpend)}</CardTitle>
+                  <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-purple-500/50 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6 relative">
+                      <div className="flex items-center justify-between">
+                        <CardDescription className="text-xs sm:text-sm">Marketing Spend</CardDescription>
+                        <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                          <Sparkles className="w-4 h-4 text-purple-500" />
+                        </div>
+                      </div>
+                      <CardTitle className="text-lg sm:text-xl lg:text-2xl truncate">{formatCurrency(metrics.kpis.totalMarketingSpend)}</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <div className="text-sm text-muted-foreground">
+                    <CardContent className="p-3 sm:p-6 pt-0 relative">
+                      <div className="text-xs sm:text-sm text-muted-foreground">
                         CPL: {formatCurrency(metrics.costs.costPerLead)}
                       </div>
                     </CardContent>
@@ -349,7 +426,7 @@ export default function AdvancedAnalyticsPage() {
               )}
               
               {/* Funnel + ROI Calculator */}
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
                 {funnel && <ConversionFunnelChart funnel={funnel} />}
                 <ROICalculator />
               </div>

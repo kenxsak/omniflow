@@ -37,9 +37,8 @@ import {
 } from './aisensy-client';
 
 import {
-  sendBulkGupshupWhatsApp,
+  sendBulkWhatsAppGupshup,
   type GupshupConfig,
-  type SendBulkGupshupWhatsAppInput
 } from './gupshup-client';
 
 export type WhatsAppProvider = 'meta' | 'authkey' | 'aisensy' | 'gupshup';
@@ -233,20 +232,29 @@ export async function sendUnifiedWhatsAppBulk(
 
         case 'gupshup':
           if (config.gupshup) {
-            const gupshupResult = await sendBulkGupshupWhatsApp(config.gupshup, {
-              templateName: input.templateName,
+            const gupshupResult = await sendBulkWhatsAppGupshup(config.gupshup, {
+              source: config.gupshup.source || '',
+              templateId: input.templateName, // templateName is used as templateId
               recipients: input.recipients.map(r => ({
                 phone: r.phone,
-                parameters: r.parameters
+                params: r.parameters
               }))
             });
+
+            const successCount = gupshupResult.results?.filter(r => r.success).length || 0;
+            const failCount = gupshupResult.results?.filter(r => !r.success).length || 0;
 
             result = {
               success: gupshupResult.success,
               provider: 'gupshup',
-              totalSent: gupshupResult.totalSent,
-              totalFailed: gupshupResult.totalFailed,
-              results: gupshupResult.results
+              totalSent: successCount,
+              totalFailed: failCount,
+              results: gupshupResult.results?.map(r => ({
+                phone: r.phone,
+                success: r.success,
+                messageId: r.messageId,
+                error: r.error
+              }))
             };
           }
           break;

@@ -720,27 +720,29 @@ export default function AICampaignStudioPage() {
   }
 
   return (
-    <div className="container mx-auto py-6 max-w-6xl">
-      <div className="flex items-center justify-between mb-6">
+    <div className="container mx-auto py-4 sm:py-6 px-4 sm:px-6 max-w-6xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Sparkles className="h-8 w-8 text-primary" />
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+            <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
             AI Email Campaign Studio
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Create professional email campaigns from a single prompt using AI
           </p>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Button variant="outline" size="sm" asChild>
             <Link href="/campaigns/ai-email/saved-templates">
-              <BookmarkPlus className="mr-2 h-4 w-4" />
-              Saved Templates
+              <BookmarkPlus className="mr-1 sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Saved Templates</span>
+              <span className="sm:hidden">Templates</span>
             </Link>
           </Button>
-          <Badge variant="outline" className="text-sm">
-            <span className="mr-2">🚀 BETA</span>
+          <Badge variant="outline" className="text-xs sm:text-sm">
+            <span className="mr-1 sm:mr-2">🚀</span>
+            <span className="hidden sm:inline">BETA</span>
           </Badge>
         </div>
       </div>
@@ -759,36 +761,36 @@ export default function AICampaignStudioPage() {
 
       <Progress value={progressPercentage} className="mb-6" />
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
         <Card className={stage >= 1 ? 'border-primary' : ''}>
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <div className={`rounded-full w-8 h-8 flex items-center justify-center ${stage >= 1 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+          <CardHeader className="p-2 sm:pb-3 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
+              <div className={`rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm ${stage >= 1 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
                 1
               </div>
-              <CardTitle className="text-lg">Describe</CardTitle>
+              <CardTitle className="text-xs sm:text-lg text-center sm:text-left">Describe</CardTitle>
             </div>
           </CardHeader>
         </Card>
 
         <Card className={stage >= 2 ? 'border-primary' : ''}>
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <div className={`rounded-full w-8 h-8 flex items-center justify-center ${stage >= 2 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+          <CardHeader className="p-2 sm:pb-3 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
+              <div className={`rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm ${stage >= 2 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
                 2
               </div>
-              <CardTitle className="text-lg">Review & Edit</CardTitle>
+              <CardTitle className="text-xs sm:text-lg text-center sm:text-left">Review</CardTitle>
             </div>
           </CardHeader>
         </Card>
 
         <Card className={stage >= 3 ? 'border-primary' : ''}>
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <div className={`rounded-full w-8 h-8 flex items-center justify-center ${stage >= 3 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+          <CardHeader className="p-2 sm:pb-3 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
+              <div className={`rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm ${stage >= 3 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
                 3
               </div>
-              <CardTitle className="text-lg">Publish</CardTitle>
+              <CardTitle className="text-xs sm:text-lg text-center sm:text-left">Publish</CardTitle>
             </div>
           </CardHeader>
         </Card>

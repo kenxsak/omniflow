@@ -353,30 +353,30 @@ export default function EmailListsPage() {
   const totalPages = Math.ceil(filteredContacts.length / contactsPerPage);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <PageTitle 
           title="Email Lists" 
           description="Create and manage email lists for your marketing campaigns and automations." 
         />
-        <Button asChild variant="outline">
+        <Button asChild variant="outline" size="sm" className="text-xs sm:text-sm">
           <Link href="/campaigns/email-automations">
-            <Bot className="mr-2 h-4 w-4" /> Manage Automations
+            <Bot className="mr-1.5 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /> <span className="hidden xs:inline">Manage </span>Automations
           </Link>
         </Button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
         <Card>
-          <CardHeader>
+          <CardHeader className="p-3 sm:p-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
               <div>
-                <CardTitle>Your Email Lists</CardTitle>
-                <CardDescription>Create lists for different customer segments to send targeted emails.</CardDescription>
+                <CardTitle className="text-base sm:text-lg">Your Email Lists</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Create lists for different customer segments to send targeted emails.</CardDescription>
               </div>
               <Dialog open={isCreateListDialogOpen} onOpenChange={setIsCreateListDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm"><PlusCircle className="mr-2 h-4 w-4" />Create New List</Button>
+                  <Button size="sm" className="text-xs sm:text-sm"><PlusCircle className="mr-1.5 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /><span className="hidden xs:inline">Create New </span>List</Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
@@ -431,48 +431,48 @@ export default function EmailListsPage() {
               </Dialog>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
             {isLoadingLists ? (
               <div className="flex justify-center items-center h-32">
-                <Loader2 className="animate-spin h-6 w-6 text-primary" />
+                <Loader2 className="animate-spin h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
             ) : emailLists.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Mail className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>No email lists created yet.</p>
-                <p className="text-sm">Create your first list to start organizing contacts.</p>
+              <div className="text-center py-6 sm:py-8 text-muted-foreground">
+                <Mail className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-2 opacity-50" />
+                <p className="text-sm sm:text-base">No email lists created yet.</p>
+                <p className="text-xs sm:text-sm">Create your first list to start organizing contacts.</p>
               </div>
             ) : (
-              <div className="space-y-2 max-h-[400px] overflow-y-auto">
+              <div className="space-y-2 max-h-[350px] sm:max-h-[400px] overflow-y-auto">
                 {emailLists.map(list => (
                   <div 
                     key={list.id} 
                     className={cn(
-                      "flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 border rounded-md hover:bg-muted/30 gap-2 cursor-pointer transition-colors",
+                      "flex flex-col p-2.5 sm:p-3 border rounded-md hover:bg-muted/30 gap-2 cursor-pointer transition-colors",
                       selectedList?.id === list.id && "bg-muted/50 border-primary"
                     )}
                     onClick={() => handleViewContacts(list)}
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-medium">{list.name}</p>
-                        <Badge className={cn("text-xs", getListTypeColor(list.type))}>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                        <p className="font-medium text-sm sm:text-base truncate">{list.name}</p>
+                        <Badge className={cn("text-[10px] sm:text-xs", getListTypeColor(list.type))}>
                           {getListTypeLabel(list.type)}
                         </Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {list.contactCount || 0} contacts | Created: {getValidDate(list.createdAt) ? format(getValidDate(list.createdAt)!, 'PP') : 'N/A'}
+                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+                        {list.contactCount || 0} contacts | {getValidDate(list.createdAt) ? format(getValidDate(list.createdAt)!, 'PP') : 'N/A'}
                       </p>
                       {list.description && (
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{list.description}</p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 line-clamp-1">{list.description}</p>
                       )}
                     </div>
-                    <div className="flex gap-2 flex-shrink-0 self-end sm:self-center">
-                      <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleViewContacts(list); }}>
-                        <Eye className="mr-1 h-4 w-4" />Contacts
+                    <div className="flex gap-1.5 sm:gap-2 flex-wrap">
+                      <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleViewContacts(list); }} className="text-xs h-7 sm:h-8 px-2 sm:px-3">
+                        <Eye className="mr-1 h-3 w-3 sm:h-4 sm:w-4" /><span className="hidden xs:inline">Contacts</span><span className="xs:hidden">View</span>
                       </Button>
-                      <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); openSyncDialog(list); }} disabled={(list.contactCount || 0) === 0}>
-                        <CloudUpload className="mr-1 h-4 w-4" />Sync
+                      <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); openSyncDialog(list); }} disabled={(list.contactCount || 0) === 0} className="text-xs h-7 sm:h-8 px-2 sm:px-3">
+                        <CloudUpload className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />Sync
                       </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
@@ -507,13 +507,13 @@ export default function EmailListsPage() {
         </Card>
 
         <Card>
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <CardHeader className="p-3 sm:p-6">
+            <div className="flex flex-col gap-2">
               <div>
-                <CardTitle>
+                <CardTitle className="text-base sm:text-lg">
                   {selectedList ? `Contacts in "${selectedList.name}"` : 'Select a List'}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   {selectedList 
                     ? `${contactsInSelectedList.length} contacts in this list`
                     : 'Click on a list to view and manage its contacts'
@@ -521,17 +521,18 @@ export default function EmailListsPage() {
                 </CardDescription>
               </div>
               {selectedList && (
-                <div className="flex gap-2 flex-wrap">
-                  <Button size="sm" variant="outline" onClick={handleDownloadTemplate}>
-                    <FileDown className="mr-2 h-4 w-4" />Template
+                <div className="flex gap-1.5 sm:gap-2 flex-wrap">
+                  <Button size="sm" variant="outline" onClick={handleDownloadTemplate} className="text-xs h-7 sm:h-8 px-2 sm:px-3">
+                    <FileDown className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /><span className="hidden xs:inline">Template</span><span className="xs:hidden">DL</span>
                   </Button>
                   <Button 
                     size="sm" 
                     variant="outline" 
                     onClick={() => document.getElementById('email-contact-upload-input')?.click()} 
                     disabled={isUploadingContacts}
+                    className="text-xs h-7 sm:h-8 px-2 sm:px-3"
                   >
-                    {isUploadingContacts ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                    {isUploadingContacts ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Upload className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />}
                     Upload
                   </Button>
                   <input 
@@ -543,7 +544,7 @@ export default function EmailListsPage() {
                   />
                   <Dialog open={isAddContactDialogOpen} onOpenChange={setIsAddContactDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button size="sm"><PlusCircle className="mr-2 h-4 w-4" />Add</Button>
+                      <Button size="sm" className="text-xs h-7 sm:h-8 px-2 sm:px-3"><PlusCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />Add</Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
@@ -602,25 +603,25 @@ export default function EmailListsPage() {
               )}
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
             {!selectedList ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>Select a list from the left to view contacts</p>
+              <div className="text-center py-8 sm:py-12 text-muted-foreground">
+                <Users className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-2 opacity-50" />
+                <p className="text-sm sm:text-base">Select a list from above to view contacts</p>
               </div>
             ) : isLoadingContacts ? (
               <div className="flex justify-center items-center h-32">
-                <Loader2 className="animate-spin h-6 w-6 text-primary" />
+                <Loader2 className="animate-spin h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
             ) : (
               <>
                 {contactsInSelectedList.length > 0 && (
-                  <div className="relative mb-4">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <div className="relative mb-3 sm:mb-4">
+                    <Search className="absolute left-2.5 top-2.5 h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                     <Input
                       type="search"
                       placeholder="Search contacts..."
-                      className="pl-8"
+                      className="pl-7 sm:pl-8 text-sm h-8 sm:h-9"
                       value={searchTerm}
                       onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                     />
@@ -628,13 +629,73 @@ export default function EmailListsPage() {
                 )}
                 
                 {filteredContacts.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <p>{searchTerm ? 'No contacts match your search.' : 'No contacts in this list yet.'}</p>
-                    <p className="text-sm mt-1">Add contacts manually or upload an Excel/CSV file.</p>
+                  <div className="text-center py-6 sm:py-8 text-muted-foreground">
+                    <p className="text-sm sm:text-base">{searchTerm ? 'No contacts match your search.' : 'No contacts in this list yet.'}</p>
+                    <p className="text-xs sm:text-sm mt-1">Add contacts manually or upload an Excel/CSV file.</p>
                   </div>
                 ) : (
                   <>
-                    <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
+                    {/* Mobile Card View */}
+                    <div className="sm:hidden space-y-2 max-h-[300px] overflow-y-auto">
+                      {currentContacts.map(contact => (
+                        <div key={contact.id} className="p-2.5 border rounded-md">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                              <UserCircle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                              <div className="min-w-0">
+                                <p className="font-medium text-sm truncate">{contact.name}</p>
+                                <p className="text-xs text-muted-foreground truncate">{contact.email}</p>
+                                {contact.company && (
+                                  <p className="text-[10px] text-muted-foreground truncate">{contact.company}</p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              {contact.status === 'active' ? (
+                                <Badge variant="secondary" className="text-[10px] bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 px-1.5">
+                                  Active
+                                </Badge>
+                              ) : contact.status === 'unsubscribed' ? (
+                                <Badge variant="secondary" className="text-[10px] bg-yellow-100 text-yellow-800 px-1.5">
+                                  Unsub
+                                </Badge>
+                              ) : (
+                                <Badge variant="destructive" className="text-[10px] px-1.5">
+                                  Bounced
+                                </Badge>
+                              )}
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive hover:text-destructive">
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Delete Contact?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Remove {contact.name} from this list? This cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction 
+                                      onClick={() => handleDeleteContact(contact.id)}
+                                      className={buttonVariants({ variant: "destructive" })}
+                                    >
+                                      Delete
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Desktop Table View */}
+                    <div className="hidden sm:block overflow-x-auto max-h-[300px] overflow-y-auto">
                       <Table>
                         <TableHeader>
                           <TableRow>
@@ -707,26 +768,28 @@ export default function EmailListsPage() {
                     </div>
                     
                     {totalPages > 1 && (
-                      <div className="flex items-center justify-between pt-4 border-t mt-4">
-                        <p className="text-sm text-muted-foreground">
-                          Page {currentPage} of {totalPages}
+                      <div className="flex items-center justify-between pt-3 sm:pt-4 border-t mt-3 sm:mt-4">
+                        <p className="text-xs sm:text-sm text-muted-foreground">
+                          {currentPage}/{totalPages}
                         </p>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                             disabled={currentPage === 1}
+                            className="h-7 w-7 sm:h-8 sm:w-8 p-0"
                           >
-                            <ChevronLeft className="h-4 w-4" />
+                            <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                             disabled={currentPage === totalPages}
+                            className="h-7 w-7 sm:h-8 sm:w-8 p-0"
                           >
-                            <ChevronRight className="h-4 w-4" />
+                            <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
                           </Button>
                         </div>
                       </div>

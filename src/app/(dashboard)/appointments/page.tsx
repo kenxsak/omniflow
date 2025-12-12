@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -20,7 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Calendar, Plus, Settings, RefreshCw, CalendarCheck, CalendarClock, CalendarX, Users } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
@@ -37,10 +38,13 @@ import {
   syncCalComBookingsAction,
 } from '@/app/actions/appointment-actions';
 import type { Appointment, AppointmentFilter, AppointmentStats, CreateAppointmentInput, UpdateAppointmentInput } from '@/types/appointments';
+import { Animated, AnimatedCounter } from '@/components/ui/animated';
+import gsap from 'gsap';
 
 export default function AppointmentsPage() {
   const { appUser } = useAuth();
   const { toast } = useToast();
+  const statsRef = useRef<HTMLDivElement>(null);
   
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [stats, setStats] = useState<AppointmentStats | null>(null);
@@ -56,6 +60,18 @@ export default function AppointmentsPage() {
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
   
   const [filters, setFilters] = useState<AppointmentFilter>({});
+
+  // GSAP animation for stats cards - instant
+  useEffect(() => {
+    if (statsRef.current && stats) {
+      const cards = statsRef.current.querySelectorAll('.stat-card');
+      gsap.fromTo(
+        cards,
+        { opacity: 0, y: 10, scale: 0.98 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.25, stagger: 0, ease: 'power2.out' }
+      );
+    }
+  }, [stats]);
 
   const fetchAppointments = useCallback(async () => {
     if (!appUser?.idToken) return;
@@ -319,109 +335,188 @@ export default function AppointmentsPage() {
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Appointments</h1>
-          <p className="text-muted-foreground">
-            Manage your bookings and schedule
-          </p>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <Button
-            variant="outline"
-            onClick={handleSyncCalCom}
-            disabled={isSyncing}
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
-            {isSyncing ? 'Syncing...' : 'Sync Cal.com'}
-          </Button>
-          <Link href="/settings?tab=integrations">
-            <Button variant="outline">
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
-            </Button>
-          </Link>
-          <Button onClick={() => setShowCreateDialog(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Appointment
-          </Button>
-        </div>
-      </div>
-
-      {stats && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Appointments</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
-              <p className="text-xs text-muted-foreground">All time bookings</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Scheduled</CardTitle>
-              <CalendarClock className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.scheduled}</div>
-              <p className="text-xs text-muted-foreground">Upcoming appointments</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed</CardTitle>
-              <CalendarCheck className="h-4 w-4 text-blue-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.completed}</div>
-              <p className="text-xs text-muted-foreground">Finished appointments</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">This Week</CardTitle>
-              <Users className="h-4 w-4 text-purple-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-purple-600">{stats.upcomingThisWeek}</div>
-              <p className="text-xs text-muted-foreground">
-                {stats.upcomingToday} today
+    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
+      {/* Header Section */}
+      <Animated animation="fadeUp">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  Appointments
+                </h1>
+                <Badge variant="secondary" className="text-xs">
+                  <Icon icon="solar:clock-circle-linear" className="w-3 h-3 mr-1" />
+                  Live
+                </Badge>
+              </div>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Manage your bookings and schedule
               </p>
+            </div>
+            
+            {/* Desktop Actions */}
+            <div className="hidden sm:flex gap-2 flex-wrap">
+              <Button
+                variant="outline"
+                onClick={handleSyncCalCom}
+                disabled={isSyncing}
+                className="transition-all duration-300 hover:shadow-md"
+              >
+                <Icon icon="solar:refresh-linear" className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+                {isSyncing ? 'Syncing...' : 'Sync Cal.com'}
+              </Button>
+              <Link href="/settings?tab=integrations">
+                <Button variant="outline" className="transition-all duration-300 hover:shadow-md">
+                  <Icon icon="solar:settings-linear" className="h-4 w-4 mr-2" />
+                  Settings
+                </Button>
+              </Link>
+              <Button 
+                onClick={() => setShowCreateDialog(true)}
+                className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 hover:shadow-lg"
+              >
+                <Icon icon="solar:add-circle-linear" className="h-4 w-4 mr-2" />
+                New Appointment
+              </Button>
+            </div>
+          </div>
+          
+          {/* Mobile Actions */}
+          <div className="flex sm:hidden gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSyncCalCom}
+              disabled={isSyncing}
+              className="flex-shrink-0 touch-target"
+            >
+              <Icon icon="solar:refresh-linear" className={`h-4 w-4 mr-1.5 ${isSyncing ? 'animate-spin' : ''}`} />
+              {isSyncing ? 'Syncing' : 'Sync'}
+            </Button>
+            <Link href="/settings?tab=integrations">
+              <Button variant="outline" size="sm" className="flex-shrink-0 touch-target">
+                <Icon icon="solar:settings-linear" className="h-4 w-4 mr-1.5" />
+                Settings
+              </Button>
+            </Link>
+            <Button 
+              size="sm"
+              onClick={() => setShowCreateDialog(true)}
+              className="flex-shrink-0 touch-target bg-gradient-to-r from-primary to-accent"
+            >
+              <Icon icon="solar:add-circle-linear" className="h-4 w-4 mr-1.5" />
+              New
+            </Button>
+          </div>
+        </div>
+      </Animated>
+
+      {/* Stats Cards */}
+      {stats && (
+        <div ref={statsRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-primary/50 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Total</CardTitle>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Icon icon="solar:calendar-linear" className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold">
+                <AnimatedCounter value={stats.total} />
+              </div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">All time bookings</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-green-500/50 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Scheduled</CardTitle>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                <Icon icon="solar:calendar-mark-linear" className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-600">
+                <AnimatedCounter value={stats.scheduled} />
+              </div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Upcoming</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-violet-500/50 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Completed</CardTitle>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                <Icon icon="solar:calendar-check-linear" className="h-4 w-4 sm:h-5 sm:w-5 text-violet-500" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-violet-600">
+                <AnimatedCounter value={stats.completed} />
+              </div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Finished</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-purple-500/50 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">This Week</CardTitle>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-600">
+                <AnimatedCounter value={stats.upcomingThisWeek} />
+              </div>
+              <div className="flex items-center gap-1 mt-1">
+                <Icon icon="solar:graph-up-linear" className="w-3 h-3 text-green-500" />
+                <p className="text-[10px] sm:text-xs text-muted-foreground">{stats.upcomingToday} today</p>
+              </div>
             </CardContent>
           </Card>
         </div>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            All Appointments
-          </CardTitle>
-          <CardDescription>
-            View, manage, and schedule appointments with your clients
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <AppointmentList
-            appointments={appointments}
-            isLoading={isLoading}
-            onView={handleView}
-            onEdit={handleEdit}
-            onCancel={handleCancelClick}
-            onComplete={handleCompleteAppointment}
-            onDelete={handleDeleteClick}
-            onFilterChange={handleFilterChange}
-          />
-        </CardContent>
-      </Card>
+      <Animated animation="fadeUp">
+        <Card className="overflow-hidden border-0 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Icon icon="solar:calendar-linear" className="h-4 w-4 text-primary" />
+                  </div>
+                  All Appointments
+                </CardTitle>
+                <CardDescription className="mt-1 text-xs sm:text-sm">
+                  View, manage, and schedule appointments with your clients
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0 sm:p-6">
+            <div className="overflow-x-auto">
+              <AppointmentList
+                appointments={appointments}
+                isLoading={isLoading}
+                onView={handleView}
+                onEdit={handleEdit}
+                onCancel={handleCancelClick}
+                onComplete={handleCompleteAppointment}
+                onDelete={handleDeleteClick}
+                onFilterChange={handleFilterChange}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </Animated>
 
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">

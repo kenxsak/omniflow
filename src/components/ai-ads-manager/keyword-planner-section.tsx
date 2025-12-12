@@ -133,10 +133,10 @@ const KeywordPlannerSectionComponent: React.FC<KeywordPlannerSectionProps> = ({
               );
             })}
           </Accordion>
-          <Alert variant="default" className="mt-4 text-xs border-blue-300 bg-blue-50 dark:bg-blue-900/30">
-            <Info className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400"/>
-            <AlertTitleComponent className="text-blue-700 dark:text-blue-300">Keyword Research Tip</AlertTitleComponent>
-            <AlertDescription className="text-blue-600 dark:text-blue-400">
+          <Alert variant="default" className="mt-4 text-xs border-violet-300 bg-violet-50 dark:bg-violet-900/30">
+            <Info className="mr-2 h-4 w-4 text-violet-600 dark:text-violet-400"/>
+            <AlertTitleComponent className="text-violet-700 dark:text-violet-300">Keyword Research Tip</AlertTitleComponent>
+            <AlertDescription className="text-violet-600 dark:text-violet-400">
               These AI-generated keywords and their estimated metrics are a starting point. For best results, use Google Keyword Planner or other SEO tools to check actual search volumes, competition, and refine your list before launching campaigns.
             </AlertDescription>
           </Alert>

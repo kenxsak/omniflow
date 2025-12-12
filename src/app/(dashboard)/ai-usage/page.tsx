@@ -112,13 +112,13 @@ export default function AIUsagePage() {
     : 0;
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <PageTitle title="AI Usage Analytics" />
-          <p className="text-muted-foreground">Monitor your AI usage, costs, and credits</p>
+          <p className="text-sm sm:text-base text-muted-foreground">Monitor your AI usage, costs, and credits</p>
         </div>
-        <Button onClick={loadData} disabled={isLoading} variant="outline">
+        <Button onClick={loadData} disabled={isLoading} variant="outline" size="sm" className="w-full sm:w-auto">
           <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
@@ -164,63 +164,71 @@ export default function AIUsagePage() {
           )}
 
           {/* Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">AI Credits</CardTitle>
-                <Zap className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+                <CardTitle className="text-xs sm:text-sm font-medium">AI Credits</CardTitle>
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-lg sm:text-2xl font-bold">
                   {formatNumber(analytics?.currentMonth.creditsRemaining || 0)}
                 </div>
-                <p className="text-xs text-muted-foreground mb-2">
+                <p className="text-[10px] sm:text-xs text-muted-foreground mb-2">
                   of {formatNumber(analytics?.currentMonth.creditsLimit || 0)} remaining
                 </p>
-                <Progress value={creditsUsagePercent} className="h-2" />
-                <p className="text-xs text-muted-foreground mt-1">
+                <Progress value={creditsUsagePercent} className="h-1.5 sm:h-2" />
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                   {creditsUsagePercent.toFixed(1)}% used
                 </p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Operations</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+                <CardTitle className="text-xs sm:text-sm font-medium">Operations</CardTitle>
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
+                  <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500" />
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-lg sm:text-2xl font-bold">
                   {formatNumber(analytics?.currentMonth.operations || 0)}
                 </div>
-                <p className="text-xs text-muted-foreground">This month</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">This month</p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Estimated Cost</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+                <CardTitle className="text-xs sm:text-sm font-medium">Est. Cost</CardTitle>
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                  <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-500" />
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-lg sm:text-2xl font-bold truncate">
                   {formatCurrency(analytics?.currentMonth.estimatedCost || 0)}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {analytics?.apiKeyInfo.usingOwnKey ? 'Using own API key' : 'Using platform API'}
+                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                  {analytics?.apiKeyInfo.usingOwnKey ? 'Own API key' : 'Platform API'}
                 </p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Plan</CardTitle>
-                <Key className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
+                <CardTitle className="text-xs sm:text-sm font-medium">Plan</CardTitle>
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                  <Key className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-500" />
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{analytics?.plan.name}</div>
-                <p className="text-xs text-muted-foreground">
-                  {formatNumber(analytics?.plan.monthlyCreditsLimit || 0)} credits/month
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-lg sm:text-2xl font-bold truncate">{analytics?.plan.name}</div>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
+                  {formatNumber(analytics?.plan.monthlyCreditsLimit || 0)} credits/mo
                 </p>
               </CardContent>
             </Card>
@@ -240,46 +248,46 @@ export default function AIUsagePage() {
 
           {/* Usage Breakdown */}
           <Card>
-            <CardHeader>
-              <CardTitle>Usage Breakdown</CardTitle>
-              <CardDescription>AI operations by type this month</CardDescription>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-base sm:text-lg">Usage Breakdown</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">AI operations by type this month</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b">
-                <div>
-                  <p className="font-medium">Text Generation</p>
-                  <p className="text-sm text-muted-foreground">
+            <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6 pt-0">
+              <div className="flex items-center justify-between pb-2 sm:pb-3 border-b gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm sm:text-base">Text Generation</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">
                     {formatNumber(analytics?.breakdown.textGeneration?.calls || 0)} calls •{' '}
                     {formatNumber(analytics?.breakdown.textGeneration?.tokens || 0)} tokens
                   </p>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold">{formatCurrency(analytics?.breakdown.textGeneration?.cost || 0)}</p>
+                <div className="text-right shrink-0">
+                  <p className="font-semibold text-sm sm:text-base">{formatCurrency(analytics?.breakdown.textGeneration?.cost || 0)}</p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pb-2 border-b">
-                <div>
-                  <p className="font-medium">Image Generation</p>
-                  <p className="text-sm text-muted-foreground">
+              <div className="flex items-center justify-between pb-2 sm:pb-3 border-b gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm sm:text-base">Image Generation</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     {formatNumber(analytics?.breakdown.imageGeneration?.images || 0)} images
                   </p>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold">{formatCurrency(analytics?.breakdown.imageGeneration?.cost || 0)}</p>
+                <div className="text-right shrink-0">
+                  <p className="font-semibold text-sm sm:text-base">{formatCurrency(analytics?.breakdown.imageGeneration?.cost || 0)}</p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pb-2">
-                <div>
-                  <p className="font-medium">Text-to-Speech</p>
-                  <p className="text-sm text-muted-foreground">
+              <div className="flex items-center justify-between pb-2 gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm sm:text-base">Text-to-Speech</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">
                     {formatNumber(analytics?.breakdown.textToSpeech?.calls || 0)} calls •{' '}
-                    {formatNumber(analytics?.breakdown.textToSpeech?.characters || 0)} characters
+                    {formatNumber(analytics?.breakdown.textToSpeech?.characters || 0)} chars
                   </p>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold">{formatCurrency(analytics?.breakdown.textToSpeech?.cost || 0)}</p>
+                <div className="text-right shrink-0">
+                  <p className="font-semibold text-sm sm:text-base">{formatCurrency(analytics?.breakdown.textToSpeech?.cost || 0)}</p>
                 </div>
               </div>
             </CardContent>
@@ -311,32 +319,34 @@ export default function AIUsagePage() {
 
           {/* Historical Usage */}
           <Card>
-            <CardHeader>
-              <CardTitle>Historical Usage (Last 6 Months)</CardTitle>
-              <CardDescription>Monthly AI operations and costs</CardDescription>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-base sm:text-lg">Historical Usage</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">Monthly AI operations and costs (last 6 months)</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0 sm:p-6 sm:pt-0">
               <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Month</TableHead>
-                      <TableHead className="text-right">Operations</TableHead>
-                      <TableHead className="text-right">Credits Used</TableHead>
-                      <TableHead className="text-right">Cost</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {historicalData.map((month) => (
-                      <TableRow key={month.month}>
-                        <TableCell className="font-medium">{month.month}</TableCell>
-                        <TableCell className="text-right">{formatNumber(month.operations)}</TableCell>
-                        <TableCell className="text-right">{formatNumber(month.creditsUsed)}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(month.cost)}</TableCell>
+                <div className="min-w-[400px] sm:min-w-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs sm:text-sm">Month</TableHead>
+                        <TableHead className="text-right text-xs sm:text-sm">Ops</TableHead>
+                        <TableHead className="text-right text-xs sm:text-sm">Credits</TableHead>
+                        <TableHead className="text-right text-xs sm:text-sm">Cost</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {historicalData.map((month) => (
+                        <TableRow key={month.month}>
+                          <TableCell className="font-medium text-xs sm:text-sm">{month.month}</TableCell>
+                          <TableCell className="text-right text-xs sm:text-sm">{formatNumber(month.operations)}</TableCell>
+                          <TableCell className="text-right text-xs sm:text-sm">{formatNumber(month.creditsUsed)}</TableCell>
+                          <TableCell className="text-right text-xs sm:text-sm">{formatCurrency(month.cost)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
             </CardContent>
           </Card>

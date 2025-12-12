@@ -209,7 +209,10 @@ export async function getUserFromServerSession(): Promise<{
       },
     };
   } catch (error: any) {
-    console.error('Error getting user from server session:', error);
+    // Don't log during build-time static analysis (DYNAMIC_SERVER_USAGE is expected)
+    if (!error?.digest?.includes('DYNAMIC_SERVER_USAGE')) {
+      console.error('Error getting user from server session:', error);
+    }
     return { success: false, error: error.message || 'Authentication failed' };
   }
 }

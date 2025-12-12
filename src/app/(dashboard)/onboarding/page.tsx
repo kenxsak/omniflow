@@ -184,53 +184,61 @@ export default function OnboardingPage() {
 
   if (!appUser || !company) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">{getFriendlyLoading('data/loading')}</p>
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+          <p className="text-sm sm:text-base text-muted-foreground">{getFriendlyLoading('data/loading')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-background via-primary/5 to-muted/20 py-6 sm:py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2">
+        {/* Header */}
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl xs:text-3xl sm:text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
             Welcome to OmniFlow! 👋
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">
             Let&apos;s get you set up in 5 minutes
           </p>
         </div>
 
-        <div className="mb-8">
+        {/* Progress */}
+        <div className="mb-6 sm:mb-8">
           <ProgressIndicator currentStep={currentStep} />
         </div>
 
-        <div className="mb-6">{renderStep()}</div>
+        {/* Step Content */}
+        <div className="mb-4 sm:mb-6">{renderStep()}</div>
 
+        {/* Navigation */}
         {currentStep > 1 && currentStep < 4 && (
           <div className="max-w-2xl mx-auto">
-            <div className="flex justify-between items-center pt-4">
+            <div className="flex justify-between items-center pt-4 gap-4">
               <Button
                 variant="outline"
-                size="lg"
+                size="default"
                 onClick={handleBack}
                 disabled={isLoading}
+                className="text-sm sm:text-base"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
               </Button>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-xs sm:text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
                 Step {currentStep} of 4
               </div>
             </div>
           </div>
         )}
 
-        <div className="text-center mt-8 text-sm text-muted-foreground">
+        {/* Help Text */}
+        <div className="text-center mt-6 sm:mt-8 text-xs sm:text-sm text-muted-foreground">
           <p>Need help? Contact our support team anytime</p>
         </div>
       </div>

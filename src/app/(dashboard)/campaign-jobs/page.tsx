@@ -142,49 +142,38 @@ export default function CampaignJobsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="space-y-4 sm:space-y-6 px-4 sm:px-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <PageTitle 
           title="Campaign Jobs" 
           description="Track delivery status of Email, SMS, and WhatsApp campaigns"
         />
-        <Button onClick={loadCampaignJobs} variant="outline">
+        <Button onClick={loadCampaignJobs} variant="outline" size="sm" className="w-full sm:w-auto">
           <RefreshCw className="mr-2 h-4 w-4" />
           Refresh
         </Button>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Active Campaign Jobs</CardTitle>
-          <CardDescription>
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-base sm:text-lg">Active Campaign Jobs</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Monitor the progress of your campaign delivery in real-time
           </CardDescription>
         </CardHeader>
         <CardContent>
           {jobs.length === 0 ? (
-            <div className="text-center py-12">
-              <AlertTriangle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No campaign jobs found</p>
-              <p className="text-sm text-muted-foreground mt-2">
+            <div className="text-center py-8 sm:py-12">
+              <AlertTriangle className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-sm sm:text-base text-muted-foreground">No campaign jobs found</p>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-2">
                 Campaign jobs will appear here after you publish campaigns from the AI Campaign Studio
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Channel</TableHead>
-                  <TableHead>Provider/Tool</TableHead>
-                  <TableHead>Campaign Name</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Progress</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead className="text-right">Details</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Mobile Card View */}
+              <div className="block lg:hidden space-y-3">
                 {jobs.map((job) => {
                   const createdDate = job.createdAt?.toDate 
                     ? job.createdAt.toDate() 
@@ -193,51 +182,122 @@ export default function CampaignJobsPage() {
                   const provider = getProviderLabel(job);
                   
                   return (
-                    <TableRow key={job.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {getChannelIcon(job.jobType)}
-                          <span className="capitalize">{job.jobType}</span>
+                    <Card key={job.id} className="p-4">
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                              {getChannelIcon(job.jobType)}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-medium text-sm truncate">{job.campaignName}</p>
+                              <p className="text-xs text-muted-foreground capitalize">{job.jobType}</p>
+                            </div>
+                          </div>
+                          {getStatusBadge(job.status)}
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        {provider ? (
-                          <Badge variant="outline" className="font-mono text-xs">
+                        
+                        <div className="space-y-1">
+                          <Progress value={progressPercent} className="h-2" />
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>
+                              {job.progress?.sent || 0}/{job.progress?.total || 0} sent
+                              {job.progress && job.progress.failed > 0 && (
+                                <span className="text-destructive ml-1">
+                                  ({job.progress.failed} failed)
+                                </span>
+                              )}
+                            </span>
+                            <span>{format(createdDate, 'MMM dd, HH:mm')}</span>
+                          </div>
+                        </div>
+                        
+                        {provider && (
+                          <Badge variant="outline" className="font-mono text-[10px]">
                             {provider}
                           </Badge>
-                        ) : (
-                          <span className="text-muted-foreground text-xs">-</span>
                         )}
-                      </TableCell>
-                      <TableCell className="font-medium">{job.campaignName}</TableCell>
-                      <TableCell>{getStatusBadge(job.status)}</TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <Progress value={progressPercent} className="h-2 w-32" />
-                          <p className="text-xs text-muted-foreground">
-                            {job.progress?.sent || 0}/{job.progress?.total || 0} sent
-                            {job.progress && job.progress.failed > 0 && (
-                              <span className="text-destructive ml-2">
-                                ({job.progress.failed} failed)
-                              </span>
-                            )}
-                          </p>
-                        </div>
-                      </TableCell>
-                      <TableCell>{format(createdDate, 'MMM dd, HH:mm')}</TableCell>
-                      <TableCell className="text-right">
+                        
                         {job.lastError && (
-                          <p className="text-xs text-destructive truncate max-w-xs">
+                          <p className="text-xs text-destructive line-clamp-2">
                             {job.lastError}
                           </p>
                         )}
-                      </TableCell>
-                    </TableRow>
+                      </div>
+                    </Card>
                   );
                 })}
-              </TableBody>
-            </Table>
-            </div>
+              </div>
+              
+              {/* Desktop Table View */}
+              <div className="hidden lg:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Channel</TableHead>
+                      <TableHead>Provider/Tool</TableHead>
+                      <TableHead>Campaign Name</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Progress</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead className="text-right">Details</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {jobs.map((job) => {
+                      const createdDate = job.createdAt?.toDate 
+                        ? job.createdAt.toDate() 
+                        : new Date(job.createdAt || Date.now());
+                      const progressPercent = getProgressPercentage(job);
+                      const provider = getProviderLabel(job);
+                      
+                      return (
+                        <TableRow key={job.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {getChannelIcon(job.jobType)}
+                              <span className="capitalize">{job.jobType}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {provider ? (
+                              <Badge variant="outline" className="font-mono text-xs">
+                                {provider}
+                              </Badge>
+                            ) : (
+                              <span className="text-muted-foreground text-xs">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="font-medium">{job.campaignName}</TableCell>
+                          <TableCell>{getStatusBadge(job.status)}</TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              <Progress value={progressPercent} className="h-2 w-32" />
+                              <p className="text-xs text-muted-foreground">
+                                {job.progress?.sent || 0}/{job.progress?.total || 0} sent
+                                {job.progress && job.progress.failed > 0 && (
+                                  <span className="text-destructive ml-2">
+                                    ({job.progress.failed} failed)
+                                  </span>
+                                )}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell>{format(createdDate, 'MMM dd, HH:mm')}</TableCell>
+                          <TableCell className="text-right">
+                            {job.lastError && (
+                              <p className="text-xs text-destructive truncate max-w-xs">
+                                {job.lastError}
+                              </p>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

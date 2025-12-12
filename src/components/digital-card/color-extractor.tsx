@@ -50,7 +50,7 @@ export function ColorExtractor({ logoUrl, onColorsExtracted }: ColorExtractorPro
   };
 
   return (
-    <div className="space-y-4 p-4 border rounded-lg bg-gradient-to-r from-blue-50 to-purple-50">
+    <div className="space-y-4 p-4 border rounded-lg bg-gradient-to-r from-violet-50 to-purple-50">
       <div className="flex items-start gap-3">
         <Sparkles className="h-5 w-5 mt-0.5 text-purple-600" />
         <div className="flex-1">

@@ -141,19 +141,19 @@ export default function SubscriptionDetails() {
                 <Bot className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
                 <span className="text-muted-foreground"><strong className="text-foreground">{(currentPlan.aiCreditsPerMonth ?? 0).toLocaleString()}</strong> AI Credits/month</span>
               </div>
-              {currentPlan.maxImagesPerMonth !== undefined && (
+              {currentPlan.maxImagesPerMonth != null && currentPlan.maxImagesPerMonth > 0 && (
                 <div className="flex items-start">
                   <Image className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
                   <span className="text-muted-foreground"><strong className="text-foreground">{currentPlan.maxImagesPerMonth.toLocaleString()}</strong> images/month</span>
                 </div>
               )}
-              {currentPlan.maxTextPerMonth !== undefined && (
+              {currentPlan.maxTextPerMonth != null && currentPlan.maxTextPerMonth > 0 && (
                 <div className="flex items-start">
                   <Type className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
                   <span className="text-muted-foreground"><strong className="text-foreground">{currentPlan.maxTextPerMonth.toLocaleString()}</strong> text ops/month</span>
                 </div>
               )}
-              {currentPlan.maxTTSPerMonth !== undefined && (
+              {currentPlan.maxTTSPerMonth != null && currentPlan.maxTTSPerMonth > 0 && (
                 <div className="flex items-start">
                   <Mic className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
                   <span className="text-muted-foreground"><strong className="text-foreground">{currentPlan.maxTTSPerMonth.toLocaleString()}</strong> voice ops/month</span>

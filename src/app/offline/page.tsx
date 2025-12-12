@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 
 export default function OfflinePage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 p-4">
       <div className="max-w-md w-full bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 text-center text-white">
         <div className="mb-6 flex justify-center">
           <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">

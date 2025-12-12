@@ -179,67 +179,127 @@ export default function AICampaignDraftsPage() {
               </Button>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Campaign Goal</TableHead>
-                  <TableHead>Channels</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>AI Credits</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Mobile Card View */}
+              <div className="block sm:hidden space-y-4">
                 {drafts.map((draft) => {
                   const createdDate = typeof draft.createdAt === 'string'
                     ? new Date(draft.createdAt)
                     : draft.createdAt.toDate();
                   
                   return (
-                    <TableRow key={draft.id}>
-                      <TableCell className="font-medium">
-                        {draft.parsedBrief?.campaignGoal || 'No goal specified'}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          {getChannelIcons(draft.selectedChannels)}
+                    <Card key={draft.id} className="p-4">
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">
+                              {draft.parsedBrief?.campaignGoal || 'No goal specified'}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {format(createdDate, 'MMM dd, HH:mm')}
+                            </p>
+                          </div>
+                          {getStatusBadge(draft.status)}
                         </div>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(draft.status)}</TableCell>
-                      <TableCell>{draft.aiCreditsConsumed || 0}</TableCell>
-                      <TableCell>{format(createdDate, 'MMM dd, HH:mm')}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            asChild
-                          >
-                            <Link href={`/campaigns/ai-email?draft=${draft.id}`}>
-                              <Send className="h-4 w-4 mr-1" />
-                              Use Draft
-                            </Link>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(draft.id)}
-                            disabled={deletingId === draft.id}
-                          >
-                            {deletingId === draft.id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Trash2 className="h-4 w-4" />
-                            )}
-                          </Button>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              {getChannelIcons(draft.selectedChannels)}
+                            </span>
+                            <span>{draft.aiCreditsConsumed || 0} credits</span>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" asChild>
+                              <Link href={`/campaigns/ai-email?draft=${draft.id}`}>
+                                <Send className="h-3 w-3 mr-1" />
+                                Use
+                              </Link>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(draft.id)}
+                              disabled={deletingId === draft.id}
+                            >
+                              {deletingId === draft.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </div>
+                    </Card>
                   );
                 })}
-              </TableBody>
-            </Table>
+              </div>
+              
+              {/* Desktop Table View */}
+              <div className="hidden sm:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Campaign Goal</TableHead>
+                      <TableHead>Channels</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>AI Credits</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {drafts.map((draft) => {
+                      const createdDate = typeof draft.createdAt === 'string'
+                        ? new Date(draft.createdAt)
+                        : draft.createdAt.toDate();
+                      
+                      return (
+                        <TableRow key={draft.id}>
+                          <TableCell className="font-medium">
+                            {draft.parsedBrief?.campaignGoal || 'No goal specified'}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              {getChannelIcons(draft.selectedChannels)}
+                            </div>
+                          </TableCell>
+                          <TableCell>{getStatusBadge(draft.status)}</TableCell>
+                          <TableCell>{draft.aiCreditsConsumed || 0}</TableCell>
+                          <TableCell>{format(createdDate, 'MMM dd, HH:mm')}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                asChild
+                              >
+                                <Link href={`/campaigns/ai-email?draft=${draft.id}`}>
+                                  <Send className="h-4 w-4 mr-1" />
+                                  Use Draft
+                                </Link>
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDelete(draft.id)}
+                                disabled={deletingId === draft.id}
+                              >
+                                {deletingId === draft.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

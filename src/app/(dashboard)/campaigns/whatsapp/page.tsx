@@ -381,26 +381,26 @@ export default function WhatsAppMarketingPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <PageTitle title="WhatsApp Marketing (via wa.me)" description="Manage contact lists and manually initiate messages using wa.me links." />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-1 md:grid-cols-2">
-          <TabsTrigger value="manage-lists"><Users className="mr-2 h-4 w-4" />Manage Lists & Contacts</TabsTrigger>
-          <TabsTrigger value="send-campaign"><Send className="mr-2 h-4 w-4" />Send Campaign via wa.me</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="manage-lists" className="text-xs sm:text-sm px-2 sm:px-3"><Users className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /><span className="hidden xs:inline">Manage </span>Lists</TabsTrigger>
+          <TabsTrigger value="send-campaign" className="text-xs sm:text-sm px-2 sm:px-3"><Send className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /><span className="hidden xs:inline">Send </span>Campaign</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="manage-lists" className="space-y-4 mt-4">
+        <TabsContent value="manage-lists" className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
           <Card>
-            <CardHeader>
+            <CardHeader className="p-3 sm:p-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
-                  <CardTitle>Your WhatsApp Lists</CardTitle>
-                  <CardDescription>Create and manage lists of contacts for your WhatsApp campaigns.</CardDescription>
+                  <CardTitle className="text-base sm:text-lg">Your WhatsApp Lists</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">Create and manage lists of contacts for your WhatsApp campaigns.</CardDescription>
                 </div>
                 <Dialog open={isCreateListDialogOpen} onOpenChange={setIsCreateListDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button size="sm"><PlusCircle className="mr-2 h-4 w-4" />Create New List</Button>
+                    <Button size="sm" className="text-xs sm:text-sm"><PlusCircle className="mr-1.5 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /><span className="hidden xs:inline">Create New </span>List</Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader><DialogTitle>Create New WhatsApp List</DialogTitle></DialogHeader>
@@ -418,20 +418,20 @@ export default function WhatsAppMarketingPage() {
                 </Dialog>
               </div>
             </CardHeader>
-            <CardContent>
-              {isLoadingLists ? <div className="flex justify-center items-center h-20"><Loader2 className="animate-spin h-6 w-6 text-primary" /></div> :
-                whatsAppLists.length === 0 ? <p className="text-muted-foreground text-center py-4">No lists created yet.</p> :
+            <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+              {isLoadingLists ? <div className="flex justify-center items-center h-20"><Loader2 className="animate-spin h-5 w-5 sm:h-6 sm:w-6 text-primary" /></div> :
+                whatsAppLists.length === 0 ? <p className="text-muted-foreground text-center py-4 text-sm">No lists created yet.</p> :
                 <div className="space-y-2">
                   {whatsAppLists.map(list => (
-                    <div key={list.id} className={cn("flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 border rounded-md hover:bg-muted/30 gap-2", selectedList?.id === list.id && "bg-muted/50 border-primary")}>
-                      <div>
-                        <p className="font-medium">{list.name} <span className="text-xs text-muted-foreground">({list.contactCount || 0} contacts)</span></p>
-                        <p className="text-xs text-muted-foreground">Created: {getValidDate(list.createdAt) ? format(getValidDate(list.createdAt)!, 'PP') : 'N/A'}</p>
+                    <div key={list.id} className={cn("flex flex-col p-2.5 sm:p-3 border rounded-md hover:bg-muted/30 gap-2", selectedList?.id === list.id && "bg-muted/50 border-primary")}>
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm sm:text-base truncate">{list.name} <span className="text-[10px] sm:text-xs text-muted-foreground">({list.contactCount || 0})</span></p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">{getValidDate(list.createdAt) ? format(getValidDate(list.createdAt)!, 'PP') : 'N/A'}</p>
                       </div>
-                      <div className="flex gap-2 flex-shrink-0 self-end sm:self-center">
-                        <Button variant="outline" size="sm" onClick={() => handleViewContacts(list)}><Eye className="mr-1 h-4 w-4" />View Contacts</Button>
+                      <div className="flex gap-1.5 sm:gap-2 flex-wrap">
+                        <Button variant="outline" size="sm" onClick={() => handleViewContacts(list)} className="text-xs h-7 sm:h-8 px-2 sm:px-3"><Eye className="mr-1 h-3 w-3 sm:h-4 sm:w-4" /><span className="hidden xs:inline">View </span>Contacts</Button>
                         <AlertDialog>
-                          <AlertDialogTrigger asChild><Button variant="destructive" size="sm" onClick={(e) => e.stopPropagation()}><Trash2 className="mr-1 h-4 w-4" />Delete</Button></AlertDialogTrigger>
+                          <AlertDialogTrigger asChild><Button variant="destructive" size="sm" onClick={(e) => e.stopPropagation()} className="text-xs h-7 sm:h-8 px-2 sm:px-3"><Trash2 className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />Delete</Button></AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader><AlertDialogTitle>Delete List "{list.name}"?</AlertDialogTitle><AlertDialogDescription>This will delete the list and all its contacts. This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
                             <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleDeleteList(list.id, list.name)} className={buttonVariants({variant: "destructive"})}>Delete List</AlertDialogAction></AlertDialogFooter>
@@ -447,18 +447,18 @@ export default function WhatsAppMarketingPage() {
 
           {selectedList && (
             <Card>
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                    <CardTitle>Contacts in "{selectedList.name}"</CardTitle>
-                    <div className="flex gap-2 flex-wrap">
-                        <Button size="sm" variant="outline" onClick={handleDownloadTemplate}><FileDown className="mr-2 h-4 w-4" />Download Template</Button>
-                        <Button size="sm" variant="outline" onClick={() => document.getElementById('contact-upload-input')?.click()} disabled={isUploadingContacts}>
-                            {isUploadingContacts ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                            Upload Contacts (Excel/CSV)
+              <CardHeader className="p-3 sm:p-6">
+                <div className="flex flex-col gap-2">
+                    <CardTitle className="text-base sm:text-lg">Contacts in "{selectedList.name}"</CardTitle>
+                    <div className="flex gap-1.5 sm:gap-2 flex-wrap">
+                        <Button size="sm" variant="outline" onClick={handleDownloadTemplate} className="text-xs h-7 sm:h-8 px-2 sm:px-3"><FileDown className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /><span className="hidden xs:inline">Download </span>Template</Button>
+                        <Button size="sm" variant="outline" onClick={() => document.getElementById('contact-upload-input')?.click()} disabled={isUploadingContacts} className="text-xs h-7 sm:h-8 px-2 sm:px-3">
+                            {isUploadingContacts ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Upload className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />}
+                            Upload
                         </Button>
                         <input type="file" id="contact-upload-input" accept=".csv, .xlsx, .xls" onChange={handleContactFileUpload} style={{ display: 'none' }} />
                         <Dialog open={isAddContactDialogOpen} onOpenChange={setIsAddContactDialogOpen}>
-                        <DialogTrigger asChild><Button size="sm"><PlusCircle className="mr-2 h-4 w-4"/>Add Contact Manually</Button></DialogTrigger>
+                        <DialogTrigger asChild><Button size="sm" className="text-xs h-7 sm:h-8 px-2 sm:px-3"><PlusCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4"/>Add</Button></DialogTrigger>
                         <DialogContent>
                             <DialogHeader><DialogTitle>Add Contact to "{selectedList.name}"</DialogTitle></DialogHeader>
                             <form onSubmit={(e) => { e.preventDefault(); handleAddContactToList(); }}>
@@ -477,10 +477,30 @@ export default function WhatsAppMarketingPage() {
                     </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                {isLoadingLists && contactsInSelectedList.length === 0 ? <div className="flex justify-center items-center h-20"><Loader2 className="animate-spin h-6 w-6 text-primary" /></div> :
-                  contactsInSelectedList.length === 0 ? <p className="text-muted-foreground text-center py-4">No contacts in this list yet. Add contacts manually or upload an Excel/CSV file.</p> :
-                  <div className="overflow-x-auto">
+              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+                {isLoadingLists && contactsInSelectedList.length === 0 ? <div className="flex justify-center items-center h-20"><Loader2 className="animate-spin h-5 w-5 sm:h-6 sm:w-6 text-primary" /></div> :
+                  contactsInSelectedList.length === 0 ? <p className="text-muted-foreground text-center py-4 text-xs sm:text-sm">No contacts in this list yet. Add contacts manually or upload an Excel/CSV file.</p> :
+                  <>
+                    {/* Mobile Card View */}
+                    <div className="sm:hidden space-y-2 max-h-[300px] overflow-y-auto">
+                      {contactsInSelectedList.map(contact => (
+                        <div key={contact.id} className="flex items-center justify-between p-2.5 border rounded-md">
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-sm truncate">{contact.name}</p>
+                            <p className="text-xs text-muted-foreground">{contact.phoneNumber}</p>
+                          </div>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild><Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Trash2 className="h-3 w-3 text-destructive"/></Button></AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader><AlertDialogTitle>Delete contact "{contact.name}"?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
+                              <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleDeleteContact(contact.id)} className={buttonVariants({variant: "destructive"})}>Delete</AlertDialogAction></AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Desktop Table View */}
+                    <div className="hidden sm:block overflow-x-auto">
                     <Table>
                         <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Phone Number</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
                         <TableBody>
@@ -501,17 +521,18 @@ export default function WhatsAppMarketingPage() {
                         ))}
                         </TableBody>
                     </Table>
-                  </div>
+                    </div>
+                  </>
                 }
               </CardContent>
             </Card>
           )}
         </TabsContent>
 
-        <TabsContent value="send-campaign" className="space-y-4 mt-4">
+        <TabsContent value="send-campaign" className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
           <Card>
-            <CardHeader><CardTitle>1. Select WhatsApp List for Campaign</CardTitle></CardHeader>
-            <CardContent>
+            <CardHeader className="p-3 sm:p-6"><CardTitle className="text-base sm:text-lg">1. Select WhatsApp List for Campaign</CardTitle></CardHeader>
+            <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
               <Select value={selectedListIdForCampaign} onValueChange={async (value) => {
                 if (!appUser?.companyId) return;
                 setSelectedListIdForCampaign(value);
@@ -527,20 +548,20 @@ export default function WhatsAppMarketingPage() {
             </CardContent>
           </Card>
 
-          <Alert className="bg-blue-50 border-blue-200">
-            <AlertTitleComponent className="text-blue-900">📋 Choose Message Source</AlertTitleComponent>
-            Use ready-made templates, generate with AI (1 credit per message), or type your own message. Personalization with <code className="font-mono text-sm bg-white p-0.5 rounded">*{CONTACT_NAME_PLACEHOLDER}*</code> supported.
+          <Alert className="bg-blue-50 border-blue-200 py-2 sm:py-3">
+            <AlertTitleComponent className="text-blue-900 text-sm sm:text-base">📋 Choose Message Source</AlertTitleComponent>
+            <p className="text-xs sm:text-sm text-blue-800">Use templates, AI (1 credit), or type your own. Personalize with <code className="font-mono text-[10px] sm:text-sm bg-white p-0.5 rounded">*{CONTACT_NAME_PLACEHOLDER}*</code>.</p>
           </Alert>
           
           <Card>
-            <CardHeader>
-                <CardTitle>2. Draft Your WhatsApp Campaign Message</CardTitle>
+            <CardHeader className="p-3 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">2. Draft Your WhatsApp Campaign Message</CardTitle>
             </CardHeader>
-            <Tabs defaultValue="template-wa" className="w-full">
+            <Tabs defaultValue="template-wa" className="w-full px-3 sm:px-6">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="template-wa">📋 Templates</TabsTrigger>
-                <TabsTrigger value="ai-wa">✨ AI Draft</TabsTrigger>
-                <TabsTrigger value="manual-wa">✍️ Manual</TabsTrigger>
+                <TabsTrigger value="template-wa" className="text-xs sm:text-sm px-1 sm:px-3">📋 <span className="hidden xs:inline">Templates</span><span className="xs:hidden">Tmpl</span></TabsTrigger>
+                <TabsTrigger value="ai-wa" className="text-xs sm:text-sm px-1 sm:px-3">✨ AI</TabsTrigger>
+                <TabsTrigger value="manual-wa" className="text-xs sm:text-sm px-1 sm:px-3">✍️ <span className="hidden xs:inline">Manual</span><span className="xs:hidden">Type</span></TabsTrigger>
               </TabsList>
 
               {/* Templates Tab */}
@@ -605,33 +626,33 @@ export default function WhatsAppMarketingPage() {
 
           {selectedListIdForCampaign && campaignMessage && (
             <Card>
-              <CardHeader>
-                <CardTitle>4. Bulk Send Campaign</CardTitle>
-                <CardDescription>
-                  Select contacts below. Click "Send to Selected" to send text message via wa.me links. Each contact opens one-by-one.
+              <CardHeader className="p-3 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">4. Bulk Send Campaign</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Select contacts below. Click "Send to Selected" to send text message via wa.me links.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-6 pt-0 sm:pt-0">
                 {/* Bulk Action Buttons */}
-                <div className="flex gap-2 p-3 bg-muted rounded-lg">
-                  <Button size="sm" variant="outline" onClick={selectAllContacts} disabled={isBulkSendingActive}>
-                    ✓ Select All
+                <div className="flex flex-wrap gap-2 p-2 sm:p-3 bg-muted rounded-lg">
+                  <Button size="sm" variant="outline" onClick={selectAllContacts} disabled={isBulkSendingActive} className="text-xs h-7 sm:h-8 px-2 sm:px-3">
+                    ✓ All
                   </Button>
-                  <Button size="sm" variant="outline" onClick={deselectAllContacts} disabled={isBulkSendingActive}>
-                    ✗ Deselect All
+                  <Button size="sm" variant="outline" onClick={deselectAllContacts} disabled={isBulkSendingActive} className="text-xs h-7 sm:h-8 px-2 sm:px-3">
+                    ✗ None
                   </Button>
-                  <div className="flex-1" />
-                  <div className="text-sm text-muted-foreground pt-1">
-                    {selectedContactIds.size} selected
+                  <div className="flex-1 min-w-0" />
+                  <div className="text-xs sm:text-sm text-muted-foreground pt-1">
+                    {selectedContactIds.size} sel.
                   </div>
                   <Button 
                     size="sm" 
                     onClick={startBulkSending} 
                     disabled={selectedContactIds.size === 0 || isBulkSendingActive}
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    className="bg-green-600 hover:bg-green-700 text-white text-xs h-7 sm:h-8 px-2 sm:px-3"
                   >
-                    <Send className="mr-2 h-4 w-4" />
-                    Send to Selected ({selectedContactIds.size})
+                    <Send className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                    Send ({selectedContactIds.size})
                   </Button>
                 </div>
 

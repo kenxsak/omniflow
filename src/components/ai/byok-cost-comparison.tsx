@@ -199,10 +199,10 @@ export function BYOKCostComparison({
               )}
             </div>
           ) : (
-            <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
-              <div className="text-sm text-blue-900">
+            <div className="rounded-lg bg-violet-50 border border-violet-200 p-4">
+              <div className="text-sm text-violet-900">
                 <strong>Current plan works great for your usage</strong>
-                <div className="mt-1 text-blue-700">
+                <div className="mt-1 text-violet-700">
                   You're using {usagePercent.toFixed(1)}% of your included credits. BYOK becomes beneficial when you consistently use 80%+ of your credits.
                 </div>
               </div>

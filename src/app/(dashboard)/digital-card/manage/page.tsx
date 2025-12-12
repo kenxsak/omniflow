@@ -208,15 +208,15 @@ export default function ManageDigitalCardsPage() {
   const limitDescription = plan && userCount > 0 ? getDigitalCardLimitDescription(plan, userCount) : '';
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
-      <div className="flex justify-between items-center mb-6">
+    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-6xl">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Digital Cards</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold">Digital Cards</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
             Manage your digital business cards
           </p>
         </div>
-        <Button onClick={() => router.push('/digital-card/create')}>
+        <Button onClick={() => router.push('/digital-card/create')} className="w-full sm:w-auto">
           <Plus className="h-4 w-4 mr-2" />
           Create New Card
         </Button>
@@ -225,16 +225,16 @@ export default function ManageDigitalCardsPage() {
       {/* Card Limit Indicator */}
       {plan && userCount > 0 && (
         <Card className="mb-6 border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="h-5 w-5 text-blue-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                     Digital Card Usage
                   </h3>
                 </div>
-                <p className="text-sm text-gray-600 mb-3">
+                <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   {limitDescription}
                 </p>
                 
@@ -242,7 +242,7 @@ export default function ManageDigitalCardsPage() {
                 <div className="mb-2">
                   <Progress 
                     value={usagePercentage} 
-                    className={`h-3 ${
+                    className={`h-2 sm:h-3 ${
                       limitStatus === 'limit_reached' 
                         ? 'bg-red-100' 
                         : limitStatus === 'warning' 
@@ -252,7 +252,7 @@ export default function ManageDigitalCardsPage() {
                   />
                 </div>
                 
-                <div className="flex items-center justify-between text-xs text-gray-500">
+                <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-1 text-[10px] sm:text-xs text-gray-500">
                   <span>
                     <span className={`font-semibold ${
                       limitStatus === 'limit_reached' ? 'text-red-600' :
@@ -262,7 +262,7 @@ export default function ManageDigitalCardsPage() {
                       {currentCards} of {maxCards}
                     </span> cards used
                     {plan.digitalCardsPerUser && plan.digitalCardsPerUser > 0 && (
-                      <span className="ml-2 text-muted-foreground">
+                      <span className="hidden sm:inline ml-2 text-muted-foreground">
                         • {userCount} team {userCount === 1 ? 'member' : 'members'} × {plan.digitalCardsPerUser} {plan.digitalCardsPerUser === 1 ? 'card' : 'cards'} each
                       </span>
                     )}
@@ -281,7 +281,7 @@ export default function ManageDigitalCardsPage() {
                 <Button 
                   variant="default" 
                   size="sm"
-                  className="ml-4"
+                  className="w-full sm:w-auto"
                   onClick={() => router.push('/settings/subscription')}
                 >
                   <ArrowUpCircle className="w-4 h-4 mr-2" />
@@ -292,8 +292,8 @@ export default function ManageDigitalCardsPage() {
             
             {/* Pro tip when approaching limit */}
             {plan.id !== 'plan_enterprise' && limitStatus !== 'ok' && (
-              <div className="mt-4 p-3 bg-white rounded-md border border-blue-200">
-                <p className="text-sm text-gray-700">
+              <div className="mt-4 p-2 sm:p-3 bg-white rounded-md border border-blue-200">
+                <p className="text-xs sm:text-sm text-gray-700">
                   💡 <strong>Pro tip:</strong>{' '}
                   {plan.id === 'plan_free' && 'Upgrade to Starter to add team members - each gets their own card!'}
                   {plan.id === 'plan_starter' && 'Upgrade to Pro - each team member gets 2 cards instead of 1!'}
@@ -314,11 +314,11 @@ export default function ManageDigitalCardsPage() {
 
       {cards.length === 0 ? (
         <Card>
-          <CardContent className="py-12">
+          <CardContent className="py-8 sm:py-12">
             <div className="text-center space-y-4">
-              <div className="text-6xl mb-4">📇</div>
-              <h3 className="text-xl font-semibold">No digital cards yet</h3>
-              <p className="text-muted-foreground max-w-md mx-auto">
+              <div className="text-5xl sm:text-6xl mb-4">📇</div>
+              <h3 className="text-lg sm:text-xl font-semibold">No digital cards yet</h3>
+              <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">
                 Create your first digital card to share your business information with customers
               </p>
               <Button onClick={() => router.push('/digital-card/create')}>
@@ -329,90 +329,90 @@ export default function ManageDigitalCardsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {cards.map((card) => (
             <Card key={card.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg truncate">
+              <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-base sm:text-lg truncate">
                       {card.businessInfo.name}
                     </CardTitle>
-                    <CardDescription className="truncate">
+                    <CardDescription className="truncate text-xs sm:text-sm">
                       @{card.username}
                     </CardDescription>
                   </div>
                   <Badge
                     variant={card.status === 'active' ? 'default' : 'secondary'}
-                    className="ml-2"
+                    className="text-xs shrink-0"
                   >
                     {card.status}
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-sm text-muted-foreground">
+              <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6 pt-2 sm:pt-2">
+                <div className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
                   {card.businessInfo.tagline || card.businessInfo.description}
                 </div>
 
                 {card.analytics && (
-                  <div className="grid grid-cols-3 gap-2 text-center p-3 bg-muted rounded-lg">
+                  <div className="grid grid-cols-3 gap-2 text-center p-2 sm:p-3 bg-muted rounded-lg">
                     <div>
-                      <div className="text-2xl font-bold">{card.analytics.views || 0}</div>
-                      <div className="text-xs text-muted-foreground">Views</div>
+                      <div className="text-lg sm:text-2xl font-bold">{card.analytics.views || 0}</div>
+                      <div className="text-[10px] sm:text-xs text-muted-foreground">Views</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold">
+                      <div className="text-lg sm:text-2xl font-bold">
                         {Object.values(card.analytics.linkClicks || {}).reduce((a, b) => a + b, 0)}
                       </div>
-                      <div className="text-xs text-muted-foreground">Clicks</div>
+                      <div className="text-[10px] sm:text-xs text-muted-foreground">Clicks</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold">
+                      <div className="text-lg sm:text-2xl font-bold">
                         {card.analytics.leadsGenerated || 0}
                       </div>
-                      <div className="text-xs text-muted-foreground">Leads</div>
+                      <div className="text-[10px] sm:text-xs text-muted-foreground">Leads</div>
                     </div>
                   </div>
                 )}
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => window.open(`/card/${card.username}`, '_blank')}
-                    className="flex-1"
+                    className="flex-1 text-xs sm:text-sm"
                   >
-                    <ExternalLink className="h-4 w-4 mr-1" />
+                    <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                     View
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => router.push(`/digital-card/edit/${card.id}`)}
-                    className="flex-1"
+                    className="flex-1 text-xs sm:text-sm"
                   >
-                    <Edit className="h-4 w-4 mr-1" />
+                    <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                     Edit
                   </Button>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-1 sm:gap-2">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => copyCardUrl(card.username)}
-                    className="flex-1"
+                    className="flex-1 text-xs sm:text-sm"
                   >
-                    <Copy className="h-4 w-4 mr-1" />
-                    {copiedUrl === card.username ? 'Copied!' : 'Copy Link'}
+                    <Copy className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    {copiedUrl === card.username ? 'Copied!' : 'Copy'}
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => shareCard(card.username)}
                   >
-                    <Share2 className="h-4 w-4" />
+                    <Share2 className="h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>
                   <QRCodeGenerator
                     cardUrl={`${window.location.origin}/card/${card.username}`}
@@ -428,17 +428,19 @@ export default function ManageDigitalCardsPage() {
                     size="sm"
                     onClick={() => toggleCardStatus(card)}
                     disabled={actionLoading}
-                    className="flex-1"
+                    className="flex-1 text-xs sm:text-sm"
                   >
                     {card.status === 'active' ? (
                       <>
-                        <EyeOff className="h-4 w-4 mr-1" />
-                        Deactivate
+                        <EyeOff className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                        <span className="hidden xs:inline">Deactivate</span>
+                        <span className="xs:hidden">Off</span>
                       </>
                     ) : (
                       <>
-                        <Eye className="h-4 w-4 mr-1" />
-                        Activate
+                        <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                        <span className="hidden xs:inline">Activate</span>
+                        <span className="xs:hidden">On</span>
                       </>
                     )}
                   </Button>
@@ -448,7 +450,7 @@ export default function ManageDigitalCardsPage() {
                     onClick={() => setDeleteCardId(card.id)}
                     disabled={actionLoading}
                   >
-                    <Trash2 className="h-4 w-4 text-destructive" />
+                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 text-destructive" />
                   </Button>
                 </div>
               </CardContent>

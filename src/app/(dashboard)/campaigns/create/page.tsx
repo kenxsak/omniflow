@@ -601,24 +601,24 @@ export default function CreateCampaignPage() {
     // Step 1: Choose Channel
     if (currentStep === 1) {
       return (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Choose Your Channel</h2>
-            <p className="text-muted-foreground">Select how you want to reach your contacts</p>
+            <h2 className="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Choose Your Channel</h2>
+            <p className="text-sm sm:text-base text-muted-foreground">Select how you want to reach your contacts</p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <Card 
               className="cursor-pointer hover:border-primary transition-all"
               onClick={() => handleChannelSelect('email')}
             >
-              <CardHeader>
-                <Mail className="h-12 w-12 text-blue-500 mb-4" />
-                <CardTitle>Email Campaign</CardTitle>
-                <CardDescription>Send professional emails with rich content</CardDescription>
+              <CardHeader className="p-4 sm:p-6">
+                <Mail className="h-8 w-8 sm:h-12 sm:w-12 text-blue-500 mb-2 sm:mb-4" />
+                <CardTitle className="text-base sm:text-lg">Email Campaign</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Send professional emails with rich content</CardDescription>
               </CardHeader>
-              <CardContent>
-                <ul className="text-sm space-y-2 text-muted-foreground">
+              <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+                <ul className="text-xs sm:text-sm space-y-1 sm:space-y-2 text-muted-foreground">
                   <li>✓ Rich HTML content</li>
                   <li>✓ Images and links</li>
                   <li>✓ Track open rates</li>
@@ -630,13 +630,13 @@ export default function CreateCampaignPage() {
               className="cursor-pointer hover:border-primary transition-all"
               onClick={() => handleChannelSelect('sms')}
             >
-              <CardHeader>
-                <MessageSquare className="h-12 w-12 text-green-500 mb-4" />
-                <CardTitle>SMS Campaign</CardTitle>
-                <CardDescription>Send text messages to mobile phones</CardDescription>
+              <CardHeader className="p-4 sm:p-6">
+                <MessageSquare className="h-8 w-8 sm:h-12 sm:w-12 text-green-500 mb-2 sm:mb-4" />
+                <CardTitle className="text-base sm:text-lg">SMS Campaign</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Send text messages to mobile phones</CardDescription>
               </CardHeader>
-              <CardContent>
-                <ul className="text-sm space-y-2 text-muted-foreground">
+              <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+                <ul className="text-xs sm:text-sm space-y-1 sm:space-y-2 text-muted-foreground">
                   <li>✓ Instant delivery</li>
                   <li>✓ 98% open rate</li>
                   <li>✓ Global reach</li>
@@ -645,16 +645,16 @@ export default function CreateCampaignPage() {
             </Card>
 
             <Card 
-              className="cursor-pointer hover:border-primary transition-all"
+              className="cursor-pointer hover:border-primary transition-all sm:col-span-2 lg:col-span-1"
               onClick={() => handleChannelSelect('whatsapp')}
             >
-              <CardHeader>
-                <MessageCircle className="h-12 w-12 text-emerald-500 mb-4" />
-                <CardTitle>WhatsApp Campaign</CardTitle>
-                <CardDescription>Send messages via WhatsApp Business</CardDescription>
+              <CardHeader className="p-4 sm:p-6">
+                <MessageCircle className="h-8 w-8 sm:h-12 sm:w-12 text-emerald-500 mb-2 sm:mb-4" />
+                <CardTitle className="text-base sm:text-lg">WhatsApp Campaign</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Send messages via WhatsApp Business</CardDescription>
               </CardHeader>
-              <CardContent>
-                <ul className="text-sm space-y-2 text-muted-foreground">
+              <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+                <ul className="text-xs sm:text-sm space-y-1 sm:space-y-2 text-muted-foreground">
                   <li>✓ Rich media support</li>
                   <li>✓ High engagement</li>
                   <li>✓ Template-based</li>
@@ -669,29 +669,30 @@ export default function CreateCampaignPage() {
     // Step 2: Select Recipients
     if (currentStep === 2) {
       return (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Select Recipients</h2>
-            <p className="text-muted-foreground">Choose which contact lists should receive this campaign</p>
+            <h2 className="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Select Recipients</h2>
+            <p className="text-sm sm:text-base text-muted-foreground">Choose which contact lists should receive this campaign</p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div>
-              <Label htmlFor="campaign-name">Campaign Name</Label>
+              <Label htmlFor="campaign-name" className="text-sm sm:text-base">Campaign Name</Label>
               <Input
                 id="campaign-name"
                 placeholder="e.g., Spring Sale Announcement"
                 value={campaignName}
                 onChange={(e) => setCampaignName(e.target.value)}
+                className="text-sm sm:text-base"
               />
             </div>
 
             <Separator />
 
             {channel === 'email' && emailProvider && (
-              <Alert>
-                <Settings className="h-4 w-4" />
-                <AlertDescription>
+              <Alert className="py-2 sm:py-3">
+                <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                <AlertDescription className="text-xs sm:text-sm">
                   Using <strong>{emailProvider === 'brevo' ? 'Brevo' : emailProvider === 'sender' ? 'Sender.net' : 'SMTP'}</strong> to send emails.
                   {emailProvider === 'smtp' && ' Contact lists are from your WhatsApp/SMS contacts.'}
                 </AlertDescription>
@@ -699,15 +700,15 @@ export default function CreateCampaignPage() {
             )}
 
             <div>
-              <Label className="text-base font-semibold">Contact Lists</Label>
+              <Label className="text-sm sm:text-base font-semibold">Contact Lists</Label>
               {isLoadingGroups ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <div className="flex items-center justify-center py-6 sm:py-8">
+                  <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-primary" />
                 </div>
               ) : recipientGroups.length === 0 ? (
-                <Alert className="mt-4">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
+                <Alert className="mt-3 sm:mt-4 py-2 sm:py-3">
+                  <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <AlertDescription className="text-xs sm:text-sm">
                     No contact lists found. Please create contact lists first.
                     {(channel === 'sms' || channel === 'whatsapp') && (
                       <Link href="/whatsapp-marketing" className="ml-2 underline">
@@ -717,7 +718,7 @@ export default function CreateCampaignPage() {
                   </AlertDescription>
                 </Alert>
               ) : (
-                <div className="grid gap-3 mt-4">
+                <div className="grid gap-2 sm:gap-3 mt-3 sm:mt-4">
                   {recipientGroups.map((group) => (
                     <Card
                       key={group.id}
@@ -728,25 +729,25 @@ export default function CreateCampaignPage() {
                       }`}
                       onClick={() => handleRecipientToggle(group.id, group.count)}
                     >
-                      <CardContent className="flex items-center justify-between p-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`h-5 w-5 rounded border-2 flex items-center justify-center ${
+                      <CardContent className="flex items-center justify-between p-3 sm:p-4">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className={`h-4 w-4 sm:h-5 sm:w-5 rounded border-2 flex items-center justify-center ${
                             selectedRecipientGroups.includes(group.id)
                               ? 'bg-primary border-primary'
                               : 'border-muted-foreground'
                           }`}>
                             {selectedRecipientGroups.includes(group.id) && (
-                              <CheckCircle className="h-4 w-4 text-white" />
+                              <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                             )}
                           </div>
                           <div>
-                            <p className="font-medium">{group.name}</p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="font-medium text-sm sm:text-base">{group.name}</p>
+                            <p className="text-xs sm:text-sm text-muted-foreground">
                               {group.count} contacts
                             </p>
                           </div>
                         </div>
-                        <Users className="h-5 w-5 text-muted-foreground" />
+                        <Users className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                       </CardContent>
                     </Card>
                   ))}
@@ -755,26 +756,28 @@ export default function CreateCampaignPage() {
             </div>
 
             {totalRecipients > 0 && (
-              <Alert>
-                <CheckCircle className="h-4 w-4" />
-                <AlertDescription>
+              <Alert className="py-2 sm:py-3">
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                <AlertDescription className="text-xs sm:text-sm">
                   <strong>{totalRecipients}</strong> contacts selected
                 </AlertDescription>
               </Alert>
             )}
           </div>
 
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setCurrentStep(1)}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <Button variant="outline" onClick={() => setCurrentStep(1)} className="text-sm sm:text-base">
+              <ArrowLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
               Back
             </Button>
             <Button 
               onClick={() => setCurrentStep(3)}
               disabled={selectedRecipientGroups.length === 0 || !campaignName.trim()}
+              className="text-sm sm:text-base"
             >
-              Next: Compose Message
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <span className="sm:hidden">Next</span>
+              <span className="hidden sm:inline">Next: Compose Message</span>
+              <ArrowRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
           </div>
         </div>
@@ -784,44 +787,46 @@ export default function CreateCampaignPage() {
     // Step 3: Compose Message
     if (currentStep === 3) {
       return (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Compose Your Message</h2>
-            <p className="text-muted-foreground">Create the content for your {channel} campaign</p>
+            <h2 className="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Compose Your Message</h2>
+            <p className="text-sm sm:text-base text-muted-foreground">Create the content for your {channel} campaign</p>
           </div>
 
           {channel === 'email' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <Label htmlFor="sender-name">Your Name</Label>
+                  <Label htmlFor="sender-name" className="text-sm sm:text-base">Your Name</Label>
                   <Input
                     id="sender-name"
                     placeholder="e.g., John Doe"
                     value={senderName}
                     onChange={(e) => setSenderName(e.target.value)}
+                    className="text-sm sm:text-base"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="sender-email">Your Email</Label>
+                  <Label htmlFor="sender-email" className="text-sm sm:text-base">Your Email</Label>
                   <Input
                     id="sender-email"
                     type="email"
                     placeholder="e.g., john@company.com"
                     value={senderEmail}
                     onChange={(e) => setSenderEmail(e.target.value)}
+                    className="text-sm sm:text-base"
                   />
                 </div>
               </div>
 
               {availableEmailProviders.length > 1 && (
                 <div>
-                  <Label htmlFor="email-provider">Send Using</Label>
+                  <Label htmlFor="email-provider" className="text-sm sm:text-base">Send Using</Label>
                   <Select 
                     value={emailProvider || undefined} 
                     onValueChange={(v: 'brevo' | 'sender' | 'smtp') => setEmailProvider(v)}
                   >
-                    <SelectTrigger id="email-provider">
+                    <SelectTrigger id="email-provider" className="text-sm sm:text-base">
                       <SelectValue placeholder="Select email service" />
                     </SelectTrigger>
                     <SelectContent>
@@ -832,39 +837,41 @@ export default function CreateCampaignPage() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                     Choose which email service to use for sending
                   </p>
                 </div>
               )}
 
               <div>
-                <Label htmlFor="email-subject">Email Subject</Label>
+                <Label htmlFor="email-subject" className="text-sm sm:text-base">Email Subject</Label>
                 <Input
                   id="email-subject"
                   placeholder="e.g., Special Offer Just for You!"
                   value={emailSubject}
                   onChange={(e) => setEmailSubject(e.target.value)}
+                  className="text-sm sm:text-base"
                 />
               </div>
 
               <div>
-                <Label htmlFor="email-content">Email Message</Label>
+                <Label htmlFor="email-content" className="text-sm sm:text-base">Email Message</Label>
                 <Textarea
                   id="email-content"
                   placeholder="Write your email message here... Use {{ contact.FIRSTNAME }} to personalize."
                   value={emailContent}
                   onChange={(e) => setEmailContent(e.target.value)}
                   rows={6}
+                  className="text-sm sm:text-base"
                 />
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                   Tip: Use {'{'}{ contact.FIRSTNAME }{'}'} to personalize each email
                 </p>
               </div>
               
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
+              <Alert className="py-2 sm:py-3">
+                <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                <AlertDescription className="text-xs sm:text-sm">
                   For advanced features like rich HTML editor, templates, and AI assistance,{' '}
                   <Link href="/email-marketing/create-campaign" className="underline font-medium">
                     use the Email Marketing page
@@ -875,11 +882,11 @@ export default function CreateCampaignPage() {
           )}
 
           {channel === 'sms' && (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div>
-                <Label htmlFor="message-type">Message Type</Label>
+                <Label htmlFor="message-type" className="text-sm sm:text-base">Message Type</Label>
                 <Select value={messageType} onValueChange={(v: any) => setMessageType(v)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-sm sm:text-base">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -890,7 +897,7 @@ export default function CreateCampaignPage() {
               </div>
 
               <div>
-                <Label htmlFor="sms-message">Message</Label>
+                <Label htmlFor="sms-message" className="text-sm sm:text-base">Message</Label>
                 <Textarea
                   id="sms-message"
                   placeholder="Your SMS message here..."
@@ -898,20 +905,22 @@ export default function CreateCampaignPage() {
                   onChange={(e) => setSmsMessage(e.target.value)}
                   rows={4}
                   maxLength={160}
+                  className="text-sm sm:text-base"
                 />
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                   {smsMessage.length}/160 characters
                 </p>
               </div>
 
               {messageType === 'promotional' && (
                 <div>
-                  <Label htmlFor="dlt-template">DLT Template ID (for India)</Label>
+                  <Label htmlFor="dlt-template" className="text-sm sm:text-base">DLT Template ID (for India)</Label>
                   <Input
                     id="dlt-template"
                     placeholder="Enter DLT Template ID"
                     value={dltTemplateId}
                     onChange={(e) => setDltTemplateId(e.target.value)}
+                    className="text-sm sm:text-base"
                   />
                 </div>
               )}
@@ -919,28 +928,29 @@ export default function CreateCampaignPage() {
           )}
 
           {channel === 'whatsapp' && (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div>
-                <Label htmlFor="broadcast-name">Broadcast Name</Label>
+                <Label htmlFor="broadcast-name" className="text-sm sm:text-base">Broadcast Name</Label>
                 <Input
                   id="broadcast-name"
                   placeholder="e.g., Spring Sale 2025"
                   value={broadcastName}
                   onChange={(e) => setBroadcastName(e.target.value)}
+                  className="text-sm sm:text-base"
                 />
               </div>
 
               <div>
-                <Label htmlFor="template">WhatsApp Template</Label>
+                <Label htmlFor="template" className="text-sm sm:text-base">WhatsApp Template</Label>
                 {isLoadingTemplates ? (
-                  <div className="flex items-center gap-2 py-4">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span className="text-sm text-muted-foreground">Loading templates...</span>
+                  <div className="flex items-center gap-2 py-3 sm:py-4">
+                    <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                    <span className="text-xs sm:text-sm text-muted-foreground">Loading templates...</span>
                   </div>
                 ) : whatsappTemplates.length === 0 ? (
-                  <Alert className="mt-2">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
+                  <Alert className="mt-2 py-2 sm:py-3">
+                    <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <AlertDescription className="text-xs sm:text-sm">
                       No templates found. Please configure WATI and create templates first.
                       <Link href="/settings" className="ml-2 underline">
                         Go to Settings
@@ -949,7 +959,7 @@ export default function CreateCampaignPage() {
                   </Alert>
                 ) : (
                   <Select value={whatsappTemplate} onValueChange={setWhatsappTemplate}>
-                    <SelectTrigger>
+                    <SelectTrigger className="text-sm sm:text-base">
                       <SelectValue placeholder="Select a template" />
                     </SelectTrigger>
                     <SelectContent>
@@ -965,9 +975,9 @@ export default function CreateCampaignPage() {
             </div>
           )}
 
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setCurrentStep(2)}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <Button variant="outline" onClick={() => setCurrentStep(2)} className="text-sm sm:text-base">
+              <ArrowLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
               Back
             </Button>
             <Button 
@@ -977,9 +987,11 @@ export default function CreateCampaignPage() {
                 (channel === 'sms' && !smsMessage.trim()) ||
                 (channel === 'whatsapp' && !whatsappTemplate)
               }
+              className="text-sm sm:text-base"
             >
-              Next: Review & Send
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <span className="sm:hidden">Next</span>
+              <span className="hidden sm:inline">Next: Review & Send</span>
+              <ArrowRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
           </div>
         </div>
@@ -989,38 +1001,38 @@ export default function CreateCampaignPage() {
     // Step 4: Review & Send
     if (currentStep === 4) {
       return (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Review & Send</h2>
-            <p className="text-muted-foreground">Check your campaign details before sending</p>
+            <h2 className="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Review & Send</h2>
+            <p className="text-sm sm:text-base text-muted-foreground">Check your campaign details before sending</p>
           </div>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Campaign Summary</CardTitle>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-base sm:text-lg">Campaign Summary</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <CardContent className="space-y-3 sm:space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Channel</p>
-                  <p className="font-medium capitalize flex items-center gap-2">
-                    {channel === 'email' && <Mail className="h-4 w-4" />}
-                    {channel === 'sms' && <MessageSquare className="h-4 w-4" />}
-                    {channel === 'whatsapp' && <MessageCircle className="h-4 w-4" />}
+                  <p className="text-xs sm:text-sm text-muted-foreground">Channel</p>
+                  <p className="font-medium capitalize flex items-center gap-1 sm:gap-2 text-sm sm:text-base">
+                    {channel === 'email' && <Mail className="h-3 w-3 sm:h-4 sm:w-4" />}
+                    {channel === 'sms' && <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />}
+                    {channel === 'whatsapp' && <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />}
                     {channel}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Campaign Name</p>
-                  <p className="font-medium">{campaignName}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Campaign Name</p>
+                  <p className="font-medium text-sm sm:text-base truncate">{campaignName}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Recipients</p>
-                  <p className="font-medium">{totalRecipients} contacts</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Recipients</p>
+                  <p className="font-medium text-sm sm:text-base">{totalRecipients} contacts</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Contact Lists</p>
-                  <p className="font-medium">{selectedRecipientGroups.length} list(s)</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Contact Lists</p>
+                  <p className="font-medium text-sm sm:text-base">{selectedRecipientGroups.length} list(s)</p>
                 </div>
               </div>
 
@@ -1028,10 +1040,10 @@ export default function CreateCampaignPage() {
 
               {channel === 'sms' && (
                 <div>
-                  <p className="text-sm text-muted-foreground mb-2">Message Preview</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-2">Message Preview</p>
                   <Card className="bg-muted/50">
-                    <CardContent className="pt-4">
-                      <p className="text-sm whitespace-pre-wrap">{smsMessage}</p>
+                    <CardContent className="p-3 sm:pt-4">
+                      <p className="text-xs sm:text-sm whitespace-pre-wrap">{smsMessage}</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -1039,23 +1051,23 @@ export default function CreateCampaignPage() {
 
               {channel === 'whatsapp' && (
                 <div>
-                  <p className="text-sm text-muted-foreground mb-2">Template</p>
-                  <Badge>{whatsappTemplate}</Badge>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-2">Template</p>
+                  <Badge className="text-xs sm:text-sm">{whatsappTemplate}</Badge>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
+          <Alert className="py-2 sm:py-3">
+            <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+            <AlertDescription className="text-xs sm:text-sm">
               Your campaign will be processed in the background and sent to all selected contacts within a few minutes.
             </AlertDescription>
           </Alert>
 
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setCurrentStep(3)} disabled={isSending}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <Button variant="outline" onClick={() => setCurrentStep(3)} disabled={isSending} className="text-sm sm:text-base">
+              <ArrowLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
               Back
             </Button>
             <Button 
@@ -1063,16 +1075,19 @@ export default function CreateCampaignPage() {
               disabled={isSending}
               variant="accent"
               size="lg"
+              className="text-sm sm:text-base"
             >
               {isSending ? (
                 <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Sending Campaign...
+                  <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                  <span className="sm:hidden">Sending...</span>
+                  <span className="hidden sm:inline">Sending Campaign...</span>
                 </>
               ) : (
                 <>
-                  <Send className="mr-2 h-5 w-5" />
-                  Send Campaign Now
+                  <Send className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="sm:hidden">Send Now</span>
+                  <span className="hidden sm:inline">Send Campaign Now</span>
                 </>
               )}
             </Button>
@@ -1085,32 +1100,32 @@ export default function CreateCampaignPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6 px-2 sm:px-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
         <PageTitle 
           title="Create Campaign" 
           description="Send messages to your contacts in a few simple steps"
         />
-        <Button variant="ghost" asChild>
+        <Button variant="ghost" asChild className="self-start sm:self-auto text-sm sm:text-base">
           <Link href="/campaigns">Cancel</Link>
         </Button>
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="p-4 sm:p-6">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">
+              <span className="text-xs sm:text-sm font-medium">
                 Step {currentStep} of 4
               </span>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-xs sm:text-sm text-muted-foreground">
                 {Math.round(progressPercentage)}% Complete
               </span>
             </div>
-            <Progress value={progressPercentage} className="h-2" />
+            <Progress value={progressPercentage} className="h-1.5 sm:h-2" />
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
           {renderStepContent()}
         </CardContent>
       </Card>

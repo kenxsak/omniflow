@@ -71,7 +71,7 @@ const STATUS_CONFIG: Record<
   },
   rescheduled: {
     label: 'Rescheduled',
-    className: 'bg-blue-100 text-blue-800 border-blue-200',
+    className: 'bg-violet-100 text-violet-800 border-violet-200',
   },
 };
 

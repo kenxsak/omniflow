@@ -167,42 +167,42 @@ export default function WhatsAppBulkCampaignsClient() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <PageTitle
           title="Send to Many People"
           subtitle="Send WhatsApp messages to hundreds or thousands of contacts at once"
           icon={MessageCircle}
         />
-        <Button asChild>
+        <Button asChild size="sm" className="w-full sm:w-auto">
           <Link href="/ai-campaigns?channel=whatsapp">
-            <Sparkles className="mr-2 h-4 w-4" /> Create with AI
+            <Sparkles className="mr-2 h-3 w-3 sm:h-4 sm:w-4" /> Create with AI
           </Link>
         </Button>
       </div>
 
       {campaigns.length === 0 && !isLoadingCampaigns && (
-        <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-          <Sparkles className="h-5 w-5 text-blue-600" />
-          <AlertTitle className="text-blue-900 dark:text-blue-100">Quick Start Guide</AlertTitle>
+        <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-900/20 py-3 sm:py-4">
+          <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+          <AlertTitle className="text-blue-900 dark:text-blue-100 text-sm sm:text-base">Quick Start Guide</AlertTitle>
           <AlertDescription className="text-blue-800 dark:text-blue-200">
             <div className="space-y-2 mt-2">
-              <p className="text-sm">To send your first WhatsApp message to many people:</p>
-              <ol className="text-sm space-y-1 ml-4 list-decimal">
-                <li>Choose your platform (Meta, WMart CPaaS, AiSensy, or WATI) and connect it in Settings</li>
+              <p className="text-xs sm:text-sm">To send your first WhatsApp message to many people:</p>
+              <ol className="text-xs sm:text-sm space-y-1 ml-4 list-decimal">
+                <li>Choose your platform and connect it in Settings</li>
                 <li>Create a list of contacts in WhatsApp Marketing</li>
                 <li>Come back here and click "Create Campaign" to send</li>
               </ol>
               <div className="flex flex-col sm:flex-row gap-2 mt-3">
-                <Button asChild className="min-h-11" variant="outline">
+                <Button asChild className="min-h-9 sm:min-h-11 text-xs sm:text-sm" variant="outline" size="sm">
                   <Link href="/settings">
-                    <Settings className="h-4 w-4 mr-2" />
+                    <Settings className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     Set Up Connection
                   </Link>
                 </Button>
-                <Button asChild className="min-h-11" variant="outline">
+                <Button asChild className="min-h-9 sm:min-h-11 text-xs sm:text-sm" variant="outline" size="sm">
                   <Link href="/whatsapp-marketing">
-                    <Users className="h-4 w-4 mr-2" />
+                    <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     Manage Contacts
                   </Link>
                 </Button>
@@ -213,47 +213,47 @@ export default function WhatsAppBulkCampaignsClient() {
       )}
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'campaigns' | 'create')}>
-        <TabsList>
-          <TabsTrigger value="campaigns">
-            <Users className="h-4 w-4 mr-2" />
-            My Campaigns
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="campaigns" className="text-xs sm:text-sm">
+            <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+            <span className="hidden xs:inline">My </span>Campaigns
           </TabsTrigger>
-          <TabsTrigger value="create">
-            <Plus className="h-4 w-4 mr-2" />
-            Create Campaign
+          <TabsTrigger value="create" className="text-xs sm:text-sm">
+            <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+            Create<span className="hidden xs:inline"> Campaign</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="campaigns" className="space-y-4">
+        <TabsContent value="campaigns" className="space-y-3 sm:space-y-4">
           <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
+            <CardHeader className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <CardTitle>Campaign History</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-base sm:text-lg">Campaign History</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">
                     View and manage your WhatsApp bulk campaigns
                   </CardDescription>
                 </div>
-                <Button variant="outline" size="sm" onClick={loadCampaigns} disabled={isLoadingCampaigns}>
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingCampaigns ? 'animate-spin' : ''}`} />
+                <Button variant="outline" size="sm" onClick={loadCampaigns} disabled={isLoadingCampaigns} className="w-full sm:w-auto text-xs sm:text-sm">
+                  <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 ${isLoadingCampaigns ? 'animate-spin' : ''}`} />
                   Refresh
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
               {isLoadingCampaigns ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <div className="flex items-center justify-center py-6 sm:py-8">
+                  <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-muted-foreground" />
                 </div>
               ) : campaigns.length === 0 ? (
-                <div className="text-center py-8">
-                  <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No campaigns yet</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
+                <div className="text-center py-6 sm:py-8">
+                  <MessageCircle className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />
+                  <h3 className="text-base sm:text-lg font-medium mb-2">No campaigns yet</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-4">
                     Create your first WhatsApp bulk campaign to get started
                   </p>
-                  <Button onClick={() => setActiveTab('create')}>
-                    <Plus className="h-4 w-4 mr-2" />
+                  <Button onClick={() => setActiveTab('create')} size="sm">
+                    <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     Create Campaign
                   </Button>
                 </div>

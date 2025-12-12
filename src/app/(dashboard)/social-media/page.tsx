@@ -619,25 +619,38 @@ export default function SocialMediaPage() {
   }, []);
 
   return (
-    <div className="space-y-8">
-      <PageTitle title="AI Social Content Factory" description="Generate engaging text, image prompts, video ideas, images, discover trending topics, manage reviews, and plan WhatsApp messages." />
-      <ContextualHelpButton pageId="social-media" />
+    <div className="space-y-4 sm:space-y-6 px-4 sm:px-6 py-4 sm:py-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+        <div>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            AI Social Content Factory
+          </h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+            Generate engaging text, images, video ideas, and discover trending topics.
+          </p>
+        </div>
+        <ContextualHelpButton pageId="social-media" />
+      </div>
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6">
         
-        <Card ref={trendInputsRef}>
-          <CardHeader>
-            <CardTitle className="flex items-center"><Lightbulb className="mr-2 h-5 w-5 text-yellow-500" />AI Trending Topic Suggester</CardTitle>
-            <CardDescription>Discover trending topics for your niche.</CardDescription>
+        <Card ref={trendInputsRef} className="overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center text-base sm:text-lg"><Lightbulb className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-yellow-500" />AI Trending Topic Suggester</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">Discover trending topics for your niche.</CardDescription>
           </CardHeader>
           <form onSubmit={handleTrendFormSubmit}>
-            <CardContent className="space-y-4">
-                <div><Label htmlFor="trendNiche">Business Niche *</Label><Input id="trendNiche" value={trendInputs.businessNiche} onChange={(e) => handleTrendInputChange('businessNiche', e.target.value)} placeholder="e.g., Sustainable Home Decor" required /></div>
-                <div><Label htmlFor="trendContentType">Content Type *</Label><Select value={trendInputs.contentType} onValueChange={(value: ContentCreationType) => handleTrendInputChange('contentType', value)}><SelectTrigger id="trendContentType"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="BlogPost">Blog Post</SelectItem><SelectItem value="YouTubeVideo">YouTube Video</SelectItem></SelectContent></Select></div>
-                <div><Label htmlFor="trendHorizon">Planning Horizon *</Label><Select value={trendInputs.planningHorizon} onValueChange={(value: PlanningHorizon) => handleTrendInputChange('planningHorizon', value)}><SelectTrigger id="trendHorizon"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Daily">Daily</SelectItem><SelectItem value="Weekly">Weekly</SelectItem><SelectItem value="Monthly">Monthly</SelectItem></SelectContent></Select></div>
-                <div><Label htmlFor="trendRegion">Target Region (Optional)</Label><Input id="trendRegion" value={trendInputs.targetRegion || ''} onChange={(e) => handleTrendInputChange('targetRegion', e.target.value)} placeholder="e.g., India, USA, Global" /></div>
+            <CardContent className="space-y-4 p-4 sm:p-6 pt-0 sm:pt-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div><Label htmlFor="trendNiche" className="text-xs sm:text-sm">Business Niche *</Label><Input id="trendNiche" value={trendInputs.businessNiche} onChange={(e) => handleTrendInputChange('businessNiche', e.target.value)} placeholder="e.g., Sustainable Home Decor" required className="mt-1.5" /></div>
+                  <div><Label htmlFor="trendContentType" className="text-xs sm:text-sm">Content Type *</Label><Select value={trendInputs.contentType} onValueChange={(value: ContentCreationType) => handleTrendInputChange('contentType', value)}><SelectTrigger id="trendContentType" className="mt-1.5"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="BlogPost">Blog Post</SelectItem><SelectItem value="YouTubeVideo">YouTube Video</SelectItem></SelectContent></Select></div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div><Label htmlFor="trendHorizon" className="text-xs sm:text-sm">Planning Horizon *</Label><Select value={trendInputs.planningHorizon} onValueChange={(value: PlanningHorizon) => handleTrendInputChange('planningHorizon', value)}><SelectTrigger id="trendHorizon" className="mt-1.5"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Daily">Daily</SelectItem><SelectItem value="Weekly">Weekly</SelectItem><SelectItem value="Monthly">Monthly</SelectItem></SelectContent></Select></div>
+                  <div><Label htmlFor="trendRegion" className="text-xs sm:text-sm">Target Region (Optional)</Label><Input id="trendRegion" value={trendInputs.targetRegion || ''} onChange={(e) => handleTrendInputChange('targetRegion', e.target.value)} placeholder="e.g., India, USA, Global" className="mt-1.5" /></div>
+                </div>
             </CardContent>
-            <CardFooter><Button type="submit" disabled={isLoadingTrends}><SearchCheck className="mr-2 h-4 w-4" /> {isLoadingTrends ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null} Get Trends</Button></CardFooter>
+            <CardFooter className="p-4 sm:p-6 pt-0 sm:pt-0"><Button type="submit" disabled={isLoadingTrends} className="w-full sm:w-auto"><SearchCheck className="mr-2 h-4 w-4" /> {isLoadingTrends ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null} Get Trends</Button></CardFooter>
           </form>
           {trendingSuggestions && trendingSuggestions.length > 0 && (
             <CardContent className="mt-4 border-t pt-4"><h3 className="text-md font-semibold mb-2">Topic Suggestions:</h3><Accordion type="single" collapsible className="w-full">
@@ -655,10 +668,10 @@ export default function SocialMediaPage() {
             </Accordion></CardContent>)}
         </Card>
 
-         <Card ref={promptEnhancerRef}>
-          <CardHeader>
-            <CardTitle className="flex items-center"><Brain className="mr-2 h-5 w-5 text-teal-500" />AI Prompt Enhancer / Creator</CardTitle>
-            <CardDescription>Turn simple ideas into powerful, detailed prompts for other AI tools or to refine inputs for OmniFlow's generators.</CardDescription>
+         <Card ref={promptEnhancerRef} className="overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center text-base sm:text-lg"><Brain className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-teal-500" />AI Prompt Enhancer / Creator</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">Turn simple ideas into powerful, detailed prompts for other AI tools.</CardDescription>
           </CardHeader>
           <form onSubmit={handleEnhancedPromptSubmit}>
             <CardContent className="space-y-4">
@@ -707,10 +720,10 @@ export default function SocialMediaPage() {
         </Card>
 
 
-        <Card ref={contentGeneratorRef}>
-          <CardHeader>
-              <CardTitle className="flex items-center"><FileCode className="mr-2 h-5 w-5 text-orange-500" />Content Generator</CardTitle>
-              <CardDescription>AI-powered text for social posts, blogs, sales pages, and YouTube scripts.</CardDescription>
+        <Card ref={contentGeneratorRef} className="overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center text-base sm:text-lg"><FileCode className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />Content Generator</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">AI-powered text for social posts, blogs, sales pages, and YouTube scripts.</CardDescription>
           </CardHeader>
           <form onSubmit={handleContentFormSubmit}>
               <CardContent className="space-y-4">
@@ -870,10 +883,10 @@ export default function SocialMediaPage() {
             </Card>
         )}
 
-        <Card ref={imageGeneratorRef}>
-          <CardHeader>
-              <CardTitle className="flex items-center"><ImageIcon className="mr-2 h-5 w-5 text-purple-500" />AI Image Generator (Premium)</CardTitle>
-              <CardDescription>Generate actual AI images with Vertex AI Imagen or get enhanced prompts for external tools like DALL-E, Midjourney, and Stable Diffusion.</CardDescription>
+        <Card ref={imageGeneratorRef} className="overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center text-base sm:text-lg"><ImageIcon className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />AI Image Generator (Premium)</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">Generate AI images with Vertex AI Imagen or get enhanced prompts for external tools.</CardDescription>
           </CardHeader>
           <form onSubmit={handleImageGenerationSubmit}>
               <CardContent className="space-y-4">

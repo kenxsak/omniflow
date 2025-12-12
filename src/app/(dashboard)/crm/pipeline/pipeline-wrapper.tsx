@@ -73,37 +73,40 @@ export function PipelineWrapper() {
   const statuses: Array<Lead['status']> = ['New', 'Contacted', 'Qualified', 'Won', 'Lost'];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <PageTitle title="Pipeline" description="Visualize your sales pipeline" />
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        {statuses.map(status => (
-          <Card key={status}>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">{status}</CardTitle>
-              <div className="text-2xl font-bold">{leadsByStatus[status].length}</div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {leadsByStatus[status].slice(0, 3).map(lead => (
-                  <div 
-                    key={lead.id} 
-                    onClick={() => handleLeadClick(lead.id)}
-                    className="text-sm border-l-2 border-primary pl-2 cursor-pointer hover:bg-accent hover:text-accent-foreground p-2 rounded transition-colors"
-                  >
-                    <div className="font-medium truncate">{lead.name}</div>
-                    <div className="text-xs text-muted-foreground truncate">{lead.email}</div>
-                  </div>
-                ))}
-                {leadsByStatus[status].length > 3 && (
-                  <div className="text-xs text-muted-foreground">
-                    +{leadsByStatus[status].length - 3} more
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      {/* Mobile: Horizontal scroll, Desktop: Grid */}
+      <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="flex gap-3 sm:gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-5 min-w-max sm:min-w-0">
+          {statuses.map(status => (
+            <Card key={status} className="min-w-[200px] sm:min-w-0">
+              <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-3">
+                <CardTitle className="text-xs sm:text-sm font-medium">{status}</CardTitle>
+                <div className="text-xl sm:text-2xl font-bold">{leadsByStatus[status].length}</div>
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+                <div className="space-y-1.5 sm:space-y-2">
+                  {leadsByStatus[status].slice(0, 3).map(lead => (
+                    <div 
+                      key={lead.id} 
+                      onClick={() => handleLeadClick(lead.id)}
+                      className="text-xs sm:text-sm border-l-2 border-primary pl-2 cursor-pointer hover:bg-accent hover:text-accent-foreground p-1.5 sm:p-2 rounded transition-colors"
+                    >
+                      <div className="font-medium truncate">{lead.name}</div>
+                      <div className="text-[10px] sm:text-xs text-muted-foreground truncate">{lead.email}</div>
+                    </div>
+                  ))}
+                  {leadsByStatus[status].length > 3 && (
+                    <div className="text-[10px] sm:text-xs text-muted-foreground">
+                      +{leadsByStatus[status].length - 3} more
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   );

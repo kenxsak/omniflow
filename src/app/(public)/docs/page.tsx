@@ -48,12 +48,12 @@ export default function DocsPage() {
               </Card>
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-950/20 p-8 rounded-lg">
+            <div className="bg-violet-50 dark:bg-violet-950/20 p-8 rounded-lg">
               <h2 className="text-2xl font-bold mb-4">Full Documentation Coming Soon</h2>
               <p className="text-muted-foreground mb-6">
                 We're building comprehensive documentation to help you get the most out of OmniFlow. For now, check out the resources in your dashboard or contact our support team.
               </p>
-              <Button asChild className="bg-blue-600 hover:bg-blue-700">
+              <Button asChild className="bg-violet-600 hover:bg-violet-700">
                 <Link href="/signup">Get Started <ArrowRight className="ml-2" /></Link>
               </Button>
             </div>

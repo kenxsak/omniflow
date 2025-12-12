@@ -475,15 +475,15 @@ export default function CreateCampaignForm({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Create New Campaign</CardTitle>
-        <CardDescription>Send WhatsApp messages to your contact list</CardDescription>
+      <CardHeader className="p-4 sm:p-6">
+        <CardTitle className="text-base sm:text-lg">Create New Campaign</CardTitle>
+        <CardDescription className="text-xs sm:text-sm">Send WhatsApp messages to your contact list</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="platform">WhatsApp Platform</Label>
+      <CardContent className="space-y-3 sm:space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
+        <div className="space-y-1.5 sm:space-y-2">
+          <Label htmlFor="platform" className="text-sm sm:text-base">WhatsApp Platform</Label>
           <Select value={selectedPlatform} onValueChange={(v: any) => setSelectedPlatform(v)}>
-            <SelectTrigger id="platform">
+            <SelectTrigger id="platform" className="text-sm sm:text-base">
               <SelectValue placeholder="Select platform" />
             </SelectTrigger>
             <SelectContent>
@@ -498,30 +498,31 @@ export default function CreateCampaignForm({
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="campaignName">Campaign Name</Label>
+        <div className="space-y-1.5 sm:space-y-2">
+          <Label htmlFor="campaignName" className="text-sm sm:text-base">Campaign Name</Label>
           <Input
             id="campaignName"
             placeholder="e.g., Summer Sale 2025"
             value={campaignName}
             onChange={(e) => setCampaignName(e.target.value)}
+            className="text-sm sm:text-base"
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="template">
+        <div className="space-y-1.5 sm:space-y-2">
+          <Label htmlFor="template" className="text-sm sm:text-base">
             {selectedPlatform === 'aisensy' ? 'AiSensy Campaign Name' : 'Template'}
           </Label>
           {selectedPlatform === 'wati' || selectedPlatform === 'meta' || selectedPlatform === 'gupshup' || (selectedPlatform === 'authkey' && templates.length > 0) ? (
             <Select value={selectedTemplate} onValueChange={selectedPlatform === 'authkey' ? handleTemplateChange : setSelectedTemplate}>
-              <SelectTrigger id="template">
+              <SelectTrigger id="template" className="text-sm sm:text-base">
                 <SelectValue placeholder="Choose a template" />
               </SelectTrigger>
               <SelectContent>
                 {isLoadingTemplates ? (
-                  <div className="p-2 text-sm text-muted-foreground">Loading...</div>
+                  <div className="p-2 text-xs sm:text-sm text-muted-foreground">Loading...</div>
                 ) : templates.length === 0 ? (
-                  <div className="p-4 text-sm text-muted-foreground">
+                  <div className="p-3 sm:p-4 text-xs sm:text-sm text-muted-foreground">
                     No templates found. Please check your platform settings.
                   </div>
                 ) : (
@@ -545,12 +546,13 @@ export default function CreateCampaignForm({
               placeholder={selectedPlatform === 'aisensy' ? 'Enter AiSensy campaign name' : 'Enter template name'}
               value={selectedTemplate}
               onChange={(e) => setSelectedTemplate(e.target.value)}
+              className="text-sm sm:text-base"
             />
           )}
         </div>
 
         {selectedPlatform === 'authkey' && selectedTemplate && (
-          <div className="space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="isMediaTemplate"
@@ -562,7 +564,7 @@ export default function CreateCampaignForm({
                   }
                 }}
               />
-              <Label htmlFor="isMediaTemplate" className="text-sm font-normal cursor-pointer">
+              <Label htmlFor="isMediaTemplate" className="text-xs sm:text-sm font-normal cursor-pointer">
                 This template has an image/video/document header
               </Label>
             </div>
@@ -570,43 +572,42 @@ export default function CreateCampaignForm({
         )}
 
         {selectedPlatform === 'authkey' && isMediaTemplate && (
-          <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
+          <div className="space-y-2 sm:space-y-3 p-3 sm:p-4 border rounded-lg bg-muted/50">
             <div className="flex items-center gap-2">
-              <Image className="h-4 w-4 text-primary" />
-              <Label htmlFor="mediaUrl" className="font-medium">Media URL</Label>
+              <Image className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+              <Label htmlFor="mediaUrl" className="font-medium text-sm sm:text-base">Media URL</Label>
               {mediaUrlSaved && (
                 <span className="text-xs text-green-600 flex items-center gap-1">
-                  <Check className="h-3 w-3" /> Saved
+                  <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> Saved
                 </span>
               )}
             </div>
             <p className="text-xs text-muted-foreground mb-2">
-              Paste the image/video/document URL from your CPaaS panel. It will be saved for this template so you won't need to paste it again.
+              Paste the image/video/document URL from your CPaaS panel. It will be saved for this template.
             </p>
-            <div className="text-xs space-y-2 p-2 bg-amber-50 dark:bg-amber-900/30 rounded border border-amber-200 dark:border-amber-700">
+            <div className="text-xs space-y-1.5 sm:space-y-2 p-2 bg-amber-50 dark:bg-amber-900/30 rounded border border-amber-200 dark:border-amber-700">
               <p className="font-semibold text-amber-900 dark:text-amber-100">⚠️ Media Requirements:</p>
-              <ul className="list-disc ml-4 space-y-1 text-amber-800 dark:text-amber-200">
-                <li><strong>Use WMart CPaaS URLs only</strong> - External URLs won't work</li>
+              <ul className="list-disc ml-3 sm:ml-4 space-y-0.5 sm:space-y-1 text-amber-800 dark:text-amber-200">
+                <li><strong>Use WMart CPaaS URLs only</strong></li>
                 <li>Image: Max <strong>5 MB</strong> (JPEG/PNG)</li>
-                <li>Video: Max <strong>16 MB</strong> (MP4 only)</li>
+                <li>Video: Max <strong>16 MB</strong> (MP4)</li>
                 <li>Document: Max <strong>100 MB</strong> (PDF)</li>
-                <li>URL must start with: <code className="bg-amber-100 dark:bg-amber-800 px-1 rounded">https://wpgallery.s3...</code></li>
               </ul>
-              <p className="text-amber-700 dark:text-amber-300 pt-1">
-                Get your media URL from: <a href="https://cpaas.wmart.in" target="_blank" className="underline hover:text-amber-600">WMart CPaaS Dashboard</a> → WhatsApp → Templates → Click template → Copy Header Media URL
+              <p className="text-amber-700 dark:text-amber-300 pt-1 text-xs">
+                Get URL from: <a href="https://cpaas.wmart.in" target="_blank" className="underline hover:text-amber-600">WMart CPaaS</a> → WhatsApp → Templates
               </p>
             </div>
             <div className="flex gap-2">
               <Input
                 id="mediaUrl"
-                placeholder="https://wpgallery.s3.ap-south-1.amazonaws.com/gallery/..."
+                placeholder="https://wpgallery.s3..."
                 value={mediaUrl}
                 onChange={(e) => {
                   setMediaUrl(e.target.value);
                   setMediaUrlSaved(false);
                   setImageLoadError(false);
                 }}
-                className="flex-1"
+                className="flex-1 text-xs sm:text-sm"
               />
               <Button
                 type="button"
@@ -614,13 +615,14 @@ export default function CreateCampaignForm({
                 size="sm"
                 onClick={handleSaveMediaUrl}
                 disabled={!mediaUrl || isSavingMediaUrl || mediaUrlSaved}
+                className="h-8 w-8 sm:h-9 sm:w-9 p-0"
               >
                 {isSavingMediaUrl ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                 ) : mediaUrlSaved ? (
-                  <Check className="h-4 w-4" />
+                  <Check className="h-3 w-3 sm:h-4 sm:w-4" />
                 ) : (
-                  <Save className="h-4 w-4" />
+                  <Save className="h-3 w-3 sm:h-4 sm:w-4" />
                 )}
               </Button>
             </div>
@@ -628,7 +630,7 @@ export default function CreateCampaignForm({
             {mediaUrl && !imageLoadError && (
               <div className="mt-2">
                 <p className="text-xs text-muted-foreground mb-2">Preview:</p>
-                <div className="relative w-32 h-32 border rounded overflow-hidden bg-white">
+                <div className="relative w-24 h-24 sm:w-32 sm:h-32 border rounded overflow-hidden bg-white">
                   <img
                     src={mediaUrl}
                     alt="Media preview"
@@ -641,21 +643,21 @@ export default function CreateCampaignForm({
             
             {imageLoadError && (
               <p className="text-xs text-amber-600">
-                Could not load preview. The URL may be for a video/document or the image is not publicly accessible. Campaign will still work.
+                Could not load preview. Campaign will still work.
               </p>
             )}
           </div>
         )}
 
-        <div className="space-y-2">
-          <Label htmlFor="recipientList">Recipient List</Label>
+        <div className="space-y-1.5 sm:space-y-2">
+          <Label htmlFor="recipientList" className="text-sm sm:text-base">Recipient List</Label>
           <Select value={selectedListId} onValueChange={setSelectedListId}>
-            <SelectTrigger id="recipientList">
+            <SelectTrigger id="recipientList" className="text-sm sm:text-base">
               <SelectValue placeholder="Select a contact list" />
             </SelectTrigger>
             <SelectContent>
               {whatsappLists.length === 0 ? (
-                <div className="p-4 text-sm">
+                <div className="p-3 sm:p-4 text-xs sm:text-sm">
                   <p className="text-muted-foreground mb-2">No contact lists found.</p>
                   <p className="text-xs text-muted-foreground">Create a contact list in WhatsApp Marketing.</p>
                 </div>
@@ -671,28 +673,28 @@ export default function CreateCampaignForm({
         </div>
 
         {selectedListId && (
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription>
+          <Alert className="py-2 sm:py-3">
+            <Info className="h-3 w-3 sm:h-4 sm:w-4" />
+            <AlertDescription className="text-xs sm:text-sm">
               Ready to send to {whatsappLists.find(l => l.id === selectedListId)?.contactCount || 0} contacts
             </AlertDescription>
           </Alert>
         )}
       </CardContent>
-      <CardFooter>
+      <CardFooter className="p-4 pt-0 sm:p-6 sm:pt-0">
         <Button 
           onClick={handleSendCampaign} 
           disabled={isSending || !campaignName || !selectedTemplate || !selectedListId}
-          className="w-full"
+          className="w-full text-sm sm:text-base"
         >
           {isSending ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2 animate-spin" />
               Sending...
             </>
           ) : (
             <>
-              <Send className="h-4 w-4 mr-2" />
+              <Send className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
               Send Campaign
             </>
           )}

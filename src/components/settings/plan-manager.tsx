@@ -668,8 +668,8 @@ export default function PlanManager() {
                               {plan.crmAccessLevel === 'full' ? 'Full CRM' : 'Basic CRM'}
                             </span>
                             <div className="flex gap-1 text-xs">
-                              {plan.allowBulkImport && <span className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-1 py-0.5 rounded">Import</span>}
-                              {plan.allowBulkExport && <span className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-1 py-0.5 rounded">Export</span>}
+                              {plan.allowBulkImport && <span className="bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-300 px-1 py-0.5 rounded">Import</span>}
+                              {plan.allowBulkExport && <span className="bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-300 px-1 py-0.5 rounded">Export</span>}
                             </div>
                           </div>
                         </TableCell>

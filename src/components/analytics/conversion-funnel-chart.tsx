@@ -62,14 +62,14 @@ export default function ConversionFunnelChart({ funnel }: ConversionFunnelChartP
           <div className="space-y-1">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-blue-500" />
+                <Eye className="h-4 w-4 text-violet-500" />
                 <span className="font-medium">{stages.views.label}</span>
               </div>
               <span className="text-muted-foreground">
                 {formatNumber(stages.views.count)} ({formatNumber(stages.views.unique)} unique)
               </span>
             </div>
-            <div className="h-12 bg-gradient-to-r from-blue-500 to-blue-400 rounded-md flex items-center justify-center text-white font-semibold shadow-sm"
+            <div className="h-12 bg-gradient-to-r from-violet-500 to-violet-400 rounded-md flex items-center justify-center text-white font-semibold shadow-sm"
                  style={{ width: `${viewWidth}%` }}>
               100%
             </div>

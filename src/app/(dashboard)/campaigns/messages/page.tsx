@@ -101,9 +101,9 @@ export default function UnifiedSmsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2 sm:gap-3">
         <PageTitle 
           title="Bulk SMS Marketing" 
           description="Create and send SMS campaigns to multiple contacts with automatic provider routing."
@@ -111,18 +111,18 @@ export default function UnifiedSmsPage() {
         <div className="flex items-center gap-2">
           {getProviderBadge()}
         </div>
-        <p className="text-sm text-muted-foreground">{getProviderDescription()}</p>
+        <p className="text-xs sm:text-sm text-muted-foreground">{getProviderDescription()}</p>
       </div>
 
       {/* Alert if no provider is configured */}
       {defaultProvider === 'none' && (
         <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950 dark:border-yellow-800">
-          <CardContent className="pt-6">
-            <div className="flex gap-3">
-              <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+          <CardContent className="p-3 sm:pt-6">
+            <div className="flex gap-2 sm:gap-3">
+              <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-yellow-900 dark:text-yellow-100">SMS Provider Not Configured</h3>
-                <p className="text-sm text-yellow-800 dark:text-yellow-200 mt-1">
+                <h3 className="font-semibold text-yellow-900 dark:text-yellow-100 text-sm sm:text-base">SMS Provider Not Configured</h3>
+                <p className="text-xs sm:text-sm text-yellow-800 dark:text-yellow-200 mt-1">
                   To send bulk SMS campaigns, please configure at least one SMS provider (Fast2SMS, MSG91, or Twilio) in your Settings.
                 </p>
               </div>
@@ -135,47 +135,47 @@ export default function UnifiedSmsPage() {
       {defaultProvider !== 'none' && (
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'ai' | 'bulk')} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="ai" className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
-              <span className="hidden sm:inline">Create with AI</span>
+            <TabsTrigger value="ai" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Create with </span>AI
             </TabsTrigger>
-            <TabsTrigger value="bulk" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Send Campaign</span>
+            <TabsTrigger value="bulk" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Send </span>Campaign
             </TabsTrigger>
           </TabsList>
 
           {/* Tab 1: Create with AI */}
-          <TabsContent value="ai" className="space-y-4">
+          <TabsContent value="ai" className="space-y-3 sm:space-y-4">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5" />
+              <CardHeader className="p-3 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
                   Generate SMS Message with AI
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   Use AI to help draft your bulk SMS message. Using {defaultProvider.toUpperCase()}.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
                 <SendSmsForm />
               </CardContent>
             </Card>
           </TabsContent>
 
           {/* Tab 2: Bulk Campaigns */}
-          <TabsContent value="bulk" className="space-y-4">
+          <TabsContent value="bulk" className="space-y-3 sm:space-y-4">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
+              <CardHeader className="p-3 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5" />
                   Send Bulk SMS Campaign
                 </CardTitle>
-                <CardDescription>
-                  Send SMS campaigns to multiple contacts at once with personalization. Test individual messages before sending. Using {defaultProvider.toUpperCase()}.
+                <CardDescription className="text-xs sm:text-sm">
+                  Send SMS campaigns to multiple contacts at once with personalization. Using {defaultProvider.toUpperCase()}.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
                 <BulkSMSCampaigns defaultProvider={defaultProvider as 'fast2sms' | 'msg91' | 'twilio'} />
               </CardContent>
             </Card>

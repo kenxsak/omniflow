@@ -413,23 +413,29 @@ function LeadsTableInner({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <PageTitle 
-          title={userRole === 'user' ? 'My Leads' : 'All Leads'} 
-          description={userRole === 'user' 
-            ? 'View and manage leads assigned to you' 
-            : 'Select and manage your contacts with bulk actions'
-          } 
-        />
-        <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
-            <Download className="h-4 w-4 mr-2" />
-            Download Template
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <PageTitle 
+            title={userRole === 'user' ? 'My Leads' : 'All Leads'} 
+            description={userRole === 'user' 
+              ? 'View and manage leads assigned to you' 
+              : 'Select and manage your contacts with bulk actions'
+            } 
+          />
+          <Button onClick={openAddLeadDialog} size="sm" className="w-full sm:w-auto">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Contact
           </Button>
-          <div className="flex items-center gap-2">
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleDownloadTemplate} className="text-xs sm:text-sm h-8 sm:h-9">
+            <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+            <span className="hidden xs:inline">Download </span>Template
+          </Button>
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <Select value={defaultCountryCode} onValueChange={setDefaultCountryCode}>
-              <SelectTrigger className="w-[140px] h-9">
-                <SelectValue placeholder="Country Code" />
+              <SelectTrigger className="w-[100px] sm:w-[140px] h-8 sm:h-9 text-xs sm:text-sm">
+                <SelectValue placeholder="Code" />
               </SelectTrigger>
               <SelectContent>
                 {COUNTRY_CODES.map((cc) => (
@@ -444,9 +450,10 @@ function LeadsTableInner({
               size="sm" 
               onClick={() => document.getElementById('csv-upload-input')?.click()}
               disabled={isUploading}
+              className="text-xs sm:text-sm h-8 sm:h-9"
             >
-              {isUploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
-              Import CSV/Excel
+              {isUploading ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 animate-spin" /> : <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />}
+              <span className="hidden xs:inline">Import </span>CSV
             </Button>
             <input 
               type="file" 
@@ -456,21 +463,19 @@ function LeadsTableInner({
               style={{ display: 'none' }} 
             />
           </div>
-          <Button onClick={openAddLeadDialog}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Contact
-          </Button>
         </div>
       </div>
 
       {userRole && userRole !== 'user' && (
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'my' | 'all' | 'unassigned')}>
-          <TabsList>
-            <TabsTrigger value="all">All Leads ({totalLeads})</TabsTrigger>
-            <TabsTrigger value="my">My Leads ({allLoadedLeads.filter(l => l.assignedTo === userId).length})</TabsTrigger>
-            <TabsTrigger value="unassigned">Unassigned ({allLoadedLeads.filter(l => !l.assignedTo || l.assignedTo === '_UNASSIGNED_').length})</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="overflow-x-auto -mx-1 px-1">
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'my' | 'all' | 'unassigned')}>
+            <TabsList className="inline-flex w-max sm:w-auto">
+              <TabsTrigger value="all" className="text-xs sm:text-sm px-2 sm:px-3">All ({totalLeads})</TabsTrigger>
+              <TabsTrigger value="my" className="text-xs sm:text-sm px-2 sm:px-3">My ({allLoadedLeads.filter(l => l.assignedTo === userId).length})</TabsTrigger>
+              <TabsTrigger value="unassigned" className="text-xs sm:text-sm px-2 sm:px-3">Unassigned ({allLoadedLeads.filter(l => !l.assignedTo || l.assignedTo === '_UNASSIGNED_').length})</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       )}
 
       {planMetadata && (
@@ -546,25 +551,26 @@ function LeadsTableInner({
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-4 flex-wrap">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
         <Input
           placeholder="Search contacts..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
+          className="w-full sm:max-w-sm h-8 sm:h-9 text-sm"
         />
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between sm:justify-end gap-2">
           <Button 
             variant="outline" 
             size="sm"
             onClick={handleDeleteAll}
             disabled={isDeleting || totalLeads === 0}
+            className="text-xs sm:text-sm h-8 sm:h-9"
           >
-            <AlertTriangle className="h-4 w-4 mr-2" />
-            Delete All
+            <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+            <span className="hidden xs:inline">Delete </span>All
           </Button>
-          <div className="text-sm text-muted-foreground">
-            {filteredLeads.length} contact{filteredLeads.length !== 1 ? 's' : ''} {filteredLeads.length !== totalLeads && `(${totalLeads} total)`}
+          <div className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+            {filteredLeads.length} {filteredLeads.length !== totalLeads && `/ ${totalLeads}`}
           </div>
         </div>
       </div>

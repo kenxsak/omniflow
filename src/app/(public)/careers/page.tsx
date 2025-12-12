@@ -20,7 +20,7 @@ export default function CareersPage() {
               Help us revolutionize how small businesses manage their sales and marketing.
             </p>
 
-            <div className="bg-blue-50 dark:bg-blue-950/20 p-8 rounded-lg mb-12">
+            <div className="bg-violet-50 dark:bg-violet-950/20 p-8 rounded-lg mb-12">
               <h2 className="text-2xl font-bold mb-4">Join WMart Online Services</h2>
               <p className="text-muted-foreground mb-6">
                 WMart Online Services (makers of OmniFlow) is looking for talented people to join our fast-growing team. We value innovation, collaboration, and a passion for helping small businesses succeed.

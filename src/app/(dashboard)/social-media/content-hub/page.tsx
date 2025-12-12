@@ -123,28 +123,103 @@ export default function ContentHubPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <PageTitle
           title="Website & Blog Content Hub"
           description="A central library for all your saved content. Blog posts and sales pages are instantly live upon creation."
         />
-        <Button asChild>
+        <Button asChild size="sm" className="w-full sm:w-auto">
           <Link href="/social-media">
-            <Edit3 className="mr-2 h-4 w-4" /> Go to Content Generator
+            <Edit3 className="mr-2 h-4 w-4" /> <span className="hidden xs:inline">Go to </span>Content Generator
           </Link>
         </Button>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Saved Content</CardTitle>
-          <CardDescription>
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="text-base sm:text-lg">Saved Content</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             All your saved content is stored in the database. This hub is where you manage content for social media and your public-facing pages.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
+        <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+          {/* Mobile Card View */}
+          <div className="sm:hidden space-y-3">
+            {isLoading ? (
+              <div className="h-24 flex items-center justify-center"><Loader2 className="h-5 w-5 animate-spin"/></div>
+            ) : posts.length === 0 ? (
+              <div className="h-24 flex items-center justify-center text-center text-muted-foreground text-sm">
+                No saved posts yet. Go to the "Content Generator" to create and save some content.
+              </div>
+            ) : (
+              posts.map((post) => (
+                <div key={post.id} className="p-3 border rounded-md space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {getIconForPlatform(post.platform)}
+                      <span className="text-sm font-medium">{post.platform}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Badge variant={getStatusBadgeVariant(post.status)} className="text-[10px]">{post.status}</Badge>
+                      {(post.platform === 'BlogPost' || post.platform === 'SalesLandingPage') && (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => handleToggleStatus(post)}
+                        >
+                          {post.status === 'Posted' ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{post.textContent.substring(0, 100)}...</p>
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <span className="text-[10px] text-muted-foreground">
+                      {post.scheduledAt ? format(new Date(post.scheduledAt), 'PP') : 'Not scheduled'}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      {(post.platform === 'BlogPost' || post.platform === 'SalesLandingPage') && (
+                        <>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                            <Link href={`/blog/${post.id}`} target="_blank"><ExternalLink className="h-3 w-3" /></Link>
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCopyLink(post.id)}>
+                            <LinkIcon className="h-3 w-3" />
+                          </Button>
+                        </>
+                      )}
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setPostToSchedule(post)}>
+                        <Clock className="h-3 w-3" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                        <Link href={`/social-media?editPostId=${post.id}`}><Edit3 className="h-3 w-3" /></Link>
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-7 w-7"><Trash2 className="h-3 w-3 text-destructive" /></Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeletePost(post.id)} className={buttonVariants({ variant: "destructive" })}>Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden sm:block overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>

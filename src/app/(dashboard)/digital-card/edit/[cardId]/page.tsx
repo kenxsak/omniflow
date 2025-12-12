@@ -261,10 +261,10 @@ export default function EditDigitalCardPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
+    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-6xl">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Edit Digital Card</h1>
-        <p className="text-muted-foreground mt-2">
+        <h1 className="text-2xl sm:text-3xl font-bold">Edit Digital Card</h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
           Update your digital card
         </p>
       </div>
@@ -282,19 +282,23 @@ export default function EditDigitalCardPage() {
         </Alert>
       )}
 
-      <Tabs defaultValue="basic" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="basic">Basic Info</TabsTrigger>
-          <TabsTrigger value="contact">Contact</TabsTrigger>
-          <TabsTrigger value="links">Links</TabsTrigger>
-          <TabsTrigger value="social">Social Media</TabsTrigger>
-          <TabsTrigger value="lead-capture">Lead Capture</TabsTrigger>
-          <TabsTrigger value="branding">Branding</TabsTrigger>
-          <TabsTrigger value="embed" className="flex items-center gap-1">
-            <Code2 className="h-3 w-3" />
-            <span className="hidden sm:inline">Embed</span>
-          </TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="basic" className="space-y-4 sm:space-y-6">
+        <div className="sticky top-14 sm:top-16 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 bg-background/95 backdrop-blur-sm border-b">
+          <div className="overflow-x-auto scrollbar-hide">
+            <TabsList className="inline-flex w-max min-w-full sm:grid sm:w-full sm:grid-cols-7 gap-1 p-1">
+              <TabsTrigger value="basic" className="px-3 sm:px-3 text-xs sm:text-sm">Basic</TabsTrigger>
+              <TabsTrigger value="contact" className="px-3 sm:px-3 text-xs sm:text-sm">Contact</TabsTrigger>
+              <TabsTrigger value="links" className="px-3 sm:px-3 text-xs sm:text-sm">Links</TabsTrigger>
+              <TabsTrigger value="social" className="px-3 sm:px-3 text-xs sm:text-sm">Social</TabsTrigger>
+              <TabsTrigger value="lead-capture" className="px-3 sm:px-3 text-xs sm:text-sm">Leads</TabsTrigger>
+              <TabsTrigger value="branding" className="px-3 sm:px-3 text-xs sm:text-sm">Brand</TabsTrigger>
+              <TabsTrigger value="embed" className="flex items-center gap-1 px-3 sm:px-3 text-xs sm:text-sm">
+                <Code2 className="h-3 w-3" />
+                <span className="hidden xs:inline">Embed</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
+        </div>
 
         <TabsContent value="basic">
           <Card>
