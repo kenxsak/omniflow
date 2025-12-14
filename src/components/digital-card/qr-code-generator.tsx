@@ -97,12 +97,12 @@ export default function QRCodeGenerator({
                   className="w-64 h-64"
                 />
               </div>
-              <div className="flex flex-col gap-2 w-full">
-                <Button onClick={downloadQRCode} className="w-full">
-                  <Download className="h-4 w-4 mr-2" />
-                  Download QR Code (PNG)
+              <div className="flex flex-col gap-2 w-full items-center">
+                <Button onClick={downloadQRCode} variant="outline" size="sm">
+                  <Download className="h-3.5 w-3.5 mr-1.5" />
+                  Download PNG
                 </Button>
-                <p className="text-xs text-center text-muted-foreground mt-2">
+                <p className="text-xs text-center text-muted-foreground">
                   Print this QR code on business cards, flyers, or posters
                 </p>
               </div>
