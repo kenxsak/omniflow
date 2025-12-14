@@ -947,8 +947,8 @@ export default function ChatInterface({
                         />
                       </div>
                     ) : (
-                      <div className="p-4 bg-yellow-50 dark:bg-yellow-950 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                        <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                      <div className="p-4 bg-warning-muted rounded-lg border border-warning/30">
+                        <p className="text-sm text-warning">
                           Image generated but preview unavailable. The image has been saved.
                         </p>
                       </div>
@@ -975,7 +975,7 @@ export default function ChatInterface({
                       </TabsList>
                       <TabsContent value="preview" className="mt-2">
                         <div className="space-y-2">
-                          <div className="border-2 rounded-lg overflow-hidden bg-white shadow-sm">
+                          <div className="border-2 rounded-lg overflow-hidden bg-card shadow-sm">
                             <iframe
                               srcDoc={message.metadata.htmlContent}
                               className="w-full h-[600px] border-0"

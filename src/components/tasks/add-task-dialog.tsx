@@ -1,9 +1,8 @@
-
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogBody, DialogCloseButton } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,14 +16,13 @@ import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { CalendarIcon, Loader2, Wand2 } from 'lucide-react';
 import { Calendar } from '../ui/calendar';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { logActivity } from '@/lib/activity-log';
 import { generateTaskSuggestions, type GenerateTaskSuggestionsInput } from '@/ai/flows/generate-task-suggestions-flow';
 import { useAuth } from '@/hooks/use-auth';
-
+import { Icon } from '@iconify/react';
 
 const taskSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -59,7 +57,6 @@ export default function AddTaskDialog({ isOpen, onOpenChange, onTaskSaved, taskT
   const [taskSuggestions, setTaskSuggestions] = useState<string[] | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-
   useEffect(() => {
     if (isOpen && appUser?.companyId) {
       if (taskToEdit) {
@@ -85,7 +82,7 @@ export default function AddTaskDialog({ isOpen, onOpenChange, onTaskSaved, taskT
           companyId: appUser.companyId,
         });
       }
-      setTaskSuggestions(null); // Clear suggestions when dialog opens/changes
+      setTaskSuggestions(null);
     }
   }, [isOpen, taskToEdit, reset, appUser]);
 
@@ -105,8 +102,9 @@ export default function AddTaskDialog({ isOpen, onOpenChange, onTaskSaved, taskT
         const result = await generateTaskSuggestions(input);
         setTaskSuggestions(result.taskSuggestions);
         toast({ title: 'AI Suggestions Ready' });
-    } catch (e: any) {
-        toast({ title: "Suggestion Error", description: e.message || "Could not generate suggestions.", variant: "destructive"});
+    } catch (e: unknown) {
+        const errorMessage = e instanceof Error ? e.message : "Could not generate suggestions.";
+        toast({ title: "Suggestion Error", description: errorMessage, variant: "destructive"});
     } finally {
         setIsGenerating(false);
     }
@@ -116,7 +114,6 @@ export default function AddTaskDialog({ isOpen, onOpenChange, onTaskSaved, taskT
     setValue('title', title, { shouldValidate: true });
     setTaskSuggestions(null);
   };
-
 
   const onSubmit: SubmitHandler<TaskFormData> = async (data) => {
      if (!appUser?.companyId) {
@@ -147,140 +144,223 @@ export default function AddTaskDialog({ isOpen, onOpenChange, onTaskSaved, taskT
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{taskToEdit ? 'Edit Task' : 'Create New Task'}</DialogTitle>
+        <DialogHeader className="relative">
+          <DialogTitle>{taskToEdit ? 'Edit Task' : 'New Task'}</DialogTitle>
           <DialogDescription>Fill in the details for your task. Click save when you're done.</DialogDescription>
+          <DialogCloseButton />
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-3">
-          <input type="hidden" {...control.register("companyId")} />
-          <div>
-            <div className="flex justify-between items-center mb-1">
-              <Label htmlFor="title">Title</Label>
-              <Button type="button" variant="ghost" size="sm" onClick={handleGenerateSuggestions} disabled={isGenerating}>
-                <Wand2 className="mr-2 h-4 w-4" />
-                {isGenerating ? 'Suggesting...' : 'Suggest with AI'}
-              </Button>
-            </div>
-            <Controller name="title" control={control} render={({ field }) => <Input id="title" {...field} />} />
-            {errors.title && <p className="text-sm text-destructive mt-1">{errors.title.message}</p>}
-            {isGenerating && <div className="flex items-center text-muted-foreground text-sm mt-2"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating suggestions...</div>}
-            {taskSuggestions && (
-                <div className="mt-2 space-y-1">
-                    <Label className="text-xs">Suggestions:</Label>
-                    <ul className="space-y-1">
-                        {taskSuggestions.map((suggestion, index) => (
-                            <li key={index} className="flex items-center justify-between text-sm p-1.5 bg-muted/50 rounded-md">
-                                <span className="flex-grow pr-2">{suggestion}</span>
-                                <Button type="button" size="xs" variant="secondary" onClick={() => useSuggestion(suggestion)}>Use</Button>
-                            </li>
-                        ))}
-                    </ul>
+        
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <DialogBody className="space-y-5 max-h-[60vh] overflow-y-auto">
+            <input type="hidden" {...control.register("companyId")} />
+            
+            {/* Title */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label htmlFor="title" className="text-stone-800 dark:text-stone-200 font-medium text-sm">Title</Label>
+                <button 
+                  type="button" 
+                  onClick={handleGenerateSuggestions} 
+                  disabled={isGenerating}
+                  className="flex items-center gap-1.5 text-xs text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 transition-colors disabled:opacity-50"
+                >
+                  <Icon icon="solar:magic-stick-3-linear" className="h-3.5 w-3.5" />
+                  {isGenerating ? 'Suggesting...' : 'Suggest with AI'}
+                </button>
+              </div>
+              <Controller 
+                name="title" 
+                control={control} 
+                render={({ field }) => (
+                  <Input 
+                    id="title" 
+                    {...field} 
+                    className="bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800 rounded-lg h-11"
+                    placeholder="Enter task title..."
+                  />
+                )} 
+              />
+              {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+              
+              {isGenerating && (
+                <div className="flex items-center text-stone-500 text-sm">
+                  <Icon icon="solar:refresh-linear" className="mr-2 h-4 w-4 animate-spin" /> 
+                  Generating suggestions...
                 </div>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="status">Status</Label>
-              <Controller name="status" control={control} render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger id="status"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="To Do">To Do</SelectItem>
-                    <SelectItem value="In Progress">In Progress</SelectItem>
-                    <SelectItem value="Done">Done</SelectItem>
-                  </SelectContent>
-                </Select>
-              )} />
-            </div>
-            <div>
-              <Label htmlFor="priority">Priority</Label>
-              <Controller name="priority" control={control} render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger id="priority"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Low">Low</SelectItem>
-                    <SelectItem value="Medium">Medium</SelectItem>
-                    <SelectItem value="High">High</SelectItem>
-                  </SelectContent>
-                </Select>
-              )} />
-            </div>
-          </div>
-          
-           <div>
-                <Label htmlFor="dueDate">Due Date</Label>
-                <Controller
-                    name="dueDate"
-                    control={control}
-                    render={({ field }) => (
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant={"outline"}
-                                    className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}
-                                >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-                                <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
-                            </PopoverContent>
-                        </Popover>
-                    )}
-                />
-                 {errors.dueDate && <p className="text-sm text-destructive mt-1">{errors.dueDate.message}</p>}
+              )}
+              
+              {taskSuggestions && (
+                <div className="space-y-2 pt-2">
+                  <p className="text-xs text-stone-500 font-medium uppercase tracking-wide">Suggestions:</p>
+                  <div className="space-y-1.5">
+                    {taskSuggestions.map((suggestion, index) => (
+                      <div 
+                        key={index} 
+                        className="flex items-center justify-between text-sm p-2.5 bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg"
+                      >
+                        <span className="flex-grow pr-2 text-stone-700 dark:text-stone-300">{suggestion}</span>
+                        <button 
+                          type="button" 
+                          onClick={() => useSuggestion(suggestion)}
+                          className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wide bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 rounded transition-colors"
+                        >
+                          Use
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div>
-                <Label htmlFor="leadId">Link to Lead (Optional)</Label>
-                <Controller
-                    name="leadId"
-                    control={control}
-                    render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value || '_NONE_'}>
-                            <SelectTrigger id="leadId"><SelectValue placeholder="Select a lead..." /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="_NONE_">None</SelectItem>
-                                {Array.isArray(allLeads) && allLeads.map(lead => (
-                                    <SelectItem key={lead.id} value={lead.id}>{lead.name}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    )}
-                />
+            {/* Status & Priority */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="status" className="text-stone-800 dark:text-stone-200 font-medium text-sm">Status</Label>
+                <Controller name="status" control={control} render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger id="status" className="bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800 rounded-lg h-11">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="To Do">To Do</SelectItem>
+                      <SelectItem value="In Progress">In Progress</SelectItem>
+                      <SelectItem value="Done">Done</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="priority" className="text-stone-800 dark:text-stone-200 font-medium text-sm">Priority</Label>
+                <Controller name="priority" control={control} render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger id="priority" className="bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800 rounded-lg h-11">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Low">Low</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="High">High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )} />
+              </div>
+            </div>
+            
+            {/* Due Date */}
+            <div className="space-y-2">
+              <Label htmlFor="dueDate" className="text-stone-800 dark:text-stone-200 font-medium text-sm">Due Date</Label>
+              <Controller
+                name="dueDate"
+                control={control}
+                render={({ field }) => (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal h-11 bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800 rounded-lg",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        <Icon icon="solar:calendar-linear" className="mr-2 h-4 w-4" />
+                        {field.value ? (
+                          <span className="font-mono uppercase text-sm tracking-wide">
+                            {format(field.value, "MMMM do, yyyy")}
+                          </span>
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                    </PopoverContent>
+                  </Popover>
+                )}
+              />
+              {errors.dueDate && <p className="text-sm text-destructive">{errors.dueDate.message}</p>}
             </div>
 
-            <div>
-                <Label htmlFor="appointmentId">Link to Appointment (Optional)</Label>
-                <Controller
-                    name="appointmentId"
-                    control={control}
-                    render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value || '_NONE_'}>
-                            <SelectTrigger id="appointmentId"><SelectValue placeholder="Select an appointment..." /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="_NONE_">None</SelectItem>
-                                {Array.isArray(allAppointments) && allAppointments.map(appt => (
-                                    <SelectItem key={appt.id} value={appt.id}>
-                                        {appt.title} - {format(new Date(appt.startTime), 'MMM d, yyyy')}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    )}
-                />
+            {/* Link to Lead */}
+            <div className="space-y-2">
+              <Label htmlFor="leadId" className="text-stone-800 dark:text-stone-200 font-medium text-sm">Link to Lead (Optional)</Label>
+              <Controller
+                name="leadId"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value || '_NONE_'}>
+                    <SelectTrigger id="leadId" className="bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800 rounded-lg h-11">
+                      <SelectValue placeholder="Select a lead..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="_NONE_">None</SelectItem>
+                      {Array.isArray(allLeads) && allLeads.map(lead => (
+                        <SelectItem key={lead.id} value={lead.id}>{lead.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
 
-          <div>
-            <Label htmlFor="notes">Notes</Label>
-            <Controller name="notes" control={control} render={({ field }) => <Textarea id="notes" {...field} placeholder="Add any relevant notes here..."/>} />
-          </div>
+            {/* Link to Appointment */}
+            <div className="space-y-2">
+              <Label htmlFor="appointmentId" className="text-stone-800 dark:text-stone-200 font-medium text-sm">Link to Appointment (Optional)</Label>
+              <Controller
+                name="appointmentId"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value || '_NONE_'}>
+                    <SelectTrigger id="appointmentId" className="bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800 rounded-lg h-11">
+                      <SelectValue placeholder="Select an appointment..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="_NONE_">None</SelectItem>
+                      {Array.isArray(allAppointments) && allAppointments.map(appt => (
+                        <SelectItem key={appt.id} value={appt.id}>
+                          {appt.title} - {format(new Date(appt.startTime), 'MMM d, yyyy')}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            {/* Notes */}
+            <div className="space-y-2">
+              <Label htmlFor="notes" className="text-stone-800 dark:text-stone-200 font-medium text-sm">Notes</Label>
+              <Controller 
+                name="notes" 
+                control={control} 
+                render={({ field }) => (
+                  <Textarea 
+                    id="notes" 
+                    {...field} 
+                    placeholder="Add any relevant notes here..."
+                    className="bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800 rounded-lg min-h-[100px] resize-none"
+                  />
+                )} 
+              />
+            </div>
+          </DialogBody>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Saving...' : 'Save Task'}</Button>
+            <button 
+              type="button" 
+              onClick={() => onOpenChange(false)}
+              className="px-4 py-2.5 text-sm font-semibold font-mono uppercase tracking-wide text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+            >
+              Cancel
+            </button>
+            <Button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="px-4 py-2.5 h-auto text-sm font-semibold font-mono uppercase tracking-wide"
+            >
+              {isSubmitting ? 'Saving...' : 'Save Task'}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

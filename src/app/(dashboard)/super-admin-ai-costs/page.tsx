@@ -165,7 +165,7 @@ export default function SuperAdminAICostsPage() {
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-red-600">
+                <div className="text-2xl font-bold text-destructive">
                   {formatCurrency(platformStats?.currentMonth.totalGoogleCost || 0)}
                 </div>
                 <p className="text-xs text-muted-foreground">Paid to Google APIs</p>
@@ -178,7 +178,7 @@ export default function SuperAdminAICostsPage() {
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-2xl font-bold text-success">
                   {formatCurrency(platformStats?.currentMonth.totalRevenue || 0)}
                 </div>
                 <p className="text-xs text-muted-foreground">Charged to users</p>
@@ -191,7 +191,7 @@ export default function SuperAdminAICostsPage() {
                 <BarChart3 className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold text-primary">
                   {formatCurrency(platformStats?.currentMonth.totalProfit || 0)}
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -252,13 +252,13 @@ export default function SuperAdminAICostsPage() {
                             <TableCell className="text-right">
                               {formatNumber(company.currentMonth.creditsUsed)}
                             </TableCell>
-                            <TableCell className="text-right text-red-600">
+                            <TableCell className="text-right text-destructive">
                               {formatCurrency(company.currentMonth.estimatedCost)}
                             </TableCell>
-                            <TableCell className="text-right text-green-600">
+                            <TableCell className="text-right text-success">
                               {formatCurrency(company.currentMonth.platformRevenue)}
                             </TableCell>
-                            <TableCell className="text-right text-blue-600">
+                            <TableCell className="text-right text-primary">
                               {formatCurrency(company.currentMonth.platformProfit)}
                             </TableCell>
                             <TableCell>
@@ -305,10 +305,10 @@ export default function SuperAdminAICostsPage() {
                           <TableCell className="text-right">
                             {formatNumber(company.operations)}
                           </TableCell>
-                          <TableCell className="text-right text-green-600">
+                          <TableCell className="text-right text-success">
                             {formatCurrency(company.revenue)}
                           </TableCell>
-                          <TableCell className="text-right text-blue-600">
+                          <TableCell className="text-right text-primary">
                             {formatCurrency(company.profit)}
                           </TableCell>
                         </TableRow>
@@ -409,13 +409,13 @@ export default function SuperAdminAICostsPage() {
                       <TableCell className="text-right">
                         {formatNumber(month.totalOperations)}
                       </TableCell>
-                      <TableCell className="text-right text-red-600">
+                      <TableCell className="text-right text-destructive">
                         {formatCurrency(month.totalGoogleCost)}
                       </TableCell>
-                      <TableCell className="text-right text-green-600">
+                      <TableCell className="text-right text-success">
                         {formatCurrency(month.totalRevenue)}
                       </TableCell>
-                      <TableCell className="text-right text-blue-600">
+                      <TableCell className="text-right text-primary">
                         {formatCurrency(month.totalProfit)}
                       </TableCell>
                     </TableRow>

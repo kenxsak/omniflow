@@ -15,24 +15,24 @@ import type { AuditLogEntry, AuditAction } from '@/types/enterprise';
 import { format, formatDistanceToNow } from 'date-fns';
 
 const actionColors: Record<string, string> = {
-  create: 'bg-green-100 text-green-800',
-  update: 'bg-violet-100 text-violet-800',
-  delete: 'bg-red-100 text-red-800',
-  view: 'bg-gray-100 text-gray-800',
-  assign: 'bg-purple-100 text-purple-800',
-  claim: 'bg-yellow-100 text-yellow-800',
-  release: 'bg-orange-100 text-orange-800',
-  login: 'bg-cyan-100 text-cyan-800',
-  logout: 'bg-slate-100 text-slate-800',
-  bulk_assign: 'bg-indigo-100 text-indigo-800',
-  export: 'bg-teal-100 text-teal-800',
-  import: 'bg-emerald-100 text-emerald-800',
+  create: 'bg-success-muted text-success',
+  update: 'bg-primary/10 text-primary',
+  delete: 'bg-destructive-muted text-destructive',
+  view: 'bg-muted text-muted-foreground',
+  assign: 'bg-primary/10 text-primary',
+  claim: 'bg-warning-muted text-warning',
+  release: 'bg-warning-muted text-warning',
+  login: 'bg-info-muted text-info',
+  logout: 'bg-muted text-muted-foreground',
+  bulk_assign: 'bg-primary/10 text-primary',
+  export: 'bg-info-muted text-info',
+  import: 'bg-success-muted text-success',
 };
 
 const severityColors: Record<string, string> = {
-  info: 'border-violet-500',
-  warning: 'border-yellow-500',
-  critical: 'border-red-500',
+  info: 'border-info',
+  warning: 'border-warning',
+  critical: 'border-destructive',
 };
 
 export function AuditLogViewer() {

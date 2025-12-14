@@ -24,31 +24,31 @@ export function UpgradePrompt({
   const router = useRouter();
 
   return (
-    <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
-      <AlertTriangle className="h-4 w-4 text-amber-600" />
-      <AlertTitle className="text-amber-900 dark:text-amber-100">
+    <Alert variant="warning">
+      <AlertTriangle className="h-4 w-4" />
+      <AlertTitle>
         {featureName ? `${featureName} Limit Reached` : 'Upgrade Required'}
       </AlertTitle>
       <AlertDescription className="space-y-4">
-        <p className="text-amber-800 dark:text-amber-200">
+        <p>
           {reason}
         </p>
         <div className="flex items-center gap-4 pt-2">
           <div className="flex-1">
-            <p className="text-sm font-medium text-amber-900 dark:text-amber-100">
+            <p className="text-sm font-medium">
               Current: {currentPlan.name}
             </p>
-            <p className="text-xs text-amber-700 dark:text-amber-300">
+            <p className="text-xs opacity-80">
               ${currentPlan.priceMonthlyUSD}/month
             </p>
           </div>
-          <ArrowRight className="h-4 w-4 text-amber-600" />
+          <ArrowRight className="h-4 w-4" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-amber-900 dark:text-amber-100 flex items-center gap-1">
+            <p className="text-sm font-medium flex items-center gap-1">
               <Sparkles className="h-3 w-3" />
               Recommended: {suggestedPlan.name}
             </p>
-            <p className="text-xs text-amber-700 dark:text-amber-300">
+            <p className="text-xs opacity-80">
               ${suggestedPlan.priceMonthlyUSD}/month
             </p>
           </div>
@@ -97,7 +97,7 @@ export function LimitReachedModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <Card className="w-full max-w-md mx-4">
         <CardHeader>
-          <div className="flex items-center gap-2 text-amber-600">
+          <div className="flex items-center gap-2 text-warning">
             <AlertTriangle className="h-5 w-5" />
             <CardTitle>Limit Reached</CardTitle>
           </div>
@@ -106,8 +106,8 @@ export function LimitReachedModal({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 p-4">
-            <p className="text-sm text-amber-900 dark:text-amber-100">
+          <div className="rounded-lg bg-warning-muted p-4">
+            <p className="text-sm text-warning-muted-foreground">
               <strong>Usage:</strong> {currentUsage} / {limit} {limitMessages[limitType]}
             </p>
           </div>

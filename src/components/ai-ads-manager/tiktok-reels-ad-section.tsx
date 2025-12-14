@@ -29,7 +29,7 @@ const TiktokReelsAdSectionComponent: React.FC<TiktokReelsAdSectionProps> = ({
   return (
     <Card ref={tiktokReelsAdGeneratorRef}>
         <CardHeader>
-          <CardTitle className="flex items-center"><TiktokIcon className="mr-2 h-5 w-5 text-purple-500" />TikTok & Reels Ad Catalyst</CardTitle>
+          <CardTitle className="flex items-center"><TiktokIcon className="mr-2 h-5 w-5 text-primary" />TikTok & Reels Ad Catalyst</CardTitle>
           <CardDescription>
             AI for campaign planning, short-form video ad concepts, suggesting trending sounds/effects, snappy captions, and clear calls to action for TikTok and Instagram Reels.
           </CardDescription>
@@ -66,7 +66,7 @@ const TiktokReelsAdSectionComponent: React.FC<TiktokReelsAdSectionProps> = ({
             ))}
             {output.generalTipsForPlatform && output.generalTipsForPlatform.length > 0 && (
               <div className="mt-4">
-                <h4 className="font-semibold mb-2 flex items-center"><Lightbulb className="mr-2 h-4 w-4 text-yellow-500"/>General Tips for TikTok/Reels:</h4>
+                <h4 className="font-semibold mb-2 flex items-center"><Lightbulb className="mr-2 h-4 w-4 text-muted-foreground"/>General Tips for TikTok/Reels:</h4>
                 <ul className="list-disc list-inside pl-4 space-y-1 text-sm text-muted-foreground bg-muted/30 p-3 rounded-md">
                   {output.generalTipsForPlatform.map((tip, i) => <li key={`tip-${i}`}>{tip}</li>)}
                 </ul>

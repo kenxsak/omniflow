@@ -1,18 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
 import {
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useFeatureFlag } from "@/hooks/use-feature-flag";
 import gsap from "gsap";
@@ -38,19 +34,12 @@ const allNavItems: NavItem[] = [
   },
 
   {
-    href: "/get-started",
-    label: "Quick Start",
-    icon: "solar:play-circle-linear",
-    tooltip: "NEW? Start here! Learn how to use OmniFlow",
-    badge: "New",
-  },
-
-  {
     href: "/digital-card/manage",
     label: "Digital Cards",
-    icon: "solar:card-linear",
+    icon: "solar:smartphone-linear",
     tooltip: "Create digital business cards with Voice AI chatbot",
     featureId: "feat_digital_cards",
+    badge: "FREE",
     subItems: [
       {
         href: "/digital-card/manage",
@@ -292,6 +281,7 @@ const superAdminNavItems: NavItem[] = [
 
 export default function SidebarNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const [openSubMenus, setOpenSubMenus] = useState<Record<string, boolean>>({});
   const { isSuperAdmin, appUser, company } = useAuth();
   const { isFeatureEnabled } = useFeatureFlag();
@@ -299,6 +289,26 @@ export default function SidebarNav() {
   const menuRef = useRef<HTMLUListElement>(null);
 
   const isAdmin = appUser?.role === "admin" || appUser?.role === "superadmin";
+
+  // Prefetch routes on hover for instant navigation
+  const prefetchRoute = useCallback((href: string) => {
+    if (href && href !== '#' && !href.startsWith('http')) {
+      router.prefetch(href);
+    }
+  }, [router]);
+
+  // Prefetch all main routes on mount for instant navigation
+  useEffect(() => {
+    const prefetchMainRoutes = () => {
+      const mainRoutes = ['/dashboard', '/crm', '/tasks', '/campaigns', '/ai-chat', '/settings'];
+      mainRoutes.forEach(route => {
+        router.prefetch(route);
+      });
+    };
+    // Delay prefetching to not block initial render
+    const timer = setTimeout(prefetchMainRoutes, 1000);
+    return () => clearTimeout(timer);
+  }, [router]);
 
   useEffect(() => {
     const filterItems = async () => {
@@ -373,7 +383,7 @@ export default function SidebarNav() {
   }, [filteredNavItems]);
 
   return (
-    <SidebarMenu ref={menuRef} className="p-2 space-y-0.5">
+    <SidebarMenu ref={menuRef} className="px-2 py-1 space-y-1">
       {filteredNavItems.map((item) => {
         const isParentActive =
           pathname === item.href ||
@@ -390,31 +400,27 @@ export default function SidebarNav() {
                 pathname.startsWith(sub.href) &&
                 sub.href.length > item.href.length)
           );
+          const isActive = isAnySubItemActive || (isParentActive && item.href === pathname);
+          
           return (
-            <SidebarMenuItem key={item.label} data-nav-item>
-              <SidebarMenuButton
-                isActive={
-                  isAnySubItemActive ||
-                  (isParentActive && item.href === pathname)
-                }
-                tooltip={{ children: item.tooltip, className: "capitalize" }}
+            <SidebarMenuItem key={item.label} data-nav-item className="list-none">
+              {/* AutoSend-style button with expandable submenu */}
+              <button
                 onClick={() => toggleSubMenu(item.href)}
                 aria-expanded={isSubMenuOpen}
+                data-state={isActive ? "on" : "off"}
                 className={cn(
-                  "justify-between transition-all duration-200 rounded-lg",
-                  (isAnySubItemActive ||
-                    (isParentActive && item.href === pathname)) &&
-                    "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                  "flex items-center gap-x-3 px-2 h-8 w-full border rounded-lg transition-all duration-100 cursor-pointer justify-between",
+                  isActive 
+                    ? "bg-card text-foreground border-border font-semibold" 
+                    : "border-transparent text-muted-foreground hover:bg-card hover:text-foreground hover:border-border"
                 )}
               >
-                <div className="flex items-center gap-2.5">
-                  <Icon
-                    icon={item.icon}
-                    className="h-4 w-4 sm:h-5 sm:w-5 shrink-0"
-                  />
-                  <span className="text-sm truncate">{item.label}</span>
+                <div className="flex items-center gap-x-3">
+                  <Icon icon={item.icon} className="h-[18px] w-[18px] shrink-0" />
+                  <span className="font-medium text-sm">{item.label}</span>
                   {item.badge && (
-                    <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-primary text-primary-foreground rounded-full">
+                    <span className="px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide bg-primary text-primary-foreground rounded">
                       {item.badge}
                     </span>
                   )}
@@ -426,16 +432,16 @@ export default function SidebarNav() {
                     isSubMenuOpen && "rotate-180"
                   )}
                 />
-              </SidebarMenuButton>
+              </button>
+              
+              {/* Submenu with animation */}
               <div
                 className={cn(
-                  "overflow-hidden transition-all duration-200",
-                  isSubMenuOpen
-                    ? "max-h-[500px] opacity-100"
-                    : "max-h-0 opacity-0"
+                  "overflow-hidden transition-all duration-200 ease-out",
+                  isSubMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
                 )}
               >
-                <SidebarMenuSub className="mt-1 space-y-0.5">
+                <div className="mt-1 ml-7 space-y-1">
                   {item.subItems.map((subItem) => {
                     const isSubItemActive =
                       pathname === subItem.href ||
@@ -443,73 +449,49 @@ export default function SidebarNav() {
                         pathname.startsWith(subItem.href) &&
                         subItem.href.length > item.href.length);
                     return (
-                      <SidebarMenuSubItem key={subItem.href}>
-                        <Link href={subItem.href} passHref legacyBehavior>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={isSubItemActive}
-                            className={cn(
-                              "transition-all duration-200 rounded-md",
-                              isSubItemActive &&
-                                "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                            )}
-                          >
-                            <a className="flex items-center gap-2">
-                              <Icon
-                                icon={subItem.icon}
-                                className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0"
-                              />
-                              <span className="text-xs sm:text-sm truncate">
-                                {subItem.label}
-                              </span>
-                            </a>
-                          </SidebarMenuSubButton>
-                        </Link>
-                      </SidebarMenuSubItem>
+                      <Link
+                        key={subItem.href}
+                        href={subItem.href}
+                        data-state={isSubItemActive ? "on" : "off"}
+                        onMouseEnter={() => prefetchRoute(subItem.href)}
+                        className={cn(
+                          "flex items-center gap-x-3 px-2 h-7 w-full border rounded-lg transition-all duration-100",
+                          isSubItemActive 
+                            ? "bg-card text-foreground border-border font-semibold" 
+                            : "border-transparent text-muted-foreground hover:bg-card hover:text-foreground hover:border-border"
+                        )}
+                      >
+                        <Icon icon={subItem.icon} className="h-4 w-4 shrink-0" />
+                        <span className="font-medium text-xs">{subItem.label}</span>
+                      </Link>
                     );
                   })}
-                </SidebarMenuSub>
+                </div>
               </div>
             </SidebarMenuItem>
           );
         } else {
           return (
-            <SidebarMenuItem key={item.label} data-nav-item>
+            <SidebarMenuItem key={item.label} data-nav-item className="list-none" onMouseEnter={() => !item.disabled && prefetchRoute(item.href)}>
               <Link
                 href={item.disabled ? "#" : item.href}
-                passHref
-                legacyBehavior
+                data-state={isParentActive && !item.disabled ? "on" : "off"}
+                className={cn(
+                  "flex items-center gap-x-3 px-2 h-8 w-full border rounded-lg transition-all duration-100",
+                  isParentActive && !item.disabled 
+                    ? "bg-card text-foreground border-border font-semibold" 
+                    : "border-transparent text-muted-foreground hover:bg-card hover:text-foreground hover:border-border",
+                  item.disabled && "opacity-50 cursor-not-allowed hover:bg-transparent hover:border-transparent hover:text-muted-foreground"
+                )}
+                onClick={item.disabled ? (e) => e.preventDefault() : undefined}
               >
-                <SidebarMenuButton
-                  asChild
-                  isActive={isParentActive && !item.disabled}
-                  tooltip={{ children: item.tooltip, className: "capitalize" }}
-                  className={cn(
-                    "justify-start transition-all duration-200 rounded-lg",
-                    isParentActive &&
-                      !item.disabled &&
-                      "bg-sidebar-accent text-sidebar-accent-foreground font-medium",
-                    item.disabled &&
-                      "opacity-50 cursor-not-allowed hover:bg-transparent"
-                  )}
-                  disabled={item.disabled}
-                  onClick={
-                    item.disabled ? (e) => e.preventDefault() : undefined
-                  }
-                >
-                  <a className="flex items-center gap-2.5">
-                    <Icon
-                      icon={item.icon}
-                      className="h-4 w-4 sm:h-5 sm:w-5 shrink-0"
-                    />
-                    <span className="text-sm truncate">{item.label}</span>
-                    {item.badge && (
-                      <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-primary text-primary-foreground rounded-full">
-                        {item.badge}
-                      </span>
-                    )}
-                  </a>
-                </SidebarMenuButton>
+                <Icon icon={item.icon} className="h-[18px] w-[18px] shrink-0" />
+                <span className="font-medium text-sm">{item.label}</span>
+                {item.badge && (
+                  <span className="px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide bg-primary text-primary-foreground rounded">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             </SidebarMenuItem>
           );

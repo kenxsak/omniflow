@@ -7,7 +7,7 @@ function Skeleton({
   return (
     <div
       className={cn(
-        "animate-pulse rounded-lg bg-muted/70",
+        "animate-pulse rounded-md bg-muted/50",
         className
       )}
       {...props}
@@ -18,12 +18,12 @@ function Skeleton({
 // Pre-built skeleton components for common use cases
 function SkeletonCard({ className }: { className?: string }) {
   return (
-    <div className={cn("rounded-xl border bg-card p-4 sm:p-6 space-y-4", className)}>
-      <div className="flex items-center justify-between">
-        <Skeleton className="h-5 w-24 sm:w-32" />
-        <Skeleton className="h-8 w-8 rounded-full" />
+    <div className={cn("rounded-lg border border-border bg-card p-4 space-y-3", className)}>
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-7 w-7 rounded-md" />
+        <Skeleton className="h-4 w-24" />
       </div>
-      <Skeleton className="h-8 w-20 sm:w-24" />
+      <Skeleton className="h-6 w-16" />
       <Skeleton className="h-3 w-full" />
     </div>
   )
@@ -31,8 +31,8 @@ function SkeletonCard({ className }: { className?: string }) {
 
 function SkeletonTable({ rows = 5 }: { rows?: number }) {
   return (
-    <div className="rounded-lg border overflow-hidden">
-      <div className="bg-muted/30 p-3 sm:p-4 border-b">
+    <div className="rounded-lg border border-border/50 dark:border-border/10 overflow-hidden bg-card">
+      <div className="bg-muted/30 dark:bg-muted/10 p-3 sm:p-4 border-b border-border/50 dark:border-border/10">
         <div className="flex gap-4">
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-4 w-32 hidden sm:block" />

@@ -1,17 +1,14 @@
 "use client";
 
-import { Bot } from 'lucide-react';
 import Link from 'next/link';
+import { Logo } from '@/components/ui/logo';
 
 export function PublicFooter() {
   return (
     <footer className="bg-background border-t">
       <div className="container mx-auto py-6 sm:py-8 px-4">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-          <Link href="/" className="flex items-center gap-2 font-bold text-base sm:text-lg text-primary">
-            <Bot className="h-5 w-5 sm:h-6 sm:w-6" />
-            <span>OmniFlow</span>
-          </Link>
+          <Logo href="/" size="sm" />
           <p className="text-xs sm:text-sm text-muted-foreground text-center">
             © {new Date().getFullYear()} OmniFlow. All rights reserved.
           </p>

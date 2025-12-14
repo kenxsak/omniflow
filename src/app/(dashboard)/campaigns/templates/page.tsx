@@ -280,19 +280,18 @@ export default function TemplatesPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="email" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
-            <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span>Email</span>
+        <TabsList className="rounded-t-xl">
+          <TabsTrigger value="email">
+            <Mail className="h-4 w-4" />
+            Email
           </TabsTrigger>
-          <TabsTrigger value="sms" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
-            <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span>SMS</span>
+          <TabsTrigger value="sms">
+            <MessageSquare className="h-4 w-4" />
+            SMS
           </TabsTrigger>
-          <TabsTrigger value="whatsapp" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
-            <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline">WhatsApp</span>
-            <span className="xs:hidden">WA</span>
+          <TabsTrigger value="whatsapp">
+            <MessageCircle className="h-4 w-4" />
+            WhatsApp
           </TabsTrigger>
         </TabsList>
 

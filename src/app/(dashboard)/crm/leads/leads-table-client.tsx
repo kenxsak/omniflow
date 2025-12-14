@@ -11,7 +11,8 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LeadActionsProvider, useLeadActions } from '@/components/crm/lead-actions-provider';
 import { ContactUsageIndicator } from '@/components/crm/contact-usage-indicator';
 import { BulkAssignDialog } from '@/components/crm/bulk-assign-dialog';
-import { Plus, Upload, Download, Loader2, Users, Trash2, AlertTriangle, UserPlus, Calendar, ChevronRight } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { AppointmentDialog } from '@/components/appointments/appointment-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { createLeadAction, updateLeadAction, bulkDeleteLeadsAction, deleteAllLeadsAction, loadMoreLeadsAction } from '@/app/actions/lead-actions';
@@ -423,13 +424,13 @@ function LeadsTableInner({
             } 
           />
           <Button onClick={openAddLeadDialog} size="sm" className="w-full sm:w-auto">
-            <Plus className="h-4 w-4 mr-2" />
+            <Icon icon="solar:add-circle-linear" className="h-4 w-4 mr-2" />
             Add Contact
           </Button>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" onClick={handleDownloadTemplate} className="text-xs sm:text-sm h-8 sm:h-9">
-            <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+            <Icon icon="solar:download-linear" className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
             <span className="hidden xs:inline">Download </span>Template
           </Button>
           <div className="flex items-center gap-1.5 sm:gap-2">
@@ -452,7 +453,7 @@ function LeadsTableInner({
               disabled={isUploading}
               className="text-xs sm:text-sm h-8 sm:h-9"
             >
-              {isUploading ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 animate-spin" /> : <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />}
+              {isUploading ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 animate-spin" /> : <Icon icon="solar:upload-linear" className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />}
               <span className="hidden xs:inline">Import </span>CSV
             </Button>
             <input 
@@ -491,8 +492,8 @@ function LeadsTableInner({
         <div className="rounded-lg border bg-muted/50 p-3 sm:p-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-muted/50 flex items-center justify-center">
+                <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
               </div>
               <div>
                 <p className="font-medium text-sm">
@@ -509,7 +510,7 @@ function LeadsTableInner({
                 disabled={isDeleting}
                 className="flex-1 sm:flex-none"
               >
-                <Users className="h-4 w-4 mr-2" />
+                <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4 mr-2" />
                 Add to List
               </Button>
               {userRole && userRole !== 'user' && (
@@ -520,7 +521,7 @@ function LeadsTableInner({
                   disabled={isDeleting}
                   className="flex-1 sm:flex-none"
                 >
-                  <UserPlus className="h-4 w-4 mr-2" />
+                  <Icon icon="solar:user-plus-linear" className="h-4 w-4 mr-2" />
                   Assign to Rep
                 </Button>
               )}
@@ -534,7 +535,7 @@ function LeadsTableInner({
                 {isDeleting ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
-                  <Trash2 className="h-4 w-4 mr-2" />
+                  <Icon icon="solar:trash-bin-trash-linear" className="h-4 w-4 mr-2" />
                 )}
                 Delete
               </Button>
@@ -566,7 +567,7 @@ function LeadsTableInner({
             disabled={isDeleting || totalLeads === 0}
             className="text-xs sm:text-sm h-8 sm:h-9"
           >
-            <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+            <Icon icon="solar:danger-triangle-linear" className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
             <span className="hidden xs:inline">Delete </span>All
           </Button>
           <div className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
@@ -597,7 +598,7 @@ function LeadsTableInner({
             {isLoadingMore ? (
               <Loader2 className="h-4 w-4 animate-spin mr-2" />
             ) : (
-              <ChevronRight className="h-4 w-4 mr-2" />
+              <Icon icon="solar:alt-arrow-right-linear" className="h-4 w-4 mr-2" />
             )}
             Load More ({totalLeads - allLoadedLeads.length} remaining)
           </Button>

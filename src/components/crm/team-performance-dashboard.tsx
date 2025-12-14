@@ -80,8 +80,8 @@ export function TeamPerformanceDashboard({ leads, teamMembers }: TeamPerformance
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
-                <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="p-3 rounded-full bg-info-muted">
+                <Users className="h-6 w-6 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{teamMembers.length}</p>
@@ -94,8 +94,8 @@ export function TeamPerformanceDashboard({ leads, teamMembers }: TeamPerformance
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-green-100 dark:bg-green-900">
-                <Target className="h-6 w-6 text-green-600 dark:text-green-400" />
+              <div className="p-3 rounded-full bg-success-muted">
+                <Target className="h-6 w-6 text-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{avgLeadsPerRep}</p>
@@ -108,8 +108,8 @@ export function TeamPerformanceDashboard({ leads, teamMembers }: TeamPerformance
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900">
-                <TrendingUp className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <div className="p-3 rounded-full bg-primary/10">
+                <TrendingUp className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{leads.filter(l => l.status === 'Won').length}</p>
@@ -123,7 +123,7 @@ export function TeamPerformanceDashboard({ leads, teamMembers }: TeamPerformance
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-orange-100 dark:bg-orange-900">
-                <AlertCircle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                <AlertCircle className="h-6 w-6 text-muted-foreground" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{unassignedLeads}</p>
@@ -183,7 +183,7 @@ export function TeamPerformanceDashboard({ leads, teamMembers }: TeamPerformance
                     <div className="flex gap-2 text-xs text-muted-foreground">
                       <span>{rep.totalLeads} leads</span>
                       <span>|</span>
-                      <span className="text-green-600">{rep.wonLeads} won</span>
+                      <span className="text-success">{rep.wonLeads} won</span>
                       {rep.conversionRate > 0 && (
                         <>
                           <span>|</span>
@@ -241,19 +241,19 @@ export function TeamPerformanceDashboard({ leads, teamMembers }: TeamPerformance
                     </td>
                     <td className="text-center py-3 px-2 font-medium">{rep.totalLeads}</td>
                     <td className="text-center py-3 px-2">
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">{rep.newLeads}</Badge>
+                      <Badge variant="info">{rep.newLeads}</Badge>
                     </td>
                     <td className="text-center py-3 px-2">
-                      <Badge variant="outline" className="bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">{rep.contactedLeads}</Badge>
+                      <Badge variant="warning">{rep.contactedLeads}</Badge>
                     </td>
                     <td className="text-center py-3 px-2">
-                      <Badge variant="outline" className="bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400">{rep.qualifiedLeads}</Badge>
+                      <Badge variant="outline" className="bg-success-muted text-success-muted-foreground">{rep.qualifiedLeads}</Badge>
                     </td>
                     <td className="text-center py-3 px-2">
-                      <Badge variant="outline" className="bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">{rep.wonLeads}</Badge>
+                      <Badge variant="success">{rep.wonLeads}</Badge>
                     </td>
                     <td className="text-center py-3 px-2">
-                      <Badge variant="outline" className="bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400">{rep.lostLeads}</Badge>
+                      <Badge variant="destructive">{rep.lostLeads}</Badge>
                     </td>
                     <td className="text-center py-3 px-2">
                       <div className="flex items-center gap-2 justify-center">

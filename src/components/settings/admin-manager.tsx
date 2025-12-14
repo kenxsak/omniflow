@@ -243,14 +243,14 @@ export default function AdminManager() {
                                 const plan = plans.find(p => p.id === company.planId);
                                 const discount = plan?.yearlyDiscountPercentage;
                                 return discount ? (
-                                  <span className="ml-1 text-xs text-green-600 font-semibold">
+                                  <span className="ml-1 text-xs text-success font-semibold">
                                     ({discount}% off)
                                   </span>
                                 ) : null;
                               })()}
                             </TableCell>
                             <TableCell>
-                                <Badge variant={company.status === 'active' ? 'secondary' : 'destructive'} className={company.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                                <Badge variant={company.status === 'active' ? 'success' : 'warning'}>
                                     {company.status}
                                 </Badge>
                             </TableCell>
@@ -329,7 +329,7 @@ export default function AdminManager() {
                                                         const plan = plans.find(p => p.id === company.planId);
                                                         const discount = plan?.yearlyDiscountPercentage;
                                                         return discount ? (
-                                                            <span className="ml-1 text-xs text-green-600">
+                                                            <span className="ml-1 text-xs text-success">
                                                                 ({discount}% off)
                                                             </span>
                                                         ) : null;

@@ -114,11 +114,11 @@ export default function ContentHubPage() {
   const getIconForPlatform = (platform: SocialMediaPost['platform']) => {
     switch (platform) {
         case 'BlogPost':
-            return <Rss className="h-4 w-4 text-orange-500" />;
+            return <Rss className="h-4 w-4 text-warning-muted-foreground" />;
         case 'SalesLandingPage':
-            return <FileCode className="h-4 w-4 text-green-500" />;
+            return <FileCode className="h-4 w-4 text-success-muted-foreground" />;
         default:
-            return <Edit3 className="h-4 w-4 text-blue-500" />;
+            return <Edit3 className="h-4 w-4 text-primary" />;
     }
   };
 

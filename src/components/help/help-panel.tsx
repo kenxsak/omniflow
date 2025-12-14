@@ -130,7 +130,7 @@ export function HelpPanel({ pageId, isOpen, onClose }: HelpPanelProps) {
                     href={content.videoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs sm:text-sm text-blue-600 hover:underline flex items-center gap-1"
+                    className="text-xs sm:text-sm text-primary hover:underline flex items-center gap-1"
                   >
                     📺 {content.videoTitle || "Watch how to use this page"} (
                     {content.videoDuration || "0:30"})
@@ -150,7 +150,7 @@ export function HelpPanel({ pageId, isOpen, onClose }: HelpPanelProps) {
                         key={index}
                         className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground"
                       >
-                        <span className="text-yellow-500 mt-0.5">✓</span>
+                        <span className="text-warning mt-0.5">✓</span>
                         <span>{tip}</span>
                       </li>
                     ))}

@@ -46,7 +46,7 @@ const KeywordPlannerSectionComponent: React.FC<KeywordPlannerSectionProps> = ({
       <form onSubmit={onSubmit}>
         <CardContent className="space-y-4">
           <Alert variant="destructive" className="bg-orange-50 border-orange-300 dark:bg-orange-900/30 dark:border-orange-700">
-            <AlertTriangle className="mr-2 h-4 w-4 !text-orange-600 dark:!text-orange-400" />
+            <AlertTriangle className="mr-2 h-4 w-4 text-muted-foreground" />
             <AlertTitleComponent className="text-orange-700 dark:text-orange-300">Important Disclaimer</AlertTitleComponent>
             <AlertDescription className="text-orange-600 dark:text-orange-400 text-xs">
               The 'Estimated Competition' and 'Estimated CPC Range' are **AI-generated estimations** and **NOT live data from Google Ads**. They are for directional guidance ONLY. Use Google's official Keyword Planner tool for accurate data.
@@ -101,7 +101,7 @@ const KeywordPlannerSectionComponent: React.FC<KeywordPlannerSectionProps> = ({
                     <AccordionContent className="space-y-2 pt-2">
                       <div className="flex flex-wrap gap-2">
                         {negativeKeywords.map((keyword, index) => (
-                          <Badge key={index} variant="outline" className="text-xs cursor-pointer hover:bg-destructive/10 text-red-700 border-red-300" onClick={() => onCopyToClipboard(keyword, "Negative Keyword")} title={`Copy "${keyword}"`}>{keyword}</Badge>
+                          <Badge key={index} variant="outline" className="text-xs cursor-pointer hover:bg-destructive/10 text-destructive-muted-foreground border-destructive-border" onClick={() => onCopyToClipboard(keyword, "Negative Keyword")} title={`Copy "${keyword}"`}>{keyword}</Badge>
                         ))}
                       </div>
                       <Button variant="outline" size="xs" onClick={() => onCopyToClipboard(negativeKeywords.join('\n'), title)}><ClipboardCopy className="mr-1 h-3 w-3" />Copy All {title}</Button>
@@ -134,7 +134,7 @@ const KeywordPlannerSectionComponent: React.FC<KeywordPlannerSectionProps> = ({
             })}
           </Accordion>
           <Alert variant="default" className="mt-4 text-xs border-violet-300 bg-violet-50 dark:bg-violet-900/30">
-            <Info className="mr-2 h-4 w-4 text-violet-600 dark:text-violet-400"/>
+            <Info className="mr-2 h-4 w-4 text-muted-foreground"/>
             <AlertTitleComponent className="text-violet-700 dark:text-violet-300">Keyword Research Tip</AlertTitleComponent>
             <AlertDescription className="text-violet-600 dark:text-violet-400">
               These AI-generated keywords and their estimated metrics are a starting point. For best results, use Google Keyword Planner or other SEO tools to check actual search volumes, competition, and refine your list before launching campaigns.

@@ -385,9 +385,15 @@ export default function WhatsAppMarketingPage() {
       <PageTitle title="WhatsApp Marketing (via wa.me)" description="Manage contact lists and manually initiate messages using wa.me links." />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="manage-lists" className="text-xs sm:text-sm px-2 sm:px-3"><Users className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /><span className="hidden xs:inline">Manage </span>Lists</TabsTrigger>
-          <TabsTrigger value="send-campaign" className="text-xs sm:text-sm px-2 sm:px-3"><Send className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /><span className="hidden xs:inline">Send </span>Campaign</TabsTrigger>
+        <TabsList className="rounded-t-xl">
+          <TabsTrigger value="manage-lists">
+            <Users className="h-4 w-4" />
+            Manage Lists
+          </TabsTrigger>
+          <TabsTrigger value="send-campaign">
+            <Send className="h-4 w-4" />
+            Send Campaign
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="manage-lists" className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
@@ -548,9 +554,9 @@ export default function WhatsAppMarketingPage() {
             </CardContent>
           </Card>
 
-          <Alert className="bg-blue-50 border-blue-200 py-2 sm:py-3">
-            <AlertTitleComponent className="text-blue-900 text-sm sm:text-base">📋 Choose Message Source</AlertTitleComponent>
-            <p className="text-xs sm:text-sm text-blue-800">Use templates, AI (1 credit), or type your own. Personalize with <code className="font-mono text-[10px] sm:text-sm bg-white p-0.5 rounded">*{CONTACT_NAME_PLACEHOLDER}*</code>.</p>
+          <Alert variant="info" className="py-2 sm:py-3">
+            <AlertTitleComponent className="text-sm sm:text-base">📋 Choose Message Source</AlertTitleComponent>
+            <p className="text-xs sm:text-sm">Use templates, AI (1 credit), or type your own. Personalize with <code className="font-mono text-[10px] sm:text-sm bg-card p-0.5 rounded">*{CONTACT_NAME_PLACEHOLDER}*</code>.</p>
           </Alert>
           
           <Card>
@@ -558,10 +564,10 @@ export default function WhatsAppMarketingPage() {
                 <CardTitle className="text-base sm:text-lg">2. Draft Your WhatsApp Campaign Message</CardTitle>
             </CardHeader>
             <Tabs defaultValue="template-wa" className="w-full px-3 sm:px-6">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="template-wa" className="text-xs sm:text-sm px-1 sm:px-3">📋 <span className="hidden xs:inline">Templates</span><span className="xs:hidden">Tmpl</span></TabsTrigger>
-                <TabsTrigger value="ai-wa" className="text-xs sm:text-sm px-1 sm:px-3">✨ AI</TabsTrigger>
-                <TabsTrigger value="manual-wa" className="text-xs sm:text-sm px-1 sm:px-3">✍️ <span className="hidden xs:inline">Manual</span><span className="xs:hidden">Type</span></TabsTrigger>
+              <TabsList className="rounded-t-xl">
+                <TabsTrigger value="template-wa">📋 Templates</TabsTrigger>
+                <TabsTrigger value="ai-wa">✨ AI</TabsTrigger>
+                <TabsTrigger value="manual-wa">✍️ Manual</TabsTrigger>
               </TabsList>
 
               {/* Templates Tab */}

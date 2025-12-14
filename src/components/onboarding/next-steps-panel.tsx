@@ -4,10 +4,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Users, GitBranch, DollarSign, Mail, Target, Sparkles,
-  ArrowRight, CheckCircle2, Circle, TrendingUp, Send
-} from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import Link from 'next/link';
 import type { DealStats } from '@/types/crm';
 
@@ -15,7 +12,7 @@ interface NextStep {
   id: string;
   title: string;
   description: string;
-  icon: React.ElementType;
+  icon: string;
   href: string;
   actionLabel: string;
   priority: 'high' | 'medium' | 'low';
@@ -35,7 +32,7 @@ const NEXT_STEPS: NextStep[] = [
     id: 'add-contacts',
     title: 'Add more contacts',
     description: 'Build your contact list to grow your sales pipeline',
-    icon: Users,
+    icon: 'users',
     href: '/crm',
     actionLabel: 'Add Contacts',
     priority: 'high',
@@ -46,7 +43,7 @@ const NEXT_STEPS: NextStep[] = [
     id: 'create-deal',
     title: 'Create your first deal',
     description: 'Track opportunities and forecast revenue',
-    icon: DollarSign,
+    icon: 'dollar',
     href: '/crm/pipeline',
     actionLabel: 'Create Deal',
     priority: 'high',
@@ -57,7 +54,7 @@ const NEXT_STEPS: NextStep[] = [
     id: 'view-pipeline',
     title: 'Review your pipeline',
     description: 'Visualize deals across stages',
-    icon: GitBranch,
+    icon: 'pipeline',
     href: '/crm/pipeline',
     actionLabel: 'View Pipeline',
     priority: 'medium',
@@ -68,7 +65,7 @@ const NEXT_STEPS: NextStep[] = [
     id: 'send-campaign',
     title: 'Send a marketing campaign',
     description: 'Reach your contacts with email, SMS, or WhatsApp',
-    icon: Send,
+    icon: 'send',
     href: '/campaigns',
     actionLabel: 'Create Campaign',
     priority: 'medium',
@@ -79,7 +76,7 @@ const NEXT_STEPS: NextStep[] = [
     id: 'try-ai',
     title: 'Try AI content generation',
     description: 'Let AI write compelling marketing messages',
-    icon: Sparkles,
+    icon: 'sparkles',
     href: '/ai-assistant',
     actionLabel: 'Try AI',
     priority: 'low',
@@ -90,7 +87,7 @@ const NEXT_STEPS: NextStep[] = [
     id: 'close-deal',
     title: 'Close a deal',
     description: 'Mark a deal as won to track revenue',
-    icon: Target,
+    icon: 'target',
     href: '/crm/pipeline',
     actionLabel: 'View Deals',
     priority: 'high',
@@ -101,7 +98,7 @@ const NEXT_STEPS: NextStep[] = [
     id: 'grow-revenue',
     title: 'Grow your pipeline',
     description: 'Add more high-value opportunities',
-    icon: TrendingUp,
+    icon: 'trending-up',
     href: '/crm/pipeline',
     actionLabel: 'Add Deals',
     priority: 'medium',
@@ -110,10 +107,11 @@ const NEXT_STEPS: NextStep[] = [
   },
 ];
 
+// All priorities use neutral backgrounds - no colored tints
 const priorityColors = {
-  high: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  medium: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-  low: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  high: 'bg-muted/60 dark:bg-white/[0.06] text-muted-foreground',
+  medium: 'bg-muted/60 dark:bg-white/[0.06] text-muted-foreground',
+  low: 'bg-muted/60 dark:bg-white/[0.06] text-muted-foreground',
 };
 
 interface NextStepsPanelProps {
@@ -147,21 +145,20 @@ export function NextStepsPanel({
     .slice(0, maxSteps);
 
   const completedCount = NEXT_STEPS.filter(step => step.completed(data)).length;
-  const progressPercent = (completedCount / NEXT_STEPS.length) * 100;
 
   if (activeSteps.length === 0) {
     return (
-      <Card className="border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/20 dark:border-green-800/50">
+      <Card className="border-success-border">
         <CardContent className="pt-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-full bg-green-100 dark:bg-green-900/50">
-              <CheckCircle2 className="h-6 w-6 text-green-600" />
+            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+              <AppIcon name="check-circle" size={24} className="text-success-muted-foreground" />
             </div>
             <div>
-              <h3 className="font-semibold text-green-800 dark:text-green-300">
+              <h3 className="font-semibold">
                 You're all set!
               </h3>
-              <p className="text-sm text-green-600 dark:text-green-400">
+              <p className="text-sm text-muted-foreground">
                 You've completed the essential setup steps. Keep growing your business!
               </p>
             </div>
@@ -177,14 +174,16 @@ export function NextStepsPanel({
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-primary" />
+              <div className="h-8 w-8 rounded-xl bg-muted/60 dark:bg-white/[0.06] flex items-center justify-center">
+                <AppIcon name="target" size={16} className="text-muted-foreground" />
+              </div>
               Next Steps
             </CardTitle>
             <CardDescription>
               Recommended actions to grow your business
             </CardDescription>
           </div>
-          <Badge variant="secondary" className="bg-primary/10 text-primary">
+          <Badge variant="secondary">
             {completedCount}/{NEXT_STEPS.length} done
           </Badge>
         </div>
@@ -192,29 +191,28 @@ export function NextStepsPanel({
       <CardContent>
         <div className="space-y-3">
           {activeSteps.map((step) => {
-            const Icon = step.icon;
             const isCompleted = step.completed(data);
             
             return (
               <div
                 key={step.id}
-                className="flex items-center gap-4 p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                className="flex items-center gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
               >
                 <div className="shrink-0">
                   {isCompleted ? (
-                    <CheckCircle2 className="h-5 w-5 text-green-600" />
+                    <AppIcon name="check-circle" size={20} className="text-success-muted-foreground" />
                   ) : (
-                    <Circle className="h-5 w-5 text-muted-foreground" />
+                    <AppIcon name="circle" size={20} className="text-muted-foreground" />
                   )}
                 </div>
-                <div className={`p-2 rounded-full ${priorityColors[step.priority]}`}>
-                  <Icon className="h-4 w-4" />
+                <div className={`p-2 rounded-lg ${priorityColors[step.priority]}`}>
+                  <AppIcon name={step.icon} size={16} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-sm">{step.title}</span>
                     {step.priority === 'high' && (
-                      <Badge variant="outline" className="text-xs border-red-200 text-red-600">
+                      <Badge variant="outline" className="text-xs">
                         Priority
                       </Badge>
                     )}
@@ -224,7 +222,7 @@ export function NextStepsPanel({
                 <Button asChild size="sm" variant="outline">
                   <Link href={step.href}>
                     {step.actionLabel}
-                    <ArrowRight className="h-3 w-3 ml-1" />
+                    <AppIcon name="arrow-right" size={14} className="ml-1" />
                   </Link>
                 </Button>
               </div>

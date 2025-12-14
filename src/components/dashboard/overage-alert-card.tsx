@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, DollarSign, TrendingUp } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { getCompanyOverageAction } from '@/app/actions/overage-billing-actions';
 import type { AIOverageCharge } from '@/types/ai-usage';
 import { useAuth } from '@/hooks/use-auth';
@@ -52,7 +52,7 @@ export default function OverageAlertCard() {
       case 'invoiced':
         return <Badge variant="default">Invoiced</Badge>;
       case 'paid':
-        return <Badge className="bg-green-600">Paid</Badge>;
+        return <Badge variant="outline">Paid</Badge>;
       case 'failed':
         return <Badge variant="destructive">Payment Failed</Badge>;
       case 'waived':
@@ -63,11 +63,13 @@ export default function OverageAlertCard() {
   };
 
   return (
-    <Card className="border-orange-200 bg-orange-50/50">
+    <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-orange-600" />
+            <div className="h-8 w-8 rounded-xl bg-muted/60 dark:bg-white/[0.06] flex items-center justify-center">
+              <AppIcon name="warning" size={16} className="text-muted-foreground" />
+            </div>
             <CardTitle className="text-lg">AI Credits Overage</CardTitle>
           </div>
           {getBillingStatusBadge()}
@@ -78,7 +80,7 @@ export default function OverageAlertCard() {
       </CardHeader>
       <CardContent className="space-y-4">
         <Alert>
-          <DollarSign className="h-4 w-4" />
+          <AppIcon name="dollar" size={16} />
           <AlertDescription>
             <div className="space-y-2">
               <p className="font-semibold text-foreground">
@@ -122,7 +124,7 @@ export default function OverageAlertCard() {
 
         {overage.billingStatus === 'failed' && (
           <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
+            <AppIcon name="warning" size={16} />
             <AlertDescription>
               <p className="font-semibold">Payment Failed</p>
               <p className="text-sm mt-1">{overage.failureReason || 'Please update your payment method.'}</p>
@@ -151,7 +153,7 @@ export default function OverageAlertCard() {
         <div className="mt-4">
           <Button variant="default" size="sm" className="w-full" asChild>
             <a href="/settings">
-              <TrendingUp className="mr-2 h-4 w-4" />
+              <AppIcon name="trending-up" size={16} className="mr-2" />
               Upgrade Plan to Avoid Future Overages
             </a>
           </Button>

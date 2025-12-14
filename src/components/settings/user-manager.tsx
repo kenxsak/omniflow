@@ -238,7 +238,7 @@ export default function UserManager() {
                     <AlertTitle className="font-semibold">Automated Email Invitations</AlertTitle>
                     <p className="mt-1">The invited person will receive a professional email with a direct link to sign up and join your company. They must use the email address you specify here when creating their account.</p>
                     {(!company?.apiKeys?.brevo?.apiKey || !company?.apiKeys?.brevo?.senderEmail || !company?.apiKeys?.brevo?.senderName) && (
-                      <p className="mt-2 text-amber-700 font-medium">⚠️ Note: Configure your Brevo API key, sender email, and sender name in Settings → API Keys to enable automated emails.</p>
+                      <p className="mt-2 text-warning font-medium">⚠️ Note: Configure your Brevo API key, sender email, and sender name in Settings → API Keys to enable automated emails.</p>
                     )}
                 </Alert>
               </DialogHeader>

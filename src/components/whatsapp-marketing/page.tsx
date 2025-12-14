@@ -9,10 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogBody, DialogCloseButton } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { PlusCircle, Trash2, Users, Send, Wand2, Loader2, CheckCircle, MessageCircle, Eye, Copy, ClipboardCopy, Upload, FileDown, Info } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { useToast } from '@/hooks/use-toast';
 import { getWhatsAppLists, addWhatsAppList, deleteWhatsAppList, getWhatsAppContacts, addWhatsAppContact, deleteWhatsAppContact, bulkImportContacts } from '@/lib/whatsapp-marketing-data';
 import type { WhatsAppList, WhatsAppContact } from '@/types/whatsapp';
@@ -308,9 +308,15 @@ export default function WhatsAppMarketingPage() {
       <PageTitle title="WhatsApp Marketing (via wa.me)" description="Manage local contact lists and manually initiate messages using wa.me links." />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-1 md:grid-cols-2">
-          <TabsTrigger value="manage-lists"><Users className="mr-2 h-4 w-4" />Manage Lists & Contacts</TabsTrigger>
-          <TabsTrigger value="send-campaign"><Send className="mr-2 h-4 w-4" />Send Campaign via wa.me</TabsTrigger>
+        <TabsList className="rounded-t-xl">
+          <TabsTrigger value="manage-lists">
+            <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4" />
+            Manage Lists
+          </TabsTrigger>
+          <TabsTrigger value="send-campaign">
+            <Icon icon="solar:plain-linear" className="h-4 w-4" />
+            Send Campaign
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="manage-lists" className="space-y-4 mt-4">
@@ -323,18 +329,23 @@ export default function WhatsAppMarketingPage() {
                 </div>
                 <Dialog open={isCreateListDialogOpen} onOpenChange={setIsCreateListDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button size="sm"><PlusCircle className="mr-2 h-4 w-4" />Create New List</Button>
+                    <Button size="sm"><Icon icon="solar:add-circle-linear" className="mr-2 h-4 w-4" />Create New List</Button>
                   </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader><DialogTitle>Create New WhatsApp List</DialogTitle></DialogHeader>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader className="relative">
+                      <DialogTitle>Create New WhatsApp List</DialogTitle>
+                      <DialogCloseButton />
+                    </DialogHeader>
                     <form onSubmit={(e) => { e.preventDefault(); handleCreateList(); }}>
-                      <div className="grid gap-4 py-4">
-                        <Label htmlFor="new-list-name">List Name</Label>
-                        <Input id="new-list-name" value={newListName} onChange={(e) => setNewListName(e.target.value)} placeholder="e.g., New Leads Q1, Product Launch Prospects" required/>
-                      </div>
+                      <DialogBody>
+                        <div className="space-y-2">
+                          <Label htmlFor="new-list-name" className="text-sm font-medium">List Name</Label>
+                          <Input id="new-list-name" value={newListName} onChange={(e) => setNewListName(e.target.value)} placeholder="e.g., New Leads Q1, Product Launch Prospects" required className="bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800 rounded-lg h-11"/>
+                        </div>
+                      </DialogBody>
                       <DialogFooter>
-                        <Button variant="outline" type="button" onClick={() => setIsCreateListDialogOpen(false)}>Cancel</Button>
-                        <Button type="submit">Create List</Button>
+                        <button type="button" onClick={() => setIsCreateListDialogOpen(false)} className="px-4 py-2.5 text-sm font-semibold font-mono uppercase tracking-wide text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 transition-colors">Cancel</button>
+                        <Button type="submit" className="px-4 py-2.5 h-auto text-sm font-semibold font-mono uppercase tracking-wide">Create List</Button>
                       </DialogFooter>
                     </form>
                   </DialogContent>
@@ -342,7 +353,7 @@ export default function WhatsAppMarketingPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {isLoadingLists ? <div className="flex justify-center items-center h-20"><Loader2 className="animate-spin h-6 w-6 text-primary" /></div> :
+              {isLoadingLists ? <div className="flex justify-center items-center h-20"><Icon icon="solar:refresh-linear" className="animate-spin h-6 w-6 text-primary" /></div> :
                 whatsAppLists.length === 0 ? <p className="text-muted-foreground text-center py-4">No lists created yet.</p> :
                 <div className="space-y-2">
                   {whatsAppLists.map(list => (
@@ -352,9 +363,9 @@ export default function WhatsAppMarketingPage() {
                         <p className="text-xs text-muted-foreground">Created: {new Date(list.createdAt).toLocaleDateString()}</p>
                       </div>
                       <div className="flex gap-2 flex-shrink-0 self-end sm:self-center">
-                        <Button variant="outline" size="sm" onClick={() => handleViewContacts(list)}><Eye className="mr-1 h-4 w-4" />View Contacts</Button>
+                        <Button variant="outline" size="sm" onClick={() => handleViewContacts(list)}><Icon icon="solar:eye-linear" className="mr-1 h-4 w-4" />View Contacts</Button>
                         <AlertDialog>
-                          <AlertDialogTrigger asChild><Button variant="destructive" size="sm" onClick={(e) => e.stopPropagation()}><Trash2 className="mr-1 h-4 w-4" />Delete</Button></AlertDialogTrigger>
+                          <AlertDialogTrigger asChild><Button variant="destructive" size="sm" onClick={(e) => e.stopPropagation()}><Icon icon="solar:trash-bin-trash-linear" className="mr-1 h-4 w-4" />Delete</Button></AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader><AlertDialogTitle>Delete List "{list.name}"?</AlertDialogTitle><AlertDialogDescription>This will delete the list and all its contacts. This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
                             <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleDeleteList(list.id, list.name)} className={buttonVariants({variant: "destructive"})}>Delete List</AlertDialogAction></AlertDialogFooter>
@@ -374,26 +385,35 @@ export default function WhatsAppMarketingPage() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <CardTitle>Contacts in "{selectedList.name}"</CardTitle>
                     <div className="flex gap-2 flex-wrap">
-                        <Button size="sm" variant="outline" onClick={handleDownloadTemplate}><FileDown className="mr-2 h-4 w-4" />Download Template</Button>
+                        <Button size="sm" variant="outline" onClick={handleDownloadTemplate}><Icon icon="solar:file-download-linear" className="mr-2 h-4 w-4" />Download Template</Button>
                         <Button size="sm" variant="outline" onClick={() => document.getElementById('contact-upload-input')?.click()} disabled={isUploadingContacts}>
-                            {isUploadingContacts ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                            {isUploadingContacts ? <Icon icon="solar:refresh-linear" className="mr-2 h-4 w-4 animate-spin" /> : <Icon icon="solar:upload-linear" className="mr-2 h-4 w-4" />}
                             Upload Contacts (Excel/CSV)
                         </Button>
                         <input type="file" id="contact-upload-input" accept=".csv, .xlsx, .xls" onChange={handleContactFileUpload} style={{ display: 'none' }} />
                         <Dialog open={isAddContactDialogOpen} onOpenChange={setIsAddContactDialogOpen}>
-                        <DialogTrigger asChild><Button size="sm"><PlusCircle className="mr-2 h-4 w-4"/>Add Contact Manually</Button></DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader><DialogTitle>Add Contact to "{selectedList.name}"</DialogTitle></DialogHeader>
+                        <DialogTrigger asChild><Button size="sm"><Icon icon="solar:add-circle-linear" className="mr-2 h-4 w-4"/>Add Contact Manually</Button></DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                            <DialogHeader className="relative">
+                              <DialogTitle>Add Contact to "{selectedList.name}"</DialogTitle>
+                              <DialogCloseButton />
+                            </DialogHeader>
                             <form onSubmit={(e) => { e.preventDefault(); handleAddContactToList(); }}>
-                                <div className="space-y-3 py-3">
-                                    <div><Label htmlFor="contact-name-modal">Name *</Label><Input id="contact-name-modal" value={newContactName} onChange={(e)=>setNewContactName(e.target.value)} required /></div>
-                                    <div>
-                                    <Label htmlFor="contact-phone-modal">WhatsApp Number *</Label>
-                                    <Input id="contact-phone-modal" type="tel" value={newContactPhoneNumber} onChange={(e)=>setNewContactPhoneNumber(e.target.value)} placeholder="e.g., +919876543210 (with country code)" required />
-                                    <p className="text-xs text-muted-foreground mt-1">Include country code (e.g., +1 for US, +91 for India).</p>
+                                <DialogBody className="space-y-4">
+                                    <div className="space-y-2">
+                                      <Label htmlFor="contact-name-modal" className="text-sm font-medium">Name *</Label>
+                                      <Input id="contact-name-modal" value={newContactName} onChange={(e)=>setNewContactName(e.target.value)} required className="bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800 rounded-lg h-11" />
                                     </div>
-                                </div>
-                                <DialogFooter><Button variant="outline" type="button" onClick={()=>setIsAddContactDialogOpen(false)}>Cancel</Button><Button type="submit">Add Contact</Button></DialogFooter>
+                                    <div className="space-y-2">
+                                      <Label htmlFor="contact-phone-modal" className="text-sm font-medium">WhatsApp Number *</Label>
+                                      <Input id="contact-phone-modal" type="tel" value={newContactPhoneNumber} onChange={(e)=>setNewContactPhoneNumber(e.target.value)} placeholder="e.g., +919876543210 (with country code)" required className="bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800 rounded-lg h-11" />
+                                      <p className="text-xs text-muted-foreground">Include country code (e.g., +1 for US, +91 for India).</p>
+                                    </div>
+                                </DialogBody>
+                                <DialogFooter>
+                                  <button type="button" onClick={()=>setIsAddContactDialogOpen(false)} className="px-4 py-2.5 text-sm font-semibold font-mono uppercase tracking-wide text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 transition-colors">Cancel</button>
+                                  <Button type="submit" className="px-4 py-2.5 h-auto text-sm font-semibold font-mono uppercase tracking-wide">Add Contact</Button>
+                                </DialogFooter>
                             </form>
                         </DialogContent>
                        </Dialog>
@@ -401,7 +421,7 @@ export default function WhatsAppMarketingPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                {isLoadingLists && contactsInSelectedList.length === 0 ? <div className="flex justify-center items-center h-20"><Loader2 className="animate-spin h-6 w-6 text-primary" /></div> :
+                {isLoadingLists && contactsInSelectedList.length === 0 ? <div className="flex justify-center items-center h-20"><Icon icon="solar:refresh-linear" className="animate-spin h-6 w-6 text-primary" /></div> :
                   contactsInSelectedList.length === 0 ? <p className="text-muted-foreground text-center py-4">No contacts in this list yet. Add contacts manually or upload an Excel/CSV file.</p> :
                   <div className="overflow-x-auto">
                     <Table>
@@ -413,7 +433,7 @@ export default function WhatsAppMarketingPage() {
                             <TableCell>{contact.phoneNumber}</TableCell>
                             <TableCell className="text-right">
                                 <AlertDialog>
-                                    <AlertDialogTrigger asChild><Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive"/></Button></AlertDialogTrigger>
+                                    <AlertDialogTrigger asChild><Button variant="ghost" size="icon"><Icon icon="solar:trash-bin-trash-linear" className="h-4 w-4 text-destructive"/></Button></AlertDialogTrigger>
                                     <AlertDialogContent>
                                         <AlertDialogHeader><AlertDialogTitle>Delete contact "{contact.name}"?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
                                         <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleDeleteContact(contact.id)} className={buttonVariants({variant: "destructive"})}>Delete</AlertDialogAction></AlertDialogFooter>
@@ -470,16 +490,16 @@ export default function WhatsAppMarketingPage() {
                         <Input id="wa-ai-outcome" value={aiMessageInputs.outcome} onChange={(e) => setAiMessageInputs(prev => ({ ...prev, outcome: e.target.value }))} placeholder="e.g., Get users to visit link" />
                     </div>
                     <Button type="submit" variant="outline" size="sm" disabled={isAiDraftingMessage}>
-                        {isAiDraftingMessage ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+                        {isAiDraftingMessage ? <Icon icon="solar:refresh-linear" className="mr-2 h-4 w-4 animate-spin" /> : <Icon icon="solar:magic-stick-3-linear" className="mr-2 h-4 w-4" />}
                         Draft with AI
                     </Button>
                      <Label htmlFor="campaign-message">Campaign Message (Edit AI draft or write your own)</Label>
                      <Textarea id="campaign-message" value={campaignMessage} onChange={(e) => setCampaignMessage(e.target.value)} rows={7} placeholder={placeholderForCampaignMessage} className="min-h-[150px]" />
                      <p className="text-xs text-muted-foreground mt-1">
                         {`The AI will use `}
-                        <code className="font-mono text-purple-600 p-0.5 bg-muted rounded-sm">*{CONTACT_NAME_PLACEHOLDER}*</code>
+                        <code className="font-mono text-primary p-0.5 bg-muted rounded-sm">*{CONTACT_NAME_PLACEHOLDER}*</code>
                         {` for personalization. Your business name `}
-                        <code className="font-mono text-purple-600 p-0.5 bg-muted rounded-sm">*{profileBusinessName}*</code>
+                        <code className="font-mono text-primary p-0.5 bg-muted rounded-sm">*{profileBusinessName}*</code>
                         {` (from settings) will be added to the signature if not already present.`}
                      </p>
                 </CardContent>
@@ -494,7 +514,7 @@ export default function WhatsAppMarketingPage() {
                      <Input id="single-send-phone" type="tel" value={singleSendPhoneNumber} onChange={(e) => setSingleSendPhoneNumber(e.target.value)} placeholder="e.g., +919876543210 (with country code)" />
                  </div>
                  <Button onClick={() => initiateSingleWaMeSend(singleSendPhoneNumber, campaignMessage, "Test Contact")} disabled={!singleSendPhoneNumber || !campaignMessage} size="sm">
-                     <Send className="mr-2 h-4 w-4"/> Send Test Message
+                     <Icon icon="solar:plain-linear" className="mr-2 h-4 w-4"/> Send Test Message
                  </Button>
              </CardContent>
           </Card>
@@ -521,11 +541,11 @@ export default function WhatsAppMarketingPage() {
                       disabled={contact.hasBeenSent}
                       className={cn(
                         contact.hasBeenSent 
-                          ? "bg-green-500 hover:bg-green-600 text-white"
+                          ? "bg-success hover:bg-success/90 text-success-foreground"
                           : "bg-primary hover:bg-primary/90 text-primary-foreground" 
                       )}
                     >
-                      {contact.hasBeenSent ? <CheckCircle className="mr-2 h-4 w-4" /> : <Send className="mr-2 h-4 w-4" />}
+                      {contact.hasBeenSent ? <Icon icon="solar:check-circle-bold" className="mr-2 h-4 w-4" /> : <Icon icon="solar:plain-linear" className="mr-2 h-4 w-4" />}
                       {contact.hasBeenSent ? "Initiated" : `Send to ${contact.name.split(' ')[0]}`}
                     </Button>
                   </div>

@@ -104,7 +104,7 @@ export default function CampaignsPage() {
             <Icon icon="solar:paper-plane-linear" className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
           </div>
           <p className="text-sm sm:text-base text-muted-foreground mb-4">No campaigns yet. Create your first campaign!</p>
-          <Button asChild variant="gradient">
+          <Button asChild>
             <Link href="/campaigns/ai-email">
               <Icon icon="solar:magic-stick-3-linear" className="mr-2 h-4 w-4" />
               Create with AI
@@ -224,7 +224,7 @@ export default function CampaignsPage() {
                 <span className="hidden xs:inline">Compose</span>
               </Link>
             </Button>
-            <Button asChild variant="gradient" size="sm" className="flex-1 sm:flex-none">
+            <Button asChild size="sm" className="flex-1 sm:flex-none">
               <Link href="/campaigns/ai-email">
                 <Icon icon="solar:magic-stick-3-linear" className="mr-1.5 h-4 w-4" />
                 AI Studio
@@ -279,23 +279,23 @@ export default function CampaignsPage() {
           <Card className="card-gradient-purple">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4 sm:pb-2">
               <CardTitle className="text-xs sm:text-sm font-medium">Email</CardTitle>
-              <Icon icon="solar:letter-linear" className="h-4 w-4 text-purple-600" />
+              <Icon icon="solar:letter-linear" className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent className="p-3 sm:p-4 pt-0">
-              <div className="text-lg sm:text-2xl font-bold text-purple-700 dark:text-purple-300">
+              <div className="text-lg sm:text-2xl font-bold text-primary">
                 {isLoading ? <Icon icon="solar:refresh-circle-linear" className="h-5 w-5 animate-spin" /> : <AnimatedCounter value={emailCampaigns.length} />}
               </div>
             </CardContent>
           </Card>
         </StaggerItem>
         <StaggerItem>
-          <Card className="card-gradient-green">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4 sm:pb-2">
               <CardTitle className="text-xs sm:text-sm font-medium">SMS/WA</CardTitle>
-              <Icon icon="solar:chat-square-linear" className="h-4 w-4 text-emerald-600" />
+              <Icon icon="solar:chat-square-linear" className="h-4 w-4 text-success" />
             </CardHeader>
             <CardContent className="p-3 sm:p-4 pt-0">
-              <div className="text-lg sm:text-2xl font-bold text-emerald-700 dark:text-emerald-300">
+              <div className="text-lg sm:text-2xl font-bold text-success">
                 {isLoading ? <Icon icon="solar:refresh-circle-linear" className="h-5 w-5 animate-spin" /> : <AnimatedCounter value={smsCampaigns.length + whatsappCampaigns.length} />}
               </div>
             </CardContent>
@@ -323,24 +323,12 @@ export default function CampaignsPage() {
           </CardHeader>
           <CardContent className="p-4 sm:p-6 pt-0">
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
-              <div className="sticky top-14 sm:top-16 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 bg-background/95 backdrop-blur-sm border-b">
-                <div className="overflow-x-auto scrollbar-hide">
-                  <TabsList className="w-max sm:w-full grid grid-cols-4 h-auto gap-1 p-1">
-                    <TabsTrigger value="all" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">
-                      All <span className="hidden xs:inline ml-1">({allCampaigns.length})</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="email" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">
-                      Email <span className="hidden xs:inline ml-1">({emailCampaigns.length})</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="sms" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">
-                      SMS <span className="hidden xs:inline ml-1">({smsCampaigns.length})</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="whatsapp" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">
-                      WA <span className="hidden xs:inline ml-1">({whatsappCampaigns.length})</span>
-                    </TabsTrigger>
-                  </TabsList>
-                </div>
-              </div>
+              <TabsList className="rounded-none">
+                <TabsTrigger value="all">All ({allCampaigns.length})</TabsTrigger>
+                <TabsTrigger value="email">Email ({emailCampaigns.length})</TabsTrigger>
+                <TabsTrigger value="sms">SMS ({smsCampaigns.length})</TabsTrigger>
+                <TabsTrigger value="whatsapp">WhatsApp ({whatsappCampaigns.length})</TabsTrigger>
+              </TabsList>
               
               <TabsContent value="all" className="mt-4 sm:mt-6">
                 {isLoading ? (

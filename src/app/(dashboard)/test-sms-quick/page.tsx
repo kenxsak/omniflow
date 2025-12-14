@@ -167,7 +167,7 @@ export default function TestQuickSMSPage() {
                   disabled={isSending}
                   type="tel"
                 />
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   Enter 10-digit Indian mobile number (with or without +91)
                 </p>
               </div>
@@ -185,14 +185,14 @@ export default function TestQuickSMSPage() {
                   className="resize-none"
                 />
                 <div className="flex justify-between items-center">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     {message.length} characters
                   </p>
                   <div className="text-right">
                     <p className="text-sm font-semibold">
                       SMS Count: <Badge variant="outline">{smsCount}</Badge>
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       160 chars = 1 SMS, 153 chars for additional
                     </p>
                   </div>
@@ -230,26 +230,26 @@ export default function TestQuickSMSPage() {
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
               <div className="space-y-2">
-                <p className="font-semibold text-gray-900">✓ Route</p>
+                <p className="font-semibold text-foreground">✓ Route</p>
                 <Badge variant="outline" className="mt-1">Quick SMS</Badge>
-                <p className="text-gray-600 text-xs mt-1">Custom message, no template</p>
+                <p className="text-muted-foreground text-xs mt-1">Custom message, no template</p>
               </div>
 
               <div className="space-y-2">
-                <p className="font-semibold text-gray-900">✓ Provider</p>
+                <p className="font-semibold text-foreground">✓ Provider</p>
                 <Badge variant="outline" className="mt-1">Fast2SMS</Badge>
-                <p className="text-gray-600 text-xs mt-1">Lightning-fast delivery</p>
+                <p className="text-muted-foreground text-xs mt-1">Lightning-fast delivery</p>
               </div>
 
               <div className="space-y-2">
-                <p className="font-semibold text-gray-900">✓ Cost</p>
+                <p className="font-semibold text-foreground">✓ Cost</p>
                 <Badge variant="outline" className="mt-1">Higher Cost</Badge>
-                <p className="text-gray-600 text-xs mt-1">For exact pricing, check Fast2SMS dashboard</p>
+                <p className="text-muted-foreground text-xs mt-1">For exact pricing, check Fast2SMS dashboard</p>
               </div>
 
               <div className="pt-4 border-t space-y-3">
-                <p className="font-semibold text-gray-900">Message Guidelines</p>
-                <ul className="space-y-2 text-gray-600 text-xs">
+                <p className="font-semibold text-foreground">Message Guidelines</p>
+                <ul className="space-y-2 text-muted-foreground text-xs">
                   <li>• <span className="font-semibold">Max 160 chars</span> = 1 SMS</li>
                   <li>• <span className="font-semibold">Keep concise</span> = Better delivery</li>
                   <li>• <span className="font-semibold">Any content</span> = No approval needed</li>
@@ -258,8 +258,8 @@ export default function TestQuickSMSPage() {
               </div>
 
               <div className="pt-4 border-t">
-                <p className="font-semibold text-gray-900 mb-2">Use Cases:</p>
-                <ul className="space-y-1 text-gray-600 text-xs">
+                <p className="font-semibold text-foreground mb-2">Use Cases:</p>
+                <ul className="space-y-1 text-muted-foreground text-xs">
                   <li>✅ Promotional offers</li>
                   <li>✅ Flash sales alerts</li>
                   <li>✅ Reminders & updates</li>
@@ -292,29 +292,29 @@ export default function TestQuickSMSPage() {
           <CardContent className="space-y-4">
             {testResponse.success ? (
               <>
-                <Alert className="border-green-200 bg-green-50">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <AlertTitle className="text-green-900">SMS Sent Successfully</AlertTitle>
-                  <AlertDescription className="text-green-800">
+                <Alert variant="success">
+                  <CheckCircle className="h-4 w-4" />
+                  <AlertTitle>SMS Sent Successfully</AlertTitle>
+                  <AlertDescription>
                     Your message has been sent via Fast2SMS Quick SMS route. Check your phone for delivery.
                   </AlertDescription>
                 </Alert>
 
                 {testResponse.requestId && (
-                  <div className="bg-gray-50 p-4 rounded-lg font-mono text-sm">
-                    <p className="text-gray-600 mb-1">Request ID:</p>
-                    <p className="text-gray-900 break-all">{testResponse.requestId}</p>
+                  <div className="bg-muted p-4 rounded-lg font-mono text-sm">
+                    <p className="text-muted-foreground mb-1">Request ID:</p>
+                    <p className="text-foreground break-all">{testResponse.requestId}</p>
                   </div>
                 )}
 
                 {testResponse.smsCount && testResponse.estimatedCost && (
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 p-3 rounded">
-                      <p className="text-sm text-gray-600">SMS Count</p>
+                    <div className="bg-muted p-3 rounded">
+                      <p className="text-sm text-muted-foreground">SMS Count</p>
                       <p className="text-lg font-semibold">{testResponse.smsCount}</p>
                     </div>
-                    <div className="bg-gray-50 p-3 rounded">
-                      <p className="text-sm text-gray-600">Cost (Estimate)</p>
+                    <div className="bg-muted p-3 rounded">
+                      <p className="text-sm text-muted-foreground">Cost (Estimate)</p>
                       <p className="text-lg font-semibold">₹{testResponse.estimatedCost.toFixed(2)}</p>
                     </div>
                   </div>
@@ -331,11 +331,11 @@ export default function TestQuickSMSPage() {
             )}
 
             {testResponse.apiResponse && (
-              <details className="bg-gray-50 p-4 rounded-lg">
+              <details className="bg-muted p-4 rounded-lg">
                 <summary className="cursor-pointer font-semibold text-sm">
                   Full API Response (Debug Info)
                 </summary>
-                <pre className="mt-3 text-xs bg-gray-900 text-gray-100 p-3 rounded overflow-auto max-h-48">
+                <pre className="mt-3 text-xs bg-foreground/90 text-background p-3 rounded overflow-auto max-h-48">
                   {JSON.stringify(testResponse.apiResponse, null, 2)}
                 </pre>
               </details>

@@ -41,6 +41,26 @@ export function LoadingPage({ text = "Loading..." }: LoadingPageProps) {
   );
 }
 
+// Unified page loading component - use this for all page loading states
+interface PageLoadingProps {
+  text?: string;
+  fullHeight?: boolean;
+}
+
+export function PageLoading({ text = "Loading...", fullHeight = true }: PageLoadingProps) {
+  return (
+    <div className={cn(
+      "flex w-full items-center justify-center",
+      fullHeight ? "h-[calc(100vh-200px)] min-h-[300px]" : "h-48"
+    )}>
+      <div className="flex flex-col items-center gap-3">
+        <div className="h-8 w-8 rounded-full border-2 border-border border-t-foreground animate-spin" />
+        <p className="text-sm text-muted-foreground">{text}</p>
+      </div>
+    </div>
+  );
+}
+
 interface LoadingDotsProps {
   className?: string;
 }

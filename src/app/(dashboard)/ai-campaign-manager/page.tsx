@@ -287,10 +287,10 @@ export default function AiAdsManagerPage() {
         description="Leverage AI for ad campaign planning and creative generation across various platforms."
       />
 
-      <Alert variant="default" className="border-blue-300 bg-blue-50 dark:bg-blue-900/30">
-        <Lightbulb className="mr-2 h-5 w-5 text-blue-500" />
-        <AlertTitleComponent className="font-semibold text-blue-700 dark:text-blue-300">Comprehensive Ad Assistance</AlertTitleComponent>
-        <AlertDescription className="text-sm text-blue-600 dark:text-blue-400 space-y-2">
+      <Alert variant="info">
+        <Lightbulb className="mr-2 h-5 w-5" />
+        <AlertTitleComponent className="font-semibold">Comprehensive Ad Assistance</AlertTitleComponent>
+        <AlertDescription className="text-sm space-y-2">
           <p>
             This AI Ads Manager helps you plan and generate creatives for various ad platforms. Start with keyword planning for Google Ads, then generate ad copy. For other platforms, use the dedicated tools to get tailored content suggestions.
           </p>

@@ -287,10 +287,10 @@ export default function TestSMSPage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Info Alert */}
-                  <Alert className="border-blue-200 bg-blue-50">
-                    <Info className="h-4 w-4 text-blue-600" />
-                    <AlertTitle className="text-blue-900">Manual Testing</AlertTitle>
-                    <AlertDescription className="text-blue-800">
+                  <Alert variant="info">
+                    <Info className="h-4 w-4" />
+                    <AlertTitle>Manual Testing</AlertTitle>
+                    <AlertDescription>
                       Enter a phone number and variable value to test your template manually. Perfect for quick verification.
                     </AlertDescription>
                   </Alert>
@@ -306,7 +306,7 @@ export default function TestSMSPage() {
                       disabled={isSendingSingle}
                       type="tel"
                     />
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       Enter 10-digit Indian mobile number (with or without +91)
                     </p>
                   </div>
@@ -478,10 +478,10 @@ export default function TestSMSPage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Info Alert */}
-                  <Alert className="border-blue-200 bg-blue-50">
-                    <Info className="h-4 w-4 text-blue-600" />
-                    <AlertTitle className="text-blue-900">Personalization Testing</AlertTitle>
-                    <AlertDescription className="text-blue-800">
+                  <Alert variant="info">
+                    <Info className="h-4 w-4" />
+                    <AlertTitle>Personalization Testing</AlertTitle>
+                    <AlertDescription>
                       Select a contact list. System automatically loads contact names and sends personalized SMS where {"{#var#}"} is replaced with each contact's name.
                     </AlertDescription>
                   </Alert>

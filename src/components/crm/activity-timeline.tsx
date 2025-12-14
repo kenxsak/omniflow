@@ -32,16 +32,16 @@ const activityIcons: Record<ActivityType, React.ComponentType<{ className?: stri
 };
 
 const activityColors: Record<ActivityType, string> = {
-  email: 'bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-300',
-  sms: 'bg-green-100 text-green-600 dark:bg-green-900/50 dark:text-green-300',
-  whatsapp: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-300',
-  call: 'bg-purple-100 text-purple-600 dark:bg-purple-900/50 dark:text-purple-300',
-  meeting: 'bg-orange-100 text-orange-600 dark:bg-orange-900/50 dark:text-orange-300',
-  note: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/50 dark:text-yellow-300',
-  task: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300',
-  deal_created: 'bg-teal-100 text-teal-600 dark:bg-teal-900/50 dark:text-teal-300',
-  deal_updated: 'bg-cyan-100 text-cyan-600 dark:bg-cyan-900/50 dark:text-cyan-300',
-  status_change: 'bg-gray-100 text-gray-600 dark:bg-gray-900/50 dark:text-gray-300',
+  email: 'bg-info-muted text-info-muted-foreground',
+  sms: 'bg-success-muted text-success-muted-foreground',
+  whatsapp: 'bg-success-muted text-success-muted-foreground',
+  call: 'bg-primary/10 text-primary',
+  meeting: 'bg-warning-muted text-warning-muted-foreground',
+  note: 'bg-warning-muted text-warning-muted-foreground',
+  task: 'bg-primary/10 text-primary',
+  deal_created: 'bg-success-muted text-success-muted-foreground',
+  deal_updated: 'bg-info-muted text-info-muted-foreground',
+  status_change: 'bg-muted text-muted-foreground',
 };
 
 interface ActivityTimelineProps {

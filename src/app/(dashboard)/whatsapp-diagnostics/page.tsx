@@ -318,11 +318,11 @@ export default function WhatsAppDiagnosticsPage() {
       case 'success':
         return <CheckCircle className="h-5 w-5 text-green-600" />;
       case 'error':
-        return <XCircle className="h-5 w-5 text-red-600" />;
+        return <XCircle className="h-5 w-5 text-destructive" />;
       case 'warning':
-        return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
+        return <AlertTriangle className="h-5 w-5 text-warning" />;
       case 'info':
-        return <Info className="h-5 w-5 text-blue-600" />;
+        return <Info className="h-5 w-5 text-info" />;
       default:
         return <Loader2 className="h-5 w-5 animate-spin" />;
     }
@@ -331,15 +331,15 @@ export default function WhatsAppDiagnosticsPage() {
   const getStatusColor = (status: DiagnosticResult['status']) => {
     switch (status) {
       case 'success':
-        return 'border-green-200 bg-green-50';
+        return 'border-success-border bg-success-muted';
       case 'error':
-        return 'border-red-200 bg-red-50';
+        return 'border-destructive-border bg-destructive-muted';
       case 'warning':
-        return 'border-yellow-200 bg-yellow-50';
+        return 'border-warning-border bg-warning-muted';
       case 'info':
-        return 'border-blue-200 bg-blue-50';
+        return 'border-info-border bg-info-muted';
       default:
-        return 'border-gray-200 bg-gray-50';
+        return 'border-border bg-muted';
     }
   };
 
@@ -371,7 +371,7 @@ export default function WhatsAppDiagnosticsPage() {
               {provider.name}
               {status === 'success' && <Badge variant="default" className="bg-green-600">✓ Working</Badge>}
               {status === 'error' && <Badge variant="destructive">✗ Error</Badge>}
-              {status === 'warning' && <Badge variant="secondary" className="bg-yellow-600">⚠ Warning</Badge>}
+              {status === 'warning' && <Badge variant="warning">⚠ Warning</Badge>}
             </div>
             <Link href={provider.docsUrl} target="_blank" rel="noopener noreferrer">
               <Button variant="ghost" size="sm">

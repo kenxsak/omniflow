@@ -121,10 +121,10 @@ export default function VoiceChatWebhookGuide() {
         </Alert>
 
         {!webhookToken && (
-          <Alert className="bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800">
-            <Info className="h-4 w-4 text-amber-600" />
-            <AlertTitle className="text-amber-700 dark:text-amber-300">Setup Required</AlertTitle>
-            <AlertDescription className="text-amber-600 dark:text-amber-400">
+          <Alert variant="warning">
+            <Info className="h-4 w-4" />
+            <AlertTitle>Setup Required</AlertTitle>
+            <AlertDescription>
               Please configure the Voice Chat AI Widget in the "API Integrations" section above first. 
               This will generate your webhook authentication token.
             </AlertDescription>
@@ -152,7 +152,7 @@ export default function VoiceChatWebhookGuide() {
                     size="icon"
                     onClick={() => handleCopy(webhookUrl, 'url')}
                   >
-                    {copied === 'url' ? <Check className="h-4 w-4 text-green-500" /> : <ClipboardCopy className="h-4 w-4" />}
+                    {copied === 'url' ? <Check className="h-4 w-4 text-success" /> : <ClipboardCopy className="h-4 w-4" />}
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -178,7 +178,7 @@ export default function VoiceChatWebhookGuide() {
                       size="icon"
                       onClick={() => handleCopy(webhookToken, 'token')}
                     >
-                      {copied === 'token' ? <Check className="h-4 w-4 text-green-500" /> : <ClipboardCopy className="h-4 w-4" />}
+                      {copied === 'token' ? <Check className="h-4 w-4 text-success" /> : <ClipboardCopy className="h-4 w-4" />}
                     </Button>
                   )}
                 </div>
@@ -216,10 +216,10 @@ export default function VoiceChatWebhookGuide() {
                 </div>
               )}
 
-              <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800">
-                <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <AlertTitle className="text-blue-700 dark:text-blue-300">Important: Digital Card ID</AlertTitle>
-                <AlertDescription className="text-blue-600 dark:text-blue-400">
+              <Alert variant="info">
+                <Info className="h-4 w-4" />
+                <AlertTitle>Important: Digital Card ID</AlertTitle>
+                <AlertDescription>
                   Make sure your Voice Chat AI sends the <code className="font-mono">card_id</code> field 
                   with your OmniFlow Digital Card ID. This links conversations to the correct business card.
                 </AlertDescription>
@@ -294,7 +294,7 @@ export default function VoiceChatWebhookGuide() {
                     size="icon"
                     onClick={() => handleCopy(`curl ${webhookUrl}`, 'curl-get')}
                   >
-                    {copied === 'curl-get' ? <Check className="h-4 w-4 text-green-500" /> : <ClipboardCopy className="h-4 w-4" />}
+                    {copied === 'curl-get' ? <Check className="h-4 w-4 text-success" /> : <ClipboardCopy className="h-4 w-4" />}
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -333,7 +333,7 @@ export default function VoiceChatWebhookGuide() {
 
               <div className="space-y-2">
                 <Label>Expected Success Response</Label>
-                <pre className="bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 p-4 rounded-lg text-xs font-mono">
+                <pre className="bg-success-muted text-success p-4 rounded-lg text-xs font-mono">
 {`{
   "success": true,
   "leadId": "lead_abc123",
@@ -344,7 +344,7 @@ export default function VoiceChatWebhookGuide() {
 
               <div className="space-y-2">
                 <Label>Error Response Examples</Label>
-                <pre className="bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 p-4 rounded-lg text-xs font-mono">
+                <pre className="bg-destructive-muted text-destructive p-4 rounded-lg text-xs font-mono">
 {`// 400 Bad Request
 { "error": "Missing required fields: contact.name and card_id are required" }
 

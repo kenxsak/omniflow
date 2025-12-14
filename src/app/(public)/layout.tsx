@@ -16,13 +16,13 @@ export const metadata: Metadata = {
     siteName: 'OmniFlow',
     title: 'OmniFlow | Pricing & Features',
     description: 'The All-in-One Business Automation Platform, powered by AI.',
-    images: [{ url: '/logo.png', width: 1200, height: 630, alt: 'OmniFlow Logo' }],
+    images: [{ url: '/favicon_io/android-chrome-512x512.png', width: 512, height: 512, alt: 'OmniFlow Logo' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'OmniFlow | Pricing & Features',
     description: 'The All-in-One Business Automation Platform, powered by AI.',
-    images: ['/logo.png'],
+    images: ['/favicon_io/android-chrome-512x512.png'],
   },
 };
 

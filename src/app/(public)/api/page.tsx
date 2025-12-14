@@ -30,7 +30,7 @@ export default function ApiPage() {
                       <p className="text-muted-foreground mb-4">
                         Manage contacts, campaigns, and automations programmatically.
                       </p>
-                      <div className="bg-slate-900 text-slate-100 p-4 rounded text-sm font-mono overflow-x-auto">
+                      <div className="bg-foreground text-background p-4 rounded text-sm font-mono overflow-x-auto">
                         <code>curl -X GET https://api.omniflow.io/v1/contacts \<br/>
                         &nbsp;&nbsp;-H "Authorization: Bearer YOUR_API_KEY"</code>
                       </div>
@@ -39,10 +39,10 @@ export default function ApiPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-2 border-purple-500/30">
+              <Card className="border-2 border-primary/30">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <Zap className="w-8 h-8 text-purple-600 flex-shrink-0 mt-1" />
+                    <Zap className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
                     <div>
                       <h3 className="text-xl font-semibold mb-2">Webhooks</h3>
                       <p className="text-muted-foreground">
@@ -54,12 +54,12 @@ export default function ApiPage() {
               </Card>
             </div>
 
-            <div className="bg-purple-50 dark:bg-purple-950/20 p-8 rounded-lg">
+            <div className="bg-primary/5 p-8 rounded-lg">
               <h2 className="text-2xl font-bold mb-4">API Documentation Coming Soon</h2>
               <p className="text-muted-foreground mb-6">
                 Full API reference docs with code examples, authentication guides, and use cases are under development. Contact our team for early access.
               </p>
-              <Button asChild className="bg-purple-600 hover:bg-purple-700">
+              <Button asChild>
                 <Link href="/contact">Contact Us <ArrowRight className="ml-2" /></Link>
               </Button>
             </div>

@@ -1,6 +1,4 @@
-
-import { Users, Mail, Bot, Settings, AlertCircle, ClipboardCheck } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 
 export type ActivityType = 'lead' | 'email' | 'ai' | 'crm' | 'settings' | 'task' | 'other';
 
@@ -10,24 +8,24 @@ export interface RecentActivityItemProps {
   type: ActivityType;
 }
 
-const typeIcons: Record<RecentActivityItemProps['type'], LucideIcon> = {
-  lead: Users,
-  email: Mail,
-  ai: Bot,
-  crm: Settings, // Using Settings icon as a generic CRM action icon
-  settings: Settings,
-  task: ClipboardCheck,
-  other: AlertCircle,
+const typeIcons: Record<ActivityType, string> = {
+  lead: 'users',
+  email: 'mail',
+  ai: 'robot',
+  crm: 'settings',
+  settings: 'settings',
+  task: 'task',
+  other: 'alert',
 };
 
 export default function RecentActivityItem({ description, time, type }: RecentActivityItemProps) {
-  const Icon = typeIcons[type] || AlertCircle;
+  const iconName = typeIcons[type] || 'alert';
 
   return (
     <li className="flex items-start space-x-3">
       <div className="flex-shrink-0 mt-1">
-        <div className="p-2 bg-secondary rounded-full">
-          <Icon className="h-4 w-4 text-secondary-foreground" />
+        <div className="h-8 w-8 rounded-xl bg-muted/80 dark:bg-muted flex items-center justify-center">
+          <AppIcon name={iconName} size={16} className="text-foreground" />
         </div>
       </div>
       <div>

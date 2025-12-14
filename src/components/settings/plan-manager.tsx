@@ -664,7 +664,7 @@ export default function PlanManager() {
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
                           <div className="flex flex-col gap-0.5">
-                            <span className={plan.crmAccessLevel === 'full' ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}>
+                            <span className={plan.crmAccessLevel === 'full' ? 'text-success' : 'text-muted-foreground'}>
                               {plan.crmAccessLevel === 'full' ? 'Full CRM' : 'Basic CRM'}
                             </span>
                             <div className="flex gap-1 text-xs">
@@ -674,13 +674,13 @@ export default function PlanManager() {
                           </div>
                         </TableCell>
                         <TableCell className="hidden lg:table-cell">
-                          <span className={(plan.maxContacts === null || plan.maxContacts === undefined) ? 'text-green-600 dark:text-green-400' : ''}>
+                          <span className={(plan.maxContacts === null || plan.maxContacts === undefined) ? 'text-success' : ''}>
                             {(plan.maxContacts === null || plan.maxContacts === undefined) ? '∞ Unlimited' : `${plan.maxContacts.toLocaleString()} max`}
                           </span>
                         </TableCell>
                         <TableCell className="hidden xl:table-cell">
                           {plan.allowBYOK ? (
-                            <span className="text-green-600 dark:text-green-400">✓ Yes</span>
+                            <span className="text-success">✓ Yes</span>
                           ) : (
                             <span className="text-muted-foreground">✗ No</span>
                           )}

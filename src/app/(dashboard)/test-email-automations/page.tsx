@@ -205,7 +205,7 @@ export default function TestEmailAutomationsPage() {
                 <h4 className="text-sm font-medium mb-2">Errors ({result.errors.length})</h4>
                 <div className="max-h-40 overflow-y-auto space-y-1">
                   {result.errors.map((err, i) => (
-                    <p key={i} className="text-xs text-red-600 bg-red-50 p-2 rounded">
+                    <p key={i} className="text-xs text-destructive bg-destructive-muted p-2 rounded">
                       {err}
                     </p>
                   ))}

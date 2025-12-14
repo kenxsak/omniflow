@@ -223,13 +223,13 @@ export default function ContactForm({
             </div>
 
             {errors.general && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded text-sm text-red-600">
+              <div className="p-3 bg-destructive-muted border border-destructive/30 rounded text-sm text-destructive">
                 {errors.general}
               </div>
             )}
 
             {errors.contact && (
-              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-600">
+              <div className="p-3 bg-warning-muted border border-warning/30 rounded text-sm text-warning">
                 {errors.contact}
               </div>
             )}

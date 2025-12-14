@@ -9,12 +9,11 @@ const IS_LOCALHOST = self.location.hostname === 'localhost' || self.location.hos
 const APP_SHELL = [
   '/',
   '/offline',
-  '/logo.png',
   '/favicon.ico',
   '/manifest.json',
-  '/apple-touch-icon.png',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/favicon_io/apple-touch-icon.png',
+  '/favicon_io/android-chrome-192x192.png',
+  '/favicon_io/android-chrome-512x512.png'
 ];
 
 const STATIC_ASSET_PATTERNS = [

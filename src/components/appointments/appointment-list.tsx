@@ -242,7 +242,7 @@ export function AppointmentList({
     }
 
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3 items-stretch">
         {filteredAppointments.map((appointment) => (
           <AppointmentCard
             key={appointment.id}

@@ -433,10 +433,10 @@ export function formatMetricChange(current: number, previous: number): {
  */
 export function getMetricStatusColor(status: MetricInsight['status']): string {
   const colors = {
-    excellent: 'text-green-600 dark:text-green-400',
-    good: 'text-blue-600 dark:text-blue-400',
-    needs_attention: 'text-orange-600 dark:text-orange-400',
-    critical: 'text-red-600 dark:text-red-400',
+    excellent: 'text-success',
+    good: 'text-info',
+    needs_attention: 'text-warning',
+    critical: 'text-destructive',
   };
   
   return colors[status] || colors.good;

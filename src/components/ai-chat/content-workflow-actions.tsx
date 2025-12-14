@@ -103,13 +103,13 @@ export default function ContentWorkflowActions({
                     disabled={step.disabled}
                   >
                     <div className="flex items-center gap-2 w-full">
-                      <div className={`p-2 rounded-md ${step.completed ? 'bg-white/20' : 'bg-muted'}`}>
+                      <div className={`p-2 rounded-md ${step.completed ? 'bg-primary-foreground/20' : 'bg-muted'}`}>
                         <step.icon className="h-4 w-4" />
                       </div>
                       <div className="flex-1 text-left">
                         <div className="font-semibold text-sm flex items-center gap-2">
                           {step.label}
-                          {step.showCheck && <span className="text-green-500">✓</span>}
+                          {step.showCheck && <span className="text-success">✓</span>}
                         </div>
                         <div className="text-xs opacity-80">{step.description}</div>
                       </div>
@@ -124,13 +124,13 @@ export default function ContentWorkflowActions({
                   disabled={step.disabled}
                 >
                   <div className="flex items-center gap-2 w-full">
-                    <div className={`p-2 rounded-md ${step.completed ? 'bg-white/20' : 'bg-muted'}`}>
+                    <div className={`p-2 rounded-md ${step.completed ? 'bg-primary-foreground/20' : 'bg-muted'}`}>
                       <step.icon className="h-4 w-4" />
                     </div>
                     <div className="flex-1 text-left">
                       <div className="font-semibold text-sm flex items-center gap-2">
                         {step.label}
-                        {step.showCheck && <span className="text-green-500">✓</span>}
+                        {step.showCheck && <span className="text-success">✓</span>}
                       </div>
                       <div className="text-xs opacity-80">{step.description}</div>
                     </div>

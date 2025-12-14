@@ -171,14 +171,14 @@ export default function PaymentGatewayConfig() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Stripe Status */}
             <div className="flex items-start gap-4 p-4 border rounded-lg">
-              <div className={`p-3 rounded-full ${stripeStatus.configured ? 'bg-green-100 dark:bg-green-900' : 'bg-gray-100 dark:bg-gray-800'}`}>
-                <DollarSign className={`h-6 w-6 ${stripeStatus.configured ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`} />
+              <div className={`p-3 rounded-full ${stripeStatus.configured ? 'bg-success-muted' : 'bg-muted'}`}>
+                <DollarSign className={`h-6 w-6 ${stripeStatus.configured ? 'text-success' : 'text-muted-foreground'}`} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="font-semibold">Stripe</h3>
                   {stripeStatus.configured ? (
-                    <Badge variant="default" className="bg-green-600">
+                    <Badge variant="default" className="bg-success text-success-foreground">
                       <CheckCircle2 className="mr-1 h-3 w-3" />
                       Configured
                     </Badge>
@@ -209,14 +209,14 @@ export default function PaymentGatewayConfig() {
 
             {/* Razorpay Status */}
             <div className="flex items-start gap-4 p-4 border rounded-lg">
-              <div className={`p-3 rounded-full ${razorpayStatus.configured ? 'bg-green-100 dark:bg-green-900' : 'bg-gray-100 dark:bg-gray-800'}`}>
-                <IndianRupee className={`h-6 w-6 ${razorpayStatus.configured ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`} />
+              <div className={`p-3 rounded-full ${razorpayStatus.configured ? 'bg-success-muted' : 'bg-muted'}`}>
+                <IndianRupee className={`h-6 w-6 ${razorpayStatus.configured ? 'text-success' : 'text-muted-foreground'}`} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="font-semibold">Razorpay</h3>
                   {razorpayStatus.configured ? (
-                    <Badge variant="default" className="bg-green-600">
+                    <Badge variant="default" className="bg-success text-success-foreground">
                       <CheckCircle2 className="mr-1 h-3 w-3" />
                       Configured
                     </Badge>

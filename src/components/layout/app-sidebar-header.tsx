@@ -4,44 +4,52 @@ import { useSidebar } from '@/components/ui/sidebar';
 import { SheetTitle } from '@/components/ui/sheet';
 import { SidebarHeader as CustomSidebarHeaderDiv } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import { LogoIcon } from '@/components/ui/logo';
+import { useAuth } from '@/hooks/use-auth';
+
+// Map planId to display name
+const planDisplayNames: Record<string, string> = {
+  'plan_free': 'Free',
+  'plan_starter': 'Starter',
+  'plan_pro': 'Pro',
+  'plan_enterprise': 'Enterprise',
+};
+
+// Map planId to badge variant/color
+const planBadgeStyles: Record<string, string> = {
+  'plan_free': 'bg-muted text-muted-foreground',
+  'plan_starter': 'bg-info-muted text-info-muted-foreground',
+  'plan_pro': 'bg-primary/10 text-primary',
+  'plan_enterprise': 'bg-warning-muted text-warning-muted-foreground',
+};
 
 export default function AppSidebarHeader() {
   const { isMobile } = useSidebar();
+  const { company } = useAuth();
+
+  const planId = company?.planId || 'plan_free';
+  const planName = planDisplayNames[planId] || planId.replace('plan_', '').charAt(0).toUpperCase() + planId.replace('plan_', '').slice(1);
 
   return (
-    <CustomSidebarHeaderDiv className="p-3 sm:p-4 border-b border-sidebar-border/50">
+    <CustomSidebarHeaderDiv className="px-3 py-4">
       <Link 
         href="/dashboard" 
-        className="flex items-center gap-2.5 sm:gap-3 group" 
+        className="flex items-center gap-2 group" 
         aria-label="Go to Dashboard"
       >
         <div className="relative shrink-0">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-primary to-accent p-0.5 shadow-md group-hover:shadow-lg transition-shadow">
-            <div className="h-full w-full rounded-[10px] bg-sidebar flex items-center justify-center overflow-hidden">
-              <Image 
-                src="/logo.png" 
-                alt="OmniFlow Logo" 
-                width={28} 
-                height={28} 
-                className="object-contain"
-                priority
-              />
-            </div>
-          </div>
+          <LogoIcon size={24} />
         </div>
         {isMobile ? (
           <SheetTitle asChild>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg sm:text-xl font-bold gradient-text">OmniFlow</h1>
-              <Badge variant="secondary" size="sm" className="text-[10px]">Pro</Badge>
+              <h1 className="text-sm font-semibold text-foreground uppercase tracking-wide">OmniFlow</h1>
             </div>
           </SheetTitle>
         ) : (
           <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
-            <h1 className="text-lg sm:text-xl font-bold gradient-text">OmniFlow</h1>
-            <Badge variant="secondary" size="sm" className="text-[10px]">Pro</Badge>
+            <h1 className="text-sm font-semibold text-foreground uppercase tracking-wide">OmniFlow</h1>
           </div>
         )}
       </Link>

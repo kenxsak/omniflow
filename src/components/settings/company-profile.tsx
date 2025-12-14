@@ -453,7 +453,7 @@ export default function CompanyProfile() {
               </div>
               <div>
                 <span className="text-muted-foreground">Status:</span>
-                <p className={company.status === 'active' ? 'text-green-600' : 'text-yellow-600'}>
+                <p className={company.status === 'active' ? 'text-success' : 'text-warning'}>
                   {company.status === 'active' ? 'Active' : 'Paused'}
                 </p>
               </div>

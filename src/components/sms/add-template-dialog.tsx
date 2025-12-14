@@ -61,7 +61,7 @@ export function AddTemplateDialog({ idToken, onTemplateAdded, trigger }: AddTemp
     const pattern = /##[^#]+##/g;
     
     result = result.replace(pattern, (match) => {
-      return `<span class="bg-yellow-200 dark:bg-yellow-800 px-0.5 rounded font-medium">${match}</span>`;
+      return `<span class="bg-warning-muted text-warning-muted-foreground px-0.5 rounded font-medium">${match}</span>`;
     });
     
     return result;
@@ -281,16 +281,16 @@ export function AddTemplateDialog({ idToken, onTemplateAdded, trigger }: AddTemp
           )}
 
           {showDuplicateOptions && existingTemplate ? (
-            <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-900/20">
-              <AlertTriangle className="h-4 w-4 text-amber-600" />
-              <AlertTitle className="text-amber-900 dark:text-amber-100">Template Already Exists</AlertTitle>
+            <Alert variant="warning">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Template Already Exists</AlertTitle>
               <AlertDescription className="space-y-3">
-                <p className="text-sm text-amber-800 dark:text-amber-200">
+                <p className="text-sm">
                   A template with this Template ID or DLT ID already exists:
                 </p>
-                <div className="p-2 bg-white dark:bg-amber-900/40 rounded border border-amber-200 dark:border-amber-700">
-                  <p className="text-sm font-medium text-amber-900 dark:text-amber-100">{existingTemplate.name}</p>
-                  <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                <div className="p-2 bg-card rounded border border-warning-border">
+                  <p className="text-sm font-medium text-foreground">{existingTemplate.name}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
                     Template ID: {existingTemplate.templateId} | DLT ID: {existingTemplate.dltId}
                   </p>
                 </div>
@@ -299,7 +299,7 @@ export function AddTemplateDialog({ idToken, onTemplateAdded, trigger }: AddTemp
                     variant="outline"
                     size="sm"
                     onClick={handleUseExisting}
-                    className="border-green-500 text-green-700 hover:bg-green-50"
+                    className="border-success text-success hover:bg-success-muted"
                   >
                     <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
                     Use Existing
@@ -309,7 +309,7 @@ export function AddTemplateDialog({ idToken, onTemplateAdded, trigger }: AddTemp
                     size="sm"
                     onClick={handleUpdateExisting}
                     disabled={isSubmitting}
-                    className="border-blue-500 text-blue-700 hover:bg-blue-50"
+                    className="border-info text-info hover:bg-info-muted"
                   >
                     {isSubmitting ? (
                       <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
@@ -332,9 +332,9 @@ export function AddTemplateDialog({ idToken, onTemplateAdded, trigger }: AddTemp
               </AlertDescription>
             </Alert>
           ) : (
-            <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-              <Info className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-blue-800 dark:text-blue-200">
+            <Alert variant="info">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
                 <p className="text-sm font-medium mb-1">Where to find Template IDs?</p>
                 <ul className="text-xs space-y-1 list-disc ml-4">
                   <li><strong>MSG91 Template ID:</strong> MSG91 Dashboard → Templates</li>
@@ -343,7 +343,7 @@ export function AddTemplateDialog({ idToken, onTemplateAdded, trigger }: AddTemp
                 <Link 
                   href="https://msg91.com" 
                   target="_blank" 
-                  className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-2"
+                  className="inline-flex items-center gap-1 text-xs hover:underline mt-2"
                 >
                   Open MSG91 Dashboard <ExternalLink className="h-3 w-3" />
                 </Link>

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ClipboardCheck, ArrowRight, Plus, Loader2, AlertCircle, Clock } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import Link from 'next/link';
 import { format, isToday, isPast, isTomorrow } from 'date-fns';
 import { useAuth } from '@/hooks/use-auth';
@@ -71,30 +71,21 @@ export function MyTasksCard() {
     }
   };
 
-  const getPriorityColor = (priority: Task['priority']) => {
-    switch (priority) {
-      case 'High':
-        return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-      case 'Medium':
-        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
-      case 'Low':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
+  const getPriorityColor = () => {
+    return 'bg-muted text-muted-foreground border border-border';
   };
 
   const getDueLabel = (dueDate?: string) => {
     if (!dueDate) return null;
     const date = new Date(dueDate);
     if (isPast(date) && !isToday(date)) {
-      return { label: 'Overdue', className: 'text-red-600' };
+      return { label: 'Overdue', className: 'text-muted-foreground' };
     }
     if (isToday(date)) {
-      return { label: 'Due today', className: 'text-orange-600' };
+      return { label: 'Due today', className: 'text-muted-foreground' };
     }
     if (isTomorrow(date)) {
-      return { label: 'Tomorrow', className: 'text-blue-600' };
+      return { label: 'Tomorrow', className: 'text-muted-foreground' };
     }
     return { label: format(date, 'MMM d'), className: 'text-muted-foreground' };
   };
@@ -103,13 +94,15 @@ export function MyTasksCard() {
     return (
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <ClipboardCheck className="h-5 w-5 text-green-500" />
-            My Tasks
-          </CardTitle>
+          <div className="flex items-start gap-3">
+            <div className="h-8 w-8 rounded-xl bg-muted/60 dark:bg-white/[0.06] flex items-center justify-center shrink-0">
+              <AppIcon name="task" size={16} className="text-muted-foreground" />
+            </div>
+            <CardTitle className="text-base font-semibold pt-1">My Tasks</CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="flex justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <AppIcon name="loader" size={24} className="animate-spin text-muted-foreground" />
         </CardContent>
       </Card>
     );
@@ -121,21 +114,23 @@ export function MyTasksCard() {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <ClipboardCheck className="h-5 w-5 text-green-500" />
-              My Tasks
-            </CardTitle>
-            {tasks.length > 0 && (
-              <Badge variant="secondary" className="text-xs">
-                {tasks.length} pending
-              </Badge>
-            )}
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-3">
+            <div className="h-8 w-8 rounded-xl bg-muted/60 dark:bg-white/[0.06] flex items-center justify-center shrink-0">
+              <AppIcon name="task" size={16} className="text-muted-foreground" />
+            </div>
+            <div className="flex items-center gap-2 pt-1">
+              <CardTitle className="text-base font-semibold">My Tasks</CardTitle>
+              {tasks.length > 0 && (
+                <Badge variant="secondary" className="text-xs">
+                  {tasks.length} pending
+                </Badge>
+              )}
+            </div>
           </div>
           <Button variant="ghost" size="sm" asChild>
             <Link href="/tasks">
-              View All <ArrowRight className="ml-1 h-3 w-3" />
+              View All <AppIcon name="arrow-right" size={14} className="ml-1" />
             </Link>
           </Button>
         </div>
@@ -143,12 +138,12 @@ export function MyTasksCard() {
           <div className="flex gap-2 mt-2">
             {overdueCount > 0 && (
               <Badge variant="destructive" className="text-[10px]">
-                <AlertCircle className="h-3 w-3 mr-1" />
+                <AppIcon name="alert" size={12} className="mr-1" />
                 {overdueCount} overdue
               </Badge>
             )}
             {highPriorityCount > 0 && (
-              <Badge variant="default" className="text-[10px] bg-red-500">
+              <Badge variant="destructive" className="text-[10px]">
                 {highPriorityCount} high priority
               </Badge>
             )}
@@ -158,11 +153,13 @@ export function MyTasksCard() {
       <CardContent>
         {tasks.length === 0 ? (
           <div className="text-center py-6">
-            <ClipboardCheck className="h-10 w-10 mx-auto text-muted-foreground/50 mb-2" />
+            <div className="h-10 w-10 rounded-xl bg-muted/60 dark:bg-white/[0.06] flex items-center justify-center mx-auto mb-3">
+              <AppIcon name="check-circle" size={16} className="text-muted-foreground" />
+            </div>
             <p className="text-sm text-muted-foreground mb-3">No pending tasks</p>
             <Button variant="outline" size="sm" asChild>
               <Link href="/tasks">
-                <Plus className="h-4 w-4 mr-1" />
+                <AppIcon name="plus" size={14} className="mr-1" />
                 Add Task
               </Link>
             </Button>
@@ -179,18 +176,18 @@ export function MyTasksCard() {
                   <Checkbox
                     checked={false}
                     onCheckedChange={() => handleCompleteTask(task)}
-                    className="data-[state=checked]:bg-green-500"
+                    className="data-[state=checked]:bg-foreground"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-sm truncate">{task.title}</span>
-                      <Badge className={`text-[10px] px-1.5 py-0 ${getPriorityColor(task.priority)}`}>
+                      <Badge className={`text-[10px] px-1.5 py-0 ${getPriorityColor()}`}>
                         {task.priority}
                       </Badge>
                     </div>
                     {dueInfo && (
                       <div className={`flex items-center gap-1 text-[11px] ${dueInfo.className}`}>
-                        <Clock className="h-3 w-3" />
+                        <AppIcon name="clock" size={10} />
                         {dueInfo.label}
                       </div>
                     )}

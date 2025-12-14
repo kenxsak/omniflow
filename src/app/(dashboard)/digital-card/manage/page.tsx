@@ -4,31 +4,19 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { getFriendlyLoading } from '@/lib/friendly-messages';
 import {
   getUserDigitalCards,
   deleteDigitalCard,
-  updateCardStatus
 } from '@/app/actions/digital-card-actions';
 import { DigitalCard } from '@/lib/digital-card-types';
 import {
   AlertCircle,
   Plus,
   ExternalLink,
-  Edit,
-  Trash2,
-  Eye,
-  EyeOff,
-  QrCode,
-  BarChart3,
-  Copy,
   Share2,
-  ArrowUpCircle,
-  Sparkles
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -134,28 +122,6 @@ export default function ManageDigitalCardsPage() {
     }
   };
 
-  const toggleCardStatus = async (card: DigitalCard) => {
-    if (!firebaseUser) return;
-
-    setActionLoading(true);
-    try {
-      const newStatus = card.status === 'active' ? 'inactive' : 'active';
-      const idToken = await firebaseUser.getIdToken();
-      const result = await updateCardStatus({ idToken, cardId: card.id, status: newStatus });
-
-      if (!result.success) {
-        setError(result.error || 'Failed to update card status');
-      } else {
-        await loadCards();
-      }
-    } catch (err) {
-      console.error('Error updating card status:', err);
-      setError('An unexpected error occurred');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
   const copyCardUrl = (username: string) => {
     const url = `${window.location.origin}/card/${username}`;
     navigator.clipboard.writeText(url);
@@ -208,211 +174,159 @@ export default function ManageDigitalCardsPage() {
   const limitDescription = plan && userCount > 0 ? getDigitalCardLimitDescription(plan, userCount) : '';
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-6xl">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">Digital Cards</h1>
-          <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
-            Manage your digital business cards
+    <div className="flex flex-col space-y-6 w-full h-full">
+      {/* Header - Autosend style */}
+      <div className="flex items-start justify-between">
+        <div className="w-full space-y-2">
+          <p className="text-stone-800 dark:text-stone-200 font-semibold text-lg">Digital Cards</p>
+          <p className="text-stone-500 dark:text-stone-400 font-normal text-sm">
+            Create and manage your digital business cards from here.
           </p>
         </div>
-        <Button onClick={() => router.push('/digital-card/create')} className="w-full sm:w-auto">
-          <Plus className="h-4 w-4 mr-2" />
-          Create New Card
-        </Button>
+        <div>
+          <Button onClick={() => router.push('/digital-card/create')} size="lg">
+            <Plus className="h-4 w-4 -ml-1" />
+            New Card
+          </Button>
+        </div>
       </div>
 
-      {/* Card Limit Indicator */}
+      {/* Card Limit Indicator - Autosend style */}
       {plan && userCount > 0 && (
-        <Card className="mb-6 border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                    Digital Card Usage
-                  </h3>
-                </div>
-                <p className="text-xs sm:text-sm text-gray-600 mb-3">
-                  {limitDescription}
-                </p>
-                
-                {/* Progress bar */}
-                <div className="mb-2">
-                  <Progress 
-                    value={usagePercentage} 
-                    className={`h-2 sm:h-3 ${
-                      limitStatus === 'limit_reached' 
-                        ? 'bg-red-100' 
-                        : limitStatus === 'warning' 
-                          ? 'bg-yellow-100' 
-                          : 'bg-blue-100'
-                    }`}
-                  />
-                </div>
-                
-                <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-1 text-[10px] sm:text-xs text-gray-500">
-                  <span>
-                    <span className={`font-semibold ${
-                      limitStatus === 'limit_reached' ? 'text-red-600' :
-                      limitStatus === 'warning' ? 'text-yellow-600' :
-                      'text-blue-600'
-                    }`}>
-                      {currentCards} of {maxCards}
-                    </span> cards used
-                    {plan.digitalCardsPerUser && plan.digitalCardsPerUser > 0 && (
-                      <span className="hidden sm:inline ml-2 text-muted-foreground">
-                        • {userCount} team {userCount === 1 ? 'member' : 'members'} × {plan.digitalCardsPerUser} {plan.digitalCardsPerUser === 1 ? 'card' : 'cards'} each
-                      </span>
-                    )}
-                  </span>
-                  <span className={`font-medium ${
-                    limitStatus === 'limit_reached' ? 'text-red-600' :
-                    limitStatus === 'warning' ? 'text-yellow-600' :
-                    'text-blue-600'
-                  }`}>
-                    {Math.round(usagePercentage)}%
-                  </span>
-                </div>
+        <div className="border border-stone-200 dark:border-stone-800 rounded-2xl overflow-hidden">
+          <div className="bg-stone-100 dark:bg-stone-900 px-6 py-4 border-b border-stone-200 dark:border-stone-800">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-stone-800 dark:text-stone-200 font-medium text-base">Card Usage</p>
+                <p className="text-stone-500 dark:text-stone-400 font-normal text-sm">{limitDescription}</p>
               </div>
-              
               {limitStatus === 'limit_reached' && (
-                <Button 
-                  variant="default" 
-                  size="sm"
-                  className="w-full sm:w-auto"
-                  onClick={() => router.push('/settings/subscription')}
-                >
-                  <ArrowUpCircle className="w-4 h-4 mr-2" />
+                <Button size="sm" onClick={() => router.push('/settings/subscription')}>
                   Upgrade Plan
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" className="-mr-1">
+                    <path d="M5 12H19.5833M19.5833 12L12.5833 5M19.5833 12L12.5833 19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+                  </svg>
                 </Button>
               )}
             </div>
-            
-            {/* Pro tip when approaching limit */}
-            {plan.id !== 'plan_enterprise' && limitStatus !== 'ok' && (
-              <div className="mt-4 p-2 sm:p-3 bg-white rounded-md border border-blue-200">
-                <p className="text-xs sm:text-sm text-gray-700">
-                  💡 <strong>Pro tip:</strong>{' '}
-                  {plan.id === 'plan_free' && 'Upgrade to Starter to add team members - each gets their own card!'}
-                  {plan.id === 'plan_starter' && 'Upgrade to Pro - each team member gets 2 cards instead of 1!'}
-                  {plan.id === 'plan_pro' && 'Upgrade to Enterprise for 3 cards per team member!'}
-                </p>
+          </div>
+          <div className="bg-white dark:bg-stone-950 px-6 py-4">
+            <div className="flex items-center gap-8">
+              <div className="flex flex-col gap-1">
+                <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Used</p>
+                <p className="text-stone-800 dark:text-stone-200 font-semibold text-2xl font-mono">{currentCards}</p>
               </div>
-            )}
-          </CardContent>
-        </Card>
+              <div className="flex flex-col gap-1">
+                <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Limit</p>
+                <p className="text-stone-800 dark:text-stone-200 font-semibold text-2xl font-mono">{maxCards}</p>
+              </div>
+              <div className="flex-1">
+                <Progress value={usagePercentage} className="h-2" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Usage</p>
+                <p className={`font-semibold text-lg font-mono ${
+                  limitStatus === 'limit_reached' ? 'text-rose-600' :
+                  limitStatus === 'warning' ? 'text-amber-600' :
+                  'text-stone-800 dark:text-stone-200'
+                }`}>{Math.round(usagePercentage)}%</p>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {error && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+        <div className="border border-rose-200 dark:border-rose-800 rounded-2xl bg-rose-50 dark:bg-rose-950/20 px-6 py-4">
+          <p className="text-rose-700 dark:text-rose-400 text-sm">{error}</p>
+        </div>
       )}
 
       {cards.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 sm:py-12">
-            <div className="text-center space-y-4">
-              <div className="text-5xl sm:text-6xl mb-4">📇</div>
-              <h3 className="text-lg sm:text-xl font-semibold">No digital cards yet</h3>
-              <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">
-                Create your first digital card to share your business information with customers
-              </p>
-              <Button onClick={() => router.push('/digital-card/create')}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Your First Card
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-950">
+          <div className="py-12 px-6 text-center space-y-4">
+            <div className="text-5xl mb-4">📇</div>
+            <p className="text-stone-800 dark:text-stone-200 font-semibold text-lg">No digital cards yet</p>
+            <p className="text-stone-500 dark:text-stone-400 font-normal text-sm max-w-md mx-auto">
+              Create your first digital card to share your business information with customers
+            </p>
+            <Button onClick={() => router.push('/digital-card/create')}>
+              <Plus className="h-4 w-4 -ml-1" />
+              Create Your First Card
+            </Button>
+          </div>
+        </div>
       ) : (
-        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {cards.map((card) => (
-            <Card key={card.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-2">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <CardTitle className="text-base sm:text-lg truncate">
-                      {card.businessInfo.name}
-                    </CardTitle>
-                    <CardDescription className="truncate text-xs sm:text-sm">
-                      @{card.username}
-                    </CardDescription>
+            <div key={card.id} className="border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-950 flex flex-col justify-between">
+              {/* Card Content */}
+              <div className="flex flex-col gap-4 p-6">
+                {/* Header with name and status */}
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-stone-800 dark:text-stone-200 font-semibold text-sm">{card.businessInfo.name}</p>
+                    <p className="text-stone-500 dark:text-stone-400 font-normal text-xs">@{card.username}</p>
                   </div>
-                  <Badge
-                    variant={card.status === 'active' ? 'default' : 'secondary'}
-                    className="text-xs shrink-0"
-                  >
-                    {card.status}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6 pt-2 sm:pt-2">
-                <div className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
-                  {card.businessInfo.tagline || card.businessInfo.description}
+                  <span className="flex items-center gap-2">
+                    <span className={`size-2.5 border-[1.5px] rounded-full ${
+                      card.status === 'active' 
+                        ? 'bg-emerald-300 border-emerald-700' 
+                        : 'bg-stone-300 border-stone-500'
+                    }`} />
+                    <span className="text-stone-800 dark:text-stone-200 font-semibold text-xs tracking-[0.48px] font-mono uppercase">
+                      {card.status}
+                    </span>
+                  </span>
                 </div>
 
-                {card.analytics && (
-                  <div className="grid grid-cols-3 gap-2 text-center p-2 sm:p-3 bg-muted rounded-lg">
-                    <div>
-                      <div className="text-lg sm:text-2xl font-bold">{card.analytics.views || 0}</div>
-                      <div className="text-[10px] sm:text-xs text-muted-foreground">Views</div>
-                    </div>
-                    <div>
-                      <div className="text-lg sm:text-2xl font-bold">
-                        {Object.values(card.analytics.linkClicks || {}).reduce((a, b) => a + b, 0)}
-                      </div>
-                      <div className="text-[10px] sm:text-xs text-muted-foreground">Clicks</div>
-                    </div>
-                    <div>
-                      <div className="text-lg sm:text-2xl font-bold">
-                        {card.analytics.leadsGenerated || 0}
-                      </div>
-                      <div className="text-[10px] sm:text-xs text-muted-foreground">Leads</div>
-                    </div>
+                {/* Stats row */}
+                <div className="flex items-center flex-wrap gap-x-8 gap-y-4">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Views</p>
+                    <p className="text-stone-800 dark:text-stone-200 font-normal text-xs font-mono">{card.analytics?.views || 0}</p>
                   </div>
-                )}
+                  <div className="flex flex-col gap-1">
+                    <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Clicks</p>
+                    <p className="text-stone-800 dark:text-stone-200 font-normal text-xs font-mono">
+                      {Object.values(card.analytics?.linkClicks || {}).reduce((a, b) => a + b, 0)}
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Leads</p>
+                    <p className="text-stone-800 dark:text-stone-200 font-normal text-xs font-mono">{card.analytics?.leadsGenerated || 0}</p>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Created</p>
+                    <p className="text-stone-800 dark:text-stone-200 font-normal text-xs font-mono">
+                      {card.createdAt ? new Date(card.createdAt).toLocaleDateString() : '-'}
+                    </p>
+                  </div>
+                </div>
 
-                <div className="flex gap-2">
+                {/* Action buttons row */}
+                <div className="flex items-center gap-2">
                   <Button
-                    variant="outline"
                     size="sm"
                     onClick={() => window.open(`/card/${card.username}`, '_blank')}
-                    className="flex-1 text-xs sm:text-sm"
                   >
-                    <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                    View
+                    View Card
+                    <ExternalLink className="h-3 w-3 -mr-1" />
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => router.push(`/digital-card/edit/${card.id}`)}
-                    className="flex-1 text-xs sm:text-sm"
-                  >
-                    <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                    Edit
-                  </Button>
-                </div>
-
-                <div className="flex gap-1 sm:gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
                     onClick={() => copyCardUrl(card.username)}
-                    className="flex-1 text-xs sm:text-sm"
                   >
-                    <Copy className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                    {copiedUrl === card.username ? 'Copied!' : 'Copy'}
+                    {copiedUrl === card.username ? 'Copied!' : 'Copy URL'}
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => shareCard(card.username)}
+                    className="!p-2"
                   >
-                    <Share2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <Share2 className="h-4 w-4" />
                   </Button>
                   <QRCodeGenerator
                     cardUrl={`${window.location.origin}/card/${card.username}`}
@@ -421,40 +335,21 @@ export default function ManageDigitalCardsPage() {
                     size="sm"
                   />
                 </div>
+              </div>
 
-                <div className="flex gap-2 pt-2 border-t">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => toggleCardStatus(card)}
-                    disabled={actionLoading}
-                    className="flex-1 text-xs sm:text-sm"
-                  >
-                    {card.status === 'active' ? (
-                      <>
-                        <EyeOff className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                        <span className="hidden xs:inline">Deactivate</span>
-                        <span className="xs:hidden">Off</span>
-                      </>
-                    ) : (
-                      <>
-                        <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                        <span className="hidden xs:inline">Activate</span>
-                        <span className="xs:hidden">On</span>
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setDeleteCardId(card.id)}
-                    disabled={actionLoading}
-                  >
-                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 text-destructive" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+              {/* Footer action - Autosend style */}
+              <button
+                onClick={() => router.push(`/digital-card/edit/${card.id}`)}
+                className="rounded-b-2xl border-t border-stone-200 dark:border-stone-800 group w-full px-4 py-3 h-[44px] flex items-center font-semibold font-mono text-sm uppercase tracking-[0.56px] cursor-pointer transition-all outline-none bg-stone-100 dark:bg-stone-900 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 justify-between"
+              >
+                Edit
+                <span className="group-hover:translate-x-1 transform-gpu transition-all duration-100">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 12H19.5833M19.5833 12L12.5833 5M19.5833 12L12.5833 19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+                  </svg>
+                </span>
+              </button>
+            </div>
           ))}
         </div>
       )}

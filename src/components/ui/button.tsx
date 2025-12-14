@@ -5,34 +5,36 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] touch-target",
+  "inline-flex items-center justify-center gap-1 whitespace-nowrap text-center select-none transition-all duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow-md hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5",
-        destructive:
-          "bg-destructive text-destructive-foreground shadow-md hover:bg-destructive/90 hover:shadow-lg",
-        outline:
-          "border-2 border-input bg-background hover:bg-accent hover:text-accent-foreground hover:border-accent",
-        secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-md",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        accent: "bg-accent text-accent-foreground shadow-md hover:bg-accent/90 hover:shadow-lg hover:-translate-y-0.5",
-        gradient: "bg-gradient-to-r from-primary to-accent text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 hover:opacity-90",
-        success: "bg-emerald-600 text-white shadow-md hover:bg-emerald-700 hover:shadow-lg hover:-translate-y-0.5",
-        warning: "bg-amber-500 text-white shadow-md hover:bg-amber-600 hover:shadow-lg hover:-translate-y-0.5",
-        glass: "glass text-foreground hover:bg-white/90 dark:hover:bg-slate-800/90",
+        // Default - Autosend style: dark filled button with border
+        default: "bg-stone-700 text-stone-50 border-2 border-stone-800 hover:bg-stone-800 rounded-lg font-mono font-semibold uppercase text-xs tracking-wide dark:bg-stone-900 dark:border-stone-700 dark:hover:bg-stone-700",
+        // Destructive - Red
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/80 rounded-lg font-mono font-semibold uppercase text-xs tracking-wide",
+        // Outline - Border only, for secondary actions
+        outline: "border-2 border-stone-300 bg-transparent text-stone-700 hover:bg-stone-100 rounded-lg font-mono font-semibold uppercase text-xs tracking-wide dark:border-stone-600 dark:text-stone-300 dark:hover:bg-stone-800",
+        // Secondary - Subtle background
+        secondary: "bg-stone-200 text-stone-700 hover:bg-stone-300 rounded-lg font-mono font-semibold uppercase text-xs tracking-wide dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700",
+        // Ghost - No background until hover
+        ghost: "hover:bg-stone-100 text-stone-700 rounded-lg dark:hover:bg-stone-800 dark:text-stone-300",
+        // Link - Underline style
+        link: "text-stone-700 underline-offset-4 hover:underline dark:text-stone-300",
+        // Success - Green
+        success: "bg-success text-success-foreground hover:bg-success/90 active:bg-success/80 rounded-lg font-mono font-semibold uppercase text-xs tracking-wide",
+        // Warning - Amber
+        warning: "bg-warning text-warning-foreground hover:bg-warning/90 active:bg-warning/80 rounded-lg font-mono font-semibold uppercase text-xs tracking-wide",
       },
       size: {
-        default: "h-11 px-5 py-2.5",
-        sm: "h-9 rounded-md px-3.5 text-xs",
-        lg: "h-12 rounded-lg px-8 text-base",
-        xl: "h-14 rounded-xl px-10 text-lg",
-        xs: "h-8 rounded-md px-2.5 text-xs",
-        icon: "h-11 w-11",
-        "icon-sm": "h-9 w-9",
-        "icon-lg": "h-12 w-12",
+        default: "h-7 px-3 py-1",
+        sm: "h-6 px-3 py-1",
+        lg: "h-9 px-4 py-2",
+        xl: "h-10 px-5 py-2",
+        xs: "h-5 px-2 py-0.5 text-[10px]",
+        icon: "h-8 w-8",
+        "icon-sm": "h-6 w-6",
+        "icon-lg": "h-10 w-10",
       },
     },
     defaultVariants: {

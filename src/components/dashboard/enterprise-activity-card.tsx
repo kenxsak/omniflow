@@ -1,15 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { 
-  Users2, Shield, ArrowRight, Lock, Unlock, UserCheck, 
-  Activity, Clock, Loader2, Settings, UserPlus, FileEdit,
-  TrendingUp, AlertCircle
-} from 'lucide-react';
+import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuth } from '@/hooks/use-auth';
@@ -62,20 +55,15 @@ export function EnterpriseActivityCard() {
   }, [company?.id, idToken]);
 
   const getActionIcon = (action: string) => {
-    switch (action) {
-      case 'claim':
-        return <Lock className="h-3 w-3 text-orange-500" />;
-      case 'release':
-        return <Unlock className="h-3 w-3 text-green-500" />;
-      case 'create':
-        return <UserPlus className="h-3 w-3 text-violet-500" />;
-      case 'update':
-        return <FileEdit className="h-3 w-3 text-purple-500" />;
-      case 'assign':
-        return <UserCheck className="h-3 w-3 text-cyan-500" />;
-      default:
-        return <Activity className="h-3 w-3 text-gray-500" />;
-    }
+    const iconMap: Record<string, string> = {
+      claim: 'solar:lock-linear',
+      release: 'solar:lock-unlocked-linear',
+      create: 'solar:user-plus-linear',
+      update: 'solar:pen-linear',
+      assign: 'solar:user-check-linear',
+    };
+    const iconName = iconMap[action] || 'solar:chart-linear';
+    return <Icon icon={iconName} className="h-3 w-3 text-muted-foreground" />;
   };
 
   const getActionLabel = (action: string, entityType: string) => {
@@ -93,139 +81,134 @@ export function EnterpriseActivityCard() {
 
   if (isLoading) {
     return (
-      <Card className="border-2 border-purple-200/50 dark:border-purple-800/30">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Users2 className="h-5 w-5 text-purple-500" />
-            Team Activity
-            <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 text-[10px]">
-              Enterprise
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        </CardContent>
-      </Card>
+      <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+        <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-stone-200 dark:border-stone-800 flex items-center gap-1.5 sm:gap-2">
+          <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+            TEAM
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="size-1.5 sm:size-2 border-[1.5px] rounded-full bg-violet-300 border-violet-700" />
+            <span className="text-[8px] sm:text-[9px] font-semibold text-foreground uppercase tracking-wide font-mono">
+              ENT
+            </span>
+          </span>
+        </div>
+        <div className="flex justify-center py-4 sm:py-6">
+          <Icon icon="solar:refresh-linear" className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-muted-foreground" />
+        </div>
+      </div>
     );
   }
 
   if (!stats) {
     return (
-      <Card className="border-2 border-purple-200/50 dark:border-purple-800/30">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Users2 className="h-5 w-5 text-purple-500" />
-            Team Activity
-            <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 text-[10px]">
-              Enterprise
-            </Badge>
-          </CardTitle>
-          <CardDescription>
-            Collaborate with up to 50 team members
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-4">
-            <Shield className="h-10 w-10 mx-auto text-purple-300 mb-2" />
-            <p className="text-sm text-muted-foreground mb-3">
+      <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+        <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-stone-200 dark:border-stone-800 flex items-center gap-1.5 sm:gap-2">
+          <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+            TEAM
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="size-1.5 sm:size-2 border-[1.5px] rounded-full bg-violet-300 border-violet-700" />
+            <span className="text-[8px] sm:text-[9px] font-semibold text-foreground uppercase tracking-wide font-mono">
+              ENT
+            </span>
+          </span>
+        </div>
+        <div className="p-3 sm:p-4">
+          <div className="text-center py-3 sm:py-4">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
               Enterprise features for large teams
             </p>
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg text-center">
-                <Lock className="h-4 w-4 mx-auto text-purple-500 mb-1" />
-                <span className="text-[11px] text-muted-foreground">Lead Claiming</span>
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+              <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-800 text-center">
+                <span className="text-[8px] sm:text-[10px] text-muted-foreground">Claiming</span>
               </div>
-              <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg text-center">
-                <Activity className="h-4 w-4 mx-auto text-purple-500 mb-1" />
-                <span className="text-[11px] text-muted-foreground">Audit Trail</span>
+              <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-800 text-center">
+                <span className="text-[8px] sm:text-[10px] text-muted-foreground">Audit</span>
               </div>
-              <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg text-center">
-                <TrendingUp className="h-4 w-4 mx-auto text-purple-500 mb-1" />
-                <span className="text-[11px] text-muted-foreground">Auto-Assign</span>
+              <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-800 text-center">
+                <span className="text-[8px] sm:text-[10px] text-muted-foreground">Auto</span>
               </div>
             </div>
             {appUser?.role === 'admin' && (
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/settings/enterprise">
-                  <Settings className="h-4 w-4 mr-1" />
-                  Configure
+              <Button variant="outline" size="sm" asChild className="h-6 sm:h-7 text-[10px] sm:text-xs">
+                <Link href="/settings/enterprise" className="inline-flex items-center gap-1">
+                  CONFIGURE
+                  <Icon icon="solar:arrow-right-linear" className="h-3 w-3" />
                 </Link>
               </Button>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="border-2 border-purple-200/50 dark:border-purple-800/30">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Users2 className="h-5 w-5 text-purple-500" />
-              Team Activity
-              <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 text-[10px]">
-                Enterprise
-              </Badge>
-            </CardTitle>
-          </div>
-          {appUser?.role === 'admin' && (
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/settings/enterprise">
-                <Settings className="h-4 w-4 mr-1" />
-                Settings
-              </Link>
-            </Button>
-          )}
+    <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+      <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+      <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+            TEAM
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="size-1.5 sm:size-2 border-[1.5px] rounded-full bg-violet-300 border-violet-700" />
+            <span className="text-[8px] sm:text-[9px] font-semibold text-foreground uppercase tracking-wide font-mono">
+              ENT
+            </span>
+          </span>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="text-center p-3 bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-950/30 dark:to-purple-900/20 rounded-lg">
-            <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
-              {stats.totalMembers}
-            </div>
-            <div className="text-[11px] text-purple-600/70">Team Members</div>
+        {appUser?.role === 'admin' && (
+          <Button variant="ghost" size="sm" asChild className="h-6 sm:h-7 text-[10px] sm:text-xs px-2">
+            <Link href="/settings/enterprise" className="inline-flex items-center gap-1">
+              <span className="hidden sm:inline">SETTINGS</span>
+              <Icon icon="solar:arrow-right-linear" className="h-3 w-3" />
+            </Link>
+          </Button>
+        )}
+      </div>
+      <div className="p-3 sm:p-4">
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+          <div className="text-center p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-800">
+            <div className="text-sm sm:text-lg font-semibold tabular-nums text-foreground">{stats.totalMembers}</div>
+            <div className="text-[8px] sm:text-[10px] text-muted-foreground font-mono">MEMBERS</div>
           </div>
-          <div className="text-center p-3 bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/30 dark:to-green-900/20 rounded-lg">
-            <div className="text-2xl font-bold text-green-700 dark:text-green-300">
-              {stats.activeToday}
-            </div>
-            <div className="text-[11px] text-green-600/70">Active Today</div>
+          <div className="text-center p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-800">
+            <div className="text-sm sm:text-lg font-semibold tabular-nums text-foreground">{stats.activeToday}</div>
+            <div className="text-[8px] sm:text-[10px] text-muted-foreground font-mono">ACTIVE</div>
           </div>
-          <div className="text-center p-3 bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-950/30 dark:to-orange-900/20 rounded-lg">
-            <div className="text-2xl font-bold text-orange-700 dark:text-orange-300">
-              {stats.claimedLeads}
-            </div>
-            <div className="text-[11px] text-orange-600/70">Claimed Leads</div>
+          <div className="text-center p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-800">
+            <div className="text-sm sm:text-lg font-semibold tabular-nums text-foreground">{stats.claimedLeads}</div>
+            <div className="text-[8px] sm:text-[10px] text-muted-foreground font-mono">CLAIMED</div>
           </div>
         </div>
 
         {stats.recentActivity.length > 0 && (
-          <div className="space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">Recent Activity</span>
-              <Link href="/settings/enterprise" className="text-[10px] text-primary hover:underline">
-                View Audit Log
+              <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                RECENT
+              </span>
+              <Link href="/settings/enterprise" className="text-[9px] sm:text-[10px] text-muted-foreground hover:text-foreground">
+                All
               </Link>
             </div>
-            <div className="space-y-1">
-              {stats.recentActivity.slice(0, 4).map((entry) => (
+            <div className="divide-y divide-stone-200 dark:divide-stone-800">
+              {stats.recentActivity.slice(0, 3).map((entry) => (
                 <div
                   key={entry.id}
-                  className="flex items-center gap-2 py-1.5 px-2 rounded bg-muted/30 text-xs"
+                  className="flex items-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 first:pt-0 last:pb-0 text-[10px] sm:text-[11px]"
                 >
-                  {getActionIcon(entry.action)}
-                  <span className="font-medium truncate max-w-[100px]">
+                  <span className="font-medium truncate max-w-[60px] sm:max-w-[80px] text-foreground">
                     {entry.performedByName || 'User'}
                   </span>
                   <span className="text-muted-foreground truncate flex-1">
                     {getActionLabel(entry.action, entry.entityType)}
                   </span>
-                  <span className="text-[10px] text-muted-foreground flex-shrink-0">
+                  <span className="text-[9px] sm:text-[10px] text-muted-foreground flex-shrink-0 tabular-nums font-mono hidden sm:inline">
                     {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}
                   </span>
                 </div>
@@ -233,7 +216,7 @@ export function EnterpriseActivityCard() {
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

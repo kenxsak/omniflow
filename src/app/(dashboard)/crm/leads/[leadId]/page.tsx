@@ -18,6 +18,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { ActivityTimeline } from '@/components/crm/activity-timeline';
 import { ContactDeals } from '@/components/crm/contact-deals';
 import { AppointmentDialog } from '@/components/appointments/appointment-dialog';
+import { LeadQuickActions } from '@/components/crm/lead-quick-actions';
 
 const statusColors: Record<Lead['status'], string> = {
   New: 'bg-blue-500 hover:bg-blue-600',
@@ -312,6 +313,16 @@ export default function LeadDossierPage() {
                     </Tabs>
                 </div>
                 <div className="space-y-6">
+                    <LeadQuickActions 
+                        lead={{
+                            id: lead.id,
+                            name: lead.name,
+                            email: lead.email,
+                            phone: lead.phone,
+                            companyId: lead.companyId,
+                        }}
+                        onActivityLogged={loadData}
+                    />
                     <Card>
                         <CardHeader><CardTitle className="text-lg">Sync Status</CardTitle></CardHeader>
                         <CardContent className="space-y-3">

@@ -53,7 +53,7 @@ const YouTubeAdSectionComponent: React.FC<YouTubeAdSectionProps> = ({
   return (
     <Card ref={youtubeAdsGeneratorRef}>
       <CardHeader>
-        <CardTitle className="flex items-center"><Youtube className="mr-2 h-5 w-5 text-red-500" />YouTube Ads Campaign & Script Generator</CardTitle>
+        <CardTitle className="flex items-center"><Youtube className="mr-2 h-5 w-5 text-muted-foreground" />YouTube Ads Campaign & Script Generator</CardTitle>
         <CardDescription>
           AI for campaign planning, video ad scripts, voice-over text, visual concepts, thumbnail prompts, and targeting ideas for YouTube.
         </CardDescription>
@@ -110,7 +110,7 @@ const YouTubeAdSectionComponent: React.FC<YouTubeAdSectionProps> = ({
                           <div><Label className="font-semibold">Video Title:</Label><Input value={variation.videoTitle} readOnly className="mt-1 bg-background/70" /><Button variant="outline" size="xs" onClick={() => onCopyToClipboard(variation.videoTitle, "Video Title")} className="mt-1"><Copy className="mr-1 h-3 w-3" />Copy</Button></div>
                           <div><Label className="font-semibold">Ad Script:</Label><Textarea value={variation.script} readOnly rows={8} className="mt-1 bg-background/70 min-h-[150px]" /><Button variant="outline" size="xs" onClick={() => onCopyToClipboard(variation.script, "Ad Script")} className="mt-1"><Copy className="mr-1 h-3 w-3" />Copy</Button>
                               <Alert variant="default" className="mt-1 text-xs border-violet-300 bg-violet-50 dark:bg-violet-900/30">
-                                <Info className="mr-1 h-3 w-3 text-violet-600 dark:text-violet-400"/>
+                                <Info className="mr-1 h-3 w-3 text-muted-foreground"/>
                                 <AlertDescription className="text-violet-600 dark:text-violet-400">The script may contain image prompts like [IMAGE PROMPT FOR AI: ...]. Use these with an image generator for visuals.</AlertDescription>
                               </Alert>
                           </div>

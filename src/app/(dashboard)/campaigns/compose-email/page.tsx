@@ -688,7 +688,7 @@ export default function ComposeEmailPage() {
                     className="min-h-[400px] font-mono text-sm"
                   />
                 ) : (
-                  <div className="border rounded-lg p-4 min-h-[400px] bg-white dark:bg-gray-900">
+                  <div className="border rounded-lg p-4 min-h-[400px] bg-card">
                     <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
                   </div>
                 )}

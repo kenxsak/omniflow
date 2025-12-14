@@ -29,7 +29,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { cn } from '@/lib/utils';
-import { Loader2, CalendarIcon, Mail, MessageSquare, Phone } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import type {
   Appointment,
   CreateAppointmentInput,
@@ -403,7 +403,7 @@ export function AppointmentForm({
                         <Button
                           variant="outline"
                           className={cn(
-                            'w-full pl-3 text-left font-normal',
+                            'w-full pl-3 text-left font-normal h-11 bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800 rounded-lg',
                             !field.value && 'text-muted-foreground'
                           )}
                         >
@@ -412,7 +412,7 @@ export function AppointmentForm({
                           ) : (
                             <span>Pick a date</span>
                           )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          <Icon icon="solar:calendar-linear" className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
@@ -554,7 +554,7 @@ export function AppointmentForm({
           <div className="space-y-4 rounded-lg border p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-muted-foreground" />
+                <Icon icon="solar:letter-linear" className="h-4 w-4 text-muted-foreground" />
                 <Label htmlFor="emailReminder">Email Reminder</Label>
               </div>
               <div className="flex items-center gap-2">
@@ -599,7 +599,7 @@ export function AppointmentForm({
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-muted-foreground" />
+                <Icon icon="solar:phone-linear" className="h-4 w-4 text-muted-foreground" />
                 <Label htmlFor="smsReminder">SMS Reminder</Label>
               </div>
               <div className="flex items-center gap-2">
@@ -644,7 +644,7 @@ export function AppointmentForm({
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                <Icon icon="solar:chat-round-linear" className="h-4 w-4 text-muted-foreground" />
                 <Label htmlFor="whatsappReminder">WhatsApp Reminder</Label>
               </div>
               <div className="flex items-center gap-2">
@@ -707,25 +707,25 @@ export function AppointmentForm({
           )}
         />
 
-        <div className="flex justify-end gap-2">
-          <Button
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-stone-200 dark:border-stone-800 mt-6 -mx-6 px-6 bg-stone-100 dark:bg-stone-900 -mb-6 pb-4">
+          <button
             type="button"
-            variant="outline"
             onClick={onCancel}
             disabled={isSubmitting}
+            className="px-4 py-2.5 text-sm font-semibold font-mono uppercase tracking-wide text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 transition-colors disabled:opacity-50"
           >
             Cancel
-          </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          </button>
+          <Button type="submit" disabled={isSubmitting} className="px-4 py-2.5 h-auto text-sm font-semibold font-mono uppercase tracking-wide">
             {isSubmitting ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Icon icon="solar:refresh-linear" className="mr-2 h-4 w-4 animate-spin" />
                 {appointment ? 'Updating...' : 'Scheduling...'}
               </>
             ) : appointment ? (
-              'Update Appointment'
+              'Update'
             ) : (
-              'Schedule Appointment'
+              'Schedule'
             )}
           </Button>
         </div>

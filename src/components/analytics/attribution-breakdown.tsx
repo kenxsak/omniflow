@@ -217,7 +217,7 @@ export default function AttributionBreakdown({ attribution }: AttributionBreakdo
             <div className="text-xs text-muted-foreground">Marketing Spend</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">{formatPercentage(overallROI, 0)}</div>
+            <div className="text-2xl font-bold text-success">{formatPercentage(overallROI, 0)}</div>
             <div className="text-xs text-muted-foreground">Overall ROI</div>
           </div>
         </div>

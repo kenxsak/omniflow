@@ -732,7 +732,7 @@ export default function AddToMessagingListDialog({
                   <span className="text-sm text-muted-foreground">{selectedLeads.length}</span>
                 </div>
                 
-                <div className="flex items-center justify-between text-green-600 dark:text-green-400">
+                <div className="flex items-center justify-between text-success">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4" />
                     <span className="text-sm">Will be added:</span>
@@ -741,7 +741,7 @@ export default function AddToMessagingListDialog({
                 </div>
                 
                 {skippedContactCount > 0 && (
-                  <div className="flex items-center justify-between text-amber-600 dark:text-amber-400">
+                  <div className="flex items-center justify-between text-warning">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="h-4 w-4" />
                       <span className="text-sm">Will be skipped:</span>

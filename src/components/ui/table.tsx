@@ -6,13 +6,11 @@ const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto scrollbar-thin rounded-lg border">
-    <table
-      ref={ref}
-      className={cn("w-full caption-bottom text-sm", className)}
-      {...props}
-    />
-  </div>
+  <table
+    ref={ref}
+    className={cn("w-full caption-bottom text-sm", className)}
+    {...props}
+  />
 ))
 Table.displayName = "Table"
 
@@ -22,7 +20,10 @@ const TableHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <thead 
     ref={ref} 
-    className={cn("[&_tr]:border-b bg-muted/30", className)} 
+    className={cn(
+      "[&_tr]:border-b",
+      className
+    )} 
     {...props} 
   />
 ))
@@ -47,7 +48,7 @@ const TableFooter = React.forwardRef<
   <tfoot
     ref={ref}
     className={cn(
-      "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+      "border-t border-border bg-muted/50 font-medium [&>tr]:last:border-b-0",
       className
     )}
     {...props}
@@ -62,8 +63,8 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "border-b transition-colors duration-150",
-      "hover:bg-muted/50 data-[state=selected]:bg-muted",
+      "border-b border-border transition-colors duration-100",
+      "hover:bg-accent/50 data-[state=selected]:bg-accent",
       className
     )}
     {...props}
@@ -78,7 +79,8 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "h-10 sm:h-12 px-2 sm:px-4 text-left align-middle font-medium text-muted-foreground text-xs sm:text-sm",
+      "h-12 px-4 text-left align-middle",
+      "text-muted-foreground font-semibold text-xs uppercase font-mono tracking-wide",
       "[&:has([role=checkbox])]:pr-0",
       "whitespace-nowrap",
       className
@@ -95,7 +97,7 @@ const TableCell = React.forwardRef<
   <td
     ref={ref}
     className={cn(
-      "p-2 sm:p-4 align-middle text-xs sm:text-sm",
+      "p-4 align-middle text-foreground text-sm",
       "[&:has([role=checkbox])]:pr-0",
       className
     )}

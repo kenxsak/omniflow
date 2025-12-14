@@ -122,12 +122,12 @@ export default function EnterpriseSettingsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
-                <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="p-3 rounded-full bg-info-muted">
+                <Shield className="h-6 w-6 text-info-muted-foreground" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Audit Trail</p>
-                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                <Badge variant="success">
                   <CheckCircle className="h-3 w-3 mr-1" />
                   Active
                 </Badge>
@@ -139,12 +139,12 @@ export default function EnterpriseSettingsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900">
-                <Shuffle className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <div className="p-3 rounded-full bg-primary/10">
+                <Shuffle className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Auto-Distribution</p>
-                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                <Badge variant="success">
                   <CheckCircle className="h-3 w-3 mr-1" />
                   Available
                 </Badge>
@@ -156,8 +156,8 @@ export default function EnterpriseSettingsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-orange-100 dark:bg-orange-900">
-                <Key className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              <div className="p-3 rounded-full bg-warning-muted">
+                <Key className="h-6 w-6 text-warning-muted-foreground" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">SSO</p>
@@ -220,8 +220,8 @@ export default function EnterpriseSettingsPage() {
                 <div className="grid gap-4 md:grid-cols-3">
                   <Card className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded bg-blue-100">
-                        <Users className="h-5 w-5 text-blue-600" />
+                      <div className="p-2 rounded bg-info-muted">
+                        <Users className="h-5 w-5 text-info-muted-foreground" />
                       </div>
                       <div>
                         <p className="font-medium">Microsoft Entra ID</p>
@@ -231,8 +231,8 @@ export default function EnterpriseSettingsPage() {
                   </Card>
                   <Card className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded bg-green-100">
-                        <Users className="h-5 w-5 text-green-600" />
+                      <div className="p-2 rounded bg-success-muted">
+                        <Users className="h-5 w-5 text-success-muted-foreground" />
                       </div>
                       <div>
                         <p className="font-medium">Google Workspace</p>

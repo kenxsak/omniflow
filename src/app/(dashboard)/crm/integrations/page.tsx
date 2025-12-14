@@ -19,10 +19,10 @@ export default function CrmIntegrationsPage() {
         description="One-time migration from HubSpot, Zoho, or Bitrix24 into OmniFlow"
       />
 
-       <Alert variant="default" className="border-blue-300 bg-blue-50 dark:border-blue-700 dark:bg-blue-900/30 py-2 sm:py-3">
-          <LinkIcon className="h-3 w-3 sm:h-4 sm:w-4 !text-blue-600 dark:!text-blue-400" />
-          <AlertTitle className="text-blue-700 dark:text-blue-300 text-sm sm:text-base">Easy Migration to OmniFlow</AlertTitle>
-          <AlertDescription className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm">
+       <Alert variant="info" className="py-2 sm:py-3">
+          <LinkIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+          <AlertTitle className="text-sm sm:text-base">Easy Migration to OmniFlow</AlertTitle>
+          <AlertDescription className="text-xs sm:text-sm">
             Already using HubSpot, Zoho, or Bitrix24? No problem! Connect your account in <a href="/settings?tab=integrations" className="font-medium underline">Settings &gt; Connected Tools</a>, 
             then import your contacts here with one click. After import, OmniFlow becomes your main CRM - manage everything from one place and save money.
           </AlertDescription>

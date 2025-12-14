@@ -282,11 +282,11 @@ function IntegrationGroup({ category, integrations, selectedId, onSelect, savedK
     <div className="space-y-2">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 hover:shadow-sm transition-all"
+        className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-muted hover:bg-accent transition-all"
       >
-        <span className="text-sm font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wider">{category}</span>
+        <span className="text-sm font-bold text-foreground uppercase tracking-wider">{category}</span>
         <ChevronDown
-          className={`h-4 w-4 text-blue-600 dark:text-blue-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+          className={`h-4 w-4 text-muted-foreground transition-transform ${isExpanded ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -300,15 +300,15 @@ function IntegrationGroup({ category, integrations, selectedId, onSelect, savedK
                 onClick={() => onSelect(integration.id)}
                 className={`text-left px-3 py-3 rounded-lg transition-all flex items-start gap-2 border-2 ${
                   selectedId === integration.id
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50 dark:bg-gray-900/50'
+                    ? 'border-primary bg-primary/10'
+                    : 'border-transparent hover:border-border bg-muted'
                 }`}
               >
                 <span className="text-xl mt-0.5">{integration.icon}</span>
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm text-gray-900 dark:text-white">{integration.name}</div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">{integration.description}</div>
-                  {hasKeys && <div className="text-xs text-green-600 dark:text-green-400 font-medium mt-1">✓ Configured</div>}
+                  <div className="font-semibold text-sm text-foreground">{integration.name}</div>
+                  <div className="text-xs text-muted-foreground line-clamp-1">{integration.description}</div>
+                  {hasKeys && <div className="text-xs text-success font-medium mt-1">✓ Configured</div>}
                 </div>
               </button>
             );
@@ -471,7 +471,7 @@ export default function SimpleIntegrations() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center space-y-4">
-          <Loader className="h-8 w-8 animate-spin mx-auto text-blue-500" />
+          <Loader className="h-8 w-8 animate-spin mx-auto text-primary" />
           <p className="text-sm text-muted-foreground">Loading integrations...</p>
         </div>
       </div>
@@ -499,9 +499,9 @@ export default function SimpleIntegrations() {
             />
           ))}
 
-          <Alert className="mt-4 border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-            <Plus className="h-4 w-4 text-blue-600" />
-            <AlertDescription className="text-xs text-blue-700 dark:text-blue-300">
+          <Alert variant="info" className="mt-4">
+            <Plus className="h-4 w-4" />
+            <AlertDescription className="text-xs">
               <strong>Tip:</strong> New APIs can be added to categories. Contact support to add more integrations.
             </AlertDescription>
           </Alert>
@@ -511,7 +511,7 @@ export default function SimpleIntegrations() {
       {/* Right Panel - Form */}
       <div className="lg:col-span-3">
         <Card className="sticky top-4">
-          <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border-b">
+          <CardHeader className="bg-muted/50 border-b">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-3 flex-1">
                 <span className="text-4xl">{currentIntegration.icon}</span>
@@ -530,7 +530,7 @@ export default function SimpleIntegrations() {
                 href={currentIntegration.docLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-info-muted text-info text-sm font-medium hover:bg-info/20 transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
                 Get API Key Documentation
@@ -543,7 +543,7 @@ export default function SimpleIntegrations() {
                 <div key={field.key} className="space-y-2">
                   <Label className="text-sm font-medium">{field.label}</Label>
                   {field.help && (
-                    <p className="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/30 p-2 rounded border border-gray-200 dark:border-gray-700">
+                    <p className="text-xs text-muted-foreground bg-muted p-2 rounded border border-border">
                       💡 {field.help}
                     </p>
                   )}
@@ -558,7 +558,7 @@ export default function SimpleIntegrations() {
                     <button
                       type="button"
                       onClick={() => toggleShowKey(field.key)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     >
                       {showKey.has(field.key) ? (
                         <EyeOff className="h-4 w-4" />
@@ -572,9 +572,9 @@ export default function SimpleIntegrations() {
             </div>
 
             {/* Security Info */}
-            <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-900/20">
-              <AlertCircle className="h-4 w-4 text-amber-600" />
-              <AlertDescription className="text-xs text-amber-700 dark:text-amber-300">
+            <Alert variant="warning">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-xs">
                 API keys are encrypted and stored securely. Never share your API keys with others.
               </AlertDescription>
             </Alert>
@@ -582,7 +582,7 @@ export default function SimpleIntegrations() {
             {/* Save Button */}
             <Button
               onClick={handleSave}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full"
               disabled={saving}
               size="lg"
             >

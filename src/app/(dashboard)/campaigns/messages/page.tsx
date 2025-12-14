@@ -134,14 +134,14 @@ export default function UnifiedSmsPage() {
       {/* Main Tabs */}
       {defaultProvider !== 'none' && (
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'ai' | 'bulk')} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="ai" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden xs:inline">Create with </span>AI
+          <TabsList className="rounded-t-xl">
+            <TabsTrigger value="ai">
+              <Sparkles className="h-4 w-4" />
+              Create with AI
             </TabsTrigger>
-            <TabsTrigger value="bulk" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-              <Users className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden xs:inline">Send </span>Campaign
+            <TabsTrigger value="bulk">
+              <Users className="h-4 w-4" />
+              Send Campaign
             </TabsTrigger>
           </TabsList>
 

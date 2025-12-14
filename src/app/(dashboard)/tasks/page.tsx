@@ -2,13 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import PageTitle from '@/components/ui/page-title';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Animated, StaggerContainer, StaggerItem } from '@/components/ui/animated';
 import { Icon } from '@iconify/react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
@@ -20,25 +16,27 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { buttonVariants } from '@/components/ui/button';
 import Link from 'next/link';
 import { logActivity } from '@/lib/activity-log';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/use-auth';
 import { getAppointmentsAction } from '@/app/actions/appointment-actions';
 import { getLeadsForTaskDropdown } from '@/app/actions/task-actions';
+import { cn } from '@/lib/utils';
 
 const AddTaskDialog = dynamic(() => import('@/components/tasks/add-task-dialog'), { ssr: false });
 const TaskCalendarView = dynamic(() => import('@/components/tasks/task-calendar-view'), { ssr: false });
 const AppointmentDialog = dynamic(() => import('@/components/appointments/appointment-dialog').then(mod => ({ default: mod.AppointmentDialog })), { ssr: false });
 
-const priorityColors: Record<Task['priority'], string> = {
-  High: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
-  Medium: 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300',
-  Low: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+// Clerk-style status dots
+const priorityDotColors: Record<Task['priority'], string> = {
+  High: 'bg-rose-300 border-rose-700',
+  Medium: 'bg-amber-300 border-amber-700',
+  Low: 'bg-blue-300 border-blue-700',
 };
 
-const statusColors: Record<Task['status'], string> = {
-  'To Do': 'border-gray-400 text-gray-600',
-  'In Progress': 'border-amber-400 text-amber-600',
-  'Done': 'border-emerald-500 text-emerald-600',
+const statusDotColors: Record<Task['status'], string> = {
+  'To Do': 'bg-stone-300 border-stone-600',
+  'In Progress': 'bg-amber-300 border-amber-700',
+  'Done': 'bg-emerald-300 border-emerald-700',
 };
 
 export default function TasksPage() {
@@ -124,212 +122,223 @@ export default function TasksPage() {
   return (
     <>
       <div className="space-y-4 sm:space-y-6">
-        <Animated animation="fadeDown">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <PageTitle
-              title="Tasks"
-              description="Manage all your to-dos in one place"
-            />
-            <Button onClick={handleCreateNew} variant="gradient" size="sm" className="w-full sm:w-auto">
-              <Icon icon="solar:add-circle-linear" className="mr-1.5 h-4 w-4" /> New Task
-            </Button>
+        {/* Header - Clerk style */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div>
+            <h1 className="text-lg sm:text-xl font-semibold text-foreground">Tasks</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
+              Manage all your to-dos in one place
+            </p>
           </div>
-        </Animated>
+          <Button onClick={handleCreateNew} size="sm" className="h-8 text-xs w-full sm:w-auto">
+            <Icon icon="solar:add-circle-linear" className="mr-1.5 h-3.5 w-3.5" /> New Task
+          </Button>
+        </div>
 
-        {/* Stats */}
-        <StaggerContainer className="grid grid-cols-3 gap-2 sm:gap-4">
-          <StaggerItem>
-            <Card className="card-gradient-blue">
-              <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
-                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-                  <Icon icon="solar:clock-circle-linear" className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-lg sm:text-2xl font-bold text-blue-700 dark:text-blue-300">{todoCount}</p>
-                  <p className="text-[10px] sm:text-xs text-blue-600/70">To Do</p>
-                </div>
-              </CardContent>
-            </Card>
-          </StaggerItem>
-          <StaggerItem>
-            <Card className="card-gradient-amber">
-              <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
-                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
-                  <Icon icon="solar:danger-circle-linear" className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
-                </div>
-                <div>
-                  <p className="text-lg sm:text-2xl font-bold text-amber-700 dark:text-amber-300">{inProgressCount}</p>
-                  <p className="text-[10px] sm:text-xs text-amber-600/70">In Progress</p>
-                </div>
-              </CardContent>
-            </Card>
-          </StaggerItem>
-          <StaggerItem>
-            <Card className="card-gradient-green">
-              <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
-                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
-                  <Icon icon="solar:checkmark-circle-linear" className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
-                </div>
-                <div>
-                  <p className="text-lg sm:text-2xl font-bold text-emerald-700 dark:text-emerald-300">{doneCount}</p>
-                  <p className="text-[10px] sm:text-xs text-emerald-600/70">Done</p>
-                </div>
-              </CardContent>
-            </Card>
-          </StaggerItem>
-        </StaggerContainer>
+        {/* Stats - Clerk style */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          {/* To Do */}
+          <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="p-3 sm:p-4 pt-4 sm:pt-5">
+              <div className="flex items-center justify-between mb-2">
+                <Icon icon="solar:clock-circle-linear" className="h-4 w-4 text-muted-foreground/60" />
+                <span className={cn("size-1.5 sm:size-2 border-[1.5px] rounded-full", statusDotColors['To Do'])} />
+              </div>
+              <div className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">{todoCount}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">To Do</p>
+            </div>
+          </div>
+          
+          {/* In Progress */}
+          <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="p-3 sm:p-4 pt-4 sm:pt-5">
+              <div className="flex items-center justify-between mb-2">
+                <Icon icon="solar:hourglass-linear" className="h-4 w-4 text-muted-foreground/60" />
+                <span className={cn("size-1.5 sm:size-2 border-[1.5px] rounded-full", statusDotColors['In Progress'])} />
+              </div>
+              <div className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">{inProgressCount}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">In Progress</p>
+            </div>
+          </div>
+          
+          {/* Done */}
+          <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="p-3 sm:p-4 pt-4 sm:pt-5">
+              <div className="flex items-center justify-between mb-2">
+                <Icon icon="solar:check-circle-linear" className="h-4 w-4 text-muted-foreground/60" />
+                <span className={cn("size-1.5 sm:size-2 border-[1.5px] rounded-full", statusDotColors['Done'])} />
+              </div>
+              <div className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">{doneCount}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Done</p>
+            </div>
+          </div>
+        </div>
 
-        <Animated animation="fadeUp">
-          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'table' | 'calendar')} className="w-full">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 mb-4">
-              <CardTitle className="text-base sm:text-lg">All Tasks</CardTitle>
-              <TabsList className="h-auto p-1">
-                <TabsTrigger value="table" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">
-                  <Icon icon="solar:list-linear" className="mr-1.5 h-3.5 w-3.5 sm:h-4 sm:w-4" /> 
-                  <span className="hidden xs:inline">Table</span>
+        {/* Tasks List - Clerk style card */}
+        <div className="border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+          {/* Card Header */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4 sm:p-5 border-b border-stone-200 dark:border-stone-800">
+            <div className="flex items-center gap-3">
+              <div className="size-9 rounded-lg bg-stone-100 dark:bg-stone-900 flex items-center justify-center">
+                <Icon icon="solar:checklist-minimalistic-linear" className="h-4.5 w-4.5 text-muted-foreground/70" />
+              </div>
+              <div>
+                <h2 className="text-sm sm:text-base font-semibold text-foreground">All Tasks</h2>
+                <p className="text-xs text-muted-foreground">{tasks.length} total tasks</p>
+              </div>
+            </div>
+            <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'table' | 'calendar')} className="w-full sm:w-auto">
+              <TabsList className="h-9 p-1 bg-stone-100 dark:bg-stone-900 rounded-lg w-full sm:w-auto grid grid-cols-2 sm:flex">
+                <TabsTrigger value="table" className="text-xs px-4 py-1.5 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-stone-800 data-[state=active]:shadow-sm gap-1.5">
+                  <Icon icon="solar:list-linear" className="h-3.5 w-3.5" /> 
+                  <span>Table</span>
                 </TabsTrigger>
-                <TabsTrigger value="calendar" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">
-                  <Icon icon="solar:calendar-linear" className="mr-1.5 h-3.5 w-3.5 sm:h-4 sm:w-4" /> 
-                  <span className="hidden xs:inline">Calendar</span>
+                <TabsTrigger value="calendar" className="text-xs px-4 py-1.5 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-stone-800 data-[state=active]:shadow-sm gap-1.5">
+                  <Icon icon="solar:calendar-linear" className="h-3.5 w-3.5" /> 
+                  <span>Calendar</span>
                 </TabsTrigger>
               </TabsList>
-            </div>
-            
-            <TabsContent value="table">
-              <Card>
-                <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
-                  <CardDescription className="text-xs sm:text-sm">View all your scheduled tasks</CardDescription>
-                </CardHeader>
-                <CardContent className="p-0 sm:p-6 sm:pt-0">
-                  {isLoading ? (
-                    <div className="flex justify-center items-center h-32 sm:h-40">
-                      <Icon icon="solar:refresh-circle-linear" className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-primary" />
-                    </div>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <div className="min-w-[600px] sm:min-w-0">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Task</TableHead>
-                              <TableHead className="w-[80px]">Priority</TableHead>
-                              <TableHead className="w-[100px]">Status</TableHead>
-                              <TableHead className="hidden sm:table-cell">Due</TableHead>
-                              <TableHead className="hidden md:table-cell">Lead</TableHead>
-                              <TableHead className="w-[60px] text-right">Actions</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {tasks.length > 0 ? (
-                              tasks.map(task => (
-                                <TableRow key={task.id} className="group">
-                                  <TableCell>
-                                    <div className="font-medium text-xs sm:text-sm line-clamp-1" title={task.title}>
-                                      {task.title}
-                                    </div>
-                                    <div className="sm:hidden text-[10px] text-muted-foreground mt-0.5">
-                                      Due: {format(new Date(task.dueDate), 'MMM dd')}
-                                    </div>
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge className={`${priorityColors[task.priority]} text-[10px] sm:text-xs`} size="sm">
-                                      {task.priority}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge variant="outline" className={`${statusColors[task.status]} text-[10px] sm:text-xs`} size="sm">
-                                      {task.status}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell className="hidden sm:table-cell text-xs text-muted-foreground">
-                                    {format(new Date(task.dueDate), 'PP')}
-                                  </TableCell>
-                                  <TableCell className="hidden md:table-cell">
-                                    {task.leadId ? (
-                                      <Button variant="link" asChild className="p-0 h-auto text-xs">
-                                        <Link href={`/crm/leads/${task.leadId}`}>{task.leadName || 'View'}</Link>
-                                      </Button>
-                                    ) : (
-                                      <span className="text-muted-foreground text-xs">-</span>
-                                    )}
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon-sm" className="opacity-60 group-hover:opacity-100">
-                                          <Icon icon="solar:menu-dots-circle-linear" className="h-4 w-4" />
-                                        </Button>
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onSelect={() => handleEdit(task)}>
-                                          <Icon icon="solar:pen-2-linear" className="mr-2 h-4 w-4" /> Edit
-                                        </DropdownMenuItem>
-                                        {task.leadId && (
-                                          <>
-                                            <DropdownMenuItem onSelect={() => handleScheduleAppointment(task)}>
-                                              <Icon icon="solar:calendar-add-linear" className="mr-2 h-4 w-4" /> Schedule
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                          </>
-                                        )}
-                                        <AlertDialog>
-                                          <AlertDialogTrigger asChild>
-                                            <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={(e) => e.preventDefault()}>
-                                              <Icon icon="solar:trash-bin-trash-linear" className="mr-2 h-4 w-4" /> Delete
-                                            </DropdownMenuItem>
-                                          </AlertDialogTrigger>
-                                          <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                              <AlertDialogTitle>Delete Task?</AlertDialogTitle>
-                                              <AlertDialogDescription>
-                                                This will permanently delete "{task.title}".
-                                              </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                              <AlertDialogAction onClick={() => handleDelete(task)} className={buttonVariants({ variant: "destructive" })}>
-                                                Delete
-                                              </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                          </AlertDialogContent>
-                                        </AlertDialog>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  </TableCell>
-                                </TableRow>
-                              ))
-                            ) : (
-                              <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
-                                  <div className="flex flex-col items-center gap-2">
-                                    <p className="text-sm text-muted-foreground">No tasks yet</p>
-                                    <Button onClick={handleCreateNew} variant="outline" size="sm">
-                                      <Icon icon="solar:add-circle-linear" className="mr-1.5 h-4 w-4" /> Create Task
-                                    </Button>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            )}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="calendar">
+            </Tabs>
+          </div>
+          
+          {/* Card Content */}
+          {viewMode === 'table' ? (
+            <>
               {isLoading ? (
                 <div className="flex justify-center items-center h-32 sm:h-40">
-                  <Icon icon="solar:refresh-circle-linear" className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-primary" />
+                  <Icon icon="solar:refresh-linear" className="h-5 w-5 animate-spin text-muted-foreground" />
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
+                        <TableHead className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground">Task</TableHead>
+                        <TableHead className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground w-[80px]">Priority</TableHead>
+                        <TableHead className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground w-[100px]">Status</TableHead>
+                        <TableHead className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Due</TableHead>
+                        <TableHead className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground hidden md:table-cell">Lead</TableHead>
+                        <TableHead className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground w-[60px] text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {tasks.length > 0 ? (
+                        tasks.map(task => (
+                          <TableRow key={task.id} className="group border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-900/50">
+                            <TableCell className="py-3">
+                              <div className="font-medium text-xs sm:text-sm text-foreground line-clamp-1" title={task.title}>
+                                {task.title}
+                              </div>
+                              <div className="sm:hidden text-[10px] text-muted-foreground mt-0.5">
+                                Due: {format(new Date(task.dueDate), 'MMM dd')}
+                              </div>
+                            </TableCell>
+                            <TableCell className="py-3">
+                              <span className="flex items-center gap-1.5">
+                                <span className={cn("size-2 border-[1.5px] rounded-full", priorityDotColors[task.priority])} />
+                                <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide text-foreground font-mono">
+                                  {task.priority}
+                                </span>
+                              </span>
+                            </TableCell>
+                            <TableCell className="py-3">
+                              <span className="flex items-center gap-1.5">
+                                <span className={cn("size-2 border-[1.5px] rounded-full", statusDotColors[task.status])} />
+                                <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide text-foreground font-mono">
+                                  {task.status === 'In Progress' ? 'WIP' : task.status.toUpperCase()}
+                                </span>
+                              </span>
+                            </TableCell>
+                            <TableCell className="hidden sm:table-cell text-xs text-muted-foreground py-3">
+                              {format(new Date(task.dueDate), 'PP')}
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell py-3">
+                              {task.leadId ? (
+                                <Button variant="link" asChild className="p-0 h-auto text-xs text-muted-foreground hover:text-foreground">
+                                  <Link href={`/crm/leads/${task.leadId}`}>{task.leadName || 'View'}</Link>
+                                </Button>
+                              ) : (
+                                <span className="text-muted-foreground text-xs">-</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right py-3">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 opacity-60 group-hover:opacity-100 hover:bg-stone-100 dark:hover:bg-stone-800">
+                                    <Icon icon="solar:menu-dots-bold" className="h-4 w-4 text-muted-foreground" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-40">
+                                  <DropdownMenuItem onSelect={() => handleEdit(task)} className="text-xs">
+                                    <Icon icon="solar:pen-linear" className="mr-2 h-3.5 w-3.5" /> Edit
+                                  </DropdownMenuItem>
+                                  {task.leadId && (
+                                    <>
+                                      <DropdownMenuItem onSelect={() => handleScheduleAppointment(task)} className="text-xs">
+                                        <Icon icon="solar:calendar-add-linear" className="mr-2 h-3.5 w-3.5" /> Schedule
+                                      </DropdownMenuItem>
+                                      <DropdownMenuSeparator />
+                                    </>
+                                  )}
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <DropdownMenuItem className="text-xs text-destructive focus:text-destructive" onSelect={(e) => e.preventDefault()}>
+                                        <Icon icon="solar:trash-bin-trash-linear" className="mr-2 h-3.5 w-3.5" /> Delete
+                                      </DropdownMenuItem>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Delete Task?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          This will permanently delete "{task.title}".
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDelete(task)} className={buttonVariants({ variant: "destructive" })}>
+                                          Delete
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={6} className="h-24 text-center">
+                            <div className="flex flex-col items-center gap-2">
+                              <Icon icon="solar:checklist-linear" className="h-8 w-8 text-muted-foreground/40" />
+                              <p className="text-sm text-muted-foreground">No tasks yet</p>
+                              <Button onClick={handleCreateNew} variant="outline" size="sm" className="h-8 text-xs border-stone-200 dark:border-stone-800">
+                                <Icon icon="solar:add-circle-linear" className="mr-1.5 h-3.5 w-3.5" /> Create Task
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="p-4">
+              {isLoading ? (
+                <div className="flex justify-center items-center h-32 sm:h-40">
+                  <Icon icon="solar:refresh-linear" className="h-5 w-5 animate-spin text-muted-foreground" />
                 </div>
               ) : (
                 <TaskCalendarView tasks={tasks} onEditTask={handleEdit} />
               )}
-            </TabsContent>
-          </Tabs>
-        </Animated>
+            </div>
+          )}
+        </div>
       </div>
 
       <AddTaskDialog

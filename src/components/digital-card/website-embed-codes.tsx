@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Copy, Check, Code2, Calendar, MessageSquare, Bot, Layers, ExternalLink, Info, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
+import { Icon } from '@iconify/react';
+import { AiChatbotIcon } from '@/components/icons/ai-chatbot-icon';
+import { CodeBlock } from '@/components/ui/code-block';
 
 interface WebsiteEmbedCodesProps {
   cardUsername: string;
@@ -25,13 +25,9 @@ export default function WebsiteEmbedCodes({
   calcomUsername,
   calcomEventSlug,
   voiceChatEnabled,
-  contactFormEnabled,
-  calendarBookingEnabled,
   primaryColor = '#3B82F6',
   businessName = 'My Business'
 }: WebsiteEmbedCodesProps) {
-  const [copiedCode, setCopiedCode] = useState<string | null>(null);
-
   const baseUrl = typeof window !== 'undefined' 
     ? `${window.location.origin}` 
     : 'https://app.omniflow.wmart.in';
@@ -40,16 +36,6 @@ export default function WebsiteEmbedCodes({
   const calcomUrl = calcomEventSlug 
     ? `https://cal.com/${calcomUsername}/${calcomEventSlug}`
     : `https://cal.com/${calcomUsername}`;
-
-  const copyToClipboard = async (code: string, type: string) => {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopiedCode(type);
-      setTimeout(() => setCopiedCode(null), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-    }
-  };
 
   const digitalCardEmbedCode = `<!-- OmniFlow Digital Card Embed -->
 <iframe 
@@ -67,7 +53,7 @@ export default function WebsiteEmbedCodes({
   💬 Contact ${businessName}
 </a>`;
 
-  const calcomInlineCode = calcomUsername ? `<!-- Cal.com Inline Booking Calendar (Responsive) -->
+  const calcomInlineCode = calcomUsername ? `<!-- Cal.com Inline Booking Calendar -->
 <div style="position: relative; width: 100%; max-width: 100%; overflow: hidden;">
   <iframe 
     src="${calcomUrl}?embed=true&theme=light" 
@@ -77,25 +63,17 @@ export default function WebsiteEmbedCodes({
     style="border-radius: 8px; min-width: 280px; max-width: 100%; border: none;"
     loading="lazy">
   </iframe>
-</div>
-<style>
-  @media (max-width: 480px) {
-    iframe[src*="cal.com"] { height: 500px !important; }
-  }
-  @media (max-width: 360px) {
-    iframe[src*="cal.com"] { height: 450px !important; min-width: 100% !important; }
-  }
-</style>` : '';
+</div>` : '';
 
   const calcomPopupCode = calcomUsername ? `<!-- Cal.com Popup Booking Button -->
 <script src="https://app.cal.com/embed/embed.js" async></script>
 <button 
   data-cal-link="${calcomUsername}${calcomEventSlug ? '/' + calcomEventSlug : ''}" 
-  style="background: ${primaryColor}; color: white; padding: 14px 28px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-family: Arial, sans-serif; font-weight: 500;">
+  style="background: ${primaryColor}; color: white; padding: 14px 28px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">
   📅 Book Appointment
 </button>` : '';
 
-  const calcomFloatingCode = calcomUsername ? `<!-- Cal.com Floating Button (Bottom Corner) -->
+  const calcomFloatingCode = calcomUsername ? `<!-- Cal.com Floating Button -->
 <script src="https://app.cal.com/embed/embed.js" async></script>
 <script>
   Cal("floatingButton", {
@@ -106,120 +84,41 @@ export default function WebsiteEmbedCodes({
   });
 </script>` : '';
 
-  const combinedCode = `<!-- Complete Lead Capture Section -->
-<section style="max-width: 600px; margin: 40px auto; padding: 20px; font-family: Arial, sans-serif; text-align: center;">
-  <h2 style="margin-bottom: 24px; color: #1f2937;">Get in Touch with ${businessName}</h2>
-  
-  <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
-    ${calcomUsername ? `
-    <!-- Book Appointment -->
-    <button 
-      data-cal-link="${calcomUsername}${calcomEventSlug ? '/' + calcomEventSlug : ''}" 
-      style="background: ${primaryColor}; color: white; padding: 14px 28px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 500;">
-      📅 Book Appointment
-    </button>` : ''}
-    
-    <!-- Contact Form -->
-    <a href="${digitalCardUrl}" 
-       target="_blank"
-       style="display: inline-block; background: #10b981; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-size: 16px; font-weight: 500;">
-      💬 Send Message
-    </a>
-  </div>
-  
-  <p style="margin-top: 16px; color: #6b7280; font-size: 14px;">
-    We typically respond within 24 hours
-  </p>
-</section>
-
-${calcomUsername ? '<!-- Cal.com Script (required for booking button) -->\n<script src="https://app.cal.com/embed/embed.js" async></script>' : ''}`;
-
-  const directLinksCode = `<!-- Direct Links (No Code Required) -->
-
-📍 Your Digital Card URL:
+  const directLinksCode = `Your Digital Card URL:
 ${digitalCardUrl}
-
-${calcomUsername ? `📅 Your Booking URL:
+${calcomUsername ? `
+Your Booking URL:
 ${calcomUrl}
 
-📅 Embeddable Booking URL:
+Embeddable Booking URL:
 ${calcomUrl}?embed=true` : ''}
 
 Share these links anywhere:
 • Email signatures
-• Social media bios (Instagram, LinkedIn, Twitter)
+• Social media bios
 • WhatsApp/SMS messages
-• QR codes
-• Business cards`;
+• QR codes`;
 
   const voiceChatInstructions = `Voice Chat AI is configured company-wide in Settings.
 
 To add Voice AI to any external website:
 
-1️⃣ Go to Settings → API Integrations
-2️⃣ Scroll to "Voice Chat AI" section
-3️⃣ Copy your widget embed code (already configured with your settings)
-4️⃣ Paste it into your website's HTML (before </body> tag)
+1. Go to Settings → API Integrations
+2. Scroll to "Voice Chat AI" section
+3. Copy your widget embed code
+4. Paste it into your website's HTML (before </body> tag)
 
 The widget provides:
-✓ Live voice chat in 109+ languages
-✓ AI-powered conversations 24/7
-✓ Automatic lead capture
-✓ Direct CRM integration
-
-💡 Your widget code is personalized with your business info and API key.
-   Always copy from Settings to ensure it's correctly configured.`;
-
-  const CodeBlock = ({ 
-    code, 
-    type, 
-    title, 
-    description 
-  }: { 
-    code: string; 
-    type: string; 
-    title: string; 
-    description: string;
-  }) => (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div>
-          <Label className="font-medium">{title}</Label>
-          <p className="text-xs text-muted-foreground">{description}</p>
-        </div>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => copyToClipboard(code, type)}
-          className="gap-2"
-        >
-          {copiedCode === type ? (
-            <>
-              <Check className="h-4 w-4 text-green-500" />
-              Copied!
-            </>
-          ) : (
-            <>
-              <Copy className="h-4 w-4" />
-              Copy
-            </>
-          )}
-        </Button>
-      </div>
-      <Textarea
-        value={code}
-        readOnly
-        rows={Math.min(code.split('\n').length + 1, 12)}
-        className="font-mono text-xs bg-slate-50 dark:bg-slate-900"
-      />
-    </div>
-  );
+• Live voice chat in 109+ languages
+• AI-powered conversations 24/7
+• Automatic lead capture
+• Direct CRM integration`;
 
   return (
-    <Card>
+    <Card className="border-border bg-card">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Code2 className="h-5 w-5" />
+          <Icon icon="solar:code-linear" className="h-5 w-5 text-muted-foreground" />
           Website Embed Codes
         </CardTitle>
         <CardDescription>
@@ -231,166 +130,150 @@ The widget provides:
           <Alert variant="destructive" className="mb-4">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Please set a username in the <strong>Basic Info</strong> tab first to generate embed codes.
+              Please set a username in the Basic Info tab first to generate embed codes.
             </AlertDescription>
           </Alert>
         )}
 
         <Tabs defaultValue="links" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="links" className="text-xs sm:text-sm">
-              <ExternalLink className="h-4 w-4 mr-1 hidden sm:inline" />
-              Links
+          <TabsList className="bg-muted/50">
+            <TabsTrigger value="links" className="gap-1.5">
+              <Icon icon="solar:link-linear" className="h-4 w-4" />
+              <span className="hidden sm:inline">Links</span>
             </TabsTrigger>
-            <TabsTrigger value="calcom" className="text-xs sm:text-sm">
-              <Calendar className="h-4 w-4 mr-1 hidden sm:inline" />
-              Booking
+            <TabsTrigger value="calcom" className="gap-1.5">
+              <Icon icon="solar:calendar-linear" className="h-4 w-4" />
+              <span className="hidden sm:inline">Booking</span>
             </TabsTrigger>
-            <TabsTrigger value="card" className="text-xs sm:text-sm">
-              <MessageSquare className="h-4 w-4 mr-1 hidden sm:inline" />
-              Contact
+            <TabsTrigger value="card" className="gap-1.5">
+              <Icon icon="solar:chat-square-linear" className="h-4 w-4" />
+              <span className="hidden sm:inline">Contact</span>
             </TabsTrigger>
-            <TabsTrigger value="voicechat" className="text-xs sm:text-sm">
-              <Bot className="h-4 w-4 mr-1 hidden sm:inline" />
-              Voice AI
-            </TabsTrigger>
-            <TabsTrigger value="combined" className="text-xs sm:text-sm">
-              <Layers className="h-4 w-4 mr-1 hidden sm:inline" />
-              Combined
+            <TabsTrigger value="voicechat" className="gap-1.5">
+              <AiChatbotIcon className="h-4 w-4" />
+              <span className="hidden sm:inline">Voice AI</span>
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="links" className="space-y-4">
-            <Alert className="bg-blue-50 border-blue-200">
-              <Info className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-sm text-blue-800">
-                <strong>No coding required!</strong> Share these URLs directly via email, social media, or QR codes.
-              </AlertDescription>
-            </Alert>
-            <CodeBlock
-              code={directLinksCode}
-              type="links"
-              title="Direct URLs"
-              description="Share these links anywhere without any code"
-            />
+            <div className="p-3 bg-muted/50 border border-border rounded-lg">
+              <p className="text-sm text-muted-foreground flex items-center gap-2">
+                <Icon icon="solar:info-circle-linear" className="h-4 w-4 text-primary shrink-0" />
+                No coding required! Share these URLs directly via email, social media, or QR codes.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">Direct URLs</p>
+              <p className="text-xs text-muted-foreground">Share these links anywhere without any code</p>
+              <CodeBlock code={directLinksCode} language="text" />
+            </div>
           </TabsContent>
 
           <TabsContent value="calcom" className="space-y-4">
             {calcomUsername ? (
               <>
-                <Alert className="bg-green-50 border-green-200">
-                  <Calendar className="h-4 w-4 text-green-600" />
-                  <AlertDescription className="text-sm text-green-800">
+                <div className="p-3 bg-muted/50 border border-border rounded-lg">
+                  <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <Icon icon="solar:check-circle-linear" className="h-4 w-4 text-primary shrink-0" />
                     Cal.com is configured! Bookings will sync to OmniFlow CRM automatically.
-                  </AlertDescription>
-                </Alert>
-                <CodeBlock
-                  code={calcomPopupCode}
-                  type="calcom-popup"
-                  title="Popup Button (Recommended)"
-                  description="Opens calendar in a modal when clicked"
-                />
-                <CodeBlock
-                  code={calcomInlineCode}
-                  type="calcom-inline"
-                  title="Inline Calendar"
-                  description="Shows the full calendar directly on your page"
-                />
-                <CodeBlock
-                  code={calcomFloatingCode}
-                  type="calcom-floating"
-                  title="Floating Button"
-                  description="Fixed button in bottom corner of page"
-                />
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-foreground">Popup Button (Recommended)</p>
+                  <p className="text-xs text-muted-foreground">Opens calendar in a modal when clicked</p>
+                  <CodeBlock code={calcomPopupCode} language="html" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-foreground">Inline Calendar</p>
+                  <p className="text-xs text-muted-foreground">Shows the full calendar directly on your page</p>
+                  <CodeBlock code={calcomInlineCode} language="html" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-foreground">Floating Button</p>
+                  <p className="text-xs text-muted-foreground">Fixed button in bottom corner of page</p>
+                  <CodeBlock code={calcomFloatingCode} language="html" />
+                </div>
               </>
             ) : (
-              <Alert variant="destructive" className="bg-yellow-50 border-yellow-300">
-                <AlertDescription className="text-sm text-yellow-800">
-                  ⚠️ Cal.com is not configured. Enable Calendar Booking in the <strong>Lead Capture</strong> tab and enter your Cal.com username to get booking embed codes.
-                </AlertDescription>
-              </Alert>
+              <div className="p-3 bg-muted/50 border border-border rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  Cal.com is not configured. Enable Calendar Booking in the Lead Capture tab and enter your Cal.com username to get booking embed codes.
+                </p>
+              </div>
             )}
           </TabsContent>
 
           <TabsContent value="card" className="space-y-4">
-            <Alert className="bg-purple-50 border-purple-200">
-              <MessageSquare className="h-4 w-4 text-purple-600" />
-              <AlertDescription className="text-sm text-purple-800">
+            <div className="p-3 bg-muted/50 border border-border rounded-lg">
+              <p className="text-sm text-muted-foreground flex items-center gap-2">
+                <Icon icon="solar:info-circle-linear" className="h-4 w-4 text-primary shrink-0" />
                 Leads submitted through your Digital Card go directly to your OmniFlow CRM.
-              </AlertDescription>
-            </Alert>
-            <CodeBlock
-              code={digitalCardButtonCode}
-              type="card-button"
-              title="Contact Button (Recommended)"
-              description="Opens your Digital Card in a new tab"
-            />
-            <CodeBlock
-              code={digitalCardEmbedCode}
-              type="card-embed"
-              title="Embedded Card"
-              description="Shows your full Digital Card on your website"
-            />
+              </p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">Contact Button (Recommended)</p>
+              <p className="text-xs text-muted-foreground">Opens your Digital Card in a new tab</p>
+              <CodeBlock code={digitalCardButtonCode} language="html" />
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">Embedded Card</p>
+              <p className="text-xs text-muted-foreground">Shows your full Digital Card on your website</p>
+              <CodeBlock code={digitalCardEmbedCode} language="html" />
+            </div>
           </TabsContent>
 
           <TabsContent value="voicechat" className="space-y-4">
             {voiceChatEnabled ? (
               <>
-                <Alert className="bg-green-50 border-green-200">
-                  <Bot className="h-4 w-4 text-green-600" />
-                  <AlertDescription className="text-sm text-green-800">
-                    Voice Chat AI is enabled on this card! To add it to other websites, get your widget code from Settings.
-                  </AlertDescription>
-                </Alert>
-                <CodeBlock
-                  code={voiceChatInstructions}
-                  type="voicechat-instructions"
-                  title="How to Add Voice AI to Any Website"
-                  description="Your personalized embed code is available in Settings → API Integrations"
-                />
-                <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
-                  <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
-                    <strong>Quick Access:</strong> Go to Settings → API Integrations → Voice Chat AI to copy your ready-to-use embed code.
+                <div className="p-3 bg-muted/50 border border-border rounded-lg">
+                  <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <Icon icon="solar:check-circle-linear" className="h-4 w-4 text-primary shrink-0" />
+                    Voice Chat AI is enabled! Get your widget code from Settings → API Integrations.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-foreground">How to Add Voice AI</p>
+                  <p className="text-xs text-muted-foreground">Your personalized embed code is available in Settings</p>
+                  <CodeBlock code={voiceChatInstructions} language="text" />
+                </div>
+                <div className="p-4 bg-muted/50 border border-border rounded-lg">
+                  <p className="text-sm text-foreground mb-3">
+                    Go to Settings → API Integrations → Voice Chat AI to copy your ready-to-use embed code.
                   </p>
                   <a 
-                    href="/settings/integrations" 
-                    className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 underline"
+                    href="/crm/integrations" 
+                    className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80"
                   >
-                    Open API Integrations →
+                    <Icon icon="solar:settings-linear" className="h-4 w-4" />
+                    Open API Integrations
                   </a>
                 </div>
               </>
             ) : (
-              <Alert variant="destructive" className="bg-yellow-50 border-yellow-300">
-                <AlertDescription className="text-sm text-yellow-800">
-                  ⚠️ Voice Chat AI is not enabled on this card. Enable it in the <strong>Lead Capture</strong> tab to use Voice AI for lead capture. Configure it company-wide in <strong>Settings → API Integrations</strong>.
-                </AlertDescription>
-              </Alert>
+              <div className="p-3 bg-muted/50 border border-border rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  Voice Chat AI is not enabled on this card. Enable it in the Lead Capture tab to use Voice AI for lead capture.
+                </p>
+              </div>
             )}
-          </TabsContent>
-
-          <TabsContent value="combined" className="space-y-4">
-            <Alert className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-              <Layers className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-sm text-blue-800">
-                <strong>Complete solution!</strong> This code adds both booking and contact options in one section.
-              </AlertDescription>
-            </Alert>
-            <CodeBlock
-              code={combinedCode}
-              type="combined"
-              title="Complete Lead Capture Section"
-              description="Ready-to-use section with booking + contact buttons"
-            />
           </TabsContent>
         </Tabs>
 
-        <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg">
-          <h4 className="font-medium text-sm mb-2">How Leads Flow to OmniFlow:</h4>
-          <ul className="text-xs text-muted-foreground space-y-1">
-            <li>📅 <strong>Cal.com Bookings</strong> → Sync in CRM → Appointments (click Sync button)</li>
-            <li>💬 <strong>Digital Card Form</strong> → Directly added to CRM → Leads</li>
-            <li>🤖 <strong>Voice Chat AI</strong> → Captures contact info → Creates leads automatically</li>
+        <div className="mt-6 p-4 bg-muted/50 border border-border rounded-lg">
+          <h4 className="font-medium text-sm text-foreground mb-2">How Leads Flow to OmniFlow:</h4>
+          <ul className="text-xs text-muted-foreground space-y-1.5">
+            <li className="flex items-center gap-2">
+              <Icon icon="solar:calendar-linear" className="h-3.5 w-3.5 text-primary" />
+              Cal.com Bookings → Sync in CRM → Appointments
+            </li>
+            <li className="flex items-center gap-2">
+              <Icon icon="solar:chat-square-linear" className="h-3.5 w-3.5 text-primary" />
+              Digital Card Form → Directly added to CRM → Leads
+            </li>
+            <li className="flex items-center gap-2">
+              <AiChatbotIcon className="h-3.5 w-3.5 text-primary" />
+              Voice Chat AI → Captures contact info → Creates leads automatically
+            </li>
           </ul>
         </div>
       </CardContent>

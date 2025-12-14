@@ -23,20 +23,20 @@ const getCampaignStatusClass = (status: EmailCampaign['status']) => {
     case 'Sent via Brevo':
     case 'Sent via Sender.net':
     case 'Sent':
-      return 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300';
+      return 'bg-success-muted text-success-muted-foreground border border-success-border';
     case 'Draft':
-      return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300';
+      return 'bg-warning-muted text-warning-muted-foreground border border-warning-border';
     case 'Scheduled':
-      return 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300';
+      return 'bg-info-muted text-info-muted-foreground border border-info-border';
     case 'Sending via Brevo':
     case 'Sending via Sender.net':
-      return 'bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 animate-pulse';
+      return 'bg-info-muted text-info-muted-foreground border border-info-border animate-pulse';
     case 'Failed via Brevo':
     case 'Failed via Sender.net':
     case 'Failed':
-      return 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300';
+      return 'bg-destructive-muted text-destructive-muted-foreground border border-destructive-border';
     default:
-      return 'bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300';
+      return 'bg-muted text-muted-foreground border border-border';
   }
 };
 
@@ -150,7 +150,7 @@ export default function EmailMarketingPage() {
             
             {/* Desktop Actions */}
             <div className="hidden lg:flex gap-2 flex-wrap">
-              <Button asChild variant="default" className="bg-gradient-to-r from-primary to-accent hover:opacity-90">
+              <Button asChild variant="default">
                 <Link href="/campaigns/ai-email">
                   <Sparkles className="mr-2 h-4 w-4" /> Create with AI
                 </Link>
@@ -168,7 +168,7 @@ export default function EmailMarketingPage() {
           
           {/* Mobile Actions */}
           <div className="flex lg:hidden gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-            <Button asChild size="sm" className="flex-shrink-0 touch-target bg-gradient-to-r from-primary to-accent">
+            <Button asChild size="sm" variant="default" className="flex-shrink-0 touch-target">
               <Link href="/campaigns/ai-email">
                 <Sparkles className="mr-1.5 h-4 w-4" /> AI Create
               </Link>
@@ -202,43 +202,43 @@ export default function EmailMarketingPage() {
             </CardContent>
           </Card>
           
-          <Card className="group hover:shadow-lg transition-all duration-300 hover:border-green-500/50">
+          <Card className="group hover:shadow-lg transition-all duration-300 hover:border-success-border">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm text-muted-foreground">Open Rate</span>
-                <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-                  <Eye className="w-4 h-4 text-green-500" />
+                <div className="w-8 h-8 rounded-lg bg-success-muted flex items-center justify-center">
+                  <Eye className="w-4 h-4 text-success-muted-foreground" />
                 </div>
               </div>
-              <div className="text-xl sm:text-2xl font-bold text-green-600">
+              <div className="text-xl sm:text-2xl font-bold text-success">
                 <AnimatedCounter value={avgOpenRate} decimals={1} suffix="%" />
               </div>
             </CardContent>
           </Card>
           
-          <Card className="group hover:shadow-lg transition-all duration-300 hover:border-blue-500/50">
+          <Card className="group hover:shadow-lg transition-all duration-300 hover:border-info-border">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm text-muted-foreground">Click Rate</span>
-                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                  <MousePointer className="w-4 h-4 text-blue-500" />
+                <div className="w-8 h-8 rounded-lg bg-info-muted flex items-center justify-center">
+                  <MousePointer className="w-4 h-4 text-info-muted-foreground" />
                 </div>
               </div>
-              <div className="text-xl sm:text-2xl font-bold text-blue-600">
+              <div className="text-xl sm:text-2xl font-bold text-info">
                 <AnimatedCounter value={avgClickRate} decimals={1} suffix="%" />
               </div>
             </CardContent>
           </Card>
           
-          <Card className="group hover:shadow-lg transition-all duration-300 hover:border-purple-500/50">
+          <Card className="group hover:shadow-lg transition-all duration-300 hover:border-primary/50">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm text-muted-foreground">Sent</span>
-                <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4 text-purple-500" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <TrendingUp className="w-4 h-4 text-primary" />
                 </div>
               </div>
-              <div className="text-xl sm:text-2xl font-bold text-purple-600">
+              <div className="text-xl sm:text-2xl font-bold text-primary">
                 <AnimatedCounter value={sentLocalCampaigns.length} />
               </div>
             </CardContent>

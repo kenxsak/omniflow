@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from 'react';
+import { useRef, useLayoutEffect } from 'react';
 import { SidebarProvider, Sidebar, SidebarInset, SidebarContent, SidebarFooter } from '@/components/ui/sidebar';
 import SidebarNav from '@/components/layout/sidebar-nav';
 import AppHeader from '@/components/layout/app-header';
 import AppSidebarHeader from '@/components/layout/app-sidebar-header';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
-import gsap from 'gsap';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { appUser } = useAuth();
@@ -15,15 +14,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const mainRef = useRef<HTMLElement>(null);
   const prevPathname = useRef(pathname);
   
-  // Page transition animation
-  useEffect(() => {
+  // Ultra-fast page transition - CSS only, no GSAP delay
+  useLayoutEffect(() => {
     if (prevPathname.current !== pathname && mainRef.current) {
-      // Animate page content on route change
-      gsap.fromTo(
-        mainRef.current,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }
-      );
+      // Instant opacity transition via CSS class
+      mainRef.current.style.opacity = '0';
+      mainRef.current.style.transform = 'translateY(4px)';
+      
+      // Use requestAnimationFrame for instant visual update
+      requestAnimationFrame(() => {
+        if (mainRef.current) {
+          mainRef.current.style.transition = 'opacity 0.15s ease-out, transform 0.15s ease-out';
+          mainRef.current.style.opacity = '1';
+          mainRef.current.style.transform = 'translateY(0)';
+        }
+      });
+      
       prevPathname.current = pathname;
     }
   }, [pathname]);
@@ -34,15 +40,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-      <Sidebar variant="sidebar" collapsible="icon" className="border-r border-sidebar-border/50">
+      <Sidebar variant="sidebar" collapsible="icon" className="border-r border-sidebar-border dark:border-transparent">
         <AppSidebarHeader />
         <SidebarContent className="scrollbar-thin">
           <SidebarNav />
         </SidebarContent>
-        <SidebarFooter className="p-4 text-xs text-muted-foreground group-data-[collapsible=icon]:hidden border-t border-sidebar-border/50">
+        <SidebarFooter className="p-3 text-[10px] text-sidebar-foreground group-data-[collapsible=icon]:hidden">
           <div className="flex items-center justify-between">
             <span>© {new Date().getFullYear()} OmniFlow</span>
-            <span className="text-[10px] opacity-60">v2.0</span>
+            <span className="opacity-50">v2.0</span>
           </div>
         </SidebarFooter>
       </Sidebar>
@@ -50,9 +56,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <AppHeader />
         <main 
           ref={mainRef}
-          className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 overflow-x-hidden safe-area-inset"
+          className="flex-1 p-4 sm:p-6 overflow-x-hidden"
         >
-          <div className="max-w-[1600px] mx-auto w-full">
+          <div className="max-w-[1400px] mx-auto w-full">
             {children}
           </div>
         </main>

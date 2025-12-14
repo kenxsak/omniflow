@@ -117,7 +117,7 @@ export default function SubscriptionDetails() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex-grow">
                 <h3 className="text-xl font-bold text-primary flex items-center">
-                {currentPlan.isFeatured && <Star className="h-5 w-5 mr-2 text-yellow-500 fill-yellow-400" />}
+                {currentPlan.isFeatured && <Star className="h-5 w-5 mr-2 text-warning fill-warning" />}
                 {currentPlan.name} Plan
                 </h3>
             </div>
@@ -134,28 +134,28 @@ export default function SubscriptionDetails() {
             {/* Plan Limits */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="flex items-start">
-                <Users className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+                <Users className="h-5 w-5 text-success mr-3 mt-0.5 flex-shrink-0" />
                 <span className="text-muted-foreground">Up to <strong className="text-foreground">{currentPlan.maxUsers ?? 'N/A'}</strong> {currentPlan.maxUsers === 1 ? 'user' : 'users'}</span>
               </div>
               <div className="flex items-start">
-                <Bot className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+                <Bot className="h-5 w-5 text-success mr-3 mt-0.5 flex-shrink-0" />
                 <span className="text-muted-foreground"><strong className="text-foreground">{(currentPlan.aiCreditsPerMonth ?? 0).toLocaleString()}</strong> AI Credits/month</span>
               </div>
               {currentPlan.maxImagesPerMonth != null && currentPlan.maxImagesPerMonth > 0 && (
                 <div className="flex items-start">
-                  <Image className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+                  <Image className="h-5 w-5 text-success mr-3 mt-0.5 flex-shrink-0" />
                   <span className="text-muted-foreground"><strong className="text-foreground">{currentPlan.maxImagesPerMonth.toLocaleString()}</strong> images/month</span>
                 </div>
               )}
               {currentPlan.maxTextPerMonth != null && currentPlan.maxTextPerMonth > 0 && (
                 <div className="flex items-start">
-                  <Type className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+                  <Type className="h-5 w-5 text-success mr-3 mt-0.5 flex-shrink-0" />
                   <span className="text-muted-foreground"><strong className="text-foreground">{currentPlan.maxTextPerMonth.toLocaleString()}</strong> text ops/month</span>
                 </div>
               )}
               {currentPlan.maxTTSPerMonth != null && currentPlan.maxTTSPerMonth > 0 && (
                 <div className="flex items-start">
-                  <Mic className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+                  <Mic className="h-5 w-5 text-success mr-3 mt-0.5 flex-shrink-0" />
                   <span className="text-muted-foreground"><strong className="text-foreground">{currentPlan.maxTTSPerMonth.toLocaleString()}</strong> voice ops/month</span>
                 </div>
               )}
@@ -171,7 +171,7 @@ export default function SubscriptionDetails() {
                     .map((feature) => (
                         feature && (
                         <li key={feature.id} className="flex items-start">
-                            <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                            <Check className="h-4 w-4 text-success mr-2 mt-0.5 flex-shrink-0" />
                             <div>
                               <span className="text-sm font-medium text-foreground">{feature.name}</span>
                               <p className="text-xs text-muted-foreground">{feature.description}</p>
@@ -194,8 +194,8 @@ export default function SubscriptionDetails() {
 
             {/* Yearly Discount */}
             {currentPlan.yearlyDiscountPercentage && currentPlan.yearlyDiscountPercentage > 0 && (
-              <div className="bg-accent/10 rounded-lg p-3 border border-accent/20">
-                <p className="text-sm font-medium text-accent">
+              <div className="bg-success-muted rounded-lg p-3 border border-success/30">
+                <p className="text-sm font-medium text-success">
                   💰 Save {currentPlan.yearlyDiscountPercentage}% with yearly billing!
                 </p>
               </div>

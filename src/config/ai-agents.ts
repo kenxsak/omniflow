@@ -162,8 +162,8 @@ export const aiAgents: AIAgent[] = [
     id: 'general-assistant',
     name: 'General AI Assistant',
     icon: Sparkles,
-    color: 'text-yellow-600',
-    bgColor: 'bg-yellow-50 dark:bg-yellow-900/20',
+    color: 'text-warning',
+    bgColor: 'bg-warning-muted',
     description: 'Ask me anything about marketing and content',
     longDescription: 'I can help with anything related to marketing, content creation, or business strategy.',
     capabilities: [

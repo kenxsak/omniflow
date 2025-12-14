@@ -19,61 +19,47 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-11 w-full items-center justify-between rounded-lg border border-input bg-background px-3 py-2 text-sm sm:text-base",
-      "ring-offset-background transition-all duration-200",
-      "placeholder:text-muted-foreground/60",
-      "focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-primary",
+      // Autosend style select trigger
+      "group flex h-9 w-full items-center justify-between rounded-lg border px-3 py-1.5 text-sm",
+      "border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900",
+      "text-stone-800 dark:text-stone-200",
+      "transition-all duration-100",
+      "placeholder:text-stone-400 dark:placeholder:text-stone-500",
+      "focus:outline-none focus:border-stone-300 dark:focus:border-stone-600",
+      "focus-within:border-stone-300 dark:focus-within:border-stone-600",
+      "focus-within:shadow-[0_0_0_1px_rgba(0,0,0,0.05)] dark:focus-within:shadow-none",
       "disabled:cursor-not-allowed disabled:opacity-50",
-      "hover:border-muted-foreground/30",
+      "hover:border-stone-300 dark:hover:border-stone-600",
+      "hover:shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:hover:shadow-none",
       "[&>span]:line-clamp-1",
-      "touch-target",
-      "sm:h-10 sm:text-sm",
       className
     )}
     {...props}
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <Icon icon="solar:alt-arrow-down-linear" className="h-4 w-4 opacity-50 shrink-0 ml-2" />
+      {/* Autosend chevron icon */}
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        width="16" 
+        height="16" 
+        viewBox="0 0 24 24" 
+        fill="none"
+        className="text-stone-400 group-hover:text-stone-950 group-focus-within:text-stone-950 dark:group-hover:text-stone-200 dark:group-focus-within:text-stone-200 shrink-0 ml-2 transition-colors"
+      >
+        <path 
+          d="M18 9.00005C18 9.00005 13.5811 15 12 15C10.4188 15 6 9 6 9" 
+          stroke="currentColor" 
+          strokeWidth="1.5" 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ))
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
-
-const SelectScrollUpButton = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.ScrollUpButton
-    ref={ref}
-    className={cn(
-      "flex cursor-default items-center justify-center py-1",
-      className
-    )}
-    {...props}
-  >
-    <Icon icon="solar:alt-arrow-up-linear" className="h-4 w-4" />
-  </SelectPrimitive.ScrollUpButton>
-))
-SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName
-
-const SelectScrollDownButton = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.ScrollDownButton
-    ref={ref}
-    className={cn(
-      "flex cursor-default items-center justify-center py-1",
-      className
-    )}
-    {...props}
-  >
-    <Icon icon="solar:alt-arrow-down-linear" className="h-4 w-4" />
-  </SelectPrimitive.ScrollDownButton>
-))
-SelectScrollDownButton.displayName =
-  SelectPrimitive.ScrollDownButton.displayName
 
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
@@ -83,7 +69,12 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "relative z-50 max-h-[60vh] sm:max-h-96 min-w-[8rem] overflow-hidden rounded-xl border bg-popover text-popover-foreground shadow-xl",
+        // Autosend style dropdown content - clean, no arrows
+        "relative z-50 max-h-[60vh] sm:max-h-96 min-w-[8rem]",
+        "rounded-xl border border-stone-200 dark:border-stone-700",
+        "bg-white dark:bg-stone-900",
+        "text-stone-800 dark:text-stone-200",
+        "shadow-lg shadow-stone-200/50 dark:shadow-none",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -96,17 +87,15 @@ const SelectContent = React.forwardRef<
       position={position}
       {...props}
     >
-      <SelectScrollUpButton />
       <SelectPrimitive.Viewport
         className={cn(
-          "p-1",
+          "p-2 overflow-y-auto scrollbar-hide",
           position === "popper" &&
             "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
         )}
       >
         {children}
       </SelectPrimitive.Viewport>
-      <SelectScrollDownButton />
     </SelectPrimitive.Content>
   </SelectPrimitive.Portal>
 ))
@@ -118,7 +107,11 @@ const SelectLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.Label
     ref={ref}
-    className={cn("py-1.5 pl-8 pr-2 text-xs sm:text-sm font-semibold text-muted-foreground", className)}
+    className={cn(
+      "py-1.5 px-3 text-xs font-semibold uppercase tracking-wide",
+      "text-stone-500 dark:text-stone-400",
+      className
+    )}
     {...props}
   />
 ))
@@ -131,22 +124,41 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-lg py-2.5 sm:py-2 pl-8 pr-2 text-sm",
+      // Autosend style dropdown item - clean and aesthetic
+      "relative flex w-full cursor-pointer select-none items-center",
+      "rounded-lg py-2.5 px-3 pr-8 text-sm",
       "outline-none transition-colors",
-      "focus:bg-accent focus:text-accent-foreground",
+      "text-stone-700 dark:text-stone-300",
+      "hover:bg-stone-100 dark:hover:bg-stone-800",
+      "focus:bg-stone-100 dark:focus:bg-stone-800",
+      "data-[state=checked]:text-stone-950 dark:data-[state=checked]:text-white",
+      "data-[state=checked]:font-medium",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      "touch-target",
       className
     )}
     {...props}
   >
-    <span className="absolute left-2 flex h-4 w-4 items-center justify-center">
+    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+    <span className="absolute right-3 flex h-4 w-4 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Icon icon="solar:checkmark-circle-linear" className="h-4 w-4 text-primary" />
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="16" 
+          height="16" 
+          viewBox="0 0 24 24" 
+          fill="none"
+          className="text-indigo-600 dark:text-indigo-400"
+        >
+          <path 
+            d="M5 14l3.5 3.5L19 6.5" 
+            stroke="currentColor" 
+            strokeWidth="1.5" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          />
+        </svg>
       </SelectPrimitive.ItemIndicator>
     </span>
-
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ))
 SelectItem.displayName = SelectPrimitive.Item.displayName
@@ -172,6 +184,4 @@ export {
   SelectLabel,
   SelectItem,
   SelectSeparator,
-  SelectScrollUpButton,
-  SelectScrollDownButton,
 }

@@ -4,6 +4,15 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Animated } from './animated';
 
+// Horizontal falling line animation for section dividers
+function HorizontalFallingLine() {
+  return (
+    <div className="absolute bottom-0 left-0 h-px w-full overflow-hidden">
+      <div className="falling-line-horizontal absolute h-px w-24 bg-gradient-to-r from-transparent via-foreground/40 to-transparent" />
+    </div>
+  );
+}
+
 interface SectionProps {
   children: React.ReactNode;
   className?: string;
@@ -11,6 +20,7 @@ interface SectionProps {
   variant?: 'default' | 'muted' | 'gradient' | 'dark';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   animate?: boolean;
+  showDivider?: boolean;
 }
 
 export function Section({
@@ -20,6 +30,7 @@ export function Section({
   variant = 'default',
   size = 'lg',
   animate = true,
+  showDivider = false,
 }: SectionProps) {
   const variantClasses = {
     default: 'bg-background',
@@ -38,16 +49,19 @@ export function Section({
   const content = (
     <section
       id={id}
+      data-slot="section"
       className={cn(
         variantClasses[variant],
         sizeClasses[size],
         'relative overflow-hidden',
+        showDivider && 'line-b',
         className
       )}
     >
       <div className="container-mobile">
         {children}
       </div>
+      {showDivider && <HorizontalFallingLine />}
     </section>
   );
 
@@ -61,6 +75,8 @@ export function Section({
 
   return content;
 }
+
+export { HorizontalFallingLine };
 
 interface SectionHeaderProps {
   badge?: string;
@@ -80,21 +96,21 @@ export function SectionHeader({
   return (
     <div
       className={cn(
-        'max-w-3xl mb-8 sm:mb-12',
+        'max-w-2xl mb-8 sm:mb-10',
         align === 'center' && 'mx-auto text-center',
         className
       )}
     >
       {badge && (
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-primary/10 text-primary mb-4">
+        <span className="inline-flex items-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">
           {badge}
         </span>
       )}
-      <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 sm:mb-4">
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight mb-2 sm:mb-3">
         {title}
       </h2>
       {description && (
-        <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
+        <p className="text-sm sm:text-base text-muted-foreground">
           {description}
         </p>
       )}
@@ -142,24 +158,24 @@ export function FeatureCard({
   variant = 'default',
 }: FeatureCardProps) {
   const variantClasses = {
-    default: 'bg-card hover:shadow-lg',
-    bordered: 'bg-card border-2 hover:border-primary/30 hover:shadow-lg',
-    gradient: 'bg-gradient-to-br from-card to-muted/50 hover:shadow-lg',
+    default: 'bg-card border border-border',
+    bordered: 'bg-card border border-border',
+    gradient: 'bg-card border border-border',
   };
 
   return (
     <div
       className={cn(
-        'rounded-xl p-4 sm:p-6 transition-all duration-300 hover:-translate-y-1',
+        'rounded-lg p-4 sm:p-5 transition-colors duration-150 hover:bg-muted/30',
         variantClasses[variant],
         className
       )}
     >
-      <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3 sm:mb-4 text-primary">
+      <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center mb-3 text-muted-foreground">
         {icon}
       </div>
-      <h3 className="text-base sm:text-lg font-semibold mb-2">{title}</h3>
-      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+      <h3 className="text-sm font-semibold mb-1">{title}</h3>
+      <p className="text-xs text-muted-foreground">
         {description}
       </p>
     </div>

@@ -100,7 +100,7 @@ export function WhatsAppCostCalculator() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <TrendingDown className="h-5 w-5 text-green-600" />
+          <TrendingDown className="h-5 w-5 text-success" />
           WhatsApp Platform Cost Comparison
         </CardTitle>
         <CardDescription>
@@ -144,7 +144,7 @@ export function WhatsAppCostCalculator() {
                 key={provider.id}
                 className={`p-4 rounded-lg border-2 transition-all ${
                   isRecommended
-                    ? 'border-green-500 bg-green-50 dark:bg-green-900/10'
+                    ? 'border-success bg-success-muted'
                     : 'border-border bg-card'
                 }`}
               >
@@ -158,12 +158,12 @@ export function WhatsAppCostCalculator() {
                         </Badge>
                       )}
                       {isRecommended && (
-                        <Badge variant="default" className="text-xs bg-green-600">
+                        <Badge variant="default" className="text-xs bg-success text-success-foreground">
                           CHEAPEST
                         </Badge>
                       )}
                       {isRecommendedByLogic && !isRecommended && (
-                        <Badge variant="outline" className="text-xs border-green-600 text-green-600">
+                        <Badge variant="outline" className="text-xs border-success text-success">
                           RECOMMENDED
                         </Badge>
                       )}
@@ -186,7 +186,7 @@ export function WhatsAppCostCalculator() {
                     </div>
                     <div className="text-xs text-muted-foreground">per month</div>
                     {isRecommended && monthlySavings > 0 && (
-                      <div className="text-xs text-green-600 font-medium mt-1">
+                      <div className="text-xs text-success font-medium mt-1">
                         Save {formatCurrency(monthlySavings)}/mo
                       </div>
                     )}
@@ -199,18 +199,18 @@ export function WhatsAppCostCalculator() {
 
         {/* Recommendation Card */}
         {monthlyMessages > 0 && (
-          <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-            <Info className="h-4 w-4 text-blue-600" />
-            <AlertDescription className="text-sm text-blue-900 dark:text-blue-100">
+          <Alert variant="info">
+            <Info className="h-4 w-4" />
+            <AlertDescription className="text-sm">
               <div className="space-y-2">
                 <p className="font-semibold">
                   💡 For {monthlyMessages.toLocaleString('en-IN')} messages/month, we recommend {recommendation.provider}
                 </p>
-                <p className="text-blue-800 dark:text-blue-200">
+                <p>
                   {recommendation.reason}
                 </p>
                 {annualSavings > 0 && (
-                  <p className="font-medium text-green-700 dark:text-green-300">
+                  <p className="font-medium text-success">
                     Annual savings with {cheapest.name}: {formatCurrency(annualSavings)} vs {mostExpensive.name}
                   </p>
                 )}

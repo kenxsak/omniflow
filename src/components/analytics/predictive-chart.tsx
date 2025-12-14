@@ -43,15 +43,15 @@ export default function PredictiveChart({ analytics, historicalLeads }: Predicti
   });
   
   const getTrendIcon = (trend: 'increasing' | 'stable' | 'decreasing') => {
-    if (trend === 'increasing') return <TrendingUp className="h-4 w-4 text-green-500" />;
-    if (trend === 'decreasing') return <TrendingDown className="h-4 w-4 text-red-500" />;
-    return <Minus className="h-4 w-4 text-gray-500" />;
+    if (trend === 'increasing') return <TrendingUp className="h-4 w-4 text-success" />;
+    if (trend === 'decreasing') return <TrendingDown className="h-4 w-4 text-destructive" />;
+    return <Minus className="h-4 w-4 text-muted-foreground" />;
   };
   
   const getTrendColor = (direction: 'up' | 'down' | 'stable') => {
-    if (direction === 'up') return 'text-green-600';
-    if (direction === 'down') return 'text-red-600';
-    return 'text-gray-600';
+    if (direction === 'up') return 'text-success';
+    if (direction === 'down') return 'text-destructive';
+    return 'text-muted-foreground';
   };
   
   return (
@@ -139,7 +139,7 @@ export default function PredictiveChart({ analytics, historicalLeads }: Predicti
             </div>
           </div>
           
-          <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
+          <div className="p-4 bg-success-muted rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               {getTrendIcon(revenueForecast.next3Months.trend)}
               <h4 className="font-semibold">Revenue Forecast</h4>

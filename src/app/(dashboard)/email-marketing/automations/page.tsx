@@ -276,10 +276,10 @@ export default function EmailAutomationsPage() {
         />
       </div>
 
-      <Alert variant="default" className="border-blue-300 bg-blue-50 dark:border-blue-700 dark:bg-blue-900/30">
-        <Info className="h-4 w-4 !text-blue-600 dark:!text-blue-400" />
-        <AlertTitleComponent className="text-blue-700 dark:text-blue-300">Automation Backend Status</AlertTitleComponent>
-        <AlertDescription className="text-blue-600 dark:text-blue-400 space-y-1">
+      <Alert variant="info">
+        <Info className="h-4 w-4" />
+        <AlertTitleComponent>Automation Backend Status</AlertTitleComponent>
+        <AlertDescription className="space-y-1">
           <p>You can now **configure and activate** automations, and your settings will be saved to the database. The system is designed to create automation sequences for new leads and customers.</p>
           <p>
             For the emails to be sent automatically on schedule, a backend process (like a cron job) needs to call the app's API endpoint. This final step is required to make the system fully autonomous.

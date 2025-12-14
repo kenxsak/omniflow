@@ -45,14 +45,14 @@ export function BYOKCostComparison({
 
   if (usingBYOK) {
     return (
-      <Card className="border-green-200 bg-green-50/50">
+      <Card className="border-success-border bg-success-muted">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
-              <Check className="h-5 w-5 text-green-600" />
+              <Check className="h-5 w-5 text-success" />
               Using BYOK - Unlimited AI
             </CardTitle>
-            <Badge variant="outline" className="bg-green-100 text-green-700">
+            <Badge variant="outline" className="bg-success-muted text-success-muted-foreground">
               Active
             </Badge>
           </div>
@@ -63,22 +63,22 @@ export function BYOKCostComparison({
         <CardContent>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-lg border bg-white p-4">
+              <div className="rounded-lg border bg-card p-4">
                 <div className="text-sm text-muted-foreground">Plan Subscription</div>
                 <div className="text-2xl font-bold">${currentPlan.monthlyPrice}</div>
                 <div className="text-xs text-muted-foreground">per month</div>
               </div>
-              <div className="rounded-lg border bg-white p-4">
+              <div className="rounded-lg border bg-card p-4">
                 <div className="text-sm text-muted-foreground">Google API Cost</div>
                 <div className="text-2xl font-bold">${estimatedGoogleDirectCost.toFixed(2)}</div>
                 <div className="text-xs text-muted-foreground">this month</div>
               </div>
             </div>
 
-            <div className="rounded-lg bg-white border-2 border-green-200 p-4">
+            <div className="rounded-lg bg-card border-2 border-success-border p-4">
               <div className="flex items-center justify-between">
                 <span className="font-semibold">Total Monthly Cost</span>
-                <span className="text-3xl font-bold text-green-600">
+                <span className="text-3xl font-bold text-success">
                   ${totalWithBYOK.toFixed(2)}
                 </span>
               </div>
@@ -87,7 +87,7 @@ export function BYOKCostComparison({
               </div>
             </div>
 
-            <div className="rounded-lg bg-green-100 p-3 text-sm">
+            <div className="rounded-lg bg-success-muted p-3 text-sm">
               💰 <strong>Saving ${monthlySavingsWithBYOK.toFixed(2)}/month</strong> by avoiding platform markup
             </div>
           </div>
@@ -127,11 +127,11 @@ export function BYOKCostComparison({
             </div>
             <div className="mt-3 space-y-2 text-sm">
               <div className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-yellow-500" />
+                <Zap className="h-4 w-4 text-muted-foreground" />
                 <span>Credits used: {currentMonthUsage.creditsUsed} / {currentPlan.creditsIncluded} ({usagePercent.toFixed(1)}%)</span>
               </div>
               {usagePercent > 100 && (
-                <div className="text-red-600 font-medium">
+                <div className="text-destructive font-medium">
                   ⚠️ Over limit - operations blocked
                 </div>
               )}
@@ -139,9 +139,9 @@ export function BYOKCostComparison({
           </div>
 
           {/* BYOK Option */}
-          <div className="rounded-lg border-2 border-green-200 bg-green-50/50 p-4">
+          <div className="rounded-lg border-2 border-success-border bg-success-muted p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Badge variant="outline" className="bg-green-100 text-green-700">BYOK Option</Badge>
+              <Badge variant="outline" className="bg-success-muted text-success-muted-foreground">BYOK Option</Badge>
               <span className="font-semibold">Bring Your Own Key</span>
             </div>
             <div className="grid grid-cols-2 gap-4 mt-3">
@@ -156,15 +156,15 @@ export function BYOKCostComparison({
             </div>
             <div className="mt-3 space-y-2 text-sm">
               <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-green-600" />
+                <Check className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">Unlimited AI operations</span>
               </div>
               <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-green-600" />
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
                 <span>Pay Google directly (~$0.001/request)</span>
               </div>
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-green-600" />
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 <span>No credit restrictions or limits</span>
               </div>
             </div>

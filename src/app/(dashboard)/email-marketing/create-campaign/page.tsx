@@ -952,8 +952,8 @@ export default function CreateEmailCampaignPage() {
           {/* Show selected provider info if only one is configured */}
           {availableProviders.length === 1 && selectedProvider && (
             <Alert variant="default" className="text-xs">
-              <Info className="h-4 w-4 text-blue-500"/>
-              <AlertDescription className="text-blue-600">
+              <Info className="h-4 w-4 text-info-muted-foreground"/>
+              <AlertDescription className="text-info-muted-foreground">
                 Using <strong>{selectedProvider === 'brevo' ? 'Brevo' : 'Sender.net'}</strong> as your email provider
               </AlertDescription>
             </Alert>
@@ -1161,9 +1161,9 @@ export default function CreateEmailCampaignPage() {
               </p>
             )}
              <Alert variant="default" className="mt-2 text-xs">
-                <Info className="h-4 w-4 text-blue-500" />
-                <AlertTitleComponent className="font-semibold text-blue-700">Important: Email Verification Required</AlertTitleComponent>
-                <AlertDescription className="text-blue-600 space-y-1">
+                <Info className="h-4 w-4 text-info-muted-foreground" />
+                <AlertTitleComponent className="font-semibold text-foreground">Important: Email Verification Required</AlertTitleComponent>
+                <AlertDescription className="text-muted-foreground space-y-1">
                     <p>The email address you use here needs to be verified in your email service provider before you can send emails.</p>
                     {selectedProvider === 'brevo' && (
                       <>
@@ -1339,11 +1339,11 @@ export default function CreateEmailCampaignPage() {
                 </p>
             )}
             <Alert variant="default" className="mt-2 text-xs">
-                <Info className="h-4 w-4 text-blue-500"/>
-                <AlertTitleComponent className="font-semibold text-blue-700">Important Notes:</AlertTitleComponent>
-                <AlertDescription className="text-blue-600 space-y-1">
-                    <p>The validation rule requires <code className="font-mono bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded">{"{{ contact.FIRSTNAME }}"}</code> (with double curly braces) for Brevo personalization. The AI aims to include this. Ensure it's present, especially if manually editing.</p>
-                    <p>If your email includes Calls to Action (like buttons or links from the AI generator), please ensure you update placeholder URLs (e.g., <code className="font-mono bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded">href='#'</code> or <code className="font-mono bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded">href='[YOUR_LINK_HERE]'</code>) with your actual website links from the "CTA Link" field above before sending!</p>
+                <Info className="h-4 w-4 text-info-muted-foreground"/>
+                <AlertTitleComponent className="font-semibold text-foreground">Important Notes:</AlertTitleComponent>
+                <AlertDescription className="text-muted-foreground space-y-1">
+                    <p>The validation rule requires <code className="font-mono bg-muted px-1 py-0.5 rounded">{"{{ contact.FIRSTNAME }}"}</code> (with double curly braces) for Brevo personalization. The AI aims to include this. Ensure it's present, especially if manually editing.</p>
+                    <p>If your email includes Calls to Action (like buttons or links from the AI generator), please ensure you update placeholder URLs (e.g., <code className="font-mono bg-muted px-1 py-0.5 rounded">href='#'</code> or <code className="font-mono bg-muted px-1 py-0.5 rounded">href='[YOUR_LINK_HERE]'</code>) with your actual website links from the "CTA Link" field above before sending!</p>
                 </AlertDescription>
             </Alert>
         </CardContent>

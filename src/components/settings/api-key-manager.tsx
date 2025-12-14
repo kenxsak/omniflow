@@ -639,9 +639,9 @@ export default function ApiKeyManager() {
           <CardTitle className="text-lg flex items-center gap-2">
             {service.name}
             {service.isConfigured ? (
-              <CheckCircle className="h-5 w-5 text-green-500" aria-label="Configured" />
+              <CheckCircle className="h-5 w-5 text-success" aria-label="Configured" />
             ) : (
-              <AlertTriangle className="h-5 w-5 text-orange-400" aria-label="Not Configured" />
+              <AlertTriangle className="h-5 w-5 text-warning" aria-label="Not Configured" />
             )}
           </CardTitle>
           {service.description && <CardDescription className="text-xs mt-1 pr-4">{service.description}</CardDescription>}
@@ -687,18 +687,18 @@ export default function ApiKeyManager() {
         ))}
 
         {testResults[service.id] && (
-          <Alert className={testResults[service.id]?.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}>
+          <Alert variant={testResults[service.id]?.success ? 'success' : 'destructive'}>
             <div className="flex items-start gap-2">
               {testResults[service.id]?.success ? (
-                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                <CheckCircle className="h-4 w-4 mt-0.5" />
               ) : (
-                <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5" />
+                <AlertTriangle className="h-4 w-4 mt-0.5" />
               )}
               <div className="flex-1">
-                <p className={`text-sm font-medium ${testResults[service.id]?.success ? 'text-green-700' : 'text-red-700'}`}>
+                <p className="text-sm font-medium">
                   {testResults[service.id]?.success ? 'Test Successful' : 'Test Failed'}
                 </p>
-                <p className={`text-xs ${testResults[service.id]?.success ? 'text-green-600' : 'text-red-600'}`}>
+                <p className="text-xs opacity-80">
                   {testResults[service.id]?.message}
                 </p>
               </div>
@@ -753,15 +753,15 @@ export default function ApiKeyManager() {
   );
 
   const renderVoiceChatWidget = () => (
-    <Card className="overflow-hidden shadow-md border-2 border-purple-200 dark:border-purple-800">
-      <CardHeader className="flex flex-row items-start justify-between bg-purple-50/50 dark:bg-purple-900/20 p-4 border-b border-purple-200 dark:border-purple-800">
+    <Card className="overflow-hidden shadow-md border-2 border-primary/30">
+      <CardHeader className="flex flex-row items-start justify-between bg-primary/5 p-4 border-b border-primary/30">
         <div className="flex-1">
           <CardTitle className="text-lg flex items-center gap-2">
             Voice Chat AI Widget
             {voiceChatConfig?.enabled ? (
-              <CheckCircle className="h-5 w-5 text-green-500" aria-label="Configured" />
+              <CheckCircle className="h-5 w-5 text-success" aria-label="Configured" />
             ) : (
-              <AlertTriangle className="h-5 w-5 text-orange-400" aria-label="Not Configured" />
+              <AlertTriangle className="h-5 w-5 text-warning" aria-label="Not Configured" />
             )}
           </CardTitle>
           <CardDescription className="text-xs mt-1 pr-4">
@@ -786,8 +786,8 @@ export default function ApiKeyManager() {
           </p>
           {voiceChatConfig?.chatbotId && (
             <div className="flex items-center gap-2 mt-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              <span className="text-xs text-green-600 dark:text-green-400">
+              <CheckCircle className="h-4 w-4 text-success" />
+              <span className="text-xs text-success">
                 Chatbot ID detected: <code className="bg-muted px-1 py-0.5 rounded">{voiceChatConfig.chatbotId}</code>
               </span>
             </div>
@@ -796,30 +796,30 @@ export default function ApiKeyManager() {
 
         {voiceChatConfig?.enabled && (
           <>
-            <Alert className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-300 dark:from-purple-900/20 dark:to-blue-900/20 dark:border-purple-700">
-              <Info className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-              <AlertTitle className="text-purple-700 dark:text-purple-300 font-semibold">📋 Copy This to Voice Chat AI Dashboard</AlertTitle>
+            <Alert variant="info">
+              <Info className="h-4 w-4" />
+              <AlertTitle className="font-semibold">📋 Copy This to Voice Chat AI Dashboard</AlertTitle>
               <AlertDescription className="space-y-3 mt-2">
-                <p className="text-sm text-purple-600 dark:text-purple-400">
+                <p className="text-sm">
                   Paste this <strong>complete webhook URL</strong> in your Voice Chat AI dashboard (Settings → Integrations → Lead Notification Webhook URL):
                 </p>
                 <div className="flex items-center gap-2">
                   <Input
                     value={completeWebhookUrl}
                     readOnly
-                    className="flex-grow font-mono text-xs bg-white dark:bg-gray-800 border-purple-300 dark:border-purple-700"
+                    className="flex-grow font-mono text-xs bg-card border-primary/30"
                   />
                   <Button
                     variant="default"
                     size="sm"
                     onClick={() => copyToClipboard(completeWebhookUrl, 'complete')}
-                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
                     {copiedWebhookUrl ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
                     Copy
                   </Button>
                 </div>
-                <p className="text-xs text-purple-600 dark:text-purple-400 flex items-start gap-2">
+                <p className="text-xs flex items-start gap-2">
                   <span className="font-semibold">ℹ️ Note:</span>
                   <span>This URL includes your authentication token. Just paste it in the webhook field - no need to add the token separately!</span>
                 </p>
@@ -846,7 +846,7 @@ export default function ApiKeyManager() {
                       onClick={() => copyToClipboard(webhookUrl, 'url')}
                       title="Copy webhook URL"
                     >
-                      {copiedWebhookUrl ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                      {copiedWebhookUrl ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
                     </Button>
                   </div>
                 </div>
@@ -867,7 +867,7 @@ export default function ApiKeyManager() {
                       onClick={() => copyToClipboard(voiceChatConfig.webhookToken, 'token')}
                       title="Copy webhook token"
                     >
-                      {copiedWebhookToken ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                      {copiedWebhookToken ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">
@@ -877,10 +877,10 @@ export default function ApiKeyManager() {
               </div>
             </details>
 
-            <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800">
-              <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-              <AlertTitle className="text-blue-700 dark:text-blue-300">Widget Active</AlertTitle>
-              <AlertDescription className="text-blue-600 dark:text-blue-400 text-xs">
+            <Alert variant="info">
+              <CheckCircle className="h-4 w-4" />
+              <AlertTitle>Widget Active</AlertTitle>
+              <AlertDescription className="text-xs">
                 Voice Chat AI widget is now live on all your digital cards! Conversations will automatically create leads in your CRM.
               </AlertDescription>
             </Alert>
@@ -938,10 +938,10 @@ export default function ApiKeyManager() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <Alert variant="destructive" className="bg-yellow-50 border-yellow-300 dark:bg-yellow-900/30 dark:border-yellow-700">
-          <AlertTriangle className="h-4 w-4 !text-yellow-600 dark:!text-yellow-400" />
-          <AlertTitle className="text-yellow-700 dark:text-yellow-300">IMPORTANT: API Key Security</AlertTitle>
-          <AlertDescription className="text-yellow-600 dark:text-yellow-400">
+        <Alert variant="warning">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>IMPORTANT: API Key Security</AlertTitle>
+          <AlertDescription>
             Handle your API keys with care. They provide direct access to your accounts on external services. Never share them publicly.
           </AlertDescription>
         </Alert>

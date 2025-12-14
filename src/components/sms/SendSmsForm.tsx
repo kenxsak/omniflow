@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import TemplateBrowser from '@/components/templates/template-browser';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogCloseButton } from '@/components/ui/dialog';
 import { getFriendlyLabel } from '@/lib/friendly-labels';
 import { getFriendlyError, getFriendlySuccess } from '@/lib/friendly-messages';
 
@@ -140,10 +140,10 @@ export default function SendSmsForm() {
         </Alert>
 
         <Tabs defaultValue="template" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="template">📋 Ready-Made Templates</TabsTrigger>
+          <TabsList className="rounded-t-xl">
+            <TabsTrigger value="template">📋 Templates</TabsTrigger>
             <TabsTrigger value="ai">✨ AI Draft</TabsTrigger>
-            <TabsTrigger value="manual">✍️ Manual Message</TabsTrigger>
+            <TabsTrigger value="manual">✍️ Manual</TabsTrigger>
           </TabsList>
 
           {/* Ready-Made Templates Tab */}
@@ -229,9 +229,9 @@ export default function SendSmsForm() {
         )}
         
         {fast2smsConfigured && (
-            <Alert className="bg-green-50 border-green-200">
-                <AlertTitle className="text-green-900">✅ Fast2SMS Ready</AlertTitle>
-                <AlertDescription className="text-green-800">
+            <Alert variant="success">
+                <AlertTitle>✅ Fast2SMS Ready</AlertTitle>
+                <AlertDescription>
                     Messages will be sent via <strong>Fast2SMS Quick SMS</strong> - instant delivery with any message content.
                 </AlertDescription>
             </Alert>
@@ -251,9 +251,9 @@ export default function SendSmsForm() {
                   type="tel"
                   />
               </div>
-              <div className="bg-gray-100 p-3 rounded">
+              <div className="bg-muted p-3 rounded">
                 <p className="text-sm"><strong>Message Preview:</strong></p>
-                <p className="text-sm text-gray-700 mt-2">{messageBody}</p>
+                <p className="text-sm text-muted-foreground mt-2">{messageBody}</p>
               </div>
               <div className="flex justify-end">
                   <Button type="submit" disabled={isLoading || !toPhoneNumber || !messageBody || !fast2smsConfigured}>
@@ -265,11 +265,14 @@ export default function SendSmsForm() {
         )}
 
         <Dialog open={isTemplateBrowserOpen} onOpenChange={setIsTemplateBrowserOpen}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
+            <DialogContent className="sm:max-w-4xl">
+                <DialogHeader className="relative">
                     <DialogTitle>Select an SMS Template</DialogTitle>
+                    <DialogCloseButton />
                 </DialogHeader>
-                <TemplateBrowser filterType="sms" onApply={handleApplyTemplate} />
+                <DialogBody className="max-h-[60vh] overflow-y-auto">
+                    <TemplateBrowser filterType="sms" onApply={handleApplyTemplate} />
+                </DialogBody>
             </DialogContent>
         </Dialog>
     </div>

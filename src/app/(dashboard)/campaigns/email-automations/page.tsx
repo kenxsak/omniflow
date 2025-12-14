@@ -362,7 +362,7 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
                       <div>
                         <Label className="text-xs sm:text-sm">Preview</Label>
                         <div 
-                          className="p-2 sm:p-3 border rounded-md bg-white dark:bg-gray-900 min-h-[120px] sm:min-h-[150px] max-h-[200px] prose prose-sm dark:prose-invert max-w-none text-xs sm:text-sm overflow-y-auto"
+                          className="p-2 sm:p-3 border rounded-md bg-card min-h-[120px] sm:min-h-[150px] max-h-[200px] prose prose-sm dark:prose-invert max-w-none text-xs sm:text-sm overflow-y-auto"
                           dangerouslySetInnerHTML={{ __html: step.content || '<p class="text-muted-foreground">Add content to see preview...</p>' }}
                         />
                       </div>
@@ -646,10 +646,10 @@ export default function EmailAutomationsPage() {
         </div>
       </div>
 
-      <Alert variant="default" className="border-blue-300 bg-blue-50 dark:border-blue-700 dark:bg-blue-900/30">
-        <Info className="h-4 w-4 !text-blue-600 dark:!text-blue-400" />
-        <AlertTitleComponent className="text-blue-700 dark:text-blue-300">How Email Automations Work</AlertTitleComponent>
-        <AlertDescription className="text-blue-600 dark:text-blue-400 space-y-1">
+      <Alert variant="info">
+        <Info className="h-4 w-4" />
+        <AlertTitleComponent>How Email Automations Work</AlertTitleComponent>
+        <AlertDescription className="space-y-1">
           <p>1. <strong>Create Email Lists</strong> - Go to Email Lists and create lists for each customer segment (Free Trial, Paid, Churned, etc.)</p>
           <p>2. <strong>Configure Automations</strong> - Customize the email sequences below and link them to your lists.</p>
           <p>3. <strong>Activate</strong> - Turn on automations to start sending scheduled follow-up emails automatically.</p>

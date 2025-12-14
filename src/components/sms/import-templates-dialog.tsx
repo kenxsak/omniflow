@@ -181,17 +181,17 @@ export function ImportTemplatesDialog({ idToken, provider, onTemplatesImported, 
         </DialogHeader>
 
         <Tabs defaultValue="upload" className="py-4">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="rounded-t-xl">
             <TabsTrigger value="upload">Upload File</TabsTrigger>
             <TabsTrigger value="instructions">How to Export</TabsTrigger>
           </TabsList>
 
           <TabsContent value="upload" className="space-y-4 mt-4">
             {provider === 'msg91' && (
-              <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-900/20">
-                <AlertTriangle className="h-4 w-4 text-amber-600" />
-                <AlertTitle className="text-amber-900 dark:text-amber-100">Why Excel Import?</AlertTitle>
-                <AlertDescription className="text-amber-800 dark:text-amber-200 text-sm">
+              <Alert variant="warning">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Why Excel Import?</AlertTitle>
+                <AlertDescription className="text-sm">
                   {providerInfo.note}
                 </AlertDescription>
               </Alert>
@@ -211,7 +211,7 @@ export function ImportTemplatesDialog({ idToken, provider, onTemplatesImported, 
               
               {selectedFile ? (
                 <div className="space-y-2">
-                  <FileSpreadsheet className="h-12 w-12 mx-auto text-green-600" />
+                  <FileSpreadsheet className="h-12 w-12 mx-auto text-success" />
                   <p className="font-medium">{selectedFile.name}</p>
                   <Badge variant="secondary">{previewCount} templates found</Badge>
                   <Button 
@@ -261,9 +261,9 @@ export function ImportTemplatesDialog({ idToken, provider, onTemplatesImported, 
           </TabsContent>
 
           <TabsContent value="instructions" className="space-y-4 mt-4">
-            <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-              <Info className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-blue-800 dark:text-blue-200">
+            <Alert variant="info">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
                 <p className="font-medium mb-2">How to download templates from {providerInfo.name}:</p>
                 <ol className="text-sm space-y-1 list-decimal ml-4">
                   {providerInfo.downloadSteps.map((step, index) => (
@@ -274,7 +274,7 @@ export function ImportTemplatesDialog({ idToken, provider, onTemplatesImported, 
                   href={providerInfo.dashboardUrl} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mt-3"
+                  className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-3"
                 >
                   Open {providerInfo.name} Dashboard <ExternalLink className="h-3 w-3" />
                 </a>

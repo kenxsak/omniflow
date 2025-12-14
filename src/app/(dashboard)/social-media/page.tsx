@@ -69,7 +69,7 @@ const parseAndRenderScript = (scriptText: string, useImagePromptAndGo: (promptTe
       if (extractedPrompt) {
         return (
           <div key={index} className="flex items-center justify-between group my-1 p-1 bg-muted/30 rounded">
-            <span className="text-sm text-purple-600 dark:text-purple-400 italic mr-2 flex-grow">
+            <span className="text-sm text-primary italic mr-2 flex-grow">
               Visual Idea: {extractedPrompt}
             </span>
             <Button
@@ -636,7 +636,7 @@ export default function SocialMediaPage() {
         
         <Card ref={trendInputsRef} className="overflow-hidden">
           <CardHeader className="p-4 sm:p-6">
-            <CardTitle className="flex items-center text-base sm:text-lg"><Lightbulb className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-yellow-500" />AI Trending Topic Suggester</CardTitle>
+            <CardTitle className="flex items-center text-base sm:text-lg"><Lightbulb className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-warning" />AI Trending Topic Suggester</CardTitle>
             <CardDescription className="text-xs sm:text-sm">Discover trending topics for your niche.</CardDescription>
           </CardHeader>
           <form onSubmit={handleTrendFormSubmit}>
@@ -722,7 +722,7 @@ export default function SocialMediaPage() {
 
         <Card ref={contentGeneratorRef} className="overflow-hidden">
           <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="flex items-center text-base sm:text-lg"><FileCode className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />Content Generator</CardTitle>
+              <CardTitle className="flex items-center text-base sm:text-lg"><FileCode className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-warning" />Content Generator</CardTitle>
               <CardDescription className="text-xs sm:text-sm">AI-powered text for social posts, blogs, sales pages, and YouTube scripts.</CardDescription>
           </CardHeader>
           <form onSubmit={handleContentFormSubmit}>
@@ -790,10 +790,10 @@ export default function SocialMediaPage() {
                 <Card key={index} className="p-4 bg-muted/50 shadow-sm">
                     <CardTitle className="text-lg mb-3 flex items-center justify-between">
                         <div className="flex items-center">
-                            {contentInputs.platform === 'YouTubeVideoScript' ? <Youtube className="mr-2 h-5 w-5 text-red-600"/> : 
-                             isSalesPage ? <FileCode className="mr-2 h-5 w-5 text-green-600"/> :
-                             isBlogPost ? <Rss className="mr-2 h-5 w-5 text-orange-600"/> :
-                             <Edit3 className="mr-2 h-5 w-5 text-primary"/>}
+                            {contentInputs.platform === 'YouTubeVideoScript' ? <Youtube className="mr-2 h-5 w-5 text-muted-foreground"/> : 
+                             isSalesPage ? <FileCode className="mr-2 h-5 w-5 text-muted-foreground"/> :
+                             isBlogPost ? <Rss className="mr-2 h-5 w-5 text-muted-foreground"/> :
+                             <Edit3 className="mr-2 h-5 w-5 text-muted-foreground"/>}
                             Variation {index + 1} for {contentInputs.platform}
                         </div>
                         <Button variant="secondary" size="sm" onClick={() => handleSaveOrUpdatePost(variation)}>
@@ -843,7 +843,7 @@ export default function SocialMediaPage() {
                     
                     {variation.suggestedHashtagsForVariation && variation.suggestedHashtagsForVariation.length > 0 && (
                         <div className="mt-2">
-                            <Label className="flex items-center text-base"><Hash className="mr-2 h-4 w-4 text-blue-500"/>Auto-Suggested Hashtags</Label>
+                            <Label className="flex items-center text-base"><Hash className="mr-2 h-4 w-4 text-primary"/>Auto-Suggested Hashtags</Label>
                             <div className="flex flex-wrap gap-1 mt-1 p-2 border rounded-md bg-background">
                                 {variation.suggestedHashtagsForVariation.map((tag, tagIdx) => (
                                     <Badge key={tagIdx} variant="secondary" className="text-xs cursor-pointer hover:bg-primary/10" onClick={() => copyToClipboard(tag, "Hashtag")}>{tag}</Badge>
@@ -859,11 +859,11 @@ export default function SocialMediaPage() {
 
 
                     {contentInputs.platform === 'YouTubeVideoScript' && ( <>
-                        {variation.suggestedVideoTitle && (<div><Label className="flex items-center text-base"><Youtube className="mr-2 h-4 w-4 text-red-500"/>Suggested Video Title</Label><div className="flex items-center gap-2"><Input value={variation.suggestedVideoTitle} readOnly className="text-sm mt-1 bg-background flex-grow" /><Button variant="outline" size="icon" onClick={() => copyToClipboard(variation.suggestedVideoTitle!, 'Video Title')} className="mt-1 shrink-0" title="Copy Video Title"><Copy className="h-4 w-4" /></Button><Button variant="outline" size="sm" onClick={() => useTrendSuggestionForContent(variation.suggestedVideoTitle!, variation.suggestedVideoKeywordsTags || [])} className="mt-1 shrink-0 text-xs" title="Use as topic for new content"><SendToBack className="mr-1 h-3 w-3"/>Use as Topic</Button></div></div>)}
-                        {variation.suggestedVideoThumbnailPrompt && (<div><Label className="flex items-center text-base"><ImageIcon className="mr-2 h-4 w-4 text-orange-500"/>Suggested YouTube Thumbnail Prompt</Label><div className="flex items-center gap-2"><Input value={variation.suggestedVideoThumbnailPrompt} readOnly className="text-sm mt-1 bg-background flex-grow" /><Button variant="outline" size="icon" onClick={() => copyToClipboard(variation.suggestedVideoThumbnailPrompt!, 'Thumbnail Prompt')} className="mt-1 shrink-0" title="Copy Thumbnail Prompt"><Copy className="h-4 w-4" /></Button><Button variant="outline" size="sm" onClick={() => useImagePromptAndGo(variation.suggestedVideoThumbnailPrompt!)} className="mt-1 shrink-0 text-xs" title="Use prompt & go to Image Generator"><Wand2 className="mr-1 h-3 w-3" />Use for Image Gen</Button></div></div>)}
-                        {variation.suggestedVideoDescription && (<div><Label className="flex items-center text-base"><Info className="mr-2 h-4 w-4 text-blue-500"/>Suggested Video Description</Label><Textarea value={variation.suggestedVideoDescription} readOnly rows={5} className="text-sm mt-1 min-h-[100px] bg-background" /><Button variant="outline" size="sm" onClick={() => copyToClipboard(variation.suggestedVideoDescription!, 'Video Description')} className="mt-2"><Copy className="mr-2 h-3 w-3" /> Copy Description</Button></div>)}
-                        {variation.suggestedVideoKeywordsTags && variation.suggestedVideoKeywordsTags.length > 0 && (<div><Label className="flex items-center text-base"><Hash className="mr-2 h-4 w-4 text-green-500"/>Suggested Video Keywords/Tags</Label><div className="flex flex-wrap gap-1 mt-1 p-2 border rounded-md bg-background">{variation.suggestedVideoKeywordsTags.map((tag, tagIdx) => (<Badge key={tagIdx} variant="secondary" className="cursor-pointer hover:bg-primary/10" onClick={() => copyToClipboard(tag, "Keyword/Tag")}>{tag}</Badge>))}</div><div className="mt-1 space-x-1"><Button variant="outline" size="xs" onClick={() => copyToClipboard(variation.suggestedVideoKeywordsTags!, 'Keywords/Tags')}><Copy className="mr-1 h-3 w-3"/>Copy All</Button><Button variant="outline" size="xs" onClick={() => useKeywordsForHashtagSuggester(variation.suggestedVideoKeywordsTags!)} title="Use keywords for Hashtag Suggester"><SendToBack className="mr-1 h-3 w-3"/>Use for Hashtags</Button></div></div>)}
-                        {variation.suggestedVideoHashtags && variation.suggestedVideoHashtags.length > 0 && (<div><Label className="flex items-center text-base"><Hash className="mr-2 h-4 w-4 text-purple-500"/>Suggested Video Hashtags</Label><div className="flex flex-wrap gap-1 mt-1 p-2 border rounded-md bg-background">{variation.suggestedVideoHashtags.map((tag, tagIdx) => (<Badge key={tagIdx} variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => copyToClipboard(tag, "Hashtag")}>{tag}</Badge>))}</div><div className="mt-1 space-x-1"><Button variant="outline" size="xs" onClick={() => copyToClipboard(variation.suggestedVideoHashtags!, 'Hashtags')}><Copy className="mr-1 h-3 w-3"/>Copy All</Button><Button variant="outline" size="xs" onClick={() => useHashtagsForHashtagSuggester(variation.suggestedVideoHashtags!)} title="Use hashtags for Hashtag Suggester"><SendToBack className="mr-1 h-3 w-3"/>Use for Hashtags</Button></div></div>)}
+                        {variation.suggestedVideoTitle && (<div><Label className="flex items-center text-base"><Youtube className="mr-2 h-4 w-4 text-muted-foreground"/>Suggested Video Title</Label><div className="flex items-center gap-2"><Input value={variation.suggestedVideoTitle} readOnly className="text-sm mt-1 bg-background flex-grow" /><Button variant="outline" size="icon" onClick={() => copyToClipboard(variation.suggestedVideoTitle!, 'Video Title')} className="mt-1 shrink-0" title="Copy Video Title"><Copy className="h-4 w-4" /></Button><Button variant="outline" size="sm" onClick={() => useTrendSuggestionForContent(variation.suggestedVideoTitle!, variation.suggestedVideoKeywordsTags || [])} className="mt-1 shrink-0 text-xs" title="Use as topic for new content"><SendToBack className="mr-1 h-3 w-3"/>Use as Topic</Button></div></div>)}
+                        {variation.suggestedVideoThumbnailPrompt && (<div><Label className="flex items-center text-base"><ImageIcon className="mr-2 h-4 w-4 text-muted-foreground"/>Suggested YouTube Thumbnail Prompt</Label><div className="flex items-center gap-2"><Input value={variation.suggestedVideoThumbnailPrompt} readOnly className="text-sm mt-1 bg-background flex-grow" /><Button variant="outline" size="icon" onClick={() => copyToClipboard(variation.suggestedVideoThumbnailPrompt!, 'Thumbnail Prompt')} className="mt-1 shrink-0" title="Copy Thumbnail Prompt"><Copy className="h-4 w-4" /></Button><Button variant="outline" size="sm" onClick={() => useImagePromptAndGo(variation.suggestedVideoThumbnailPrompt!)} className="mt-1 shrink-0 text-xs" title="Use prompt & go to Image Generator"><Wand2 className="mr-1 h-3 w-3" />Use for Image Gen</Button></div></div>)}
+                        {variation.suggestedVideoDescription && (<div><Label className="flex items-center text-base"><Info className="mr-2 h-4 w-4 text-info-muted-foreground"/>Suggested Video Description</Label><Textarea value={variation.suggestedVideoDescription} readOnly rows={5} className="text-sm mt-1 min-h-[100px] bg-background" /><Button variant="outline" size="sm" onClick={() => copyToClipboard(variation.suggestedVideoDescription!, 'Video Description')} className="mt-2"><Copy className="mr-2 h-3 w-3" /> Copy Description</Button></div>)}
+                        {variation.suggestedVideoKeywordsTags && variation.suggestedVideoKeywordsTags.length > 0 && (<div><Label className="flex items-center text-base"><Hash className="mr-2 h-4 w-4 text-success-muted-foreground"/>Suggested Video Keywords/Tags</Label><div className="flex flex-wrap gap-1 mt-1 p-2 border rounded-md bg-background">{variation.suggestedVideoKeywordsTags.map((tag, tagIdx) => (<Badge key={tagIdx} variant="secondary" className="cursor-pointer hover:bg-primary/10" onClick={() => copyToClipboard(tag, "Keyword/Tag")}>{tag}</Badge>))}</div><div className="mt-1 space-x-1"><Button variant="outline" size="xs" onClick={() => copyToClipboard(variation.suggestedVideoKeywordsTags!, 'Keywords/Tags')}><Copy className="mr-1 h-3 w-3"/>Copy All</Button><Button variant="outline" size="xs" onClick={() => useKeywordsForHashtagSuggester(variation.suggestedVideoKeywordsTags!)} title="Use keywords for Hashtag Suggester"><SendToBack className="mr-1 h-3 w-3"/>Use for Hashtags</Button></div></div>)}
+                        {variation.suggestedVideoHashtags && variation.suggestedVideoHashtags.length > 0 && (<div><Label className="flex items-center text-base"><Hash className="mr-2 h-4 w-4 text-primary"/>Suggested Video Hashtags</Label><div className="flex flex-wrap gap-1 mt-1 p-2 border rounded-md bg-background">{variation.suggestedVideoHashtags.map((tag, tagIdx) => (<Badge key={tagIdx} variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => copyToClipboard(tag, "Hashtag")}>{tag}</Badge>))}</div><div className="mt-1 space-x-1"><Button variant="outline" size="xs" onClick={() => copyToClipboard(variation.suggestedVideoHashtags!, 'Hashtags')}><Copy className="mr-1 h-3 w-3"/>Copy All</Button><Button variant="outline" size="xs" onClick={() => useHashtagsForHashtagSuggester(variation.suggestedVideoHashtags!)} title="Use hashtags for Hashtag Suggester"><SendToBack className="mr-1 h-3 w-3"/>Use for Hashtags</Button></div></div>)}
                          <Alert variant="default" className="mt-3 text-xs">
                             <Info className="h-4 w-4" />
                             <AlertTitleComponent>Using In-Script Image Prompts</AlertTitleComponent>
@@ -872,9 +872,9 @@ export default function SocialMediaPage() {
                             </AlertDescription>
                         </Alert>
                     </>)}
-                    {variation.suggestedImagePrompt && (isWebPage || (contentInputs.platform !== 'YouTubeVideoScript')) && (<div><Label className="flex items-center text-base"><ImageIcon className="mr-2 h-4 w-4 text-purple-500"/>Suggested Image Prompt (for {contentInputs.platform})</Label><div className="flex items-center gap-2"><Input value={variation.suggestedImagePrompt} readOnly className="text-sm mt-1 bg-background flex-grow" /><Button variant="outline" size="icon" onClick={() => copyToClipboard(variation.suggestedImagePrompt!, 'Image Prompt')} className="mt-1 shrink-0" title="Copy Image Prompt"><Copy className="h-4 w-4" /></Button><Button variant="outline" size="sm" onClick={() => useImagePromptAndGo(variation.suggestedImagePrompt!)} className="mt-1 shrink-0 text-xs" title="Use prompt & go to Image Generator"><Wand2 className="mr-1 h-3 w-3" />Use for Image Gen</Button></div></div>)}
+                    {variation.suggestedImagePrompt && (isWebPage || (contentInputs.platform !== 'YouTubeVideoScript')) && (<div><Label className="flex items-center text-base"><ImageIcon className="mr-2 h-4 w-4 text-primary"/>Suggested Image Prompt (for {contentInputs.platform})</Label><div className="flex items-center gap-2"><Input value={variation.suggestedImagePrompt} readOnly className="text-sm mt-1 bg-background flex-grow" /><Button variant="outline" size="icon" onClick={() => copyToClipboard(variation.suggestedImagePrompt!, 'Image Prompt')} className="mt-1 shrink-0" title="Copy Image Prompt"><Copy className="h-4 w-4" /></Button><Button variant="outline" size="sm" onClick={() => useImagePromptAndGo(variation.suggestedImagePrompt!)} className="mt-1 shrink-0 text-xs" title="Use prompt & go to Image Generator"><Wand2 className="mr-1 h-3 w-3" />Use for Image Gen</Button></div></div>)}
                     
-                    {variation.suggestedVideoScriptIdea && contentInputs.platform !== 'YouTubeVideoScript' && (<div><Label className="flex items-center text-base"><Film className="mr-2 h-4 w-4 text-rose-500"/>Suggested Short Video Idea</Label><Textarea value={variation.suggestedVideoScriptIdea} readOnly rows={3} className="text-sm mt-1 min-h-[60px] bg-background" /><Button variant="outline" size="sm" onClick={() => copyToClipboard(variation.suggestedVideoScriptIdea!, 'Video Idea')} className="mt-2"><Copy className="mr-2 h-3 w-3" /> Copy Video Idea</Button></div>)}
+                    {variation.suggestedVideoScriptIdea && contentInputs.platform !== 'YouTubeVideoScript' && (<div><Label className="flex items-center text-base"><Film className="mr-2 h-4 w-4 text-destructive-muted-foreground"/>Suggested Short Video Idea</Label><Textarea value={variation.suggestedVideoScriptIdea} readOnly rows={3} className="text-sm mt-1 min-h-[60px] bg-background" /><Button variant="outline" size="sm" onClick={() => copyToClipboard(variation.suggestedVideoScriptIdea!, 'Video Idea')} className="mt-2"><Copy className="mr-2 h-3 w-3" /> Copy Video Idea</Button></div>)}
                     </div>
                 </Card>
                  );
@@ -885,7 +885,7 @@ export default function SocialMediaPage() {
 
         <Card ref={imageGeneratorRef} className="overflow-hidden">
           <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="flex items-center text-base sm:text-lg"><ImageIcon className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />AI Image Generator (Premium)</CardTitle>
+              <CardTitle className="flex items-center text-base sm:text-lg"><ImageIcon className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-primary" />AI Image Generator (Premium)</CardTitle>
               <CardDescription className="text-xs sm:text-sm">Generate AI images with Vertex AI Imagen or get enhanced prompts for external tools.</CardDescription>
           </CardHeader>
           <form onSubmit={handleImageGenerationSubmit}>
@@ -914,7 +914,7 @@ export default function SocialMediaPage() {
             </CardContent>)}
             {imageGenerationGuidance && (
               <CardContent className="mt-4 border-t pt-4 space-y-2">
-                <Alert variant="default" className="border-blue-300 bg-blue-50 dark:bg-blue-900/30">
+                <Alert variant="info">
                   <Info className="h-4 w-4" />
                   <AlertTitleComponent>AI Image Generation Guidance</AlertTitleComponent>
                   <AlertDescription className="mt-2">
@@ -927,7 +927,7 @@ export default function SocialMediaPage() {
 
         <Card ref={hashtagSuggesterRef}>
             <CardHeader>
-                <CardTitle className="flex items-center"><Hash className="mr-2 h-5 w-5 text-blue-500"/>AI Hashtag Suggester</CardTitle>
+                <CardTitle className="flex items-center"><Hash className="mr-2 h-5 w-5 text-primary"/>AI Hashtag Suggester</CardTitle>
                 <CardDescription>Find relevant hashtags for your posts. Can be pre-filled.</CardDescription>
             </CardHeader>
             <form onSubmit={handleHashtagFormSubmit}>
@@ -945,7 +945,7 @@ export default function SocialMediaPage() {
 
         <Card ref={reviewResponderRef}>
           <CardHeader>
-            <CardTitle className="flex items-center"><ReviewIcon className="mr-2 h-5 w-5 text-indigo-500" />AI Review Responder</CardTitle>
+            <CardTitle className="flex items-center"><ReviewIcon className="mr-2 h-5 w-5 text-primary" />AI Review Responder</CardTitle>
             <CardDescription>Generate polite and professional responses to customer reviews.</CardDescription>
           </CardHeader>
           <form onSubmit={handleReviewSubmit}>

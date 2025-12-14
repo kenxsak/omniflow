@@ -79,8 +79,8 @@ export function CreditUsageWarning({
           )}
           
           {isBYOKAvailable && (
-            <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-              <p className="text-sm font-semibold text-yellow-600 dark:text-yellow-400">
+            <div className="mt-3 p-3 bg-warning-muted border border-warning/20 rounded-lg">
+              <p className="text-sm font-semibold text-warning">
                 <Zap className="inline h-4 w-4 mr-1" />
                 Pro Tip: Use your own Google API key for unlimited AI at $0.03/image (Google's cost)
               </p>
@@ -94,9 +94,9 @@ export function CreditUsageWarning({
   // WARNING: Running low on credits
   if (percentageRemaining <= 20) {
     return (
-      <Alert variant="default" className="mb-6 border-yellow-500 bg-yellow-500/10">
-        <AlertTriangle className="h-5 w-5 text-yellow-600" />
-        <AlertTitle className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
+      <Alert variant="warning" className="mb-6">
+        <AlertTriangle className="h-5 w-5" />
+        <AlertTitle className="text-lg font-bold">
           {isLifetime ? 'Running Low on Free Credits' : 'Running Low on Monthly Credits'}
         </AlertTitle>
         <AlertDescription className="mt-2 space-y-2">

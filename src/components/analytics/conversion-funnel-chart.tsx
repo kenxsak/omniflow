@@ -62,7 +62,7 @@ export default function ConversionFunnelChart({ funnel }: ConversionFunnelChartP
           <div className="space-y-1">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-violet-500" />
+                <Eye className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">{stages.views.label}</span>
               </div>
               <span className="text-muted-foreground">
@@ -79,14 +79,14 @@ export default function ConversionFunnelChart({ funnel }: ConversionFunnelChartP
           <div className="space-y-1">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-green-500" />
+                <Users className="h-4 w-4 text-success" />
                 <span className="font-medium">{stages.leads.label}</span>
               </div>
               <span className="text-muted-foreground">
                 {formatNumber(stages.leads.count)} leads ({formatPercentage(stages.leads.conversionRate)} conversion)
               </span>
             </div>
-            <div className="h-12 bg-gradient-to-r from-green-500 to-green-400 rounded-md flex items-center justify-center text-white font-semibold shadow-sm"
+            <div className="h-12 bg-success rounded-md flex items-center justify-center text-success-foreground font-semibold shadow-sm"
                  style={{ width: `${leadWidth}%` }}>
               {formatPercentage(stages.leads.conversionRate)}
             </div>
@@ -96,14 +96,14 @@ export default function ConversionFunnelChart({ funnel }: ConversionFunnelChartP
           <div className="space-y-1">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-purple-500" />
+                <Mail className="h-4 w-4 text-primary" />
                 <span className="font-medium">{stages.engaged.label}</span>
               </div>
               <span className="text-muted-foreground">
                 {formatNumber(stages.engaged.count)} engaged ({formatPercentage(stages.engaged.conversionRate)} conversion)
               </span>
             </div>
-            <div className="h-12 bg-gradient-to-r from-purple-500 to-purple-400 rounded-md flex items-center justify-center text-white font-semibold shadow-sm"
+            <div className="h-12 bg-primary rounded-md flex items-center justify-center text-primary-foreground font-semibold shadow-sm"
                  style={{ width: `${engagedWidth}%` }}>
               {formatPercentage(stages.engaged.conversionRate)}
             </div>
@@ -113,7 +113,7 @@ export default function ConversionFunnelChart({ funnel }: ConversionFunnelChartP
           <div className="space-y-1">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-orange-500" />
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">{stages.revenue.label}</span>
               </div>
               <span className="text-muted-foreground">
@@ -131,7 +131,7 @@ export default function ConversionFunnelChart({ funnel }: ConversionFunnelChartP
         {dropOffPoints.length > 0 && (
           <div className="space-y-2">
             <h4 className="text-sm font-semibold flex items-center gap-2">
-              <TrendingDown className="h-4 w-4 text-orange-500" />
+              <TrendingDown className="h-4 w-4 text-muted-foreground" />
               Drop-off Points & Recommendations
             </h4>
             {dropOffPoints.map((point, idx) => (

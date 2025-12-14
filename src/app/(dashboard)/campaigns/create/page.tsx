@@ -649,7 +649,7 @@ export default function CreateCampaignPage() {
               onClick={() => handleChannelSelect('whatsapp')}
             >
               <CardHeader className="p-4 sm:p-6">
-                <MessageCircle className="h-8 w-8 sm:h-12 sm:w-12 text-emerald-500 mb-2 sm:mb-4" />
+                <MessageCircle className="h-8 w-8 sm:h-12 sm:w-12 text-success mb-2 sm:mb-4" />
                 <CardTitle className="text-base sm:text-lg">WhatsApp Campaign</CardTitle>
                 <CardDescription className="text-xs sm:text-sm">Send messages via WhatsApp Business</CardDescription>
               </CardHeader>
@@ -1073,7 +1073,6 @@ export default function CreateCampaignPage() {
             <Button 
               onClick={handleSendCampaign} 
               disabled={isSending}
-              variant="accent"
               size="lg"
               className="text-sm sm:text-base"
             >

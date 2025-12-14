@@ -141,8 +141,8 @@ export function Step2ConnectTool({ onToolConnected, onSkip }: Step2ConnectToolPr
               </Button>
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg p-4">
-              <p className="text-sm text-blue-900 dark:text-blue-100">
+            <div className="bg-info-muted border border-info-border rounded-lg p-4">
+              <p className="text-sm text-info-muted-foreground">
                 <strong>Note:</strong> You&apos;ll need to sign up for {selectedTool ? emailTools.find(t => t.id === selectedTool)?.name : 'your chosen service'} separately and get your API key. We&apos;ll guide you through the setup.
               </p>
             </div>

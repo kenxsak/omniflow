@@ -173,14 +173,14 @@ export default function WebhookInfo() {
           </Alert>
 
           {/* Secret Token Section */}
-          <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+          <Card className="bg-info-muted border-info-border">
             <CardHeader>
               <CardTitle className="text-base">Your Webhook Secret Token</CardTitle>
               <CardDescription>Use this token in your store's webhook settings for authentication</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex gap-2">
-                <code className="text-sm bg-white dark:bg-slate-900 p-3 rounded flex-1 overflow-auto border border-blue-200 dark:border-blue-800 text-foreground font-mono break-all">
+                <code className="text-sm bg-card p-3 rounded flex-1 overflow-auto border border-info-border text-foreground font-mono break-all">
                   omniflow_webhook_secure_token
                 </code>
                 <Button 
@@ -227,10 +227,10 @@ export default function WebhookInfo() {
                       </div>
                     )}
 
-                    <div className="pt-2 space-y-2 bg-slate-50 dark:bg-slate-900/30 p-3 rounded">
+                    <div className="pt-2 space-y-2 bg-muted p-3 rounded">
                       <p className="text-xs font-medium text-muted-foreground">Webhook URL:</p>
                       <div className="flex gap-2">
-                        <code className="text-xs bg-slate-200 dark:bg-slate-800 p-2 rounded flex-1 overflow-auto text-foreground break-all">
+                        <code className="text-xs bg-muted p-2 rounded flex-1 overflow-auto text-foreground break-all">
                           {endpoint.url}
                         </code>
                         <Button 
@@ -274,10 +274,10 @@ export default function WebhookInfo() {
                       </div>
                     )}
 
-                    <div className="pt-2 space-y-2 bg-slate-50 dark:bg-slate-900/30 p-3 rounded">
+                    <div className="pt-2 space-y-2 bg-muted p-3 rounded">
                       <p className="text-xs font-medium text-muted-foreground">Webhook URL:</p>
                       <div className="flex gap-2">
-                        <code className="text-xs bg-slate-200 dark:bg-slate-800 p-2 rounded flex-1 overflow-auto text-foreground break-all">
+                        <code className="text-xs bg-muted p-2 rounded flex-1 overflow-auto text-foreground break-all">
                           {endpoint.url}
                         </code>
                         <Button 
@@ -313,10 +313,10 @@ export default function WebhookInfo() {
                         </ul>
                       </div>
 
-                      <div className="pt-2 space-y-2 bg-slate-50 dark:bg-slate-900/30 p-3 rounded">
+                      <div className="pt-2 space-y-2 bg-muted p-3 rounded">
                         <p className="text-xs font-medium text-muted-foreground">Webhook URL:</p>
                         <div className="flex gap-2">
-                          <code className="text-xs bg-slate-200 dark:bg-slate-800 p-2 rounded flex-1 overflow-auto text-foreground break-all">
+                          <code className="text-xs bg-muted p-2 rounded flex-1 overflow-auto text-foreground break-all">
                             {endpoint.url}
                           </code>
                           <Button 
@@ -335,10 +335,10 @@ export default function WebhookInfo() {
             )}
           </Accordion>
 
-          <Alert className="bg-green-50 border-green-300 dark:bg-green-900/30 dark:border-green-700">
-            <Info className="h-4 w-4 !text-green-600 dark:!text-green-400" />
-            <AlertTitle className="text-green-700 dark:text-green-300">✅ Ready to Connect</AlertTitle>
-            <AlertDescription className="text-green-600 dark:text-green-400">
+          <Alert variant="success">
+            <Info className="h-4 w-4" />
+            <AlertTitle>✅ Ready to Connect</AlertTitle>
+            <AlertDescription>
               All webhooks are active and ready to receive data from your stores and applications. Follow the setup steps above for each platform you want to connect.
             </AlertDescription>
           </Alert>

@@ -200,7 +200,7 @@ export default function TeamManagementPage() {
             onClick={handleClockInOut} 
             disabled={isClocking} 
             size="lg" 
-            className={`w-full text-sm sm:text-base ${isClockedIn ? 'bg-red-500 hover:bg-red-600' : 'bg-gradient-to-r from-primary to-accent hover:opacity-90'}`}
+            className={`w-full text-sm sm:text-base ${isClockedIn ? 'bg-red-500 hover:bg-red-600' : ''}`}
           >
             {isClocking ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : (isClockedIn ? <LogOut className="mr-2 h-5 w-5" /> : <LogIn className="mr-2 h-5 w-5" />)}
             {isClocking ? 'Updating...' : (isClockedIn ? 'Clock Out' : 'Clock In')}

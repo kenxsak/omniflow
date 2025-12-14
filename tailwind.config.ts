@@ -42,19 +42,40 @@ export default {
   			},
   			destructive: {
   				DEFAULT: 'var(--destructive)',
-  				foreground: 'var(--destructive-foreground)'
+  				foreground: 'var(--destructive-foreground)',
+  				muted: 'var(--destructive-muted)',
+  				'muted-foreground': 'var(--destructive-muted-foreground)',
+  				border: 'var(--destructive-border)'
   			},
         success: {
           DEFAULT: 'var(--success)',
-          foreground: 'var(--success-foreground)'
+          foreground: 'var(--success-foreground)',
+          muted: 'var(--success-muted)',
+          'muted-foreground': 'var(--success-muted-foreground)',
+          border: 'var(--success-border)'
         },
         warning: {
           DEFAULT: 'var(--warning)',
-          foreground: 'var(--warning-foreground)'
+          foreground: 'var(--warning-foreground)',
+          muted: 'var(--warning-muted)',
+          'muted-foreground': 'var(--warning-muted-foreground)',
+          border: 'var(--warning-border)'
+        },
+        info: {
+          DEFAULT: 'var(--info)',
+          foreground: 'var(--info-foreground)',
+          muted: 'var(--info-muted)',
+          'muted-foreground': 'var(--info-muted-foreground)',
+          border: 'var(--info-border)'
         },
   			border: 'var(--border)',
+  			border2: 'var(--border2)',
   			input: 'var(--input)',
   			ring: 'var(--ring)',
+  			surface: {
+  				DEFAULT: 'var(--surface)',
+  				'2': 'var(--surface2)'
+  			},
   			chart: {
   				'1': 'var(--chart-1)',
   				'2': 'var(--chart-2)',

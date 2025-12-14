@@ -5,17 +5,27 @@ import { cn } from "@/lib/utils"
 const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
-    variant?: "default" | "interactive" | "glass" | "gradient" | "mobile"
+    variant?: "default" | "interactive" | "glass" | "mobile" | "clerk"
   }
 >(({ className, variant = "default", ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      "rounded-xl border bg-card text-card-foreground shadow-sm transition-all duration-200",
-      variant === "interactive" && "hover:shadow-lg hover:-translate-y-0.5 hover:border-primary/20 cursor-pointer active:scale-[0.99]",
-      variant === "glass" && "glass-card border-white/20 dark:border-slate-700/50",
-      variant === "gradient" && "gradient-card",
-      variant === "mobile" && "rounded-2xl border-border/50 shadow-none hover:bg-muted/30 active:bg-muted/50",
+      "text-card-foreground transition-all duration-100",
+      // Default variant - standard card with border
+      variant === "default" && "rounded-2xl bg-card border border-border",
+      // Interactive variant - hover effects
+      variant === "interactive" && "rounded-2xl bg-card border border-border hover:border-accent cursor-pointer",
+      // Glass variant - translucent
+      variant === "glass" && "rounded-2xl bg-card/90 border border-border backdrop-blur-sm",
+      // Mobile variant
+      variant === "mobile" && "rounded-2xl bg-card border border-border",
+      // Clerk-style box-in-box variant
+      variant === "clerk" && [
+        "rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1",
+        "[&>*:first-child]:rounded-xl [&>*:first-child]:bg-white [&>*:first-child]:dark:bg-stone-950",
+        "[&>*:first-child]:shadow-sm [&>*:first-child]:ring-1 [&>*:first-child]:ring-stone-200/60 [&>*:first-child]:dark:ring-stone-800",
+      ],
       className
     )}
     {...props}
@@ -29,7 +39,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-4 sm:p-6", className)}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
     {...props}
   />
 ))
@@ -42,7 +52,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-lg sm:text-xl font-semibold leading-tight tracking-tight",
+      "text-foreground font-semibold text-base leading-tight",
       className
     )}
     {...props}
@@ -56,7 +66,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground leading-relaxed", className)}
+    className={cn("text-muted-foreground font-normal text-sm leading-relaxed", className)}
     {...props}
   />
 ))
@@ -66,7 +76,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-4 sm:p-6 pt-0", className)} {...props} />
+  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
 ))
 CardContent.displayName = "CardContent"
 
@@ -76,7 +86,7 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-4 sm:p-6 pt-0", className)}
+    className={cn("flex items-center p-6 pt-0", className)}
     {...props}
   />
 ))

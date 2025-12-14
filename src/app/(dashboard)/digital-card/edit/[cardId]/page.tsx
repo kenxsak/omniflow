@@ -12,7 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { getDigitalCard, updateDigitalCard } from '@/app/actions/digital-card-actions';
 import { DigitalCard, UpdateDigitalCardInput, DigitalCardLink } from '@/lib/digital-card-types';
-import { AlertCircle, Plus, Trash2, GripVertical, Eye, Bot, MessageSquare, Loader2, CalendarDays, Code2 } from 'lucide-react';
+import { AlertCircle, Plus, Trash2, GripVertical, Loader2 } from 'lucide-react';
+import { Icon } from '@iconify/react';
+import { AiChatbotIcon } from '@/components/icons/ai-chatbot-icon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { ColorExtractor } from '@/components/digital-card/color-extractor';
@@ -30,6 +32,7 @@ export default function EditDigitalCardPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [card, setCard] = useState<DigitalCard | null>(null);
+  const [focusedSocial, setFocusedSocial] = useState<number | null>(null);
   
   const [formData, setFormData] = useState<Partial<UpdateDigitalCardInput>>({
     id: cardId,
@@ -261,52 +264,51 @@ export default function EditDigitalCardPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-6xl">
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold">Edit Digital Card</h1>
-        <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
-          Update your digital card
-        </p>
-      </div>
+    <div className="flex flex-col gap-6 w-full h-full">
+      {/* Header - Autosend style */}
+      <div className="flex flex-col gap-4">
+        <p className="text-stone-800 dark:text-stone-200 font-semibold text-lg">Edit Digital Card</p>
+        
+        {/* Tabs - AutoSend style */}
+        <Tabs defaultValue="basic" className="w-full">
+          <TabsList>
+            <TabsTrigger value="basic">Basic</TabsTrigger>
+            <TabsTrigger value="contact">Contact</TabsTrigger>
+            <TabsTrigger value="links">Links</TabsTrigger>
+            <TabsTrigger value="social">Social</TabsTrigger>
+            <TabsTrigger value="lead-capture">Leads</TabsTrigger>
+            <TabsTrigger value="branding">Brand</TabsTrigger>
+            <TabsTrigger value="embed">Embed</TabsTrigger>
+          </TabsList>
+          
+          <p className="text-stone-500 dark:text-stone-400 font-normal text-sm mt-4">
+            Update your digital card settings and content
+          </p>
 
       {error && (
-        <Alert variant="destructive" className="mb-6">
+        <Alert variant="destructive" className="mt-4">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
       {success && (
-        <Alert className="mb-6 bg-green-50 text-green-900 border-green-200">
+        <Alert className="mt-4 bg-green-50 text-green-900 border-green-200">
           <AlertDescription>Digital card updated successfully! Redirecting...</AlertDescription>
         </Alert>
       )}
 
-      <Tabs defaultValue="basic" className="space-y-4 sm:space-y-6">
-        <div className="sticky top-14 sm:top-16 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 bg-background/95 backdrop-blur-sm border-b">
-          <div className="overflow-x-auto scrollbar-hide">
-            <TabsList className="inline-flex w-max min-w-full sm:grid sm:w-full sm:grid-cols-7 gap-1 p-1">
-              <TabsTrigger value="basic" className="px-3 sm:px-3 text-xs sm:text-sm">Basic</TabsTrigger>
-              <TabsTrigger value="contact" className="px-3 sm:px-3 text-xs sm:text-sm">Contact</TabsTrigger>
-              <TabsTrigger value="links" className="px-3 sm:px-3 text-xs sm:text-sm">Links</TabsTrigger>
-              <TabsTrigger value="social" className="px-3 sm:px-3 text-xs sm:text-sm">Social</TabsTrigger>
-              <TabsTrigger value="lead-capture" className="px-3 sm:px-3 text-xs sm:text-sm">Leads</TabsTrigger>
-              <TabsTrigger value="branding" className="px-3 sm:px-3 text-xs sm:text-sm">Brand</TabsTrigger>
-              <TabsTrigger value="embed" className="flex items-center gap-1 px-3 sm:px-3 text-xs sm:text-sm">
-                <Code2 className="h-3 w-3" />
-                <span className="hidden xs:inline">Embed</span>
-              </TabsTrigger>
-            </TabsList>
-          </div>
-        </div>
-
         <TabsContent value="basic">
-          <Card>
-            <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
-              <CardDescription>Tell people about yourself or your business</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+            <header className="flex items-center gap-2 px-5 py-3">
+              <Icon icon="solar:user-circle-linear" className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <h2 className="text-sm font-semibold text-foreground">Basic Information</h2>
+                <p className="text-xs text-muted-foreground">Tell people about yourself or your business</p>
+              </div>
+            </header>
+            <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
+              <div className="p-5 space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="username">Username (URL) *</Label>
                 <div className="flex items-center gap-2">
@@ -435,17 +437,22 @@ export default function EditDigitalCardPage() {
                   Recommended: <strong>780 x 300px</strong> (or 1560 x 600px for high-res). Keep text minimal for best display across devices.
                 </p>
               </div>
-            </CardContent>
-          </Card>
+              </div>
+            </div>
+          </section>
         </TabsContent>
 
         <TabsContent value="contact">
-          <Card>
-            <CardHeader>
-              <CardTitle>Contact Information</CardTitle>
-              <CardDescription>How can people reach you?</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+            <header className="flex items-center gap-2 px-5 py-3">
+              <Icon icon="solar:phone-linear" className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <h2 className="text-sm font-semibold text-foreground">Contact Information</h2>
+                <p className="text-xs text-muted-foreground">How can people reach you?</p>
+              </div>
+            </header>
+            <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
+              <div className="p-5 space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input
@@ -504,21 +511,26 @@ export default function EditDigitalCardPage() {
                   })}
                 />
               </div>
-            </CardContent>
-          </Card>
+              </div>
+            </div>
+          </section>
         </TabsContent>
 
         <TabsContent value="links">
-          <Card>
-            <CardHeader>
-              <CardTitle>Action Links</CardTitle>
-              <CardDescription>Add buttons that link to your services, products, or booking pages</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+            <header className="flex items-center gap-2 px-5 py-3">
+              <Icon icon="solar:link-linear" className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <h2 className="text-sm font-semibold text-foreground">Action Links</h2>
+                <p className="text-xs text-muted-foreground">Add buttons that link to your services, products, or booking pages</p>
+              </div>
+            </header>
+            <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
+              <div className="p-5 space-y-4">
               {formData.links && formData.links.length > 0 ? (
                 <div className="space-y-3">
                   {formData.links.map((link, index) => (
-                    <Card key={link.id} className="p-4">
+                    <div key={link.id} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/30">
                       <div className="space-y-3">
                         <div className="flex items-center gap-2">
                           <GripVertical className="h-4 w-4 text-muted-foreground cursor-move" />
@@ -616,7 +628,7 @@ export default function EditDigitalCardPage() {
                           )}
                         </div>
                       </div>
-                    </Card>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -625,427 +637,523 @@ export default function EditDigitalCardPage() {
                 </p>
               )}
               
-              <Button onClick={addLink} variant="outline" className="w-full">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Link
-              </Button>
-            </CardContent>
-          </Card>
+              <div className="flex justify-center">
+                <Button onClick={addLink} variant="outline" className="w-full h-9 text-xs font-mono uppercase tracking-wide border-dashed border-stone-300 dark:border-stone-700 text-muted-foreground hover:text-foreground hover:border-stone-400 dark:hover:border-stone-600">
+                  <Plus className="h-3.5 w-3.5 mr-1.5" />
+                  Add Link
+                </Button>
+              </div>
+              </div>
+            </div>
+          </section>
         </TabsContent>
 
         <TabsContent value="social">
-          <Card>
-            <CardHeader>
-              <CardTitle>Social Media</CardTitle>
-              <CardDescription>Add your social media profiles</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="instagram">Instagram</Label>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">@</span>
-                  <Input
-                    id="instagram"
-                    placeholder="username"
-                    value={formData.socialMedia?.instagram || ''}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      socialMedia: { ...formData.socialMedia!, instagram: e.target.value }
-                    })}
-                  />
+          <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+            <header className="flex items-center gap-2 px-5 py-3">
+              <Icon icon="solar:share-linear" className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <h2 className="text-sm font-semibold text-foreground">Social Media</h2>
+                <p className="text-xs text-muted-foreground">Add your social media profiles</p>
+              </div>
+            </header>
+            <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
+              <div className="p-5 relative">
+              {/* Animated focus indicator */}
+              <div 
+                className="absolute left-0 w-1 bg-primary rounded-full transition-all duration-300 ease-out"
+                style={{
+                  height: '44px',
+                  top: `${(focusedSocial ?? 0) * 60}px`,
+                  opacity: focusedSocial !== null ? 1 : 0,
+                }}
+              />
+              
+              <div className="space-y-4">
+                {/* Instagram */}
+                <div className="flex items-center gap-4">
+                  <div className="w-8 flex justify-center">
+                    <Icon icon="ri:instagram-fill" className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 flex items-center h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
+                    <span className="w-36 shrink-0 h-full flex items-center px-3 text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">instagram.com/</span>
+                    <input
+                      id="instagram"
+                      placeholder="username"
+                      value={formData.socialMedia?.instagram || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        socialMedia: { ...formData.socialMedia!, instagram: e.target.value }
+                      })}
+                      onFocus={() => setFocusedSocial(0)}
+                      onBlur={() => setFocusedSocial(null)}
+                      className="flex-1 h-full px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                </div>
+
+                {/* YouTube */}
+                <div className="flex items-center gap-4">
+                  <div className="w-8 flex justify-center">
+                    <Icon icon="ri:youtube-fill" className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 flex items-center h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
+                    <span className="w-36 shrink-0 h-full flex items-center px-3 text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">youtube.com/</span>
+                    <input
+                      id="youtube"
+                      placeholder="@channel"
+                      value={formData.socialMedia?.youtube || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        socialMedia: { ...formData.socialMedia!, youtube: e.target.value }
+                      })}
+                      onFocus={() => setFocusedSocial(1)}
+                      onBlur={() => setFocusedSocial(null)}
+                      className="flex-1 h-full px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                </div>
+
+                {/* Facebook */}
+                <div className="flex items-center gap-4">
+                  <div className="w-8 flex justify-center">
+                    <Icon icon="ri:facebook-circle-fill" className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 flex items-center h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
+                    <span className="w-36 shrink-0 h-full flex items-center px-3 text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">facebook.com/</span>
+                    <input
+                      id="facebook"
+                      placeholder="page"
+                      value={formData.socialMedia?.facebook || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        socialMedia: { ...formData.socialMedia!, facebook: e.target.value }
+                      })}
+                      onFocus={() => setFocusedSocial(2)}
+                      onBlur={() => setFocusedSocial(null)}
+                      className="flex-1 h-full px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                </div>
+
+                {/* Twitter / X */}
+                <div className="flex items-center gap-4">
+                  <div className="w-8 flex justify-center">
+                    <Icon icon="ri:twitter-x-fill" className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 flex items-center h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
+                    <span className="w-36 shrink-0 h-full flex items-center px-3 text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">x.com/</span>
+                    <input
+                      id="twitter"
+                      placeholder="username"
+                      value={formData.socialMedia?.twitter || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        socialMedia: { ...formData.socialMedia!, twitter: e.target.value }
+                      })}
+                      onFocus={() => setFocusedSocial(3)}
+                      onBlur={() => setFocusedSocial(null)}
+                      className="flex-1 h-full px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                </div>
+
+                {/* LinkedIn */}
+                <div className="flex items-center gap-4">
+                  <div className="w-8 flex justify-center">
+                    <Icon icon="ri:linkedin-box-fill" className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 flex items-center h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
+                    <span className="w-36 shrink-0 h-full flex items-center px-3 text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">linkedin.com/in/</span>
+                    <input
+                      id="linkedin"
+                      placeholder="profile"
+                      value={formData.socialMedia?.linkedin || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        socialMedia: { ...formData.socialMedia!, linkedin: e.target.value }
+                      })}
+                      onFocus={() => setFocusedSocial(4)}
+                      onBlur={() => setFocusedSocial(null)}
+                      className="flex-1 h-full px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
                 </div>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="facebook">Facebook</Label>
-                <Input
-                  id="facebook"
-                  placeholder="username or page name"
-                  value={formData.socialMedia?.facebook || ''}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    socialMedia: { ...formData.socialMedia!, facebook: e.target.value }
-                  })}
-                />
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="twitter">Twitter / X</Label>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">@</span>
-                  <Input
-                    id="twitter"
-                    placeholder="username"
-                    value={formData.socialMedia?.twitter || ''}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      socialMedia: { ...formData.socialMedia!, twitter: e.target.value }
-                    })}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="linkedin">LinkedIn</Label>
-                <Input
-                  id="linkedin"
-                  placeholder="company or profile URL"
-                  value={formData.socialMedia?.linkedin || ''}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    socialMedia: { ...formData.socialMedia!, linkedin: e.target.value }
-                  })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="youtube">YouTube</Label>
-                <Input
-                  id="youtube"
-                  placeholder="channel URL"
-                  value={formData.socialMedia?.youtube || ''}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    socialMedia: { ...formData.socialMedia!, youtube: e.target.value }
-                  })}
-                />
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </section>
         </TabsContent>
 
         <TabsContent value="lead-capture">
-          <Card>
-            <CardHeader>
-              <CardTitle>Lead Capture Settings</CardTitle>
-              <CardDescription>Configure how visitors can contact you and become leads</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              
-              {/* Contact Form Section */}
-              <div className="p-4 border rounded-lg space-y-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
-                    <MessageSquare className="h-5 w-5 mt-0.5 text-blue-600" />
+          <div className="space-y-6">
+            {/* Contact Form Card - Clerk Style */}
+            <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+              <header className="flex items-center gap-2 px-5 py-3">
+                <Icon icon="solar:chat-square-linear" className="h-5 w-5 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Contact Form</h2>
+              </header>
+              <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
+                <div className="p-5 space-y-5">
+                  {/* Toggle Row */}
+                  <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-semibold mb-1">Contact Form</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Simple contact form button to capture leads directly into your CRM
-                      </p>
+                      <p className="text-sm font-medium text-foreground">Enable contact form</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Capture leads directly into your CRM</p>
                     </div>
+                    <Switch
+                      checked={formData.contactForm?.enabled ?? true}
+                      onCheckedChange={(checked) => setFormData({
+                        ...formData,
+                        contactForm: { ...formData.contactForm!, enabled: checked }
+                      })}
+                    />
                   </div>
-                  <Switch
-                    checked={formData.contactForm?.enabled ?? true}
-                    onCheckedChange={(checked) => setFormData({
-                      ...formData,
-                      contactForm: { ...formData.contactForm!, enabled: checked }
-                    })}
-                  />
-                </div>
 
+                  {formData.contactForm?.enabled && (
+                    <>
+                      <div className="h-px bg-stone-200 dark:bg-stone-800" />
+                      
+                      {/* Button Text */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground">Button Text</label>
+                        <Input
+                          className="h-9 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                          placeholder="Contact Us"
+                          value={formData.contactForm?.buttonText || 'Contact Us'}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            contactForm: { ...formData.contactForm!, buttonText: e.target.value }
+                          })}
+                        />
+                      </div>
+
+                      {/* Form Title */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground">Form Title</label>
+                        <Input
+                          className="h-9 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                          placeholder="Get in Touch"
+                          value={formData.contactForm?.title || 'Get in Touch'}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            contactForm: { ...formData.contactForm!, title: e.target.value }
+                          })}
+                        />
+                      </div>
+
+                      {/* Form Description */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground">Form Description</label>
+                        <Textarea
+                          className="min-h-[72px] bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                          placeholder="Send us a message and we'll get back to you soon!"
+                          value={formData.contactForm?.description || "Send us a message and we'll get back to you soon!"}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            contactForm: { ...formData.contactForm!, description: e.target.value }
+                          })}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+                
+                {/* Footer Notice */}
                 {formData.contactForm?.enabled && (
-                  <div className="space-y-4 pt-4 border-t">
-                    <div className="space-y-2">
-                      <Label htmlFor="contactButtonText">Button Text</Label>
-                      <Input
-                        id="contactButtonText"
-                        placeholder="Contact Us"
-                        value={formData.contactForm?.buttonText || 'Contact Us'}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          contactForm: { ...formData.contactForm!, buttonText: e.target.value }
-                        })}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="contactFormTitle">Form Title</Label>
-                      <Input
-                        id="contactFormTitle"
-                        placeholder="Get in Touch"
-                        value={formData.contactForm?.title || 'Get in Touch'}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          contactForm: { ...formData.contactForm!, title: e.target.value }
-                        })}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="contactFormDescription">Form Description</Label>
-                      <Textarea
-                        id="contactFormDescription"
-                        placeholder="Send us a message and we'll get back to you soon!"
-                        rows={2}
-                        value={formData.contactForm?.description || "Send us a message and we'll get back to you soon!"}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          contactForm: { ...formData.contactForm!, description: e.target.value }
-                        })}
-                      />
-                    </div>
-
-                    <div className="p-3 bg-green-50 border border-green-200 rounded-md">
-                      <p className="text-sm text-green-800">
-                        ✓ Contact form submissions automatically create leads in your CRM
-                      </p>
-                    </div>
+                  <div className="px-5 py-3 border-t border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/50 rounded-b-xl">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                      <Icon icon="solar:info-circle-linear" className="h-3.5 w-3.5" />
+                      Submissions automatically create leads in your CRM
+                    </p>
                   </div>
                 )}
               </div>
+            </section>
 
-              {/* Calendar Booking Section */}
-              <div className="p-4 border rounded-lg space-y-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
-                    <CalendarDays className="h-5 w-5 mt-0.5 text-green-600" />
+            {/* Calendar Booking Card - Clerk Style */}
+            <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+              <header className="flex items-center gap-2 px-5 py-3">
+                <Icon icon="solar:calendar-mark-linear" className="h-5 w-5 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Calendar Booking</h2>
+              </header>
+              <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
+                <div className="p-5 space-y-5">
+                  {/* Toggle Row */}
+                  <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-semibold mb-1">Calendar Booking (Cal.com)</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Let visitors book appointments directly from your digital card
-                      </p>
+                      <p className="text-sm font-medium text-foreground">Enable Cal.com booking</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Let visitors book appointments directly</p>
                     </div>
-                  </div>
-                  <Switch
-                    checked={formData.calendarBooking?.enabled || false}
-                    onCheckedChange={(checked) => {
-                      setFormData({
+                    <Switch
+                      checked={formData.calendarBooking?.enabled || false}
+                      onCheckedChange={(checked) => setFormData({
                         ...formData,
-                        calendarBooking: { 
-                          ...formData.calendarBooking!, 
-                          enabled: checked
-                        }
-                      });
-                    }}
-                  />
-                </div>
+                        calendarBooking: { ...formData.calendarBooking!, enabled: checked }
+                      })}
+                    />
+                  </div>
 
+                  {formData.calendarBooking?.enabled && (
+                    <>
+                      <div className="h-px bg-stone-200 dark:bg-stone-800" />
+                      
+                      {/* Info Banner */}
+                      <div className="flex items-start gap-2.5 p-3 rounded-lg bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+                        <Icon icon="solar:calendar-linear" className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                        <p className="text-xs text-muted-foreground">
+                          Get a free Cal.com account at <a href="https://cal.com" target="_blank" rel="noopener noreferrer" className="underline font-medium hover:text-foreground">cal.com</a>
+                        </p>
+                      </div>
+
+                      {/* Cal.com Username */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground">Cal.com Username</label>
+                        <div className="flex items-center h-9 rounded-md overflow-hidden border border-stone-200 dark:border-stone-800 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
+                          <span className="h-full flex items-center px-3 text-xs text-muted-foreground bg-stone-100 dark:bg-stone-900 border-r border-stone-200 dark:border-stone-800 select-none">cal.com/</span>
+                          <input
+                            className="flex-1 h-full px-3 bg-stone-50 dark:bg-stone-900 text-sm outline-none"
+                            placeholder="your-username"
+                            value={formData.calendarBooking?.calcomUsername || ''}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              calendarBooking: { ...formData.calendarBooking!, calcomUsername: e.target.value }
+                            })}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Event Slug */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground">Event Type <span className="text-muted-foreground font-normal">(optional)</span></label>
+                        <Input
+                          className="h-9 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                          placeholder="30min"
+                          value={formData.calendarBooking?.calcomEventSlug || ''}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            calendarBooking: { ...formData.calendarBooking!, calcomEventSlug: e.target.value }
+                          })}
+                        />
+                        <p className="text-[11px] text-muted-foreground">Leave empty to show all event types</p>
+                      </div>
+
+                      {/* Button Text */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground">Button Text</label>
+                        <Input
+                          className="h-9 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                          placeholder="Book Appointment"
+                          value={formData.calendarBooking?.buttonText || 'Book Appointment'}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            calendarBooking: { ...formData.calendarBooking!, buttonText: e.target.value }
+                          })}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+                
+                {/* Footer Notice */}
                 {formData.calendarBooking?.enabled && (
-                  <div className="space-y-4 pt-4 border-t">
-                    <Alert className="bg-blue-50 border-blue-200">
-                      <AlertDescription className="text-sm text-blue-800">
-                        📅 Enter your Cal.com username to enable appointment booking. Get a free Cal.com account at <a href="https://cal.com" target="_blank" rel="noopener noreferrer" className="underline font-medium">cal.com</a>
-                      </AlertDescription>
-                    </Alert>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="calcomUsername">Cal.com Username *</Label>
-                      <Input
-                        id="calcomUsername"
-                        placeholder="your-username"
-                        value={formData.calendarBooking?.calcomUsername || ''}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          calendarBooking: { ...formData.calendarBooking!, calcomUsername: e.target.value }
-                        })}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Your Cal.com username (from cal.com/your-username)
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="calcomEventSlug">Event Type Slug (Optional)</Label>
-                      <Input
-                        id="calcomEventSlug"
-                        placeholder="30min"
-                        value={formData.calendarBooking?.calcomEventSlug || ''}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          calendarBooking: { ...formData.calendarBooking!, calcomEventSlug: e.target.value }
-                        })}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Specific event type slug (e.g., "30min", "consultation"). Leave empty for all event types.
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="calendarButtonText">Button Text</Label>
-                      <Input
-                        id="calendarButtonText"
-                        placeholder="Book Appointment"
-                        value={formData.calendarBooking?.buttonText || 'Book Appointment'}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          calendarBooking: { ...formData.calendarBooking!, buttonText: e.target.value }
-                        })}
-                      />
-                    </div>
-
-                    <div className="p-3 bg-green-50 border border-green-200 rounded-md">
-                      <p className="text-sm text-green-800">
-                        ✓ Bookings sync to your OmniFlow CRM when Cal.com API is configured in Settings
-                      </p>
-                    </div>
+                  <div className="px-5 py-3 border-t border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/50 rounded-b-xl">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                      <Icon icon="solar:info-circle-linear" className="h-3.5 w-3.5" />
+                      Bookings sync to CRM when Cal.com API is configured in Settings
+                    </p>
                   </div>
                 )}
               </div>
+            </section>
 
-              {/* Voice Chatbot Section */}
-              <div className="p-4 border rounded-lg space-y-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
-                    <Bot className="h-5 w-5 mt-0.5 text-purple-600" />
+            {/* AI Voice Chatbot Card - Clerk Style */}
+            <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+              <header className="flex items-center gap-2 px-5 py-3">
+                <AiChatbotIcon className="h-5 w-5 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">AI Voice Chatbot</h2>
+                <span className="ml-auto text-[10px] font-medium px-2 py-0.5 rounded-full bg-stone-200 dark:bg-stone-800 text-muted-foreground">109 Languages</span>
+              </header>
+              <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
+                <div className="p-5 space-y-5">
+                  {/* Toggle Row */}
+                  <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-semibold mb-1">AI Voice Chatbot (109 Languages)</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Enable your company's Voice Chat AI widget on this digital card
-                      </p>
+                      <p className="text-sm font-medium text-foreground">Enable AI chatbot</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Voice & text chat with automatic lead capture</p>
                     </div>
-                  </div>
-                  <Switch
-                    checked={formData.voiceChatbot?.enabled || false}
-                    onCheckedChange={(checked) => {
-                      setFormData({
+                    <Switch
+                      checked={formData.voiceChatbot?.enabled || false}
+                      onCheckedChange={(checked) => setFormData({
                         ...formData,
-                        voiceChatbot: { 
-                          ...formData.voiceChatbot!, 
-                          enabled: checked
-                        }
-                      });
-                    }}
-                  />
-                </div>
-
-                {formData.voiceChatbot?.enabled && (
-                  <div className="space-y-4 pt-4 border-t">
-                    <Alert className="bg-blue-50 border-blue-200">
-                      <AlertDescription className="text-sm text-blue-800">
-                        💡 Voice Chat AI is configured company-wide in <strong>Settings → API Integrations</strong>. 
-                        Here you can customize how it appears on this specific card.
-                      </AlertDescription>
-                    </Alert>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="voiceChatGreeting">Custom Greeting (Optional)</Label>
-                      <Textarea
-                        id="voiceChatGreeting"
-                        placeholder="Hi! I'm [Your Business Name] AI assistant. How can I help you today?"
-                        rows={2}
-                        value={formData.voiceChatbot?.customGreeting || ''}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          voiceChatbot: { ...formData.voiceChatbot!, customGreeting: e.target.value }
-                        })}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Personalize the greeting message for this card. Leave empty to use the default.
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="voiceChatPosition">Widget Position</Label>
-                      <Select
-                        value={formData.voiceChatbot?.position || 'right'}
-                        onValueChange={(value: 'left' | 'right') => setFormData({
-                          ...formData,
-                          voiceChatbot: { ...formData.voiceChatbot!, position: value }
-                        })}
-                      >
-                        <SelectTrigger id="voiceChatPosition">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="right">Bottom Right</SelectItem>
-                          <SelectItem value="left">Bottom Left</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <p className="text-xs text-muted-foreground">
-                        Choose where the chat widget appears on your digital card
-                      </p>
-                    </div>
-
-                    <div className="p-4 bg-green-50 border border-green-200 rounded-md">
-                      <h4 className="font-medium text-sm text-green-900 mb-2">How it works:</h4>
-                      <ul className="text-xs text-green-800 space-y-1">
-                        <li>✓ Visitors chat with your AI assistant (voice or text in 109 languages)</li>
-                        <li>✓ AI captures contact info and conversation details</li>
-                        <li>✓ New leads are automatically created in your CRM</li>
-                        <li>✓ Marketing automation follows up automatically</li>
-                      </ul>
-                    </div>
-
+                        voiceChatbot: { ...formData.voiceChatbot!, enabled: checked }
+                      })}
+                    />
                   </div>
-                )}
-              </div>
 
-              {/* Widget Embed Code Section */}
-              {formData.voiceChatbot?.enabled && (
-                <WidgetEmbedCode
-                  cardId={cardId}
-                  enabled={formData.voiceChatbot.enabled}
-                />
-              )}
-            </CardContent>
-          </Card>
+                  {formData.voiceChatbot?.enabled && (
+                    <>
+                      <div className="h-px bg-stone-200 dark:bg-stone-800" />
+                      
+                      {/* Info Banner */}
+                      <div className="flex items-start gap-2.5 p-3 rounded-lg bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+                        <Icon icon="solar:lightbulb-linear" className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                        <p className="text-xs text-muted-foreground">
+                          Configure Voice Chat AI in <span className="font-medium">Settings → API Integrations</span>
+                        </p>
+                      </div>
+
+                      {/* Custom Greeting */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground">Custom Greeting <span className="text-muted-foreground font-normal">(optional)</span></label>
+                        <Textarea
+                          className="min-h-[72px] bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                          placeholder="Hi! I'm your AI assistant. How can I help you today?"
+                          value={formData.voiceChatbot?.customGreeting || ''}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            voiceChatbot: { ...formData.voiceChatbot!, customGreeting: e.target.value }
+                          })}
+                        />
+                      </div>
+
+                      {/* Widget Position */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground">Widget Position</label>
+                        <Select
+                          value={formData.voiceChatbot?.position || 'right'}
+                          onValueChange={(value: 'left' | 'right') => setFormData({
+                            ...formData,
+                            voiceChatbot: { ...formData.voiceChatbot!, position: value }
+                          })}
+                        >
+                          <SelectTrigger className="h-9 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="right">Bottom Right</SelectItem>
+                            <SelectItem value="left">Bottom Left</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Features List */}
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          'Voice & text in 109 languages',
+                          'Automatic lead capture',
+                          'Direct CRM integration',
+                          'Auto follow-up campaigns'
+                        ].map((feature, i) => (
+                          <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Icon icon="solar:check-circle-bold" className="h-3.5 w-3.5 text-emerald-500" />
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* Widget Embed Code Section */}
+            {formData.voiceChatbot?.enabled && (
+              <WidgetEmbedCode
+                cardId={cardId}
+                enabled={formData.voiceChatbot.enabled}
+              />
+            )}
+          </div>
         </TabsContent>
 
         <TabsContent value="branding">
-          <Card>
-            <CardHeader>
-              <CardTitle>Branding & Theme</CardTitle>
-              <CardDescription>Customize the look and feel of your digital card</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <ColorExtractor
-                logoUrl={formData.businessInfo?.logo || ''}
-                onColorsExtracted={(colors) => setFormData({
-                  ...formData,
-                  branding: {
-                    ...formData.branding!,
-                    primaryColor: colors.primary,
-                    secondaryColor: colors.secondary
-                  }
-                })}
-              />
-              
-              <div className="grid grid-cols-2 gap-4">
+          <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+            <header className="flex items-center gap-2 px-5 py-3">
+              <Icon icon="solar:palette-linear" className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <h2 className="text-sm font-semibold text-foreground">Branding & Theme</h2>
+                <p className="text-xs text-muted-foreground">Customize the look and feel of your digital card</p>
+              </div>
+            </header>
+            <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
+              <div className="p-5 space-y-4">
+              <div className="flex items-end gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="primaryColor">Primary Color</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      id="primaryColor"
-                      type="color"
-                      value={formData.branding?.primaryColor || '#3B82F6'}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        branding: { ...formData.branding!, primaryColor: e.target.value }
-                      })}
-                      className="w-20 h-10"
-                    />
-                    <Input
-                      value={formData.branding?.primaryColor || '#3B82F6'}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        branding: { ...formData.branding!, primaryColor: e.target.value }
-                      })}
-                    />
+                  <Label className="text-xs font-medium text-muted-foreground">Primary Color</Label>
+                  <div className="relative group">
+                    <div className="flex items-center h-11 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 overflow-hidden transition-all hover:border-stone-300 dark:hover:border-stone-700 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
+                      <div className="relative w-11 h-11 shrink-0">
+                        <input
+                          type="color"
+                          value={formData.branding?.primaryColor || '#3B82F6'}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            branding: { ...formData.branding!, primaryColor: e.target.value }
+                          })}
+                          className="absolute inset-0 w-full h-full cursor-pointer opacity-0"
+                        />
+                        <div 
+                          className="w-full h-full rounded-l-lg border-r border-stone-200 dark:border-stone-800"
+                          style={{ backgroundColor: formData.branding?.primaryColor || '#3B82F6' }}
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={formData.branding?.primaryColor || '#3B82F6'}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          branding: { ...formData.branding!, primaryColor: e.target.value }
+                        })}
+                        className="flex-1 h-full px-3 bg-transparent font-mono text-sm uppercase text-foreground placeholder:text-muted-foreground focus:outline-none"
+                        placeholder="#000000"
+                      />
+                    </div>
                   </div>
                 </div>
-
                 <div className="space-y-2">
-                  <Label htmlFor="secondaryColor">Secondary Color</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      id="secondaryColor"
-                      type="color"
-                      value={formData.branding?.secondaryColor || '#10B981'}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        branding: { ...formData.branding!, secondaryColor: e.target.value }
-                      })}
-                      className="w-20 h-10"
-                    />
-                    <Input
-                      value={formData.branding?.secondaryColor || '#10B981'}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        branding: { ...formData.branding!, secondaryColor: e.target.value }
-                      })}
-                    />
+                  <Label className="text-xs font-medium text-muted-foreground">Secondary Color</Label>
+                  <div className="relative group">
+                    <div className="flex items-center h-11 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 overflow-hidden transition-all hover:border-stone-300 dark:hover:border-stone-700 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
+                      <div className="relative w-11 h-11 shrink-0">
+                        <input
+                          type="color"
+                          value={formData.branding?.secondaryColor || '#10B981'}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            branding: { ...formData.branding!, secondaryColor: e.target.value }
+                          })}
+                          className="absolute inset-0 w-full h-full cursor-pointer opacity-0"
+                        />
+                        <div 
+                          className="w-full h-full rounded-l-lg border-r border-stone-200 dark:border-stone-800"
+                          style={{ backgroundColor: formData.branding?.secondaryColor || '#10B981' }}
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={formData.branding?.secondaryColor || '#10B981'}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          branding: { ...formData.branding!, secondaryColor: e.target.value }
+                        })}
+                        className="flex-1 h-full px-3 bg-transparent font-mono text-sm uppercase text-foreground placeholder:text-muted-foreground focus:outline-none"
+                        placeholder="#000000"
+                      />
+                    </div>
                   </div>
                 </div>
+                <ColorExtractor
+                  logoUrl={formData.businessInfo?.logo || ''}
+                  onColorsExtracted={(colors) => setFormData({
+                    ...formData,
+                    branding: {
+                      ...formData.branding!,
+                      primaryColor: colors.primary,
+                      secondaryColor: colors.secondary
+                    }
+                  })}
+                />
               </div>
 
               <div className="space-y-2">
@@ -1092,8 +1200,9 @@ export default function EditDigitalCardPage() {
                   </SelectContent>
                 </Select>
               </div>
-            </CardContent>
-          </Card>
+              </div>
+            </div>
+          </section>
         </TabsContent>
 
         <TabsContent value="embed">
@@ -1108,7 +1217,8 @@ export default function EditDigitalCardPage() {
             businessName={formData.businessInfo?.name}
           />
         </TabsContent>
-      </Tabs>
+        </Tabs>
+      </div>
 
       <div className="flex justify-end gap-4 mt-6">
         <Button

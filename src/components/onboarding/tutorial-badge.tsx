@@ -26,7 +26,7 @@ export const TUTORIAL_BADGES: TutorialBadge[] = [
     title: 'First Contact',
     description: 'Added your first contact',
     icon: Users,
-    color: 'bg-blue-500',
+    color: 'bg-info',
     requirement: 'Add at least 1 contact',
   },
   {
@@ -34,7 +34,7 @@ export const TUTORIAL_BADGES: TutorialBadge[] = [
     title: 'Contact Master',
     description: 'Built a solid contact base',
     icon: Star,
-    color: 'bg-purple-500',
+    color: 'bg-primary',
     requirement: 'Add 25+ contacts',
   },
   {
@@ -42,7 +42,7 @@ export const TUTORIAL_BADGES: TutorialBadge[] = [
     title: 'Deal Maker',
     description: 'Created your first deal',
     icon: Target,
-    color: 'bg-green-500',
+    color: 'bg-success',
     requirement: 'Create at least 1 deal',
   },
   {
@@ -50,7 +50,7 @@ export const TUTORIAL_BADGES: TutorialBadge[] = [
     title: 'Closer',
     description: 'Won your first deal',
     icon: Trophy,
-    color: 'bg-amber-500',
+    color: 'bg-warning',
     requirement: 'Win at least 1 deal',
   },
   {
@@ -58,7 +58,7 @@ export const TUTORIAL_BADGES: TutorialBadge[] = [
     title: 'Campaign Launcher',
     description: 'Sent your first campaign',
     icon: Mail,
-    color: 'bg-pink-500',
+    color: 'bg-primary',
     requirement: 'Send 1 email campaign',
   },
   {
@@ -216,13 +216,13 @@ export function TutorialBadges({
             key={badge.id}
             className={`relative p-4 rounded-xl border text-center transition-all ${
               isEarned 
-                ? 'bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/20 border-amber-200 dark:border-amber-800/50' 
+                ? 'bg-warning-muted border-warning-border' 
                 : 'bg-muted/30 border-muted opacity-60'
             }`}
           >
             {isEarned && (
               <div className="absolute -top-1 -right-1">
-                <CheckCircle2 className="h-5 w-5 text-green-500 fill-white" />
+                <CheckCircle2 className="h-5 w-5 text-success fill-white" />
               </div>
             )}
             <div

@@ -159,19 +159,19 @@ export default function GuidedReviewResponder({ onResponseGenerated, onBack }: G
                   <SelectContent>
                     <SelectItem value="positive">
                       <div className="flex items-center gap-2">
-                        <span className="text-green-600">😊</span>
+                        <span className="text-success">😊</span>
                         <span>Positive</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="negative">
                       <div className="flex items-center gap-2">
-                        <span className="text-red-600">😞</span>
+                        <span className="text-destructive">😞</span>
                         <span>Negative</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="neutral">
                       <div className="flex items-center gap-2">
-                        <span className="text-gray-600">😐</span>
+                        <span className="text-muted-foreground">😐</span>
                         <span>Neutral</span>
                       </div>
                     </SelectItem>
@@ -227,7 +227,7 @@ export default function GuidedReviewResponder({ onResponseGenerated, onBack }: G
           {/* Generated Response Section */}
           {generatedResponse && (
             <div className="space-y-4 pt-4 border-t">
-              <div className="flex items-center gap-2 text-green-600">
+              <div className="flex items-center gap-2 text-success">
                 <CheckCircle2 className="h-5 w-5" />
                 <span className="font-semibold">Response Generated</span>
               </div>

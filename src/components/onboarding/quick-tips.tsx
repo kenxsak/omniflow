@@ -89,60 +89,58 @@ export function QuickTips({ pageId, tips, showDismissAll = true }: QuickTipsProp
   }
 
   return (
-    <Card className="border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/20 dark:border-amber-800/50">
-      <CardContent className="pt-4">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-full bg-amber-100 dark:bg-amber-900/50">
-              <Lightbulb className="h-4 w-4 text-amber-600" />
+    <Card className="overflow-hidden">
+      <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+            TIPS
+          </span>
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-warning">
+            <span className="h-1.5 w-1.5 rounded-full bg-warning" />
+            {visibleTips.length} NEW
+          </span>
+        </div>
+        {showDismissAll && visibleTips.length > 1 && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={dismissAll}
+            className="h-7 text-xs text-muted-foreground"
+          >
+            Dismiss all
+          </Button>
+        )}
+      </div>
+      
+      <CardContent className="p-0 divide-y divide-border">
+        {visibleTips.map((tip) => (
+          <div 
+            key={tip.id}
+            className="flex items-start gap-3 px-4 py-3"
+          >
+            <div className="flex-1 min-w-0">
+              <h4 className="text-sm font-medium">{tip.title}</h4>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{tip.description}</p>
+              {tip.actionLabel && tip.actionHref && (
+                <Link 
+                  href={tip.actionHref}
+                  className="inline-flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 font-medium mt-1.5"
+                >
+                  {tip.actionLabel.toUpperCase()}
+                  <ChevronRight className="h-3 w-3" />
+                </Link>
+              )}
             </div>
-            <span className="text-sm font-semibold text-amber-800 dark:text-amber-300">Quick Tips</span>
-          </div>
-          {showDismissAll && visibleTips.length > 1 && (
             <Button 
               variant="ghost" 
-              size="sm" 
-              onClick={dismissAll}
-              className="text-amber-700 hover:text-amber-900 hover:bg-amber-100/50 -mt-1 -mr-2 h-7 text-xs"
+              size="icon" 
+              onClick={() => dismissTip(tip.id)}
+              className="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground"
             >
-              Dismiss all
+              <X className="h-3 w-3" />
             </Button>
-          )}
-        </div>
-        
-        <div className="space-y-2">
-          {visibleTips.map((tip) => (
-            <div 
-              key={tip.id}
-              className="flex items-start gap-3 p-2 rounded-lg bg-white/50 dark:bg-white/5 border border-amber-100 dark:border-amber-800/30"
-            >
-              <div className="shrink-0 mt-0.5">
-                {tip.icon || <Sparkles className="h-4 w-4 text-amber-500" />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-medium text-amber-900 dark:text-amber-200">{tip.title}</h4>
-                <p className="text-xs text-amber-700 dark:text-amber-400">{tip.description}</p>
-                {tip.actionLabel && tip.actionHref && (
-                  <Link 
-                    href={tip.actionHref}
-                    className="inline-flex items-center gap-1 text-xs text-amber-600 hover:text-amber-800 dark:text-amber-300 font-medium mt-1"
-                  >
-                    {tip.actionLabel}
-                    <ChevronRight className="h-3 w-3" />
-                  </Link>
-                )}
-              </div>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => dismissTip(tip.id)}
-                className="h-6 w-6 shrink-0 text-amber-600 hover:text-amber-800 hover:bg-amber-100/50"
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </CardContent>
     </Card>
   );

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, Users, Bot, Image, Zap, Loader2, Database, Clock, Sparkles } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import type { Plan } from '@/types/saas';
@@ -16,10 +16,10 @@ import { getCRMLimitDescription } from '@/lib/plan-helpers';
 import { 
   SupportedCurrency, 
   detectUserLocation, 
-  getCurrencySymbol, 
-  getCurrencyName,
+  getCurrencySymbol,
   getPriceForPlan as getFixedPrice 
 } from '@/lib/geo-detection';
+import { CurrencySelector } from "@/components/ui/currency-selector";
 import gsap from 'gsap';
 
 interface PricingSectionProps {
@@ -78,15 +78,6 @@ export function PricingSection({
     fetchPlansAndFeatures();
   }, []);
 
-  const getPriceForPlan = (plan: Plan): string => {
-    if (plan.priceMonthlyUSD === 0) return 'Free';
-    
-    const price = getFixedPrice(plan.id, currency);
-    const symbol = getCurrencySymbol(currency);
-    
-    return `${symbol}${price.toLocaleString()}`;
-  };
-
   const getFeatureName = (featureId: string) => {
     const feature = allFeatures.find(f => f.id === featureId);
     return feature ? feature.name : featureId.replace('feat_', '').replace(/_/g, ' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
@@ -95,7 +86,7 @@ export function PricingSection({
   const getRegionalMessage = () => {
     if (currency === 'INR') {
       return (
-        <Badge variant="default" className="mt-3 text-sm px-4 py-1.5 bg-green-600 hover:bg-green-700">
+        <Badge variant="default" className="mt-3 text-sm px-4 py-1.5 bg-success hover:bg-success/90 text-success-foreground">
           <span className="mr-1">🇮🇳</span>
           Special India Pricing - Up to 70% cheaper than global rates!
         </Badge>
@@ -126,64 +117,85 @@ export function PricingSection({
   }, [isLoading, plans]);
 
   return (
-    <section className={cn("py-12 sm:py-16 lg:py-24 px-4", className)}>
-      <div className="max-w-7xl mx-auto">
+    <section className={cn("py-12 sm:py-16 px-4", className)}>
+      <div className="max-w-6xl mx-auto">
         {showHeader && (
-          <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-            <Badge variant="outline" className="mb-4 text-xs sm:text-sm px-3 py-1">
-              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+          <div className="text-center mb-8 sm:mb-10">
+            <Badge variant="outline" className="mb-3 text-xs sm:text-sm px-3 py-1">
+              <Icon icon="solar:star-bold" className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
               Simple, Transparent Pricing
             </Badge>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
+            <h2 className="text-3xl leading-tight font-semibold sm:text-5xl sm:leading-tight text-foreground">
               {headerTitle}
             </h2>
-            <p className="mt-3 sm:mt-4 text-sm sm:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-md text-muted-foreground max-w-[600px] font-medium sm:text-xl mt-4 mx-auto">
               {headerDescription}
             </p>
-            <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-muted-foreground">
-              Pricing shown in: <strong className="text-foreground">{getCurrencyName(currency)} ({getCurrencySymbol(currency)})</strong>
+            <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
+              {getRegionalMessage()}
+              <Badge variant="secondary" className="text-xs sm:text-sm px-3 py-1">
+                <Icon icon="solar:bolt-bold" className="h-3 w-3 sm:h-4 sm:w-4 mr-1 inline" />
+                Use your own API key for unlimited AI
+              </Badge>
             </div>
-            {getRegionalMessage()}
-            <Badge variant="secondary" className="mt-3 text-xs sm:text-sm px-3 sm:px-4 py-1 sm:py-1.5">
-              <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-1 inline" />
-              Use your own Google API key for unlimited AI
-            </Badge>
           </div>
         )}
+
+        {/* Currency Selector */}
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <span className="text-sm text-muted-foreground">Currency:</span>
+          <CurrencySelector
+            value={currency}
+            onValueChange={(value) => {
+              setCurrency(value);
+              localStorage.setItem('preferred_currency', value);
+              onCurrencyChange?.(value);
+            }}
+            className="w-[200px]"
+          />
+        </div>
 
         {isLoading ? (
           <div className="flex flex-col justify-center items-center h-48 gap-4">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <Icon icon="solar:refresh-bold" className="h-8 w-8 animate-spin text-primary" />
             </div>
             <p className="text-sm text-muted-foreground">Loading plans...</p>
           </div>
         ) : (
           <div 
             ref={cardsRef}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 items-stretch"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 items-stretch"
           >
-            {plans.map((plan, index) => (
+            {plans.map((plan) => (
               <Card 
                 key={plan.id} 
                 className={cn(
-                  'pricing-card flex flex-col rounded-xl sm:rounded-2xl shadow-lg h-full transition-all duration-300 hover:shadow-xl',
+                  'pricing-card flex flex-col rounded-2xl shadow-xl h-full transition-all duration-300 overflow-hidden relative',
                   plan.isFeatured 
-                    ? 'border-2 border-primary ring-2 sm:ring-4 ring-primary/20 scale-[1.02] sm:scale-105' 
-                    : 'hover:border-primary/50'
+                    ? 'glass-4 after:content-[""] after:absolute after:-top-[128px] after:left-1/2 after:h-[128px] after:w-[100%] after:max-w-[960px] after:-translate-x-1/2 after:rounded-[50%] after:bg-brand-foreground/70 after:blur-[72px]' 
+                    : 'glass-1 hover:border-primary/50'
                 )}
               >
+                {/* Top gradient line */}
+                <hr className={cn(
+                  "absolute top-0 left-[10%] h-[1px] w-[80%] border-0 bg-gradient-to-r from-transparent via-foreground/60 to-transparent",
+                  plan.isFeatured && "via-brand"
+                )} />
                 {plan.isFeatured && (
-                  <div className="py-1.5 sm:py-2 px-3 sm:px-4 bg-gradient-to-r from-primary to-accent text-primary-foreground text-xs sm:text-sm font-semibold rounded-t-xl text-center">
-                    Most Popular
+                  <div className="py-1.5 sm:py-2 px-3 sm:px-4 bg-primary text-primary-foreground text-xs sm:text-sm font-semibold text-center">
+                    ⭐ Most Popular
                   </div>
                 )}
                 <CardHeader className="p-4 sm:p-6">
                   <CardTitle className="text-lg sm:text-xl lg:text-2xl font-bold">{plan.name}</CardTitle>
                   <p className="text-xs sm:text-sm text-muted-foreground min-h-[2rem] sm:min-h-[3rem]">{plan.description}</p>
-                  <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mt-3 sm:mt-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    {getPriceForPlan(plan)}
-                  </p>
+                  <div className="flex items-baseline gap-1 mt-3 sm:mt-4">
+                    <span className="text-muted-foreground text-2xl font-bold">
+                      {plan.priceMonthlyUSD > 0 ? getCurrencySymbol(currency) : ''}
+                    </span>
+                    <span className="text-5xl sm:text-6xl font-bold">{plan.priceMonthlyUSD === 0 ? 'Free' : getFixedPrice(plan.id, currency).toLocaleString()}</span>
+                  </div>
                   <p className="text-xs sm:text-sm text-muted-foreground">{plan.priceMonthlyUSD > 0 ? '/ month' : 'Forever'}</p>
                   {plan.yearlyDiscountPercentage && plan.yearlyDiscountPercentage > 0 && (
                     <Badge variant="secondary" className="mt-2 w-fit text-xs">Save {plan.yearlyDiscountPercentage}% yearly</Badge>
@@ -192,25 +204,19 @@ export function PricingSection({
                 <CardContent className="p-4 sm:p-6 pt-0 flex-grow">
                   <ul className="space-y-2 sm:space-y-3">
                     <li className="flex items-center">
-                      <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-green-500/10 flex items-center justify-center mr-2 flex-shrink-0">
-                        <Users className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
-                      </div>
+                      <Icon icon="solar:users-group-rounded-bold" className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground mr-2 flex-shrink-0" />
                       <span className="text-xs sm:text-sm text-muted-foreground">Up to <strong className="text-foreground">{plan.maxUsers}</strong> {plan.maxUsers === 1 ? 'user' : 'team members'}</span>
                     </li>
                     {plan.maxUsers > 1 && (
                       <li className="flex items-start">
-                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-green-500/10 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0">
-                          <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
-                        </div>
+                        <Icon icon="solar:clock-circle-bold" className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground mr-2 mt-0.5 flex-shrink-0" />
                         <span className="text-xs sm:text-sm text-muted-foreground">
                           <strong className="text-foreground">Team Management</strong>
                         </span>
                       </li>
                     )}
                     <li className="flex items-center">
-                      <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-green-500/10 flex items-center justify-center mr-2 flex-shrink-0">
-                        <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
-                      </div>
+                      <Icon icon="solar:cpu-bolt-bold" className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground mr-2 flex-shrink-0" />
                       <span className="text-xs sm:text-sm text-muted-foreground">
                         <strong className="text-foreground">{plan.aiCreditsPerMonth.toLocaleString()}</strong> AI Credits
                         {plan.priceMonthlyUSD === 0 && <span className="text-[10px] sm:text-xs ml-1">(one-time)</span>}
@@ -218,42 +224,34 @@ export function PricingSection({
                     </li>
                     {plan.allowBYOK && (
                       <li className="flex items-start">
-                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-yellow-500/10 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0">
-                          <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500" />
-                        </div>
-                        <span className="text-xs sm:text-sm font-semibold text-yellow-600 dark:text-yellow-400">UNLIMITED AI with BYOK</span>
+                        <Icon icon="solar:bolt-bold" className="h-4 w-4 sm:h-5 sm:w-5 text-brand mr-2 mt-0.5 flex-shrink-0" />
+                        <span className="text-xs sm:text-sm font-semibold text-brand dark:text-brand">UNLIMITED AI with BYOK</span>
                       </li>
                     )}
                     {plan.maxImagesPerMonth !== undefined && (
                       <li className="flex items-center">
-                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-green-500/10 flex items-center justify-center mr-2 flex-shrink-0">
-                          <Image className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
-                        </div>
+                        <Icon icon="solar:gallery-bold" className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground mr-2 flex-shrink-0" />
                         <span className="text-xs sm:text-sm text-muted-foreground"><strong className="text-foreground">{plan.maxImagesPerMonth.toLocaleString()}</strong> images/mo</span>
                       </li>
                     )}
                     <li className="flex items-center">
-                      <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-green-500/10 flex items-center justify-center mr-2 flex-shrink-0">
-                        <Database className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
-                      </div>
+                      <Icon icon="solar:database-bold" className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground mr-2 flex-shrink-0" />
                       <span className="text-xs sm:text-sm text-muted-foreground">{getCRMLimitDescription(plan)}</span>
                     </li>
                     {plan.featureIds.slice(0, 4).map((featureId, i) => (
                       <li key={i} className="flex items-start">
-                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-green-500/10 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0">
-                          <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
-                        </div>
+                        <Icon icon="solar:check-circle-bold" className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground mr-2 mt-0.5 flex-shrink-0" />
                         <span className="text-xs sm:text-sm text-muted-foreground">{getFeatureName(featureId)}</span>
                       </li>
                     ))}
                     {plan.featureIds.length > 4 && (
-                      <li className="text-xs sm:text-sm text-muted-foreground pl-8 sm:pl-9">
+                      <li className="text-xs sm:text-sm text-muted-foreground pl-6 sm:pl-7">
                         +{plan.featureIds.length - 4} more features
                       </li>
                     )}
                     {plan.allowOverage && (
                       <li className="flex items-start pt-2 border-t">
-                        <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500 mr-2 mt-0.5 flex-shrink-0" />
+                        <Icon icon="solar:bolt-bold" className="h-4 w-4 sm:h-5 sm:w-5 text-brand mr-2 mt-0.5 flex-shrink-0" />
                         <span className="text-[10px] sm:text-xs text-muted-foreground">Overage credits available</span>
                       </li>
                     )}
@@ -273,19 +271,13 @@ export function PricingSection({
                         currency={currency}
                         variant={plan.isFeatured ? 'default' : 'outline'}
                         size="lg"
-                        className={cn(
-                          "w-full text-sm sm:text-base lg:text-lg py-4 sm:py-5 lg:py-6",
-                          plan.isFeatured && "bg-gradient-to-r from-primary to-accent hover:opacity-90"
-                        )}
+                        className="w-full text-sm sm:text-base lg:text-lg py-4 sm:py-5 lg:py-6"
                       />
                     )
                   ) : (
                     <Button 
                       asChild 
-                      className={cn(
-                        "w-full text-sm sm:text-base lg:text-lg py-4 sm:py-5 lg:py-6",
-                        plan.isFeatured && "bg-gradient-to-r from-primary to-accent hover:opacity-90"
-                      )}
+                      className="w-full text-sm sm:text-base lg:text-lg py-4 sm:py-5 lg:py-6"
                       variant={plan.isFeatured ? 'default' : 'outline'}
                     >
                       <Link href="/signup">Get Started</Link>

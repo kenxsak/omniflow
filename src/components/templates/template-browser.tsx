@@ -98,7 +98,7 @@ export default function TemplateBrowser({ filterType, onApply }: TemplateBrowser
 
       {!filterType && (
         <Tabs value={selectedType} onValueChange={(value) => setSelectedType(value as TemplateType)}>
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="rounded-t-xl max-w-md">
             <TabsTrigger value="email">Email Templates</TabsTrigger>
             <TabsTrigger value="sms">SMS Templates</TabsTrigger>
           </TabsList>

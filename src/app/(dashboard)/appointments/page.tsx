@@ -1,9 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -38,13 +36,11 @@ import {
   syncCalComBookingsAction,
 } from '@/app/actions/appointment-actions';
 import type { Appointment, AppointmentFilter, AppointmentStats, CreateAppointmentInput, UpdateAppointmentInput } from '@/types/appointments';
-import { Animated, AnimatedCounter } from '@/components/ui/animated';
-import gsap from 'gsap';
+import { AnimatedCounter } from '@/components/ui/animated';
 
 export default function AppointmentsPage() {
   const { appUser } = useAuth();
   const { toast } = useToast();
-  const statsRef = useRef<HTMLDivElement>(null);
   
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [stats, setStats] = useState<AppointmentStats | null>(null);
@@ -61,18 +57,6 @@ export default function AppointmentsPage() {
   
   const [filters, setFilters] = useState<AppointmentFilter>({});
 
-  // GSAP animation for stats cards - instant
-  useEffect(() => {
-    if (statsRef.current && stats) {
-      const cards = statsRef.current.querySelectorAll('.stat-card');
-      gsap.fromTo(
-        cards,
-        { opacity: 0, y: 10, scale: 0.98 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.25, stagger: 0, ease: 'power2.out' }
-      );
-    }
-  }, [stats]);
-
   const fetchAppointments = useCallback(async () => {
     if (!appUser?.idToken) return;
     
@@ -85,8 +69,6 @@ export default function AppointmentsPage() {
       
       if (appointmentsResult.success) {
         setAppointments(appointmentsResult.appointments);
-      } else {
-        console.error('Error fetching appointments:', appointmentsResult.error);
       }
       
       if (statsResult.success) {
@@ -96,7 +78,7 @@ export default function AppointmentsPage() {
       console.error('Error fetching appointments:', error);
       toast({
         title: 'Error',
-        description: 'Failed to load appointments. Please try again.',
+        description: 'Failed to load appointments.',
         variant: 'destructive',
       });
     } finally {
@@ -120,26 +102,14 @@ export default function AppointmentsPage() {
       });
       
       if (result.success) {
-        toast({
-          title: 'Appointment Created',
-          description: 'Your appointment has been scheduled successfully.',
-        });
+        toast({ title: 'Appointment Created', description: 'Scheduled successfully.' });
         setShowCreateDialog(false);
         fetchAppointments();
       } else {
-        toast({
-          title: 'Error',
-          description: result.error || 'Failed to create appointment.',
-          variant: 'destructive',
-        });
+        toast({ title: 'Error', description: result.error || 'Failed to create.', variant: 'destructive' });
       }
-    } catch (error) {
-      console.error('Error creating appointment:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to create appointment. Please try again.',
-        variant: 'destructive',
-      });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to create appointment.', variant: 'destructive' });
     }
   };
 
@@ -154,27 +124,15 @@ export default function AppointmentsPage() {
       });
       
       if (result.success) {
-        toast({
-          title: 'Appointment Updated',
-          description: 'Your appointment has been updated successfully.',
-        });
+        toast({ title: 'Appointment Updated', description: 'Updated successfully.' });
         setShowEditDialog(false);
         setEditingAppointment(null);
         fetchAppointments();
       } else {
-        toast({
-          title: 'Error',
-          description: result.error || 'Failed to update appointment.',
-          variant: 'destructive',
-        });
+        toast({ title: 'Error', description: result.error || 'Failed to update.', variant: 'destructive' });
       }
-    } catch (error) {
-      console.error('Error updating appointment:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update appointment. Please try again.',
-        variant: 'destructive',
-      });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to update appointment.', variant: 'destructive' });
     }
   };
 
@@ -188,27 +146,15 @@ export default function AppointmentsPage() {
       });
       
       if (result.success) {
-        toast({
-          title: 'Appointment Cancelled',
-          description: 'The appointment has been cancelled.',
-        });
+        toast({ title: 'Appointment Cancelled' });
         setShowCancelDialog(false);
         setSelectedAppointmentId(null);
         fetchAppointments();
       } else {
-        toast({
-          title: 'Error',
-          description: result.error || 'Failed to cancel appointment.',
-          variant: 'destructive',
-        });
+        toast({ title: 'Error', description: result.error, variant: 'destructive' });
       }
-    } catch (error) {
-      console.error('Error cancelling appointment:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to cancel appointment. Please try again.',
-        variant: 'destructive',
-      });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to cancel.', variant: 'destructive' });
     }
   };
 
@@ -222,27 +168,15 @@ export default function AppointmentsPage() {
       });
       
       if (result.success) {
-        toast({
-          title: 'Appointment Deleted',
-          description: 'The appointment has been deleted.',
-        });
+        toast({ title: 'Appointment Deleted' });
         setShowDeleteDialog(false);
         setSelectedAppointmentId(null);
         fetchAppointments();
       } else {
-        toast({
-          title: 'Error',
-          description: result.error || 'Failed to delete appointment.',
-          variant: 'destructive',
-        });
+        toast({ title: 'Error', description: result.error, variant: 'destructive' });
       }
-    } catch (error) {
-      console.error('Error deleting appointment:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete appointment. Please try again.',
-        variant: 'destructive',
-      });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to delete.', variant: 'destructive' });
     }
   };
 
@@ -256,25 +190,13 @@ export default function AppointmentsPage() {
       });
       
       if (result.success) {
-        toast({
-          title: 'Appointment Completed',
-          description: 'The appointment has been marked as completed.',
-        });
+        toast({ title: 'Appointment Completed' });
         fetchAppointments();
       } else {
-        toast({
-          title: 'Error',
-          description: result.error || 'Failed to complete appointment.',
-          variant: 'destructive',
-        });
+        toast({ title: 'Error', description: result.error, variant: 'destructive' });
       }
-    } catch (error) {
-      console.error('Error completing appointment:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to complete appointment. Please try again.',
-        variant: 'destructive',
-      });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to complete.', variant: 'destructive' });
     }
   };
 
@@ -288,23 +210,14 @@ export default function AppointmentsPage() {
       if (result.success) {
         toast({
           title: 'Sync Complete',
-          description: `Synced ${result.synced} bookings. Created: ${result.created}, Updated: ${result.updated}`,
+          description: `Synced ${result.synced} bookings.`,
         });
         fetchAppointments();
       } else {
-        toast({
-          title: 'Sync Failed',
-          description: result.error || 'Failed to sync Cal.com bookings.',
-          variant: 'destructive',
-        });
+        toast({ title: 'Sync Failed', description: result.error, variant: 'destructive' });
       }
-    } catch (error) {
-      console.error('Error syncing Cal.com:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to sync Cal.com bookings. Please try again.',
-        variant: 'destructive',
-      });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to sync.', variant: 'destructive' });
     } finally {
       setIsSyncing(false);
     }
@@ -334,189 +247,194 @@ export default function AppointmentsPage() {
     setShowDeleteDialog(true);
   };
 
+  // Status dot colors - Clerk style
+  const statDotColors = {
+    total: 'bg-stone-300 border-stone-600',
+    scheduled: 'bg-emerald-300 border-emerald-700',
+    completed: 'bg-violet-300 border-violet-700',
+    thisWeek: 'bg-rose-300 border-rose-700',
+  };
+
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
-      {/* Header Section */}
-      <Animated animation="fadeUp">
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Appointments
-                </h1>
-                <Badge variant="secondary" className="text-xs">
-                  <Icon icon="solar:clock-circle-linear" className="w-3 h-3 mr-1" />
-                  Live
-                </Badge>
-              </div>
-              <p className="text-sm sm:text-base text-muted-foreground">
-                Manage your bookings and schedule
-              </p>
-            </div>
-            
-            {/* Desktop Actions */}
-            <div className="hidden sm:flex gap-2 flex-wrap">
-              <Button
-                variant="outline"
-                onClick={handleSyncCalCom}
-                disabled={isSyncing}
-                className="transition-all duration-300 hover:shadow-md"
-              >
-                <Icon icon="solar:refresh-linear" className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
-                {isSyncing ? 'Syncing...' : 'Sync Cal.com'}
-              </Button>
-              <Link href="/settings?tab=integrations">
-                <Button variant="outline" className="transition-all duration-300 hover:shadow-md">
-                  <Icon icon="solar:settings-linear" className="h-4 w-4 mr-2" />
-                  Settings
-                </Button>
-              </Link>
-              <Button 
-                onClick={() => setShowCreateDialog(true)}
-                className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 hover:shadow-lg"
-              >
-                <Icon icon="solar:add-circle-linear" className="h-4 w-4 mr-2" />
-                New Appointment
-              </Button>
-            </div>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header - Clerk style */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-lg sm:text-xl font-semibold text-foreground">Appointments</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
+              Manage your bookings and schedule
+            </p>
           </div>
           
-          {/* Mobile Actions */}
-          <div className="flex sm:hidden gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+          {/* Desktop Actions */}
+          <div className="hidden sm:flex gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={handleSyncCalCom}
               disabled={isSyncing}
-              className="flex-shrink-0 touch-target"
+              className="h-8 text-xs border-stone-200 dark:border-stone-800"
             >
-              <Icon icon="solar:refresh-linear" className={`h-4 w-4 mr-1.5 ${isSyncing ? 'animate-spin' : ''}`} />
-              {isSyncing ? 'Syncing' : 'Sync'}
+              <Icon icon="solar:refresh-linear" className={`h-3.5 w-3.5 mr-1.5 ${isSyncing ? 'animate-spin' : ''}`} />
+              {isSyncing ? 'Syncing...' : 'Sync Cal.com'}
             </Button>
             <Link href="/settings?tab=integrations">
-              <Button variant="outline" size="sm" className="flex-shrink-0 touch-target">
-                <Icon icon="solar:settings-linear" className="h-4 w-4 mr-1.5" />
+              <Button variant="outline" size="sm" className="h-8 text-xs border-stone-200 dark:border-stone-800">
+                <Icon icon="solar:settings-linear" className="h-3.5 w-3.5 mr-1.5" />
                 Settings
               </Button>
             </Link>
             <Button 
               size="sm"
               onClick={() => setShowCreateDialog(true)}
-              className="flex-shrink-0 touch-target bg-gradient-to-r from-primary to-accent"
+              className="h-8 text-xs"
             >
-              <Icon icon="solar:add-circle-linear" className="h-4 w-4 mr-1.5" />
-              New
+              <Icon icon="solar:add-circle-linear" className="h-3.5 w-3.5 mr-1.5" />
+              New Appointment
             </Button>
           </div>
         </div>
-      </Animated>
+        
+        {/* Mobile Actions */}
+        <div className="flex sm:hidden gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSyncCalCom}
+            disabled={isSyncing}
+            className="h-8 text-xs shrink-0 border-stone-200 dark:border-stone-800"
+          >
+            <Icon icon="solar:refresh-linear" className={`h-3.5 w-3.5 mr-1 ${isSyncing ? 'animate-spin' : ''}`} />
+            Sync
+          </Button>
+          <Link href="/settings?tab=integrations">
+            <Button variant="outline" size="sm" className="h-8 text-xs shrink-0 border-stone-200 dark:border-stone-800">
+              <Icon icon="solar:settings-linear" className="h-3.5 w-3.5 mr-1" />
+              Settings
+            </Button>
+          </Link>
+          <Button 
+            size="sm"
+            onClick={() => setShowCreateDialog(true)}
+            className="h-8 text-xs shrink-0"
+          >
+            <Icon icon="solar:add-circle-linear" className="h-3.5 w-3.5 mr-1" />
+            New
+          </Button>
+        </div>
+      </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Clerk style */}
       {stats && (
-        <div ref={statsRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-primary/50 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">Total</CardTitle>
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Icon icon="solar:calendar-linear" className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+          {/* Total */}
+          <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="p-3 sm:p-4 pt-4 sm:pt-5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                  TOTAL
+                </span>
+                <Icon icon="solar:calendar-linear" className="h-4 w-4 text-muted-foreground/60" />
               </div>
-            </CardHeader>
-            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
-              <div className="text-xl sm:text-2xl lg:text-3xl font-bold">
-                <AnimatedCounter value={stats.total} />
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">
+                  <AnimatedCounter value={stats.total} />
+                </span>
+                <span className={`size-1.5 sm:size-2 border-[1.5px] rounded-full ${statDotColors.total}`} />
               </div>
               <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">All time bookings</p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
           
-          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-green-500/50 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">Scheduled</CardTitle>
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                <Icon icon="solar:calendar-mark-linear" className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+          {/* Scheduled */}
+          <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="p-3 sm:p-4 pt-4 sm:pt-5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                  SCHEDULED
+                </span>
+                <Icon icon="solar:calendar-mark-linear" className="h-4 w-4 text-muted-foreground/60" />
               </div>
-            </CardHeader>
-            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
-              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-600">
-                <AnimatedCounter value={stats.scheduled} />
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">
+                  <AnimatedCounter value={stats.scheduled} />
+                </span>
+                <span className={`size-1.5 sm:size-2 border-[1.5px] rounded-full ${statDotColors.scheduled}`} />
               </div>
               <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Upcoming</p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
           
-          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-violet-500/50 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">Completed</CardTitle>
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-violet-500/10 flex items-center justify-center">
-                <Icon icon="solar:calendar-check-linear" className="h-4 w-4 sm:h-5 sm:w-5 text-violet-500" />
+          {/* Completed */}
+          <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="p-3 sm:p-4 pt-4 sm:pt-5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                  COMPLETED
+                </span>
+                <Icon icon="solar:check-circle-linear" className="h-4 w-4 text-muted-foreground/60" />
               </div>
-            </CardHeader>
-            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
-              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-violet-600">
-                <AnimatedCounter value={stats.completed} />
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">
+                  <AnimatedCounter value={stats.completed} />
+                </span>
+                <span className={`size-1.5 sm:size-2 border-[1.5px] rounded-full ${statDotColors.completed}`} />
               </div>
               <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Finished</p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
           
-          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-purple-500/50 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6 sm:pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">This Week</CardTitle>
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
+          {/* This Week */}
+          <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="p-3 sm:p-4 pt-4 sm:pt-5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                  THIS WEEK
+                </span>
+                <Icon icon="solar:calendar-date-linear" className="h-4 w-4 text-muted-foreground/60" />
               </div>
-            </CardHeader>
-            <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
-              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-600">
-                <AnimatedCounter value={stats.upcomingThisWeek} />
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">
+                  <AnimatedCounter value={stats.upcomingThisWeek} />
+                </span>
+                <span className={`size-1.5 sm:size-2 border-[1.5px] rounded-full ${statDotColors.thisWeek}`} />
               </div>
-              <div className="flex items-center gap-1 mt-1">
-                <Icon icon="solar:graph-up-linear" className="w-3 h-3 text-green-500" />
-                <p className="text-[10px] sm:text-xs text-muted-foreground">{stats.upcomingToday} today</p>
-              </div>
-            </CardContent>
-          </Card>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">{stats.upcomingToday} today</p>
+            </div>
+          </div>
         </div>
       )}
 
-      <Animated animation="fadeUp">
-        <Card className="overflow-hidden border-0 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div>
-                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Icon icon="solar:calendar-linear" className="h-4 w-4 text-primary" />
-                  </div>
-                  All Appointments
-                </CardTitle>
-                <CardDescription className="mt-1 text-xs sm:text-sm">
-                  View, manage, and schedule appointments with your clients
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0 sm:p-6">
-            <div className="overflow-x-auto">
-              <AppointmentList
-                appointments={appointments}
-                isLoading={isLoading}
-                onView={handleView}
-                onEdit={handleEdit}
-                onCancel={handleCancelClick}
-                onComplete={handleCompleteAppointment}
-                onDelete={handleDeleteClick}
-                onFilterChange={handleFilterChange}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </Animated>
+      {/* Appointments List Card - Clerk style */}
+      <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+        <div className="absolute inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800">
+          <div className="flex items-center gap-2">
+            <Icon icon="solar:calendar-linear" className="h-4 w-4 text-muted-foreground/60" />
+            <span className="text-sm font-medium text-foreground">All Appointments</span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            View, manage, and schedule appointments with your clients
+          </p>
+        </div>
+        <div className="p-4 sm:p-6">
+          <AppointmentList
+            appointments={appointments}
+            isLoading={isLoading}
+            onView={handleView}
+            onEdit={handleEdit}
+            onCancel={handleCancelClick}
+            onComplete={handleCompleteAppointment}
+            onDelete={handleDeleteClick}
+            onFilterChange={handleFilterChange}
+          />
+        </div>
+      </div>
 
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -559,12 +477,12 @@ export default function AppointmentsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Cancel Appointment?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will cancel the appointment and notify the client. Are you sure you want to continue?
+              This will cancel the appointment and notify the client.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setSelectedAppointmentId(null)}>
-              Keep Appointment
+              Keep
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleCancelAppointment}
@@ -581,7 +499,7 @@ export default function AppointmentsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Appointment?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. The appointment will be permanently deleted from the system.
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

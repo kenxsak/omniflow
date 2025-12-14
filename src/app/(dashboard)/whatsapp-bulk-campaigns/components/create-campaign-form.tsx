@@ -630,7 +630,7 @@ export default function CreateCampaignForm({
             {mediaUrl && !imageLoadError && (
               <div className="mt-2">
                 <p className="text-xs text-muted-foreground mb-2">Preview:</p>
-                <div className="relative w-24 h-24 sm:w-32 sm:h-32 border rounded overflow-hidden bg-white">
+                <div className="relative w-24 h-24 sm:w-32 sm:h-32 border rounded overflow-hidden bg-card">
                   <img
                     src={mediaUrl}
                     alt="Media preview"

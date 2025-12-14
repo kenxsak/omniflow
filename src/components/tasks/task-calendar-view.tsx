@@ -16,9 +16,9 @@ interface TaskCalendarViewProps {
 }
 
 const priorityDotColors: Record<Task['priority'], string> = {
-  High: 'bg-red-500',
-  Medium: 'bg-yellow-500',
-  Low: 'bg-blue-500',
+  High: 'bg-destructive',
+  Medium: 'bg-warning',
+  Low: 'bg-info',
 };
 
 const TaskDot: React.FC<{ priority: Task['priority'] }> = ({ priority }) => (

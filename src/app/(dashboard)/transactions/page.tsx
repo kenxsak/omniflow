@@ -46,9 +46,9 @@ const getStatusBadge = (status: PaymentStatus) => {
 
 const getGatewayBadge = (gateway: 'stripe' | 'razorpay') => {
   if (gateway === 'stripe') {
-    return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200"><CreditCard className="w-3 h-3 mr-1" /> Stripe</Badge>;
+    return <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30"><CreditCard className="w-3 h-3 mr-1" /> Stripe</Badge>;
   }
-  return <Badge variant="outline" className="bg-violet-50 text-violet-700 border-violet-200"><CreditCard className="w-3 h-3 mr-1" /> Razorpay</Badge>;
+  return <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30"><CreditCard className="w-3 h-3 mr-1" /> Razorpay</Badge>;
 };
 
 export default function TransactionsPage() {
@@ -216,49 +216,49 @@ export default function TransactionsPage() {
                   <CheckCircle2 className="w-4 h-4 text-green-500" />
                 </div>
               </div>
-              <div className="text-xl sm:text-2xl font-bold text-green-600">
+              <div className="text-xl sm:text-2xl font-bold text-success">
                 <AnimatedCounter value={stats.succeeded} />
               </div>
             </CardContent>
           </Card>
           
-          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-red-500/50">
+          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-destructive/50">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm text-muted-foreground">Failed</span>
-                <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
-                  <XCircle className="w-4 h-4 text-red-500" />
+                <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
+                  <XCircle className="w-4 h-4 text-destructive" />
                 </div>
               </div>
-              <div className="text-xl sm:text-2xl font-bold text-red-600">
+              <div className="text-xl sm:text-2xl font-bold text-destructive">
                 <AnimatedCounter value={stats.failed} />
               </div>
             </CardContent>
           </Card>
           
-          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-violet-500/50">
+          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-primary/50">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm text-muted-foreground">USD</span>
-                <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
-                  <DollarSign className="w-4 h-4 text-violet-500" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <DollarSign className="w-4 h-4 text-primary" />
                 </div>
               </div>
-              <div className="text-lg sm:text-xl font-bold text-violet-600 truncate">
+              <div className="text-lg sm:text-xl font-bold text-primary truncate">
                 {formatCurrency(stats.totalRevenue.USD, 'USD')}
               </div>
             </CardContent>
           </Card>
           
-          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-purple-500/50 col-span-2 sm:col-span-1">
+          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-primary/50 col-span-2 sm:col-span-1">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm text-muted-foreground">INR</span>
-                <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                  <IndianRupee className="w-4 h-4 text-purple-500" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <IndianRupee className="w-4 h-4 text-primary" />
                 </div>
               </div>
-              <div className="text-lg sm:text-xl font-bold text-purple-600 truncate">
+              <div className="text-lg sm:text-xl font-bold text-primary truncate">
                 {formatCurrency(stats.totalRevenue.INR, 'INR')}
               </div>
             </CardContent>

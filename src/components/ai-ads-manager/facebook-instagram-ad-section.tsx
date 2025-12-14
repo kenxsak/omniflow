@@ -30,7 +30,7 @@ const FacebookInstagramAdSectionComponent: React.FC<FacebookInstagramAdSectionPr
   return (
     <Card ref={facebookAdGeneratorRef}>
       <CardHeader>
-        <CardTitle className="flex items-center"><Facebook className="mr-2 h-5 w-5 text-violet-600" /><Instagram className="mr-2 h-5 w-5 text-pink-500" />Facebook & Instagram Ads Strategist</CardTitle>
+        <CardTitle className="flex items-center"><Facebook className="mr-2 h-5 w-5 text-muted-foreground" /><Instagram className="mr-2 h-5 w-5 text-muted-foreground" />Facebook & Instagram Ads Strategist</CardTitle>
         <CardDescription>
           AI for campaign planning (objectives, audience ideas), generating primary text, headlines, image/video concepts, and CTA suggestions for Meta platforms.
         </CardDescription>

@@ -168,11 +168,11 @@ export default function TestMSG91Page() {
       />
 
       {!company?.apiKeys?.msg91 && (
-        <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-900/20">
-          <AlertTriangle className="h-4 w-4 text-amber-600" />
-          <AlertTitle className="text-amber-900 dark:text-amber-100">MSG91 Setup Required</AlertTitle>
+        <Alert variant="warning">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>MSG91 Setup Required</AlertTitle>
           <AlertDescription className="space-y-3">
-            <p className="text-sm text-amber-800 dark:text-amber-200">
+            <p className="text-sm">
               To test MSG91 SMS, you need to connect your MSG91 account first.
             </p>
             <Button asChild variant="outline" size="sm">
@@ -182,9 +182,9 @@ export default function TestMSG91Page() {
         </Alert>
       )}
 
-      <Alert className="border-red-200 bg-red-50 dark:bg-red-900/20">
-        <AlertTriangle className="h-4 w-4 text-red-600" />
-        <AlertTitle className="text-red-900 dark:text-red-100">⚠️ TRAI Timing Restriction</AlertTitle>
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle>⚠️ TRAI Timing Restriction</AlertTitle>
         <AlertDescription className="space-y-2 text-sm text-red-800 dark:text-red-200">
           <p><strong>Promotional SMS can only be sent between 10:00 AM - 9:00 PM IST</strong></p>
           <p>Messages sent outside this window will be rejected with error code 651 "Blocked Promo Hours"</p>
@@ -288,9 +288,9 @@ export default function TestMSG91Page() {
           )}
 
           {savedTemplates.length === 0 && !isLoadingTemplates && (
-            <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-              <FileText className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-blue-800 dark:text-blue-200 text-sm">
+            <Alert variant="info">
+              <FileText className="h-4 w-4" />
+              <AlertDescription className="text-sm">
                 No saved templates found. You can add templates in the{' '}
                 <Link href="/sms-bulk-campaigns" className="font-medium underline hover:no-underline">
                   SMS Campaigns
@@ -331,9 +331,9 @@ export default function TestMSG91Page() {
             </p>
           </div>
 
-          <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-200 space-y-2">
-            <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">💡 Route Selection</p>
-            <div className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
+          <div className="p-3 bg-info-muted rounded border border-info-border space-y-2">
+            <p className="text-sm font-semibold text-foreground">💡 Route Selection</p>
+            <div className="text-xs text-muted-foreground space-y-1">
               <p>
                 <strong>Transactional:</strong> Same template, sent 24/7 (no timing restrictions)
               </p>
@@ -343,8 +343,8 @@ export default function TestMSG91Page() {
             </div>
           </div>
 
-          <div className="space-y-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded border border-purple-200">
-            <p className="text-sm font-semibold text-purple-900 dark:text-purple-100">Template Variables ({selectedTemplateData?.variables?.length || 0} variable{(selectedTemplateData?.variables?.length || 0) !== 1 ? 's' : ''})</p>
+          <div className="space-y-3 p-3 bg-muted rounded border border-border">
+            <p className="text-sm font-semibold text-foreground">Template Variables ({selectedTemplateData?.variables?.length || 0} variable{(selectedTemplateData?.variables?.length || 0) !== 1 ? 's' : ''})</p>
             
             {selectedTemplateData?.variables && selectedTemplateData.variables.length > 0 && (
               <div className="space-y-2">
@@ -390,10 +390,10 @@ export default function TestMSG91Page() {
           </div>
 
           {selectedTemplateData && (
-            <div className="space-y-2 p-3 bg-amber-50 dark:bg-amber-900/20 rounded border border-amber-200">
-              <p className="text-xs font-semibold text-amber-900 dark:text-amber-100">📝 Message Preview</p>
-              <div className="p-3 bg-white dark:bg-slate-950 rounded border border-amber-200 dark:border-amber-700">
-                <p className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words">
+            <div className="space-y-2 p-3 bg-warning-muted rounded border border-warning-border">
+              <p className="text-xs font-semibold text-warning-muted-foreground">📝 Message Preview</p>
+              <div className="p-3 bg-card rounded border border-warning-border">
+                <p className="text-sm text-foreground whitespace-pre-wrap break-words">
                   {selectedTemplateData.text
                     .replace(/##var1##/g, var1 || '{{variable 1}}')
                     .replace(/##var2##/g, var2 || '{{variable 2}}')
@@ -425,7 +425,7 @@ export default function TestMSG91Page() {
       </Card>
 
       {result && (
-        <Card className={result.success ? 'border-green-200 bg-green-50 dark:bg-green-900/20' : 'border-red-200 bg-red-50 dark:bg-red-900/20'}>
+        <Card className={result.success ? 'border-success/30 bg-success-muted' : 'border-destructive/30 bg-destructive-muted'}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               {result.success ? (
@@ -475,14 +475,14 @@ export default function TestMSG91Page() {
         </Card>
       )}
 
-      <Card className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
+      <Card className="border-info-border bg-info-muted">
         <CardHeader>
           <CardTitle className="text-base">How to Use & Troubleshoot</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
           <div>
-            <p className="font-semibold text-blue-900 dark:text-blue-100 mb-2">✓ How to Send</p>
-            <ol className="list-decimal ml-4 space-y-1 text-sm text-blue-900 dark:text-blue-100">
+            <p className="font-semibold text-foreground mb-2">✓ How to Send</p>
+            <ol className="list-decimal ml-4 space-y-1 text-sm text-muted-foreground">
               <li>Go to MSG91 Dashboard → Templates → Click your template</li>
               <li>Copy the <strong>Template ID</strong> (alphanumeric code like 692479929146c72555716eea)</li>
               <li>Paste it in the "MSG91 Template ID" field above</li>
@@ -498,9 +498,9 @@ export default function TestMSG91Page() {
             </ol>
           </div>
 
-          <Alert className="bg-white dark:bg-blue-950 border-blue-200">
-            <AlertTriangle className="h-4 w-4 text-blue-600" />
-            <AlertDescription className="text-xs text-blue-800 dark:text-blue-200 space-y-2">
+          <Alert variant="info">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription className="text-xs space-y-2">
               <p><strong>💡 Pro Tip: Avoid Timing Issues</strong></p>
               <p className="mt-2">If you keep getting "Blocked Promo Hours" errors:</p>
               <ul className="list-disc ml-4 space-y-1 mt-1">

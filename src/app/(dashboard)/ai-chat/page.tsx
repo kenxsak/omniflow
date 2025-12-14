@@ -250,26 +250,26 @@ export default function AIChatPage() {
 
       {/* Info Banner */}
       <Animated animation="fadeUp">
-        <div className="p-4 sm:p-5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+        <div className="p-4 sm:p-5 bg-info-muted border border-info-border rounded-xl">
           <div className="flex flex-col sm:flex-row items-start gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0">
-              <Icon icon="solar:magic-stick-3-linear" className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <div className="w-10 h-10 rounded-lg bg-info/10 flex items-center justify-center flex-shrink-0">
+              <Icon icon="solar:magic-stick-3-linear" className="h-5 w-5 text-info" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1 text-sm sm:text-base">
+              <h3 className="font-semibold text-foreground mb-1 text-sm sm:text-base">
                 New Agent-Based Interface
               </h3>
-              <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 mb-3">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-3">
                 We've organized AI features into specialized agents for easier discovery. Your classic tools are still available!
               </p>
               <div className="flex flex-wrap gap-2">
                 <Link href="/social-media">
-                  <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9 border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/50">
+                  <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9">
                     Classic Content Factory
                   </Button>
                 </Link>
                 <Link href="/ai-campaign-manager">
-                  <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9 border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/50">
+                  <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 sm:h-9">
                     Classic Ad Manager
                   </Button>
                 </Link>

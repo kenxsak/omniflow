@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import PageTitle from '@/components/ui/page-title';
 import type { Lead } from '@/lib/mock-data';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, Eye } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { AppointmentDialog } from '@/components/appointments/appointment-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 
 interface PipelineClientProps {
   leadsByStatus: Record<Lead['status'], Lead[]>;
@@ -31,69 +31,187 @@ export function PipelineClient({ leadsByStatus, statuses }: PipelineClientProps)
     setAppointmentDialogOpen(true);
   };
 
-  const statusColors: Record<Lead['status'], string> = {
-    New: 'border-blue-500',
-    Contacted: 'border-yellow-500',
-    Qualified: 'border-green-500',
-    Lost: 'border-red-500',
-    Won: 'border-purple-500',
+  // Clerk-style status dots (subtle colored dots, not backgrounds)
+  const statusDotColors: Record<Lead['status'], string> = {
+    New: 'bg-blue-300 border-blue-700',
+    Contacted: 'bg-amber-300 border-amber-700',
+    Qualified: 'bg-emerald-300 border-emerald-700',
+    Won: 'bg-violet-300 border-violet-700',
+    Lost: 'bg-rose-300 border-rose-700',
   };
 
+  const statusIcons: Record<Lead['status'], string> = {
+    New: 'solar:star-linear',
+    Contacted: 'solar:phone-calling-linear',
+    Qualified: 'solar:check-circle-linear',
+    Won: 'solar:cup-star-linear',
+    Lost: 'solar:close-circle-linear',
+  };
+
+  // Lead card component - Clerk style
+  const LeadCard = ({ lead, showActions = true }: { lead: Lead; showActions?: boolean }) => (
+    <div 
+      key={lead.id} 
+      className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3 cursor-pointer transition-all hover:bg-stone-50 dark:hover:bg-stone-900/50"
+      onClick={() => handleLeadClick(lead.id)}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <div className="font-medium truncate text-sm text-foreground">{lead.name}</div>
+          <div className="text-xs text-muted-foreground truncate">{lead.email}</div>
+          {lead.phone && (
+            <div className="text-xs text-muted-foreground truncate mt-0.5">{lead.phone}</div>
+          )}
+        </div>
+        {/* Status indicator */}
+        <span className="flex items-center gap-1 shrink-0">
+          <span className={cn(
+            "size-1.5 border-[1.5px] rounded-full",
+            statusDotColors[lead.status]
+          )} />
+          <span className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground font-mono">
+            {lead.status}
+          </span>
+        </span>
+      </div>
+      {showActions && (
+        <div className="flex gap-1 mt-2.5 pt-2.5 border-t border-stone-200 dark:border-stone-800">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs flex-1 hover:bg-stone-100 dark:hover:bg-stone-800"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleLeadClick(lead.id);
+            }}
+          >
+            <Icon icon="solar:eye-linear" className="h-3 w-3 mr-1 text-muted-foreground" />
+            View
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs flex-1 hover:bg-stone-100 dark:hover:bg-stone-800"
+            onClick={(e) => handleScheduleAppointment(lead, e)}
+          >
+            <Icon icon="solar:calendar-linear" className="h-3 w-3 mr-1 text-muted-foreground" />
+            Book
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+
   return (
-    <div className="space-y-6">
-      <PageTitle title="Pipeline" description="Visualize your sales pipeline" />
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
+      {/* Header - Clerk style */}
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-lg sm:text-xl font-semibold text-foreground">Pipeline</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
+          Visualize your sales pipeline
+        </p>
+      </div>
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      {/* Summary Stats - Clerk style cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
         {statuses.map(status => (
-          <Card key={status} className={`border-t-4 ${statusColors[status]}`}>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">{status}</CardTitle>
-              <div className="text-2xl font-bold">{leadsByStatus[status].length}</div>
-            </CardHeader>
-            <CardContent>
+          <div 
+            key={status} 
+            className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden"
+          >
+            {/* Accent bar */}
+            <div className="absolute inset-x-6 sm:inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            
+            <div className="p-3 sm:p-4 pt-4 sm:pt-5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                  {status.toUpperCase()}
+                </span>
+                <Icon icon={statusIcons[status]} className="h-4 w-4 text-muted-foreground/60" />
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">
+                  {leadsByStatus[status].length}
+                </span>
+                {/* Status dot indicator */}
+                <span className="flex items-center gap-1">
+                  <span className={cn(
+                    "size-1.5 sm:size-2 border-[1.5px] rounded-full",
+                    statusDotColors[status]
+                  )} />
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Mobile: Tabs View */}
+      <div className="block lg:hidden">
+        <Tabs defaultValue={statuses[0]} className="w-full">
+          <TabsList className="w-full grid grid-cols-5 h-auto p-1 bg-stone-100 dark:bg-stone-900 rounded-xl">
+            {statuses.map(status => (
+              <TabsTrigger 
+                key={status} 
+                value={status}
+                className="text-[9px] sm:text-[10px] py-2 px-1 rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-stone-800"
+              >
+                <span className="flex items-center gap-1">
+                  <span className={cn(
+                    "size-1.5 border-[1.5px] rounded-full",
+                    statusDotColors[status]
+                  )} />
+                  <span className="truncate">{status}</span>
+                </span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {statuses.map(status => (
+            <TabsContent key={status} value={status} className="mt-4">
               <div className="space-y-2">
-                {leadsByStatus[status].slice(0, 5).map(lead => (
-                  <div 
-                    key={lead.id} 
-                    className="text-sm border rounded-md p-2 cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors group"
-                  >
-                    <div 
-                      onClick={() => handleLeadClick(lead.id)}
-                      className="flex flex-col"
-                    >
-                      <div className="font-medium truncate">{lead.name}</div>
-                      <div className="text-xs text-muted-foreground truncate">{lead.email}</div>
-                    </div>
-                    <div className="flex gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-xs"
-                        onClick={() => handleLeadClick(lead.id)}
-                      >
-                        <Eye className="h-3 w-3 mr-1" />
-                        View
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-xs"
-                        onClick={(e) => handleScheduleAppointment(lead, e)}
-                      >
-                        <Calendar className="h-3 w-3 mr-1" />
-                        Schedule
-                      </Button>
-                    </div>
+                {leadsByStatus[status].length === 0 ? (
+                  <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-6 text-center">
+                    <Icon icon={statusIcons[status]} className="h-8 w-8 mx-auto text-muted-foreground/40 mb-2" />
+                    <p className="text-sm text-muted-foreground">No leads</p>
                   </div>
-                ))}
-                {leadsByStatus[status].length > 5 && (
-                  <div className="text-xs text-muted-foreground text-center pt-2">
-                    +{leadsByStatus[status].length - 5} more
-                  </div>
+                ) : (
+                  leadsByStatus[status].map(lead => (
+                    <LeadCard key={lead.id} lead={lead} />
+                  ))
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </TabsContent>
+          ))}
+        </Tabs>
+      </div>
+
+      {/* Desktop: Grid View */}
+      <div className="hidden lg:grid lg:grid-cols-5 gap-3">
+        {statuses.map(status => (
+          <div key={status} className="space-y-3">
+            {/* Column header - Clerk style */}
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
+              <span className={cn(
+                "size-2 border-[1.5px] rounded-full",
+                statusDotColors[status]
+              )} />
+              <span className="font-medium text-sm text-foreground">{status}</span>
+              <span className="ml-auto text-xs font-mono text-muted-foreground">
+                {leadsByStatus[status].length}
+              </span>
+            </div>
+            <div className="space-y-2 max-h-[60vh] overflow-y-auto scrollbar-thin pr-1">
+              {leadsByStatus[status].length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground text-sm">
+                  No leads
+                </div>
+              ) : (
+                leadsByStatus[status].map(lead => (
+                  <LeadCard key={lead.id} lead={lead} showActions={false} />
+                ))
+              )}
+            </div>
+          </div>
         ))}
       </div>
 

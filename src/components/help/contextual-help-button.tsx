@@ -1,8 +1,8 @@
 "use client";
 
-import { HelpCircle, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { AppIcon } from "@/components/ui/app-icon";
 import { HelpPanel } from "./help-panel";
 import { cn } from "@/lib/utils";
 import { type PageId } from "@/lib/help-content";
@@ -44,11 +44,7 @@ export function ContextualHelpButton({
         )}
         aria-label={isOpen ? "Close help" : "Open help"}
       >
-        {isOpen ? (
-          <X className="h-5 w-5" />
-        ) : (
-          <HelpCircle className="h-5 w-5" />
-        )}
+        <AppIcon name={isOpen ? "x" : "help"} size={20} />
       </Button>
 
       <HelpPanel pageId={pageId} isOpen={isOpen} onClose={() => setIsOpen(false)} />

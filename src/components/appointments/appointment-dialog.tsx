@@ -7,6 +7,8 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogBody,
+  DialogCloseButton,
 } from '@/components/ui/dialog';
 import { AppointmentForm } from './appointment-form';
 import { useAuth } from '@/contexts/auth-context';
@@ -36,7 +38,7 @@ export function AppointmentDialog({
 }: AppointmentDialogProps) {
   const { appUser } = useAuth();
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting] = useState(false);
 
   const handleSubmit = async (data: CreateAppointmentInput | UpdateAppointmentInput) => {
     if (!appUser?.idToken) {
@@ -48,7 +50,6 @@ export function AppointmentDialog({
       return;
     }
 
-    setIsSubmitting(true);
     try {
       const appointmentData = {
         ...(data as CreateAppointmentInput),
@@ -81,15 +82,13 @@ export function AppointmentDialog({
         description: 'Failed to create appointment. Please try again.',
         variant: 'destructive',
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader className="relative">
           <DialogTitle>
             {contact ? `Schedule Appointment with ${contact.name}` : 'Schedule New Appointment'}
           </DialogTitle>
@@ -98,12 +97,15 @@ export function AppointmentDialog({
               ? 'Contact details are pre-filled. Set the appointment date, time, and reminders.'
               : 'Create a new appointment with reminder settings'}
           </DialogDescription>
+          <DialogCloseButton />
         </DialogHeader>
-        <AppointmentForm
-          defaultContact={contact}
-          onSubmit={handleSubmit}
-          onCancel={() => onOpenChange(false)}
-        />
+        <DialogBody className="max-h-[60vh] overflow-y-auto">
+          <AppointmentForm
+            defaultContact={contact}
+            onSubmit={handleSubmit}
+            onCancel={() => onOpenChange(false)}
+          />
+        </DialogBody>
       </DialogContent>
     </Dialog>
   );

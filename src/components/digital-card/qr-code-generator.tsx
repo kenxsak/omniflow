@@ -85,12 +85,12 @@ export default function QRCodeGenerator({
         </DialogHeader>
         <div className="flex flex-col items-center gap-4 py-4">
           {generating ? (
-            <div className="w-64 h-64 flex items-center justify-center bg-gray-100 rounded-lg">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+            <div className="w-64 h-64 flex items-center justify-center bg-muted rounded-lg">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-foreground"></div>
             </div>
           ) : qrCodeDataUrl ? (
             <>
-              <div className="bg-white p-4 rounded-lg shadow-sm border">
+              <div className="bg-card p-4 rounded-lg shadow-sm border">
                 <img
                   src={qrCodeDataUrl}
                   alt={`QR Code for ${cardName}`}
@@ -102,7 +102,7 @@ export default function QRCodeGenerator({
                   <Download className="h-4 w-4 mr-2" />
                   Download QR Code (PNG)
                 </Button>
-                <p className="text-xs text-center text-gray-500 mt-2">
+                <p className="text-xs text-center text-muted-foreground mt-2">
                   Print this QR code on business cards, flyers, or posters
                 </p>
               </div>

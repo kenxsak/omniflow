@@ -263,7 +263,7 @@ export default function AdvancedAnalyticsPage() {
                 Refresh
               </Button>
               
-              <Button onClick={handleExport} variant="default" disabled={!metrics} className="bg-gradient-to-r from-primary to-accent hover:opacity-90">
+              <Button onClick={handleExport} variant="default" disabled={!metrics}>
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
@@ -289,7 +289,7 @@ export default function AdvancedAnalyticsPage() {
               <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             </Button>
             
-            <Button onClick={handleExport} size="sm" disabled={!metrics} className="flex-shrink-0 h-9 bg-gradient-to-r from-primary to-accent">
+            <Button onClick={handleExport} size="sm" disabled={!metrics} variant="default" className="flex-shrink-0 h-9">
               <Download className="h-4 w-4 mr-1.5" />
               Export
             </Button>

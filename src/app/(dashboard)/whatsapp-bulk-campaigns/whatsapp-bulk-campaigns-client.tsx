@@ -182,10 +182,10 @@ export default function WhatsAppBulkCampaignsClient() {
       </div>
 
       {campaigns.length === 0 && !isLoadingCampaigns && (
-        <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-900/20 py-3 sm:py-4">
-          <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-          <AlertTitle className="text-blue-900 dark:text-blue-100 text-sm sm:text-base">Quick Start Guide</AlertTitle>
-          <AlertDescription className="text-blue-800 dark:text-blue-200">
+        <Alert variant="info" className="py-3 sm:py-4">
+          <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
+          <AlertTitle className="text-sm sm:text-base">Quick Start Guide</AlertTitle>
+          <AlertDescription>
             <div className="space-y-2 mt-2">
               <p className="text-xs sm:text-sm">To send your first WhatsApp message to many people:</p>
               <ol className="text-xs sm:text-sm space-y-1 ml-4 list-decimal">
@@ -213,14 +213,14 @@ export default function WhatsAppBulkCampaignsClient() {
       )}
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'campaigns' | 'create')}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="campaigns" className="text-xs sm:text-sm">
-            <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-            <span className="hidden xs:inline">My </span>Campaigns
+        <TabsList className="rounded-t-xl">
+          <TabsTrigger value="campaigns">
+            <Users className="h-4 w-4" />
+            My Campaigns
           </TabsTrigger>
-          <TabsTrigger value="create" className="text-xs sm:text-sm">
-            <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-            Create<span className="hidden xs:inline"> Campaign</span>
+          <TabsTrigger value="create">
+            <Plus className="h-4 w-4" />
+            Create Campaign
           </TabsTrigger>
         </TabsList>
 

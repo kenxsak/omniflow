@@ -19,15 +19,15 @@ const getTwilioMessageStatusClass = (status: TwilioMessage['status']) => {
   switch (status?.toLowerCase()) {
     case 'sent':
     case 'delivered':
-      return 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300';
+      return 'bg-success-muted text-success-muted-foreground';
     case 'queued':
     case 'sending':
-      return 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 animate-pulse';
+      return 'bg-info-muted text-info-muted-foreground animate-pulse';
     case 'failed':
     case 'undelivered':
-      return 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300';
+      return 'bg-destructive-muted text-destructive-muted-foreground';
     default: // e.g., receiving, accepted
-      return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300';
+      return 'bg-warning-muted text-warning-muted-foreground';
   }
 };
 
@@ -35,15 +35,15 @@ const getTwilioMessageStatusIcon = (status: TwilioMessage['status']) => {
   switch (status?.toLowerCase()) {
     case 'sent':
     case 'delivered':
-      return <CheckCircle className="h-4 w-4 text-green-600" />;
+      return <CheckCircle className="h-4 w-4 text-success" />;
     case 'queued':
     case 'sending':
-       return <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />;
+       return <Loader2 className="h-4 w-4 text-info animate-spin" />;
     case 'failed':
     case 'undelivered':
-      return <XCircle className="h-4 w-4 text-red-600" />;
+      return <XCircle className="h-4 w-4 text-destructive" />;
     default:
-      return <MessageSquare className="h-4 w-4 text-yellow-600" />;
+      return <MessageSquare className="h-4 w-4 text-warning" />;
   }
 }
 
@@ -183,8 +183,8 @@ export default function TwilioSmsList() {
                     <TableRow key={msg.sid}>
                       <TableCell>
                           {msg.direction.startsWith('outbound') ? 
-                              <ArrowRight className="h-4 w-4 text-blue-500" title="Outbound" /> : 
-                              <ArrowLeft className="h-4 w-4 text-green-500" title="Inbound" />}
+                              <ArrowRight className="h-4 w-4 text-info" title="Outbound" /> : 
+                              <ArrowLeft className="h-4 w-4 text-success" title="Inbound" />}
                       </TableCell>
                       <TableCell className="font-medium">{msg.from}</TableCell>
                       <TableCell>{msg.to}</TableCell>

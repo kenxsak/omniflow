@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Copy, Check, Code2, Info, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
+import { Icon } from '@iconify/react';
+import { CodeBlock } from '@/components/ui/code-block';
 import { generateWidgetEmbedCode } from '@/app/actions/voice-chat-actions';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -20,9 +19,6 @@ export default function WidgetEmbedCode({ cardId, enabled }: WidgetEmbedCodeProp
   const [embedCode, setEmbedCode] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [copyError, setCopyError] = useState<string | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (enabled && firebaseUser) {
@@ -56,39 +52,15 @@ export default function WidgetEmbedCode({ cardId, enabled }: WidgetEmbedCodeProp
     }
   };
 
-  const copyToClipboard = async () => {
-    setCopyError(null);
-    
-    try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(embedCode);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } else {
-        if (textareaRef.current) {
-          textareaRef.current.select();
-          document.execCommand('copy');
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        } else {
-          setCopyError('Unable to copy automatically. Please select the text and copy manually (Ctrl+C or Cmd+C)');
-        }
-      }
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      setCopyError('Copy failed. Please select the text and copy manually (Ctrl+C or Cmd+C)');
-    }
-  };
-
   if (!enabled) {
     return null;
   }
 
   return (
-    <Card className="mt-6 border-purple-200 bg-purple-50/30">
+    <Card className="mt-6 border-border bg-card">
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Code2 className="h-5 w-5 text-purple-600" />
+          <Icon icon="solar:code-linear" className="h-5 w-5 text-muted-foreground" />
           <CardTitle className="text-lg">Widget Embed Code</CardTitle>
         </div>
         <CardDescription>
@@ -98,73 +70,44 @@ export default function WidgetEmbedCode({ cardId, enabled }: WidgetEmbedCodeProp
       <CardContent className="space-y-4">
         {error && (
           <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
         {loading ? (
           <div className="text-center py-8 text-muted-foreground">
-            <div className="animate-spin h-6 w-6 border-2 border-purple-600 border-t-transparent rounded-full mx-auto mb-2"></div>
+            <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
             Generating embed code...
           </div>
         ) : embedCode ? (
           <>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label>Code Snippet</Label>
-                <Button
-                  onClick={copyToClipboard}
-                  size="sm"
-                  variant="outline"
-                  className="gap-2"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="h-4 w-4" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4" />
-                      Copy Code
-                    </>
-                  )}
-                </Button>
+            <CodeBlock 
+              code={embedCode} 
+              language="html" 
+              showLineNumbers 
+            />
+
+            <div className="p-4 bg-muted/50 border border-border rounded-lg">
+              <div className="flex items-start gap-2 mb-3">
+                <Icon icon="solar:info-circle-linear" className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
+                <span className="font-medium text-sm text-foreground">Installation Instructions</span>
               </div>
-              <Textarea
-                ref={textareaRef}
-                value={embedCode}
-                readOnly
-                rows={12}
-                className="font-mono text-xs bg-slate-900 text-green-400 border-slate-700"
-              />
-              {copyError && (
-                <Alert variant="destructive" className="mt-2">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription className="text-sm">{copyError}</AlertDescription>
-                </Alert>
-              )}
+              <ol className="list-decimal list-inside space-y-1.5 text-xs text-muted-foreground ml-6">
+                <li>Copy the code snippet above using the "Copy" button</li>
+                <li>Paste this code just before the closing <code className="bg-stone-800 text-stone-300 px-1.5 py-0.5 rounded text-[10px] font-mono">&lt;/body&gt;</code> tag</li>
+                <li>The widget automatically uses your brand colors and settings</li>
+                <li>It loads as a secure iframe that won't interfere with your website</li>
+              </ol>
             </div>
 
-            <Alert className="bg-blue-50 border-blue-200">
-              <Info className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-sm text-blue-900">
-                <div className="font-semibold mb-2">Installation Instructions:</div>
-                <ol className="list-decimal list-inside space-y-1 text-xs">
-                  <li>Copy the code snippet above using the "Copy Code" button</li>
-                  <li>Paste this code just before the closing <code className="bg-blue-100 px-1 rounded">&lt;/body&gt;</code> tag on pages where you want the chatbot</li>
-                  <li>The widget automatically uses your brand colors and settings from the General tab</li>
-                  <li>It loads as a secure iframe that won't interfere with your website's design</li>
-                </ol>
-              </AlertDescription>
-            </Alert>
-
-            <div className="p-3 bg-green-50 border border-green-200 rounded-md">
-              <p className="text-sm text-green-800 font-medium">
-                ✓ Your widget is ready to use
+            <div className="p-3 bg-muted/50 border border-border rounded-lg">
+              <p className="text-sm text-foreground font-medium flex items-center gap-2">
+                <Icon icon="solar:check-circle-linear" className="h-4 w-4 text-primary" />
+                Your widget is ready to use
               </p>
-              <p className="text-xs text-green-700 mt-1">
-                Visitors can chat with your AI assistant in 109 languages. All conversations automatically create leads in your CRM with full chat history.
+              <p className="text-xs text-muted-foreground mt-1 ml-6">
+                Visitors can chat with your AI assistant in 109 languages. All conversations automatically create leads in your CRM.
               </p>
             </div>
           </>

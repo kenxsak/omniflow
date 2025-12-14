@@ -29,11 +29,11 @@ interface LeadTableProps {
 }
 
 const statusColors: Record<Lead['status'], string> = {
-  New: 'bg-blue-500 hover:bg-blue-600',
-  Contacted: 'bg-yellow-500 hover:bg-yellow-600',
-  Qualified: 'bg-green-500 hover:bg-green-600',
-  Lost: 'bg-red-500 hover:bg-red-600',
-  Won: 'bg-purple-500 hover:bg-purple-600',
+  New: 'bg-info hover:bg-info/90',
+  Contacted: 'bg-warning hover:bg-warning/90',
+  Qualified: 'bg-success hover:bg-success/90',
+  Lost: 'bg-destructive hover:bg-destructive/90',
+  Won: 'bg-primary hover:bg-primary/90',
 };
 
 export default function LeadTable({

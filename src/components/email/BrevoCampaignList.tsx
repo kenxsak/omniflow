@@ -19,17 +19,17 @@ import { useAuth } from '@/hooks/use-auth';
 const getBrevoCampaignStatusClass = (status: BrevoAPICampaign['status']) => {
   switch (status?.toLowerCase()) {
     case 'sent':
-      return 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300';
+      return 'bg-success-muted text-success-muted-foreground';
     case 'draft':
-      return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300';
+      return 'bg-warning-muted text-warning-muted-foreground';
     case 'queued':
     case 'inprocess': 
-      return 'bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-300 animate-pulse';
+      return 'bg-primary/10 text-primary animate-pulse';
     case 'suspended':
     case 'archive':
-      return 'bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300';
+      return 'bg-muted text-muted-foreground';
     default: 
-      return 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300'; 
+      return 'bg-primary/10 text-primary'; 
   }
 };
 

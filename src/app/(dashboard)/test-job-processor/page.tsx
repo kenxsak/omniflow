@@ -57,7 +57,7 @@ export default function TestJobProcessorPage() {
         </p>
       </div>
 
-      <Card className="mb-6 border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
+      <Card className="mb-6 border-warning/30 bg-warning-muted">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Info className="h-5 w-5 text-yellow-600" />

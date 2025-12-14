@@ -53,8 +53,8 @@ const UPGRADE_RECOMMENDATIONS = {
       '10 team members'
     ],
     icon: TrendingUp,
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-50'
+    color: 'text-primary',
+    bgColor: 'bg-primary/10'
   },
   pro: {
     suggestedPlan: 'Enterprise',
@@ -68,8 +68,8 @@ const UPGRADE_RECOMMENDATIONS = {
       '50+ team members'
     ],
     icon: Sparkles,
-    color: 'text-amber-600',
-    bgColor: 'bg-amber-50'
+    color: 'text-warning',
+    bgColor: 'bg-warning-muted'
   },
   enterprise: {
     suggestedPlan: 'Custom Plan',
@@ -83,8 +83,8 @@ const UPGRADE_RECOMMENDATIONS = {
       'Custom integrations'
     ],
     icon: Sparkles,
-    color: 'text-green-600',
-    bgColor: 'bg-green-50'
+    color: 'text-success',
+    bgColor: 'bg-success-muted'
   }
 };
 
@@ -111,10 +111,10 @@ export default function AIUpgradePrompt({
   // Soft warning (80-95% usage)
   if (!isHardLimit && usagePercent < 100) {
     return (
-      <Alert className="border-orange-200 bg-orange-50">
-        <AlertTriangle className="h-4 w-4 text-orange-600" />
-        <AlertTitle className="text-orange-900">Running Low on AI Credits</AlertTitle>
-        <AlertDescription className="text-orange-800">
+      <Alert className="border-warning-border bg-warning-muted">
+        <AlertTriangle className="h-4 w-4 text-warning" />
+        <AlertTitle className="text-warning-muted-foreground">Running Low on AI Credits</AlertTitle>
+        <AlertDescription className="text-warning-muted-foreground">
           <p className="mb-2">
             You've used <strong>{creditsLimit - creditsRemaining}</strong> of <strong>{creditsLimit}</strong> AI credits this month ({usagePercent}%).
           </p>
@@ -191,10 +191,10 @@ export default function AIUpgradePrompt({
   // Banner variant for top-of-page warnings
   if (variant === 'banner') {
     return (
-      <Alert className="border-orange-200 bg-orange-50 mb-4">
-        <AlertTriangle className="h-4 w-4 text-orange-600" />
-        <AlertTitle className="text-orange-900">AI Credit Limit Reached</AlertTitle>
-        <AlertDescription className="text-orange-800">
+      <Alert className="border-warning-border bg-warning-muted mb-4">
+        <AlertTriangle className="h-4 w-4 text-warning" />
+        <AlertTitle className="text-warning-muted-foreground">AI Credit Limit Reached</AlertTitle>
+        <AlertDescription className="text-warning-muted-foreground">
           <div className="flex items-center justify-between gap-4">
             <p>
               You've used all {creditsLimit} AI credits this month. 
@@ -239,7 +239,7 @@ export function AIOperationCostPreview({
     <Card className="border-violet-200 bg-violet-50">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
-          <Zap className="h-4 w-4 text-violet-600" />
+          <Zap className="h-4 w-4 text-muted-foreground" />
           AI Credit Cost
         </CardTitle>
       </CardHeader>
@@ -258,9 +258,9 @@ export function AIOperationCostPreview({
           </div>
 
           {willExceed && (
-            <Alert className="border-orange-200 bg-orange-50">
-              <AlertTriangle className="h-4 w-4 text-orange-600" />
-              <AlertDescription className="text-xs text-orange-800">
+            <Alert className="border-warning-border bg-warning-muted">
+              <AlertTriangle className="h-4 w-4 text-warning" />
+              <AlertDescription className="text-xs text-warning-muted-foreground">
                 This will exceed your monthly limit. You may be charged overage fees or blocked depending on your plan.
               </AlertDescription>
             </Alert>

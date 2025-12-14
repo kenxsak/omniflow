@@ -184,8 +184,8 @@ export function Step4Success({ completedSteps, onComplete }: Step4SuccessProps) 
               </Button>
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg p-4">
-              <p className="text-sm text-blue-900 dark:text-blue-100">
+            <div className="bg-info-muted border border-info-border rounded-lg p-4">
+              <p className="text-sm text-info-muted-foreground">
                 <strong>💡 Pro Tip:</strong> Check out the AI Chat for help creating email campaigns, social media posts, and more!
               </p>
             </div>

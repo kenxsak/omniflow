@@ -243,8 +243,8 @@ export function DashboardClient({
       {isManagerOrAdmin && hasTeamMembers && (
         <div className="mt-8">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <UsersRound className="h-5 w-5 text-primary" />
+            <div className="h-8 w-8 rounded-xl bg-muted/60 dark:bg-white/[0.06] flex items-center justify-center">
+              <UsersRound className="h-4 w-4 text-muted-foreground" />
             </div>
             <div>
               <h2 className="text-xl font-semibold">Team Performance</h2>

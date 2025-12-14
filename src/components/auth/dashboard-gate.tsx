@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { getCompany } from '@/lib/saas-data';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
@@ -62,29 +62,38 @@ export default function DashboardGate({ children }: { children: React.ReactNode 
   const router = useRouter();
   const [companyStatus, setCompanyStatus] = useState<'loading' | 'active' | 'paused' | 'inactive'>('loading');
   const [onboardingChecked, setOnboardingChecked] = useState(false);
+  const [initialCheckDone, setInitialCheckDone] = useState(false);
+
+  // Memoize redirect check to prevent unnecessary re-renders
+  const shouldRedirectToLogin = useMemo(() => !loading && !appUser, [loading, appUser]);
 
   useEffect(() => {
-    if (loading) return;
-
-    if (!appUser) {
+    if (shouldRedirectToLogin) {
       router.push('/login');
     }
-  }, [appUser, loading, router]);
+  }, [shouldRedirectToLogin, router]);
   
-  useEffect(() => {
-      const checkCompanyStatus = async () => {
-          if (appUser?.companyId) {
-              setCompanyStatus('loading');
-              const userCompany = await getCompany(appUser.companyId);
-              setCompanyStatus(userCompany?.status || 'paused');
-          } else if (appUser && !appUser.companyId) {
-              setCompanyStatus('paused');
-          }
-      };
-      if (!loading && appUser) {
-          checkCompanyStatus();
+  // Optimized company status check with caching
+  const checkCompanyStatus = useCallback(async () => {
+    if (appUser?.companyId) {
+      // Don't show loading if we already have a status
+      if (!initialCheckDone) {
+        setCompanyStatus('loading');
       }
-  }, [appUser, loading]);
+      const userCompany = await getCompany(appUser.companyId);
+      setCompanyStatus(userCompany?.status || 'paused');
+      setInitialCheckDone(true);
+    } else if (appUser && !appUser.companyId) {
+      setCompanyStatus('paused');
+      setInitialCheckDone(true);
+    }
+  }, [appUser, initialCheckDone]);
+
+  useEffect(() => {
+    if (!loading && appUser) {
+      checkCompanyStatus();
+    }
+  }, [appUser, loading, checkCompanyStatus]);
 
   useEffect(() => {
     if (loading || !company || onboardingChecked || isSuperAdmin) return;
@@ -99,10 +108,14 @@ export default function DashboardGate({ children }: { children: React.ReactNode 
     setOnboardingChecked(true);
   }, [company, loading, router, onboardingChecked, isSuperAdmin]);
 
-  if (loading || (appUser && companyStatus === 'loading')) {
+  // Show minimal loading state - faster perceived performance
+  if (loading || (appUser && companyStatus === 'loading' && !initialCheckDone)) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <span className="text-xs text-muted-foreground">Loading...</span>
+        </div>
       </div>
     );
   }

@@ -147,7 +147,7 @@ export function VariableMapping({ template, provider, contacts = [], onMappingsC
     const pattern = provider === 'msg91' ? /##[^#]+##/g : /\{#[^}]+#\}/g;
     
     result = result.replace(pattern, (match) => {
-      return `<span class="bg-yellow-200 dark:bg-yellow-800 px-1 rounded font-medium">${match}</span>`;
+      return `<span class="bg-warning-muted text-warning-muted-foreground px-1 rounded font-medium">${match}</span>`;
     });
     
     return result;
@@ -159,9 +159,9 @@ export function VariableMapping({ template, provider, contacts = [], onMappingsC
 
   if (parsedVariables.count === 0) {
     return (
-      <Card className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
+      <Card className="border-info-border bg-info-muted">
         <CardContent className="pt-4">
-          <p className="text-sm text-blue-800 dark:text-blue-200">
+          <p className="text-sm text-foreground">
             This template has no variables to map. The message will be sent as-is to all recipients.
           </p>
         </CardContent>
@@ -187,7 +187,7 @@ export function VariableMapping({ template, provider, contacts = [], onMappingsC
           {mappings.map((mapping, index) => (
             <div key={index} className="space-y-2 p-3 bg-muted/50 rounded-lg">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="font-mono text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                <Badge variant="warning" className="font-mono text-xs">
                   {mapping.placeholder}
                 </Badge>
                 <span className="text-sm text-muted-foreground">
@@ -255,26 +255,26 @@ export function VariableMapping({ template, provider, contacts = [], onMappingsC
         </CardContent>
       </Card>
 
-      <Card className="border-green-200 bg-green-50 dark:bg-green-900/20">
+      <Card className="border-success-border bg-success-muted">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm text-green-900 dark:text-green-100">
+          <CardTitle className="text-sm text-success-muted-foreground">
             📋 Template Preview
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div>
-            <p className="text-xs font-medium text-green-700 dark:text-green-300 mb-1">Original Template:</p>
+            <p className="text-xs font-medium text-success-muted-foreground mb-1">Original Template:</p>
             <div 
-              className="text-sm text-green-800 dark:text-green-200 p-2 bg-white dark:bg-green-950 rounded border border-green-200 dark:border-green-800"
+              className="text-sm text-foreground p-2 bg-card rounded border border-success-border"
               dangerouslySetInnerHTML={{ __html: highlightedTemplate || '' }}
             />
           </div>
           
           <div>
-            <p className="text-xs font-medium text-green-700 dark:text-green-300 mb-1">
+            <p className="text-xs font-medium text-success-muted-foreground mb-1">
               Preview ({contacts[0]?.name || 'Sample Contact'}):
             </p>
-            <div className="text-sm text-green-800 dark:text-green-200 p-2 bg-white dark:bg-green-950 rounded border border-green-200 dark:border-green-800">
+            <div className="text-sm text-foreground p-2 bg-card rounded border border-success-border">
               {previewMessage}
             </div>
           </div>

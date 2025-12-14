@@ -887,10 +887,10 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
   return (
     <div className="space-y-4">
       {campaigns.length === 0 && !isLoadingCampaigns && (
-        <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-          <Sparkles className="h-5 w-5 text-blue-600" />
-          <AlertTitle className="text-blue-900 dark:text-blue-100">Quick Start Guide</AlertTitle>
-          <AlertDescription className="text-blue-800 dark:text-blue-200">
+        <Alert variant="info">
+          <Sparkles className="h-5 w-5" />
+          <AlertTitle>Quick Start Guide</AlertTitle>
+          <AlertDescription>
             <div className="space-y-2 mt-2">
               <p className="text-sm">To send your first SMS bulk campaign:</p>
               <ol className="text-sm space-y-1 ml-4 list-decimal">
@@ -1049,11 +1049,11 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Sent</p>
-                      <p className="font-medium text-green-600">{selectedCampaign.stats.sent}</p>
+                      <p className="font-medium text-success">{selectedCampaign.stats.sent}</p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Failed</p>
-                      <p className="font-medium text-red-600">{selectedCampaign.stats.failed}</p>
+                      <p className="font-medium text-destructive">{selectedCampaign.stats.failed}</p>
                     </div>
                   </div>
 
@@ -1121,19 +1121,19 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                     <SelectContent>
                       <SelectItem value="msg91">
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="bg-green-50">MSG91</Badge>
+                          <Badge variant="outline" className="bg-success-muted">MSG91</Badge>
                           <Badge variant="secondary" className="text-xs">India + Global</Badge>
                         </div>
                       </SelectItem>
                       <SelectItem value="fast2sms">
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="bg-blue-50">Fast2SMS</Badge>
+                          <Badge variant="outline" className="bg-info-muted">Fast2SMS</Badge>
                           <Badge variant="secondary" className="text-xs">India Only</Badge>
                         </div>
                       </SelectItem>
                       <SelectItem value="twilio">
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="bg-red-50">Twilio</Badge>
+                          <Badge variant="outline" className="bg-destructive-muted">Twilio</Badge>
                           <Badge variant="secondary" className="text-xs">Global</Badge>
                         </div>
                       </SelectItem>
@@ -1159,7 +1159,7 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
 
               {selectedPlatform === 'fast2sms' && (
                 <div className="space-y-3">
-                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg space-y-3">
+                  <div className="p-4 bg-info-muted border border-info-border rounded-lg space-y-3">
                     <Label className="flex items-center gap-3 cursor-pointer">
                       <input
                         type="radio"
@@ -1188,12 +1188,12 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                     </Label>
                   </div>
 
-                  <Alert className={forceQuickSMS ? 'border-orange-200 bg-orange-50 dark:bg-orange-900/20' : 'border-green-200 bg-green-50 dark:bg-green-900/20'}>
-                    <MessageSquare className={`h-4 w-4 ${forceQuickSMS ? 'text-orange-600' : 'text-green-600'}`} />
-                    <AlertTitle className={forceQuickSMS ? 'text-orange-900 dark:text-orange-100' : 'text-green-900 dark:text-green-100'}>
+                  <Alert variant={forceQuickSMS ? 'warning' : 'success'}>
+                    <MessageSquare className="h-4 w-4" />
+                    <AlertTitle>
                       {forceQuickSMS ? 'Quick SMS Mode Active' : 'DLT Template Mode Active'}
                     </AlertTitle>
-                    <AlertDescription className={forceQuickSMS ? 'text-orange-800 dark:text-orange-200 text-sm' : 'text-green-800 dark:text-green-200 text-sm'}>
+                    <AlertDescription className="text-sm">
                       {forceQuickSMS ? (
                         <div className="space-y-1">
                           <p><strong>Higher Cost</strong> - For exact pricing, check your Fast2SMS dashboard</p>
@@ -1227,22 +1227,22 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
               </div>
 
               {shouldShowQuickSMSMapping && (
-                <div className="space-y-3 p-4 bg-purple-50 dark:bg-purple-900/10 rounded-lg border border-purple-200 dark:border-purple-800">
-                  <p className="text-xs font-medium text-purple-900 dark:text-purple-100">Personalization with Variables</p>
-                  <p className="text-xs text-purple-800 dark:text-purple-200">Add these variables to your message to personalize for each contact:</p>
+                <div className="space-y-3 p-4 bg-primary/5 rounded-lg border border-primary/20">
+                  <p className="text-xs font-medium text-foreground">Personalization with Variables</p>
+                  <p className="text-xs text-muted-foreground">Add these variables to your message to personalize for each contact:</p>
                   
                   {loadedContacts.length > 0 && (
-                    <div className="p-2 bg-white dark:bg-slate-800 rounded border border-purple-300 dark:border-purple-600">
-                      <p className="text-xs font-medium text-purple-700 dark:text-purple-300 mb-1">Your Contact Fields:</p>
-                      <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                    <div className="p-2 bg-card rounded border border-primary/30">
+                      <p className="text-xs font-medium text-primary mb-1">Your Contact Fields:</p>
+                      <div className="text-xs text-muted-foreground space-y-1">
                         {Object.keys(loadedContacts[0] || {})
                           .filter(k => !['id', 'createdAt', 'updatedAt', 'listId', 'companyId'].includes(k))
                           .map(key => {
                             const value = loadedContacts[0][key as keyof typeof loadedContacts[0]];
                             return (
                               <div key={key} className="flex justify-between gap-2">
-                                <span className="font-mono text-purple-600 dark:text-purple-400">{key}:</span>
-                                <span className="text-gray-500 dark:text-gray-500">{String(value).substring(0, 30)}</span>
+                                <span className="font-mono text-primary">{key}:</span>
+                                <span className="text-muted-foreground">{String(value).substring(0, 30)}</span>
                               </div>
                             );
                           })}
@@ -1251,7 +1251,7 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                   )}
 
                   <div className="space-y-2">
-                    <p className="text-xs font-medium text-purple-700 dark:text-purple-300">Click to Add Variables to Message:</p>
+                    <p className="text-xs font-medium text-primary">Click to Add Variables to Message:</p>
                     <div className="flex flex-wrap gap-2">
                       {['name', 'phone', 'email'].map((field) => (
                         <button
@@ -1261,7 +1261,7 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                             const variable = `{${field}}`;
                             setMessage(message + variable);
                           }}
-                          className="px-2 py-1 bg-purple-100 hover:bg-purple-200 dark:bg-purple-900 dark:hover:bg-purple-800 text-purple-700 dark:text-purple-200 text-xs rounded font-mono"
+                          className="px-2 py-1 bg-primary/10 hover:bg-primary/20 text-primary text-xs rounded font-mono"
                         >
                           {`{${field}}`}
                         </button>
@@ -1276,23 +1276,23 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                               const variable = `{${field}}`;
                               setMessage(message + variable);
                             }}
-                            className="px-2 py-1 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-200 text-xs rounded font-mono"
+                            className="px-2 py-1 bg-info-muted hover:bg-info/20 text-info text-xs rounded font-mono"
                           >
                             {`{${field}}`}
                           </button>
                         ))}
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Only fields shown above are available for personalization. Add more fields to your contacts to enable more variables.</p>
+                    <p className="text-xs text-muted-foreground mt-1">Only fields shown above are available for personalization. Add more fields to your contacts to enable more variables.</p>
                   </div>
 
                   {quickSMSMappings.length > 0 && (
-                    <div className="space-y-3 pt-3 border-t border-purple-200 dark:border-purple-700">
-                      <p className="text-xs font-medium text-purple-700 dark:text-purple-300">Variable Mapping</p>
+                    <div className="space-y-3 pt-3 border-t border-primary/20">
+                      <p className="text-xs font-medium text-primary">Variable Mapping</p>
                       <div className="space-y-2">
                         {quickSMSMappings.map((mapping) => (
-                          <div key={mapping.variableName} className="p-2 bg-white dark:bg-slate-800 rounded border border-purple-200 dark:border-purple-700 space-y-2">
+                          <div key={mapping.variableName} className="p-2 bg-card rounded border border-primary/20 space-y-2">
                             <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="font-mono text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                              <Badge variant="warning" className="font-mono text-xs">
                                 {`{${mapping.variableName}}`}
                               </Badge>
                             </div>
@@ -1342,7 +1342,7 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                   )}
 
                   {selectedListId && loadedContacts.length > 0 && message.includes('{') && (
-                    <div className="space-y-2 pt-2 border-t border-purple-200 dark:border-purple-700">
+                    <div className="space-y-2 pt-2 border-t border-primary/20">
                       <Label className="text-xs font-medium">Preview & Test Message</Label>
                       <div className="space-y-2">
                         <Select defaultValue={loadedContacts[0]?.id || ''}>
@@ -1359,9 +1359,9 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                         </Select>
 
                         {message.includes('{') && (
-                          <div className="p-2 bg-white dark:bg-slate-800 rounded border border-purple-200 dark:border-purple-700">
-                            <p className="text-xs font-medium text-purple-700 dark:text-purple-300 mb-1">Preview:</p>
-                            <p className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words">
+                          <div className="p-2 bg-card rounded border border-primary/20">
+                            <p className="text-xs font-medium text-primary mb-1">Preview:</p>
+                            <p className="text-xs text-foreground whitespace-pre-wrap break-words">
                               {message.replace(/\{(\w+)\}/g, (match, field) => {
                                 const mapping = quickSMSMappings.find(m => m.variableName === field);
                                 const testContact = loadedContacts[0];
@@ -1431,10 +1431,10 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
 
               {(!forceQuickSMS || selectedPlatform === 'msg91') && (
               <div className="space-y-3">
-                <Alert className="border-red-200 bg-red-50 dark:bg-red-900/20">
-                  <AlertTriangle className="h-4 w-4 text-red-600" />
-                  <AlertTitle className="text-red-900 dark:text-red-100">DLT Approval Required</AlertTitle>
-                  <AlertDescription className="text-red-800 dark:text-red-200 text-sm">
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>DLT Approval Required</AlertTitle>
+                  <AlertDescription className="text-sm">
                     In India, <strong>ALL SMS messages (both promotional AND transactional) MUST use DLT-approved templates</strong>. This is a TRAI requirement. Select a template below or enter your DLT Template ID.
                   </AlertDescription>
                 </Alert>
@@ -1497,22 +1497,22 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
 
                     {selectedTemplate && (
                       <div className="space-y-3">
-                        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                          <p className="text-xs font-medium text-blue-900 dark:text-blue-100 mb-2">Template Message:</p>
-                          <p className="text-sm text-blue-800 dark:text-blue-200">{selectedTemplate.text}</p>
+                        <div className="p-3 bg-info-muted rounded-lg border border-info-border">
+                          <p className="text-xs font-medium text-foreground mb-2">Template Message:</p>
+                          <p className="text-sm text-muted-foreground">{selectedTemplate.text}</p>
                         </div>
 
                         <div className="space-y-2">
                           <Label className="text-sm font-semibold">Auto-Fetched Template IDs</Label>
                           
-                          <div className="p-3 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-200 dark:border-green-800">
-                            <p className="text-xs font-medium text-green-700 dark:text-green-300 mb-1">DLT Template ID (TRAI Approval)</p>
+                          <div className="p-3 bg-success-muted rounded-lg border border-success/30">
+                            <p className="text-xs font-medium text-success mb-1">DLT Template ID (TRAI Approval)</p>
                             <div className="flex items-center gap-2">
                               <input 
                                 type="text" 
                                 readOnly 
                                 value={dltTemplateId} 
-                                className="flex-1 px-2 py-1.5 text-sm font-mono bg-white dark:bg-slate-800 border border-green-300 dark:border-green-700 rounded text-green-900 dark:text-green-100"
+                                className="flex-1 px-2 py-1.5 text-sm font-mono bg-card border border-success/30 rounded text-foreground"
                               />
                               <button
                                 type="button"
@@ -1520,15 +1520,15 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                                   navigator.clipboard.writeText(dltTemplateId);
                                   toast({ title: 'Copied DLT ID', description: dltTemplateId });
                                 }}
-                                className="px-2 py-1.5 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 text-green-700 dark:text-green-200 text-xs font-medium rounded"
+                                className="px-2 py-1.5 bg-success-muted hover:bg-success/20 text-success text-xs font-medium rounded"
                               >
                                 Copy
                               </button>
                             </div>
                           </div>
 
-                          <div className="p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg border border-purple-200 dark:border-purple-800">
-                            <p className="text-xs font-medium text-purple-700 dark:text-purple-300 mb-1">
+                          <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
+                            <p className="text-xs font-medium text-primary mb-1">
                               {selectedPlatform === 'msg91' ? 'MSG91 Template ID' : 'Fast2SMS Template ID'}
                             </p>
                             <div className="flex items-center gap-2">
@@ -1536,7 +1536,7 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                                 type="text" 
                                 readOnly 
                                 value={templateId} 
-                                className="flex-1 px-2 py-1.5 text-sm font-mono bg-white dark:bg-slate-800 border border-purple-300 dark:border-purple-700 rounded text-purple-900 dark:text-purple-100"
+                                className="flex-1 px-2 py-1.5 text-sm font-mono bg-card border border-primary/30 rounded text-foreground"
                               />
                               <button
                                 type="button"
@@ -1544,7 +1544,7 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                                   navigator.clipboard.writeText(templateId);
                                   toast({ title: `Copied ${selectedPlatform.toUpperCase()} ID`, description: templateId });
                                 }}
-                                className="px-2 py-1.5 bg-purple-100 dark:bg-purple-900 hover:bg-purple-200 dark:hover:bg-purple-800 text-purple-700 dark:text-purple-200 text-xs font-medium rounded"
+                                className="px-2 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-medium rounded"
                               >
                                 Copy
                               </button>
@@ -1564,13 +1564,13 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
 
                         <div className={`mt-4 p-3 rounded-lg border space-y-3 ${
                           selectedPlatform === 'fast2sms' && forceQuickSMS
-                            ? 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800'
-                            : 'bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800'
+                            ? 'bg-destructive-muted border-destructive/30'
+                            : 'bg-info-muted border-info-border'
                         }`}>
                           <p className={`text-xs font-medium ${
                             selectedPlatform === 'fast2sms' && forceQuickSMS
-                              ? 'text-red-900 dark:text-red-100'
-                              : 'text-blue-900 dark:text-blue-100'
+                              ? 'text-destructive'
+                              : 'text-foreground'
                           }`}>
                             Test Send Before Campaign
                             {selectedPlatform === 'fast2sms' && forceQuickSMS && ' - ₹5 charge'}
@@ -1602,7 +1602,7 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                           </div>
                           <p className={`text-xs ${
                             selectedPlatform === 'fast2sms' && forceQuickSMS
-                              ? 'text-red-700 dark:text-red-300'
+                              ? 'text-destructive'
                               : 'text-muted-foreground'
                           }`}>
                             {selectedPlatform === 'fast2sms' && forceQuickSMS
@@ -1651,7 +1651,7 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
               {estimatedCost !== null && selectedPlatform === 'msg91' && (
                 <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                   <div className="flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-green-600" />
+                    <DollarSign className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <p className="font-medium text-green-900 dark:text-green-100">
                         Estimated Cost: ₹{estimatedCost.toFixed(2)}

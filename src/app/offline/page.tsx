@@ -32,7 +32,7 @@ export default function OfflinePage() {
         
         <Button
           onClick={() => window.location.reload()}
-          className="w-full bg-white text-purple-600 hover:bg-white/90 font-semibold py-6 text-lg"
+          className="w-full bg-white text-primary hover:bg-white/90 font-semibold py-6 text-lg"
         >
           <RefreshCw className="w-5 h-5 mr-2" />
           Try Again

@@ -111,40 +111,40 @@ export default function ROICalculator() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted/50 rounded-lg">
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
-              <TrendingUp className="h-4 w-4 text-green-500" />
+              <TrendingUp className="h-4 w-4 text-success" />
               <span className="text-xs font-medium text-muted-foreground">ROI</span>
             </div>
-            <div className={`text-2xl font-bold ${roi >= 100 ? 'text-green-600' : roi >= 0 ? 'text-orange-600' : 'text-red-600'}`}>
+            <div className={`text-2xl font-bold ${roi >= 100 ? 'text-success' : roi >= 0 ? 'text-warning' : 'text-destructive'}`}>
               {roi === Infinity ? '∞' : formatPercentage(roi, 0)}
             </div>
           </div>
           
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
-              <DollarSign className="h-4 w-4 text-violet-500" />
+              <DollarSign className="h-4 w-4 text-primary" />
               <span className="text-xs font-medium text-muted-foreground">ROAS</span>
             </div>
-            <div className="text-2xl font-bold text-violet-600">
+            <div className="text-2xl font-bold text-primary">
               {roas.toFixed(2)}x
             </div>
           </div>
           
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
-              <Users className="h-4 w-4 text-purple-500" />
+              <Users className="h-4 w-4 text-primary" />
               <span className="text-xs font-medium text-muted-foreground">CPL</span>
             </div>
-            <div className="text-2xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-primary">
               {formatCurrency(cpl)}
             </div>
           </div>
           
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
-              <Target className="h-4 w-4 text-orange-500" />
+              <Target className="h-4 w-4 text-warning" />
               <span className="text-xs font-medium text-muted-foreground">CAC</span>
             </div>
-            <div className="text-2xl font-bold text-orange-600">
+            <div className="text-2xl font-bold text-warning">
               {formatCurrency(cac)}
             </div>
           </div>

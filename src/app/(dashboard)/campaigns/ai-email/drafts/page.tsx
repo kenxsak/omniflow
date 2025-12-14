@@ -149,7 +149,7 @@ export default function AICampaignDraftsPage() {
             <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
           </Button>
-          <Button asChild variant="accent">
+          <Button asChild>
             <Link href="/campaigns/ai-email">
               Create New Campaign
             </Link>
@@ -172,7 +172,7 @@ export default function AICampaignDraftsPage() {
               <p className="text-sm text-muted-foreground mt-2">
                 Drafts will appear here when you generate campaigns in the AI Campaign Studio
               </p>
-              <Button asChild className="mt-4" variant="accent">
+              <Button asChild className="mt-4">
                 <Link href="/campaigns/ai-email">
                   Create Your First Campaign
                 </Link>

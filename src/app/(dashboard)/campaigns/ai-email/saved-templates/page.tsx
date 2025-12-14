@@ -455,7 +455,7 @@ export default function SavedEmailTemplatesPage() {
               <p className="text-xs sm:text-sm text-muted-foreground mt-2">
                 Save your AI-generated emails as templates to reuse them later.
               </p>
-              <Button asChild className="mt-4" variant="accent" size="sm">
+              <Button asChild className="mt-4" size="sm">
                 <Link href="/campaigns/ai-email">
                   Create Email Campaign
                 </Link>
@@ -534,7 +534,6 @@ export default function SavedEmailTemplatesPage() {
                       )}
                     </Button>
                     <Button
-                      variant="accent"
                       size="sm"
                       onClick={() => openSendDialog(template)}
                       className="text-xs h-7 sm:h-8 px-2 sm:px-3"
@@ -562,7 +561,7 @@ export default function SavedEmailTemplatesPage() {
             <div className="border rounded-lg overflow-hidden">
               <iframe
                 srcDoc={previewTemplate.htmlContent}
-                className="w-full h-[500px] bg-white"
+                className="w-full h-[500px] bg-card"
                 title="Email Preview"
               />
             </div>
@@ -572,7 +571,7 @@ export default function SavedEmailTemplatesPage() {
               Close
             </Button>
             {previewTemplate && (
-              <Button variant="accent" onClick={() => {
+              <Button onClick={() => {
                 setPreviewDialogOpen(false);
                 openSendDialog(previewTemplate);
               }}>
@@ -718,7 +717,6 @@ export default function SavedEmailTemplatesPage() {
               Cancel
             </Button>
             <Button 
-              variant="accent" 
               onClick={handleSendTemplate} 
               disabled={
                 isSending || 

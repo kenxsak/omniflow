@@ -2,20 +2,32 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import PageTitle from '@/components/ui/page-title';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Icon } from '@iconify/react';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Lead } from '@/lib/mock-data';
 import { getPipelineData } from '@/app/actions/pipeline-actions';
+import { cn } from '@/lib/utils';
+import { AppointmentDialog } from '@/components/appointments/appointment-dialog';
+import { useToast } from '@/hooks/use-toast';
 
 export function PipelineWrapper() {
   const router = useRouter();
+  const { toast } = useToast();
   const [leadsByStatus, setLeadsByStatus] = useState<Record<Lead['status'], Lead[]> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [appointmentDialogOpen, setAppointmentDialogOpen] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
   const handleLeadClick = (leadId: string) => {
     router.push(`/crm/leads/${leadId}`);
+  };
+
+  const handleScheduleAppointment = (lead: Lead, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedLead(lead);
+    setAppointmentDialogOpen(true);
   };
 
   useEffect(() => {
@@ -23,14 +35,11 @@ export function PipelineWrapper() {
       try {
         setIsLoading(true);
         setError(null);
-        
         const data = await getPipelineData();
-        
         if (!data) {
           setError('Please log in to view your pipeline.');
           return;
         }
-        
         setLeadsByStatus(data);
       } catch (err) {
         console.error('Error loading pipeline data:', err);
@@ -39,14 +48,32 @@ export function PipelineWrapper() {
         setIsLoading(false);
       }
     };
-
     loadData();
   }, []);
+
+  const statuses: Array<Lead['status']> = ['New', 'Contacted', 'Qualified', 'Won', 'Lost'];
+
+  // Clerk-style status dots (subtle colored dots, not backgrounds)
+  const statusDotColors: Record<Lead['status'], string> = {
+    New: 'bg-blue-300 border-blue-700',
+    Contacted: 'bg-amber-300 border-amber-700',
+    Qualified: 'bg-emerald-300 border-emerald-700',
+    Won: 'bg-violet-300 border-violet-700',
+    Lost: 'bg-rose-300 border-rose-700',
+  };
+
+  const statusIcons: Record<Lead['status'], string> = {
+    New: 'solar:star-linear',
+    Contacted: 'solar:phone-calling-linear',
+    Qualified: 'solar:check-circle-linear',
+    Won: 'solar:cup-star-linear',
+    Lost: 'solar:close-circle-linear',
+  };
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        <Icon icon="solar:refresh-linear" className="w-5 h-5 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -54,9 +81,9 @@ export function PipelineWrapper() {
   if (error) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
-          <AlertCircle className="w-5 h-5" />
-          <p>{error}</p>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Icon icon="solar:danger-triangle-linear" className="w-5 h-5" />
+          <p className="text-sm">{error}</p>
         </div>
       </div>
     );
@@ -65,49 +92,183 @@ export function PipelineWrapper() {
   if (!leadsByStatus) {
     return (
       <div className="flex justify-center items-center py-12">
-        <p className="text-muted-foreground">No pipeline data available</p>
+        <p className="text-sm text-muted-foreground">No pipeline data available</p>
       </div>
     );
   }
 
-  const statuses: Array<Lead['status']> = ['New', 'Contacted', 'Qualified', 'Won', 'Lost'];
-
-  return (
-    <div className="space-y-4 sm:space-y-6">
-      <PageTitle title="Pipeline" description="Visualize your sales pipeline" />
-      
-      {/* Mobile: Horizontal scroll, Desktop: Grid */}
-      <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-        <div className="flex gap-3 sm:gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-5 min-w-max sm:min-w-0">
-          {statuses.map(status => (
-            <Card key={status} className="min-w-[200px] sm:min-w-0">
-              <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-3">
-                <CardTitle className="text-xs sm:text-sm font-medium">{status}</CardTitle>
-                <div className="text-xl sm:text-2xl font-bold">{leadsByStatus[status].length}</div>
-              </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
-                <div className="space-y-1.5 sm:space-y-2">
-                  {leadsByStatus[status].slice(0, 3).map(lead => (
-                    <div 
-                      key={lead.id} 
-                      onClick={() => handleLeadClick(lead.id)}
-                      className="text-xs sm:text-sm border-l-2 border-primary pl-2 cursor-pointer hover:bg-accent hover:text-accent-foreground p-1.5 sm:p-2 rounded transition-colors"
-                    >
-                      <div className="font-medium truncate">{lead.name}</div>
-                      <div className="text-[10px] sm:text-xs text-muted-foreground truncate">{lead.email}</div>
-                    </div>
-                  ))}
-                  {leadsByStatus[status].length > 3 && (
-                    <div className="text-[10px] sm:text-xs text-muted-foreground">
-                      +{leadsByStatus[status].length - 3} more
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+  // Lead card component - Clerk style
+  const LeadCard = ({ lead }: { lead: Lead }) => (
+    <div 
+      className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3 cursor-pointer transition-all hover:bg-stone-50 dark:hover:bg-stone-900/50"
+      onClick={() => handleLeadClick(lead.id)}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <div className="font-medium truncate text-sm text-foreground">{lead.name}</div>
+          <div className="text-xs text-muted-foreground truncate">{lead.email}</div>
+          {lead.phone && (
+            <div className="text-xs text-muted-foreground truncate mt-0.5">{lead.phone}</div>
+          )}
         </div>
       </div>
+      <div className="flex gap-1 mt-2.5 pt-2.5 border-t border-stone-200 dark:border-stone-800">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs flex-1 hover:bg-stone-100 dark:hover:bg-stone-800"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleLeadClick(lead.id);
+          }}
+        >
+          <Icon icon="solar:eye-linear" className="h-3 w-3 mr-1 text-muted-foreground" />
+          View
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs flex-1 hover:bg-stone-100 dark:hover:bg-stone-800"
+          onClick={(e) => handleScheduleAppointment(lead, e)}
+        >
+          <Icon icon="solar:calendar-linear" className="h-3 w-3 mr-1 text-muted-foreground" />
+          Book
+        </Button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
+      {/* Header - Clerk style */}
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-lg sm:text-xl font-semibold text-foreground">Pipeline</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
+          Visualize your sales pipeline
+        </p>
+      </div>
+      
+      {/* Summary Stats - Clerk style cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+        {statuses.map(status => (
+          <div 
+            key={status} 
+            className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden"
+          >
+            {/* Accent bar */}
+            <div className="absolute inset-x-6 sm:inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            
+            <div className="p-3 sm:p-4 pt-4 sm:pt-5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                  {status.toUpperCase()}
+                </span>
+                <Icon icon={statusIcons[status]} className="h-4 w-4 text-muted-foreground/60" />
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">
+                  {leadsByStatus[status].length}
+                </span>
+                {/* Status dot indicator */}
+                <span className="flex items-center gap-1">
+                  <span className={cn(
+                    "size-1.5 sm:size-2 border-[1.5px] rounded-full",
+                    statusDotColors[status]
+                  )} />
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Mobile: Tabs View */}
+      <div className="block lg:hidden">
+        <Tabs defaultValue={statuses[0]} className="w-full">
+          <TabsList className="w-full grid grid-cols-5 h-auto p-1 bg-stone-100 dark:bg-stone-900 rounded-xl">
+            {statuses.map(status => (
+              <TabsTrigger 
+                key={status} 
+                value={status}
+                className="text-[9px] sm:text-[10px] py-2 px-1 rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-stone-800"
+              >
+                <span className="flex items-center gap-1">
+                  <span className={cn(
+                    "size-1.5 border-[1.5px] rounded-full",
+                    statusDotColors[status]
+                  )} />
+                  <span className="truncate">{status}</span>
+                </span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {statuses.map(status => (
+            <TabsContent key={status} value={status} className="mt-4">
+              <div className="space-y-2">
+                {leadsByStatus[status].length === 0 ? (
+                  <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-6 text-center">
+                    <Icon icon={statusIcons[status]} className="h-8 w-8 mx-auto text-muted-foreground/40 mb-2" />
+                    <p className="text-sm text-muted-foreground">No leads</p>
+                  </div>
+                ) : (
+                  leadsByStatus[status].map(lead => (
+                    <LeadCard key={lead.id} lead={lead} />
+                  ))
+                )}
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
+      </div>
+
+      {/* Desktop: Grid View */}
+      <div className="hidden lg:grid lg:grid-cols-5 gap-3">
+        {statuses.map(status => (
+          <div key={status} className="space-y-3">
+            {/* Column header - Clerk style */}
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
+              <span className={cn(
+                "size-2 border-[1.5px] rounded-full",
+                statusDotColors[status]
+              )} />
+              <span className="font-medium text-sm text-foreground">{status}</span>
+              <span className="ml-auto text-xs font-mono text-muted-foreground">
+                {leadsByStatus[status].length}
+              </span>
+            </div>
+            <div className="space-y-2 max-h-[60vh] overflow-y-auto scrollbar-thin pr-1">
+              {leadsByStatus[status].length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground text-sm">
+                  No leads
+                </div>
+              ) : (
+                leadsByStatus[status].map(lead => (
+                  <LeadCard key={lead.id} lead={lead} />
+                ))
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <AppointmentDialog
+        open={appointmentDialogOpen}
+        onOpenChange={setAppointmentDialogOpen}
+        contact={selectedLead ? {
+          id: selectedLead.id,
+          name: selectedLead.name,
+          email: selectedLead.email,
+          phone: selectedLead.phone
+        } : undefined}
+        onSuccess={() => {
+          setAppointmentDialogOpen(false);
+          toast({
+            title: 'Appointment Scheduled',
+            description: `Appointment with ${selectedLead?.name} has been scheduled.`,
+          });
+          setSelectedLead(null);
+        }}
+      />
     </div>
   );
 }

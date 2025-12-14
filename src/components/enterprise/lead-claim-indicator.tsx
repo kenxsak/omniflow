@@ -161,7 +161,7 @@ export function LeadClaimIndicator({
 
     if (isClaimedByMe) {
       return (
-        <Badge variant="secondary" className="gap-1 bg-green-100 text-green-800">
+        <Badge variant="secondary" className="gap-1 bg-success-muted text-success-muted-foreground">
           <Lock className="h-3 w-3" />
           {timeRemaining}
         </Badge>
@@ -186,7 +186,7 @@ export function LeadClaimIndicator({
         </div>
       ) : isClaimedByMe ? (
         <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="gap-1 bg-green-100 text-green-800">
+          <Badge variant="secondary" className="gap-1 bg-success-muted text-success-muted-foreground">
             <Lock className="h-3 w-3" />
             You have this lead claimed
           </Badge>

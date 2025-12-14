@@ -360,7 +360,7 @@ export default function GuidedTrendingTopics({ onContentGenerated, onBack }: Gui
                           : 'border-muted-foreground'
                       }`}>
                         {selectedTopic === topicItem.topic && (
-                          <div className="w-2.5 h-2.5 rounded-full bg-white"></div>
+                          <div className="w-2.5 h-2.5 rounded-full bg-primary-foreground"></div>
                         )}
                       </div>
                       <div className="flex-1">

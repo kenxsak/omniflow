@@ -36,11 +36,11 @@ export default function AboutPage() {
     <div className="bg-background text-foreground min-h-screen">
       <PublicNavbar />
 
-      <main>
+      <main className="pt-14 sm:pt-16">
         <section className="py-12 sm:py-16 lg:py-20 px-4 bg-gradient-to-br from-primary/5 via-accent/5 to-background dark:from-primary/10 dark:via-accent/10 dark:to-background">
           <div ref={heroRef} className="max-w-4xl mx-auto text-center">
             <Badge variant="outline" className="mb-4 text-xs sm:text-sm px-3 py-1">
-              <Heart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-red-500" />
+              <Heart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-destructive" />
               Our Story
             </Badge>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
@@ -124,7 +124,7 @@ export default function AboutPage() {
             <p className="text-sm sm:text-base text-muted-foreground mb-6">
               Join thousands of businesses already using OmniFlow to grow faster.
             </p>
-            <Button asChild size="lg" className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-sm sm:text-base">
+            <Button asChild size="lg" variant="default">
               <Link href="/signup">
                 Start Your Free Trial <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

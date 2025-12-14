@@ -12,12 +12,12 @@ interface TemplateCardProps {
 }
 
 const categoryColors: Record<string, string> = {
-  welcome: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  promotional: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-  followup: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  reminder: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-  abandoned_cart: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-  special_offer: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+  welcome: 'bg-info-muted text-info-muted-foreground',
+  promotional: 'bg-primary/10 text-primary',
+  followup: 'bg-success-muted text-success-muted-foreground',
+  reminder: 'bg-warning-muted text-warning-muted-foreground',
+  abandoned_cart: 'bg-destructive-muted text-destructive-muted-foreground',
+  special_offer: 'bg-warning-muted text-warning-muted-foreground',
 };
 
 const categoryLabels: Record<string, string> = {

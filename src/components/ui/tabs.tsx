@@ -14,9 +14,9 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-auto items-center justify-start rounded-lg bg-muted p-1 text-muted-foreground",
-      "w-full overflow-x-auto scrollbar-hide",
-      "max-w-full",
+      // AutoSend style: transparent bg, bottom border only
+      "flex items-center border-b border-stone-200 dark:border-stone-700 w-full",
+      "gap-1 overflow-x-auto scrollbar-hide bg-transparent",
       className
     )}
     {...props}
@@ -27,22 +27,30 @@ TabsList.displayName = TabsPrimitive.List.displayName
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-md",
-      "px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium",
-      "ring-offset-background transition-all duration-200",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      // AutoSend style: border-b-2 directly on trigger
+      "flex whitespace-nowrap text-center items-center justify-center",
+      "text-sm transition-all ease-in duration-75",
+      "border-b-2 border-transparent -mb-px",
+      "font-medium text-stone-600 dark:text-stone-400",
+      // Active state: indigo text + indigo border + semibold
+      "data-[state=active]:font-semibold data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400",
+      "data-[state=active]:border-indigo-500",
+      "focus-visible:outline-none",
       "disabled:pointer-events-none disabled:opacity-50",
-      "data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
-      "hover:text-foreground/80",
-      "min-h-[36px] sm:min-h-[40px] shrink-0",
+      "shrink-0",
       className
     )}
     {...props}
-  />
+  >
+    {/* Inner div with hover bg and padding */}
+    <div className="hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg px-3 py-1.5 mb-1">
+      {children}
+    </div>
+  </TabsPrimitive.Trigger>
 ))
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName
 
@@ -55,7 +63,7 @@ const TabsContent = React.forwardRef<
     className={cn(
       "mt-2 ring-offset-background",
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-      "data-[state=active]:animate-fade-in",
+      "data-[state=active]:animate-in data-[state=active]:fade-in-0 data-[state=active]:slide-in-from-bottom-4 data-[state=active]:duration-300",
       className
     )}
     {...props}

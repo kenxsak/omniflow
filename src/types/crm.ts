@@ -141,11 +141,11 @@ export const DEAL_STATUS_LABELS: Record<DealStatus, string> = {
 };
 
 export const DEAL_STATUS_COLORS: Record<DealStatus, string> = {
-  proposal: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
-  negotiation: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
-  closing: 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300',
-  won: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-  lost: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
+  proposal: 'bg-info-muted text-info-muted-foreground',
+  negotiation: 'bg-warning-muted text-warning-muted-foreground',
+  closing: 'bg-warning-muted text-warning-muted-foreground',
+  won: 'bg-success-muted text-success-muted-foreground',
+  lost: 'bg-destructive-muted text-destructive-muted-foreground',
 };
 
 export const DEFAULT_PROBABILITIES: Record<DealStatus, number> = {

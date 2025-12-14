@@ -25,7 +25,6 @@ export type PageId =
   | 'sms-marketing'
   | 'social-media'
   | 'onboarding'
-  | 'get-started'
   | 'my-team'
   | 'settings'
   | 'business-reports';
@@ -711,51 +710,6 @@ export const helpContent: Record<PageId, HelpContent> = {
       {
         question: 'What happens when I complete all checklist items?',
         answer: 'You\'ll have a fully functional marketing system! You\'ll have sent campaigns, captured leads, used AI, and set up automation - all the basics for successful marketing.'
-      }
-    ]
-  },
-
-  'get-started': {
-    pageTitle: 'Quick Start Guide',
-    overview: 'Start marketing in 24 hours! This guide walks you through OmniFlow\'s built-in features step by step - no external tools required.',
-    capabilities: [
-      'Add your first contacts to the built-in CRM',
-      'Send email campaigns using built-in email marketing',
-      'Create a Digital Business Card for instant web presence',
-      'Use AI to write marketing content',
-      'Set up automated email sequences',
-      'Launch campaigns across email, SMS, and WhatsApp'
-    ],
-    quickActions: [
-      {
-        label: 'View Checklist',
-        icon: Lightbulb,
-        onClick: () => (window.location.href = '/'),
-      }
-    ],
-    tips: [
-      'Everything you need is built into OmniFlow - CRM, email, SMS, WhatsApp, and AI',
-      'External tools (Brevo, HubSpot, etc.) are optional for advanced users only',
-      'Follow the checklist on your dashboard to track progress',
-      'Most users can start sending campaigns in under 15 minutes',
-      'Digital Business Cards are a unique OmniFlow feature - great for lead capture'
-    ],
-    faqs: [
-      {
-        question: 'Can I really start without connecting external tools?',
-        answer: 'Yes! OmniFlow is a complete platform. Built-in CRM holds your contacts, built-in email marketing sends campaigns, built-in SMS works via wa.me links (free!), and AI generates content. External integrations are optional extras for advanced users.'
-      },
-      {
-        question: 'How long does it take to get started?',
-        answer: 'Most users send their first campaign within 15 minutes: (1) Add 10 contacts (5 min), (2) Use AI to write email (2 min), (3) Send campaign (3 min). The checklist guides you through each step.'
-      },
-      {
-        question: 'What are the "built-in" features?',
-        answer: 'OmniFlow includes: CRM (contact management), Email Marketing, SMS messaging, WhatsApp (via wa.me links), AI Content Generation, Digital Business Cards, and Marketing Automation. You don\'t need external services for any of these!'
-      },
-      {
-        question: 'When should I use external integrations?',
-        answer: 'Only if you: (1) Already use HubSpot/Zoho and want to sync contacts, (2) Need to send 1000+ emails/day (use Brevo for higher limits), or (3) Need WhatsApp Business API with template approvals. For most users, built-in features are enough.'
       }
     ]
   },

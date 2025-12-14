@@ -35,28 +35,28 @@ export function OnboardingCompletionBanner({ completedSteps, onDismiss }: Onboar
   };
 
   return (
-    <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800">
+    <Alert variant="info">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <AlertTitle className="text-blue-900 dark:text-blue-100 flex items-center gap-2 mb-2">
+          <AlertTitle className="flex items-center gap-2 mb-2">
             <CheckCircle2 className="h-5 w-5" />
             Complete Your Setup ({completedCount}/{totalSteps} steps done)
           </AlertTitle>
-          <AlertDescription className="text-blue-800 dark:text-blue-200">
+          <AlertDescription>
             You've made great progress! Complete the remaining setup steps to unlock the full power of OmniFlow.
             <div className="mt-3 flex flex-wrap gap-2">
               {!completedSteps.leadsAdded && (
-                <span className="text-xs bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">
+                <span className="text-xs bg-info-muted/50 px-2 py-1 rounded">
                   Add your first lead
                 </span>
               )}
               {!completedSteps.toolConnected && (
-                <span className="text-xs bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">
+                <span className="text-xs bg-info-muted/50 px-2 py-1 rounded">
                   Connect email tool
                 </span>
               )}
               {!completedSteps.messageCreated && (
-                <span className="text-xs bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">
+                <span className="text-xs bg-info-muted/50 px-2 py-1 rounded">
                   Create first message
                 </span>
               )}
@@ -72,7 +72,7 @@ export function OnboardingCompletionBanner({ completedSteps, onDismiss }: Onboar
           variant="ghost"
           size="sm"
           onClick={handleDismiss}
-          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
+          className="h-8 w-8 p-0 opacity-70 hover:opacity-100"
         >
           <X className="h-4 w-4" />
         </Button>

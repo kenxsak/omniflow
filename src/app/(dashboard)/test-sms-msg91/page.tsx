@@ -175,7 +175,7 @@ export default function TestMSG91SMSPage() {
                     <SelectItem value="promotional">Promotional (Marketing, Offers)</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   {messageType === 'transactional'
                     ? 'Use for OTP, confirmations, and transactional messages'
                     : 'Use for promotional offers and marketing (requires DLT template)'}
@@ -193,7 +193,7 @@ export default function TestMSG91SMSPage() {
                   disabled={isSending}
                   type="tel"
                 />
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   Enter 10-digit Indian mobile number (with or without +91)
                 </p>
               </div>
@@ -210,7 +210,7 @@ export default function TestMSG91SMSPage() {
                   rows={4}
                   className="resize-none"
                 />
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   {message.length} characters
                 </p>
               </div>
@@ -226,7 +226,7 @@ export default function TestMSG91SMSPage() {
                     onChange={(e) => setDltTemplateId(e.target.value)}
                     disabled={isSending}
                   />
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     Your approved DLT template ID from MSG91 dashboard (required for promotional SMS)
                   </p>
                 </div>
@@ -268,32 +268,32 @@ export default function TestMSG91SMSPage() {
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
               <div className="space-y-2">
-                <p className="font-semibold text-gray-900">✓ Provider</p>
+                <p className="font-semibold text-foreground">✓ Provider</p>
                 <Badge variant="outline" className="mt-1">MSG91</Badge>
-                <p className="text-gray-600 text-xs mt-1">Reliable bulk SMS for India & Global</p>
+                <p className="text-muted-foreground text-xs mt-1">Reliable bulk SMS for India & Global</p>
               </div>
 
               <div className="space-y-2">
-                <p className="font-semibold text-gray-900">✓ Message Types</p>
+                <p className="font-semibold text-foreground">✓ Message Types</p>
                 <div className="space-y-1 mt-1">
                   <Badge variant="outline" className="mr-1">Transactional</Badge>
                   <Badge variant="outline">Promotional</Badge>
                 </div>
-                <p className="text-gray-600 text-xs mt-1">Both routes supported</p>
+                <p className="text-muted-foreground text-xs mt-1">Both routes supported</p>
               </div>
 
               <div className="pt-4 border-t space-y-3">
-                <p className="font-semibold text-gray-900">Route Details</p>
+                <p className="font-semibold text-foreground">Route Details</p>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-xs font-semibold text-gray-700 mb-1">Transactional</p>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs font-semibold text-foreground mb-1">Transactional</p>
+                    <p className="text-xs text-muted-foreground">
                       Route: 4 • No template required • For OTP, confirmations, alerts
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-gray-700 mb-1">Promotional</p>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs font-semibold text-foreground mb-1">Promotional</p>
+                    <p className="text-xs text-muted-foreground">
                       Route: 1 • Requires DLT template ID • For marketing campaigns
                     </p>
                   </div>
@@ -301,8 +301,8 @@ export default function TestMSG91SMSPage() {
               </div>
 
               <div className="pt-4 border-t">
-                <p className="font-semibold text-gray-900 mb-2">Next Steps:</p>
-                <ol className="space-y-1 text-gray-600 text-xs">
+                <p className="font-semibold text-foreground mb-2">Next Steps:</p>
+                <ol className="space-y-1 text-muted-foreground text-xs">
                   <li>1️⃣ Test transactional/promotional SMS</li>
                   <li>2️⃣ Verify delivery on your phone</li>
                   <li>3️⃣ Create bulk campaigns</li>
@@ -337,29 +337,29 @@ export default function TestMSG91SMSPage() {
               <>
                 <Alert className="border-green-200 bg-green-50">
                   <CheckCircle className="h-4 w-4 text-green-600" />
-                  <AlertTitle className="text-green-900">SMS Sent Successfully</AlertTitle>
-                  <AlertDescription className="text-green-800">
+                  <AlertTitle>SMS Sent Successfully</AlertTitle>
+                  <AlertDescription>
                     Your message has been sent via MSG91. Check your phone for delivery confirmation.
                   </AlertDescription>
                 </Alert>
 
                 {testResponse.requestId && (
-                  <div className="bg-gray-50 p-4 rounded-lg font-mono text-sm">
-                    <p className="text-gray-600 mb-1">Request ID:</p>
-                    <p className="text-gray-900 break-all">{testResponse.requestId}</p>
+                  <div className="bg-muted p-4 rounded-lg font-mono text-sm">
+                    <p className="text-muted-foreground mb-1">Request ID:</p>
+                    <p className="text-foreground break-all">{testResponse.requestId}</p>
                   </div>
                 )}
 
                 {testResponse.messageId && (
-                  <div className="bg-gray-50 p-4 rounded-lg font-mono text-sm">
-                    <p className="text-gray-600 mb-1">Message ID:</p>
-                    <p className="text-gray-900 break-all">{testResponse.messageId}</p>
+                  <div className="bg-muted p-4 rounded-lg font-mono text-sm">
+                    <p className="text-muted-foreground mb-1">Message ID:</p>
+                    <p className="text-foreground break-all">{testResponse.messageId}</p>
                   </div>
                 )}
 
                 {testResponse.smsCount && (
-                  <div className="bg-gray-50 p-3 rounded">
-                    <p className="text-sm text-gray-600">SMS Count</p>
+                  <div className="bg-muted p-3 rounded">
+                    <p className="text-sm text-muted-foreground">SMS Count</p>
                     <p className="text-lg font-semibold">{testResponse.smsCount}</p>
                   </div>
                 )}
@@ -375,11 +375,11 @@ export default function TestMSG91SMSPage() {
             )}
 
             {testResponse.apiResponse && (
-              <details className="bg-gray-50 p-4 rounded-lg">
+              <details className="bg-muted p-4 rounded-lg">
                 <summary className="cursor-pointer font-semibold text-sm">
                   Full API Response (Debug Info)
                 </summary>
-                <pre className="mt-3 text-xs bg-gray-900 text-gray-100 p-3 rounded overflow-auto max-h-48">
+                <pre className="mt-3 text-xs bg-foreground/90 text-background p-3 rounded overflow-auto max-h-48">
                   {JSON.stringify(testResponse.apiResponse, null, 2)}
                 </pre>
               </details>

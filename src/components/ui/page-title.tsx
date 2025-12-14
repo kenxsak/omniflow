@@ -20,8 +20,8 @@ const PageTitle: FC<PageTitleProps> = ({ title, description, badge, actions, cla
     if (titleRef.current) {
       gsap.fromTo(
         titleRef.current,
-        { opacity: 0, y: -10 },
-        { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }
+        { opacity: 0, y: -5 },
+        { opacity: 1, y: 0, duration: 0.2, ease: 'power2.out' }
       );
     }
   }, []);
@@ -30,19 +30,19 @@ const PageTitle: FC<PageTitleProps> = ({ title, description, badge, actions, cla
     <div 
       ref={titleRef}
       className={cn(
-        "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4",
+        "flex items-start justify-between",
         className
       )}
     >
-      <div className="space-y-1 min-w-0">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+      <div className="w-full space-y-2">
+        <div className="flex items-center gap-2">
+          <p className="text-stone-800 dark:text-stone-200 font-semibold text-lg">
             {title}
-          </h1>
+          </p>
           {badge}
         </div>
         {description && (
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <p className="text-stone-500 dark:text-stone-400 font-normal text-sm">
             {description}
           </p>
         )}

@@ -128,18 +128,18 @@ export function FirstRunModal({ company, onDismiss, onComplete }: FirstRunModalP
             return (
               <Card 
                 key={step.id} 
-                className={`transition-colors ${isCompleted ? 'bg-green-50 dark:bg-green-900/20 border-green-200' : ''}`}
+                className={`transition-colors ${isCompleted ? 'bg-success-muted border-success-border' : ''}`}
               >
                 <CardContent className="p-4 flex items-center gap-4">
-                  <div className={`p-2 rounded-full ${isCompleted ? 'bg-green-100 dark:bg-green-900/50' : 'bg-muted'}`}>
+                  <div className={`p-2 rounded-full ${isCompleted ? 'bg-success/10' : 'bg-muted'}`}>
                     {isCompleted ? (
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                      <CheckCircle className="h-5 w-5 text-success" />
                     ) : (
                       <Icon className="h-5 w-5 text-muted-foreground" />
                     )}
                   </div>
                   <div className="flex-1">
-                    <h4 className={`font-medium ${isCompleted ? 'text-green-700 dark:text-green-300' : ''}`}>
+                    <h4 className={`font-medium ${isCompleted ? 'text-success-muted-foreground' : ''}`}>
                       {step.title}
                     </h4>
                     <p className="text-sm text-muted-foreground">{step.description}</p>

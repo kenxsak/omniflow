@@ -13,6 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogBody,
+  DialogCloseButton,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -23,7 +25,7 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Plus, X, Loader2, Sparkles } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { createCustomTemplate } from '@/app/actions/template-marketplace-actions';
@@ -189,22 +191,24 @@ export default function CreateTemplateDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="h-4 w-4 mr-2" />
+          <Icon icon="solar:add-circle-linear" className="h-4 w-4 mr-2" />
           Create Custom Template
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader className="relative">
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
+            <Icon icon="solar:magic-stick-3-linear" className="h-5 w-5 text-muted-foreground" />
             Create Custom Template
           </DialogTitle>
           <DialogDescription>
             Create a reusable template for your emails and SMS messages. Use {'{'}variable{'}'} syntax for dynamic content.
           </DialogDescription>
+          <DialogCloseButton />
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit}>
+          <DialogBody className="space-y-4 max-h-[60vh] overflow-y-auto">
           {/* Template Type */}
           <div className="space-y-2">
             <Label>Template Type *</Label>
@@ -340,7 +344,8 @@ export default function CreateTemplateDialog() {
                 {formData.tags.map(tag => (
                   <Badge key={tag} variant="secondary" className="gap-1">
                     {tag}
-                    <X 
+                    <Icon 
+                      icon="solar:close-circle-linear"
                       className="h-3 w-3 cursor-pointer" 
                       onClick={() => removeTag(tag)}
                     />
@@ -364,22 +369,24 @@ export default function CreateTemplateDialog() {
               Make this template public (Share with other OmniFlow users)
             </label>
           </div>
+          </DialogBody>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <button 
+              type="button" 
+              onClick={() => setOpen(false)}
+              className="px-4 py-2.5 text-sm font-semibold font-mono uppercase tracking-wide text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+            >
               Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            </button>
+            <Button type="submit" disabled={isSubmitting} className="px-4 py-2.5 h-auto text-sm font-semibold font-mono uppercase tracking-wide">
               {isSubmitting ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Icon icon="solar:refresh-linear" className="h-4 w-4 mr-2 animate-spin" />
                   Creating...
                 </>
               ) : (
-                <>
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Create Template
-                </>
+                'Create Template'
               )}
             </Button>
           </DialogFooter>

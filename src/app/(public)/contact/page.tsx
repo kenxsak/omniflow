@@ -36,7 +36,7 @@ export default function ContactPage() {
     <div className="bg-background text-foreground min-h-screen">
       <PublicNavbar />
 
-      <main>
+      <main className="pt-14 sm:pt-16">
         <section className="py-12 sm:py-16 lg:py-20 px-4 bg-gradient-to-br from-primary/5 via-accent/5 to-background">
           <div ref={heroRef} className="max-w-2xl mx-auto text-center">
             <Badge variant="outline" className="mb-4 text-xs sm:text-sm px-3 py-1">
@@ -128,7 +128,7 @@ export default function ContactPage() {
                     <span><strong>Emergency Support:</strong> 24/7 via email for urgent technical issues</span>
                   </p>
                 </div>
-                <Button asChild className="mt-6 bg-gradient-to-r from-primary to-accent hover:opacity-90 text-sm sm:text-base">
+                <Button asChild className="mt-6" variant="default">
                   <Link href="/signup">
                     Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
