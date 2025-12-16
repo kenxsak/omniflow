@@ -1,35 +1,15 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import PageTitle from '@/components/ui/page-title';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
-import {
-  Sparkles,
-  Users,
-  AlertCircle,
-  Zap,
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Icon } from '@iconify/react';
 import { useAuth } from '@/hooks/use-auth';
+import { cn } from '@/lib/utils';
 import SendSmsForm from '@/components/sms/SendSmsForm';
 import dynamic from 'next/dynamic';
 
-// Dynamically import the bulk SMS component to keep it separate and avoid loading everything at once
 const BulkSMSCampaigns = dynamic(
   () => import('@/components/sms/bulk-sms-campaigns'),
-  { loading: () => <div className="p-4">Loading bulk SMS...</div> }
+  { loading: () => <div className="p-4 text-center text-muted-foreground text-sm">Loading bulk SMS...</div> }
 );
 
 type SMSProvider = 'fast2sms' | 'msg91' | 'twilio' | 'none';
@@ -39,14 +19,12 @@ export default function UnifiedSmsPage() {
   const [defaultProvider, setDefaultProvider] = useState<SMSProvider>('none');
   const [activeTab, setActiveTab] = useState<'ai' | 'bulk'>('bulk');
 
-  // Auto-detect which SMS provider is configured
   useEffect(() => {
     if (!company?.apiKeys) {
       setDefaultProvider('none');
       return;
     }
 
-    // Priority order: Fast2SMS > MSG91 > Twilio
     if (company.apiKeys.fast2sms) {
       setDefaultProvider('fast2sms');
     } else if (company.apiKeys.msg91) {
@@ -58,129 +36,98 @@ export default function UnifiedSmsPage() {
     }
   }, [company?.apiKeys]);
 
-  const getProviderBadge = () => {
+  const getProviderName = () => {
     switch (defaultProvider) {
       case 'fast2sms':
-        return (
-          <Badge variant="default" className="bg-blue-600 flex items-center gap-1">
-            <Zap className="h-3 w-3" /> Fast2SMS Active
-          </Badge>
-        );
+        return 'Fast2SMS';
       case 'msg91':
-        return (
-          <Badge variant="default" className="bg-purple-600 flex items-center gap-1">
-            <Zap className="h-3 w-3" /> MSG91 Active
-          </Badge>
-        );
+        return 'MSG91';
       case 'twilio':
-        return (
-          <Badge variant="default" className="bg-green-600 flex items-center gap-1">
-            <Zap className="h-3 w-3" /> Twilio Active
-          </Badge>
-        );
+        return 'Twilio';
       default:
-        return (
-          <Badge variant="outline" className="flex items-center gap-1">
-            <AlertCircle className="h-3 w-3" /> No Provider Configured
-          </Badge>
-        );
-    }
-  };
-
-  const getProviderDescription = () => {
-    switch (defaultProvider) {
-      case 'fast2sms':
-        return "Fast2SMS is configured and will be used automatically for all bulk SMS campaigns.";
-      case 'msg91':
-        return "MSG91 is configured and will be used automatically for all bulk SMS campaigns.";
-      case 'twilio':
-        return "Twilio is configured and will be used automatically for all bulk SMS campaigns.";
-      default:
-        return "No SMS provider is configured. Please add an API key in Settings → API Integrations → SMS Providers to get started.";
+        return 'None';
     }
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-2 sm:gap-3">
-        <PageTitle 
-          title="Bulk SMS Marketing" 
-          description="Create and send SMS campaigns to multiple contacts with automatic provider routing."
-        />
-        <div className="flex items-center gap-2">
-          {getProviderBadge()}
-        </div>
-        <p className="text-xs sm:text-sm text-muted-foreground">{getProviderDescription()}</p>
-      </div>
+    <div className="space-y-6 pb-20">
+      {/* Page Header */}
+      <header className="relative flex w-full flex-col gap-2">
+        <h1 className="text-2xl font-semibold text-foreground">Bulk SMS Marketing</h1>
+        <p className="text-sm text-muted-foreground">Create and send SMS campaigns to multiple contacts with automatic provider routing</p>
+        {/* Provider Status */}
+        {defaultProvider !== 'none' && (
+          <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">{getProviderName()} Active</p>
+        )}
+      </header>
 
       {/* Alert if no provider is configured */}
       {defaultProvider === 'none' && (
-        <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950 dark:border-yellow-800">
-          <CardContent className="p-3 sm:pt-6">
-            <div className="flex gap-2 sm:gap-3">
-              <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-yellow-900 dark:text-yellow-100 text-sm sm:text-base">SMS Provider Not Configured</h3>
-                <p className="text-xs sm:text-sm text-yellow-800 dark:text-yellow-200 mt-1">
-                  To send bulk SMS campaigns, please configure at least one SMS provider (Fast2SMS, MSG91, or Twilio) in your Settings.
-                </p>
-              </div>
+        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4">
+          <div className="flex gap-3">
+            <Icon icon="solar:danger-triangle-linear" className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-medium text-foreground text-sm">SMS Provider Not Configured</h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                To send bulk SMS campaigns, please configure at least one SMS provider (Fast2SMS, MSG91, or Twilio) in your Settings.
+              </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
-      {/* Main Tabs */}
+      {/* Main Content */}
       {defaultProvider !== 'none' && (
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'ai' | 'bulk')} className="w-full">
-          <TabsList className="rounded-t-xl">
-            <TabsTrigger value="ai">
-              <Sparkles className="h-4 w-4" />
-              Create with AI
-            </TabsTrigger>
-            <TabsTrigger value="bulk">
-              <Users className="h-4 w-4" />
-              Send Campaign
-            </TabsTrigger>
-          </TabsList>
+        <>
+          {/* Tabs */}
+          <div className="border-b border-stone-200 dark:border-stone-800">
+            <nav className="flex gap-6" aria-label="Tabs">
+              <button
+                onClick={() => setActiveTab('ai')}
+                className={cn(
+                  "relative py-2 text-sm font-medium transition-colors",
+                  activeTab === 'ai'
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <span className="flex items-center gap-1.5">
+                  <Icon icon="solar:magic-stick-3-linear" className="h-4 w-4" />
+                  Create with AI
+                </span>
+                {activeTab === 'ai' && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-t-full" />
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab('bulk')}
+                className={cn(
+                  "relative py-2 text-sm font-medium transition-colors",
+                  activeTab === 'bulk'
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <span className="flex items-center gap-1.5">
+                  <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4" />
+                  Send Campaign
+                </span>
+                {activeTab === 'bulk' && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-t-full" />
+                )}
+              </button>
+            </nav>
+          </div>
 
-          {/* Tab 1: Create with AI */}
-          <TabsContent value="ai" className="space-y-3 sm:space-y-4">
-            <Card>
-              <CardHeader className="p-3 sm:p-6">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                  <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
-                  Generate SMS Message with AI
-                </CardTitle>
-                <CardDescription className="text-xs sm:text-sm">
-                  Use AI to help draft your bulk SMS message. Using {defaultProvider.toUpperCase()}.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
-                <SendSmsForm />
-              </CardContent>
-            </Card>
-          </TabsContent>
+          {/* Tab Content */}
+          {activeTab === 'ai' && (
+            <SendSmsForm />
+          )}
 
-          {/* Tab 2: Bulk Campaigns */}
-          <TabsContent value="bulk" className="space-y-3 sm:space-y-4">
-            <Card>
-              <CardHeader className="p-3 sm:p-6">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                  <Users className="h-4 w-4 sm:h-5 sm:w-5" />
-                  Send Bulk SMS Campaign
-                </CardTitle>
-                <CardDescription className="text-xs sm:text-sm">
-                  Send SMS campaigns to multiple contacts at once with personalization. Using {defaultProvider.toUpperCase()}.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
-                <BulkSMSCampaigns defaultProvider={defaultProvider as 'fast2sms' | 'msg91' | 'twilio'} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          {activeTab === 'bulk' && (
+            <BulkSMSCampaigns defaultProvider={defaultProvider as 'fast2sms' | 'msg91' | 'twilio'} />
+          )}
+        </>
       )}
     </div>
   );

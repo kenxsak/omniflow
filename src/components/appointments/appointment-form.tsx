@@ -19,7 +19,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 import {
   Form,
   FormControl,
@@ -268,99 +268,77 @@ export function AppointmentForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium text-muted-foreground">Client Information</h3>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
+        {/* Client Information Section */}
+        <div className="border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50 p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Icon icon="solar:user-linear" className="h-4 w-4 text-muted-foreground" />
+            <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Client Information</span>
+          </div>
 
-          <FormField
-            control={form.control}
-            name="clientName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Client Name *</FormLabel>
-                <FormControl>
-                  <Input placeholder="John Doe" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <FormField
               control={form.control}
-              name="clientEmail"
+              name="clientName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email *</FormLabel>
+                  <FormLabel className="text-xs">Client Name *</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="john@example.com" {...field} />
+                    <Input placeholder="John Doe" className="h-9" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="clientPhone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone</FormLabel>
-                  <FormControl>
-                    <Input type="tel" placeholder="+1 234 567 8900" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="clientEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">Email *</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="john@example.com" className="h-9" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="clientPhone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">Phone</FormLabel>
+                    <FormControl>
+                      <Input type="tel" placeholder="+1 234 567 8900" className="h-9" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium text-muted-foreground">Appointment Details</h3>
+        {/* Appointment Details Section */}
+        <div className="border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50 p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Icon icon="solar:document-text-linear" className="h-4 w-4 text-muted-foreground" />
+            <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Appointment Details</span>
+          </div>
 
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Title *</FormLabel>
-                <FormControl>
-                  <Input placeholder="Consultation Call" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Brief description of the appointment..."
-                    rows={2}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <FormField
               control={form.control}
-              name="location"
+              name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Location</FormLabel>
+                  <FormLabel className="text-xs">Title *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Office / Online" {...field} />
+                    <Input placeholder="Consultation Call" className="h-9" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -369,14 +347,15 @@ export function AppointmentForm({
 
             <FormField
               control={form.control}
-              name="meetingLink"
+              name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Meeting Link</FormLabel>
+                  <FormLabel className="text-xs">Description</FormLabel>
                   <FormControl>
-                    <Input
-                      type="url"
-                      placeholder="https://zoom.us/..."
+                    <Textarea
+                      placeholder="Brief description of the appointment..."
+                      rows={2}
+                      className="resize-none"
                       {...field}
                     />
                   </FormControl>
@@ -384,178 +363,221 @@ export function AppointmentForm({
                 </FormItem>
               )}
             />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">Location</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Office / Online" className="h-9" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="meetingLink"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">Meeting Link</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="url"
+                        placeholder="https://zoom.us/..."
+                        className="h-9"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium text-muted-foreground">Schedule</h3>
+        {/* Schedule Section */}
+        <div className="border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50 p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Icon icon="solar:calendar-linear" className="h-4 w-4 text-muted-foreground" />
+            <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Schedule</span>
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Date *</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="text-xs">Date *</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              'w-full pl-3 text-left font-normal h-9',
+                              !field.value && 'text-muted-foreground'
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, 'PPP')
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <Icon icon="solar:calendar-linear" className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => date < new Date()}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="time"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">Time *</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            'w-full pl-3 text-left font-normal h-11 bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800 rounded-lg',
-                            !field.value && 'text-muted-foreground'
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, 'PPP')
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <Icon icon="solar:calendar-linear" className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Select time" />
+                        </SelectTrigger>
                       </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) => date < new Date()}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="time"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Time *</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select time" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <ScrollArea className="h-60">
+                      <SelectContent className="max-h-60">
                         {timeOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
                         ))}
-                      </ScrollArea>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="duration"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">Duration *</FormLabel>
+                    <Select
+                      onValueChange={(val) => field.onChange(Number(val))}
+                      value={field.value?.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Select duration" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {DURATION_OPTIONS.map((option) => (
+                          <SelectItem
+                            key={option.value}
+                            value={option.value.toString()}
+                          >
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="timezone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">Timezone *</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Select timezone" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {TIMEZONE_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {staffMembers.length > 0 && (
+              <FormField
+                control={form.control}
+                name="assignedTo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">Assign to Staff</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Select staff member" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {staffMembers.map((staff) => (
+                          <SelectItem key={staff.id} value={staff.id}>
+                            {staff.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="duration"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Duration *</FormLabel>
-                  <Select
-                    onValueChange={(val) => field.onChange(Number(val))}
-                    value={field.value?.toString()}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select duration" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {DURATION_OPTIONS.map((option) => (
-                        <SelectItem
-                          key={option.value}
-                          value={option.value.toString()}
-                        >
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="timezone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Timezone *</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select timezone" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {TIMEZONE_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {staffMembers.length > 0 && (
-            <FormField
-              control={form.control}
-              name="assignedTo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Assign to Staff</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select staff member" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {staffMembers.map((staff) => (
-                        <SelectItem key={staff.id} value={staff.id}>
-                          {staff.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
         </div>
 
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium text-muted-foreground">Reminder Settings</h3>
-          <p className="text-xs text-muted-foreground">
-            Choose which channels to use for appointment reminders. Reminders will be sent automatically.
+        {/* Reminder Settings Section */}
+        <div className="border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50 p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Icon icon="solar:bell-linear" className="h-4 w-4 text-muted-foreground" />
+            <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Reminder Settings</span>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">
+            Choose which channels to use for appointment reminders.
           </p>
 
-          <div className="space-y-4 rounded-lg border p-4">
-            <div className="flex items-center justify-between">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between py-2 border-b border-stone-200 dark:border-stone-700 last:border-0">
               <div className="flex items-center gap-2">
                 <Icon icon="solar:letter-linear" className="h-4 w-4 text-muted-foreground" />
-                <Label htmlFor="emailReminder">Email Reminder</Label>
+                <Label htmlFor="emailReminder" className="text-sm">Email</Label>
               </div>
               <div className="flex items-center gap-2">
                 <FormField
@@ -567,15 +589,12 @@ export function AppointmentForm({
                       value={field.value?.toString()}
                       disabled={!form.watch('emailReminder')}
                     >
-                      <SelectTrigger className="w-[140px]">
+                      <SelectTrigger className="w-[130px] h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         {HOURS_BEFORE_OPTIONS.map((option) => (
-                          <SelectItem
-                            key={option.value}
-                            value={option.value.toString()}
-                          >
+                          <SelectItem key={option.value} value={option.value.toString()}>
                             {option.label}
                           </SelectItem>
                         ))}
@@ -587,20 +606,16 @@ export function AppointmentForm({
                   control={form.control}
                   name="emailReminder"
                   render={({ field }) => (
-                    <Switch
-                      id="emailReminder"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
+                    <Switch id="emailReminder" checked={field.value} onCheckedChange={field.onChange} />
                   )}
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between py-2 border-b border-stone-200 dark:border-stone-700 last:border-0">
               <div className="flex items-center gap-2">
                 <Icon icon="solar:phone-linear" className="h-4 w-4 text-muted-foreground" />
-                <Label htmlFor="smsReminder">SMS Reminder</Label>
+                <Label htmlFor="smsReminder" className="text-sm">SMS</Label>
               </div>
               <div className="flex items-center gap-2">
                 <FormField
@@ -612,15 +627,12 @@ export function AppointmentForm({
                       value={field.value?.toString()}
                       disabled={!form.watch('smsReminder')}
                     >
-                      <SelectTrigger className="w-[140px]">
+                      <SelectTrigger className="w-[130px] h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         {HOURS_BEFORE_OPTIONS.map((option) => (
-                          <SelectItem
-                            key={option.value}
-                            value={option.value.toString()}
-                          >
+                          <SelectItem key={option.value} value={option.value.toString()}>
                             {option.label}
                           </SelectItem>
                         ))}
@@ -632,20 +644,16 @@ export function AppointmentForm({
                   control={form.control}
                   name="smsReminder"
                   render={({ field }) => (
-                    <Switch
-                      id="smsReminder"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
+                    <Switch id="smsReminder" checked={field.value} onCheckedChange={field.onChange} />
                   )}
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-2">
                 <Icon icon="solar:chat-round-linear" className="h-4 w-4 text-muted-foreground" />
-                <Label htmlFor="whatsappReminder">WhatsApp Reminder</Label>
+                <Label htmlFor="whatsappReminder" className="text-sm">WhatsApp</Label>
               </div>
               <div className="flex items-center gap-2">
                 <FormField
@@ -657,15 +665,12 @@ export function AppointmentForm({
                       value={field.value?.toString()}
                       disabled={!form.watch('whatsappReminder')}
                     >
-                      <SelectTrigger className="w-[140px]">
+                      <SelectTrigger className="w-[130px] h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         {HOURS_BEFORE_OPTIONS.map((option) => (
-                          <SelectItem
-                            key={option.value}
-                            value={option.value.toString()}
-                          >
+                          <SelectItem key={option.value} value={option.value.toString()}>
                             {option.label}
                           </SelectItem>
                         ))}
@@ -677,11 +682,7 @@ export function AppointmentForm({
                   control={form.control}
                   name="whatsappReminder"
                   render={({ field }) => (
-                    <Switch
-                      id="whatsappReminder"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
+                    <Switch id="whatsappReminder" checked={field.value} onCheckedChange={field.onChange} />
                   )}
                 />
               </div>
@@ -689,16 +690,18 @@ export function AppointmentForm({
           </div>
         </div>
 
+        {/* Notes Section */}
         <FormField
           control={form.control}
           name="notes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Notes</FormLabel>
+              <FormLabel className="text-xs">Notes</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Additional notes about this appointment..."
-                  rows={3}
+                  rows={2}
+                  className="resize-none"
                   {...field}
                 />
               </FormControl>
@@ -707,25 +710,22 @@ export function AppointmentForm({
           )}
         />
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-stone-200 dark:border-stone-800 mt-6 -mx-6 px-6 bg-stone-100 dark:bg-stone-900 -mb-6 pb-4">
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={isSubmitting}
-            className="px-4 py-2.5 text-sm font-semibold font-mono uppercase tracking-wide text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 transition-colors disabled:opacity-50"
-          >
+        {/* Footer Actions */}
+        <div className="flex items-center justify-end gap-2 pt-2 border-t border-stone-200 dark:border-stone-800">
+          <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={isSubmitting} className="h-8 text-xs">
             Cancel
-          </button>
-          <Button type="submit" disabled={isSubmitting} className="px-4 py-2.5 h-auto text-sm font-semibold font-mono uppercase tracking-wide">
+          </Button>
+          <Button type="submit" size="sm" disabled={isSubmitting} className="h-8 text-xs">
             {isSubmitting ? (
               <>
-                <Icon icon="solar:refresh-linear" className="mr-2 h-4 w-4 animate-spin" />
+                <Icon icon="solar:refresh-linear" className="mr-1.5 h-3.5 w-3.5 animate-spin" />
                 {appointment ? 'Updating...' : 'Scheduling...'}
               </>
-            ) : appointment ? (
-              'Update'
             ) : (
-              'Schedule'
+              <>
+                <Icon icon="solar:calendar-add-linear" className="mr-1.5 h-3.5 w-3.5" />
+                {appointment ? 'Update' : 'Schedule Appointment'}
+              </>
             )}
           </Button>
         </div>

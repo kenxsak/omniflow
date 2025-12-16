@@ -1,13 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,20 +29,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
+
 import {
   MessageSquare,
   Plus,
   Send,
   Loader2,
-  CheckCircle,
-  XCircle,
-  Clock,
   Users,
   Eye,
   Trash2,
@@ -70,7 +56,6 @@ import { syncFast2SMSTemplatesAction, syncMSG91TemplatesAction, getSMSTemplatesA
 import { getWhatsAppLists, getWhatsAppContacts } from '@/lib/whatsapp-marketing-data';
 import type { WhatsAppList, WhatsAppContact } from '@/types/whatsapp';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import confetti from 'canvas-confetti';
 import Link from 'next/link';
 import type { SMSTemplate } from '@/lib/sms-templates-sync';
@@ -865,168 +850,181 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
   };
 
   const getStatusBadge = (status: SMSCampaign['status']) => {
-    const statusConfig = {
-      draft: { variant: 'secondary' as const, icon: Clock },
-      scheduled: { variant: 'default' as const, icon: Clock },
-      sending: { variant: 'default' as const, icon: Loader2 },
-      completed: { variant: 'default' as const, icon: CheckCircle },
-      failed: { variant: 'destructive' as const, icon: XCircle },
+    const statusColors: Record<SMSCampaign['status'], string> = {
+      draft: 'text-stone-500 dark:text-stone-400',
+      scheduled: 'text-amber-600 dark:text-amber-400',
+      sending: 'text-blue-600 dark:text-blue-400',
+      completed: 'text-emerald-600 dark:text-emerald-400',
+      failed: 'text-red-600 dark:text-red-400',
     };
 
-    const config = statusConfig[status];
-    const Icon = config.icon;
-
     return (
-      <Badge variant={config.variant} className="gap-1">
-        <Icon className="h-3 w-3" />
+      <span className={`text-xs font-medium ${statusColors[status]}`}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
-      </Badge>
+      </span>
     );
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-20">
       {campaigns.length === 0 && !isLoadingCampaigns && (
-        <Alert variant="info">
-          <Sparkles className="h-5 w-5" />
-          <AlertTitle>Quick Start Guide</AlertTitle>
-          <AlertDescription>
-            <div className="space-y-2 mt-2">
-              <p className="text-sm">To send your first SMS bulk campaign:</p>
-              <ol className="text-sm space-y-1 ml-4 list-decimal">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4">
+          <div className="flex gap-3">
+            <Sparkles className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <div className="space-y-3">
+              <div>
+                <h3 className="font-medium text-sm">Quick Start Guide</h3>
+                <p className="text-xs text-muted-foreground mt-1">To send your first SMS bulk campaign:</p>
+              </div>
+              <ol className="text-xs text-muted-foreground space-y-1 ml-4 list-decimal">
                 <li>Connect MSG91 or Fast2SMS in Settings</li>
                 <li>Create a contact list in WhatsApp Marketing</li>
-                <li>Come back here and sync your DLT-approved templates</li>
+                <li>Sync your DLT-approved templates</li>
                 <li>Select a template and send to bulk contacts</li>
               </ol>
-              <div className="flex flex-col sm:flex-row gap-2 mt-3">
-                <Button asChild className="min-h-11" variant="outline">
+              <div className="flex flex-wrap gap-2">
+                <Button asChild size="sm" variant="outline" className="h-8 text-xs">
                   <Link href="/settings">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Go to Settings
+                    <Settings className="h-3.5 w-3.5 mr-1.5" />
+                    Settings
                   </Link>
                 </Button>
-                <Button asChild className="min-h-11" variant="outline">
+                <Button asChild size="sm" variant="outline" className="h-8 text-xs">
                   <Link href="/whatsapp-marketing">
-                    <Users className="h-4 w-4 mr-2" />
-                    Manage Contacts
+                    <Users className="h-3.5 w-3.5 mr-1.5" />
+                    Contacts
                   </Link>
                 </Button>
               </div>
             </div>
-          </AlertDescription>
-        </Alert>
+          </div>
+        </div>
       )}
 
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'campaigns' | 'create')}>
-        <TabsList>
-          <TabsTrigger value="campaigns">
-            <Users className="h-4 w-4 mr-2" />
-            My Campaigns
-          </TabsTrigger>
-          <TabsTrigger value="create">
-            <Plus className="h-4 w-4 mr-2" />
-            Create Campaign
-          </TabsTrigger>
-        </TabsList>
+      {/* Clerk-style underline tabs */}
+      <div className="border-b border-stone-200 dark:border-stone-800">
+        <nav className="flex gap-6" aria-label="Tabs">
+          <button
+            onClick={() => setActiveTab('campaigns')}
+            className={`relative py-2 text-sm font-medium transition-colors ${
+              activeTab === 'campaigns'
+                ? 'text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <span className="flex items-center gap-1.5">
+              <Users className="h-4 w-4" />
+              My Campaigns
+            </span>
+            {activeTab === 'campaigns' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-t-full" />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('create')}
+            className={`relative py-2 text-sm font-medium transition-colors ${
+              activeTab === 'create'
+                ? 'text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <span className="flex items-center gap-1.5">
+              <Plus className="h-4 w-4" />
+              Create Campaign
+            </span>
+            {activeTab === 'create' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-t-full" />
+            )}
+          </button>
+        </nav>
+      </div>
 
-        <TabsContent value="campaigns" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Campaign History</CardTitle>
-                  <CardDescription>
-                    View and manage your SMS bulk campaigns
-                  </CardDescription>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={loadCampaigns}
-                  disabled={isLoadingCampaigns}
-                >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingCampaigns ? 'animate-spin' : ''}`} />
-                  Refresh
-                </Button>
+      {activeTab === 'campaigns' && (
+        <div className="space-y-4 mt-4">
+          {/* Header row */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-sm">Campaign History</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">View and manage your SMS bulk campaigns</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadCampaigns}
+              disabled={isLoadingCampaigns}
+              className="h-8 text-xs"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isLoadingCampaigns ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
+
+          {/* Content */}
+          {isLoadingCampaigns ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : campaigns.length === 0 ? (
+            <div className="text-center py-12 border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50/50 dark:bg-stone-900/30">
+              <MessageSquare className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
+              <h3 className="text-sm font-medium mb-1">No campaigns yet</h3>
+              <p className="text-xs text-muted-foreground mb-4">
+                Create your first SMS bulk campaign to get started
+              </p>
+              <Button onClick={() => setActiveTab('create')} size="sm" className="h-8 text-xs">
+                <Plus className="h-3.5 w-3.5 mr-1.5" />
+                Create Campaign
+              </Button>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-stone-200 dark:border-stone-800 overflow-hidden bg-white dark:bg-stone-950">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
+                      <th className="h-10 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Campaign</th>
+                      <th className="h-10 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Status</th>
+                      <th className="h-10 px-4 text-center align-middle text-xs font-medium text-muted-foreground">Sent</th>
+                      <th className="h-10 px-4 text-right align-middle text-xs font-medium text-muted-foreground w-[100px]">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {campaigns.map((campaign, index) => (
+                      <tr key={campaign.id} className={`hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors ${index !== campaigns.length - 1 ? 'border-b border-stone-200 dark:border-stone-800' : ''}`}>
+                        <td className="h-12 px-4 align-middle font-medium">{campaign.name}</td>
+                        <td className="h-12 px-4 align-middle">{getStatusBadge(campaign.status)}</td>
+                        <td className="h-12 px-4 align-middle text-center tabular-nums text-muted-foreground">
+                          {campaign.stats.sent}/{campaign.stats.total}
+                        </td>
+                        <td className="h-12 px-4 align-middle text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleViewCampaign(campaign)}
+                              aria-label="View campaign"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                              onClick={() => handleDeleteCampaign(campaign.id)}
+                              aria-label="Delete campaign"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            </CardHeader>
-            <CardContent>
-              {isLoadingCampaigns ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                </div>
-              ) : campaigns.length === 0 ? (
-                <div className="text-center py-8">
-                  <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No campaigns yet</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Create your first SMS bulk campaign to get started
-                  </p>
-                  <Button onClick={() => setActiveTab('create')}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Campaign
-                  </Button>
-                </div>
-              ) : (
-                <ScrollArea className="w-full">
-                  <div className="min-w-[900px]">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Campaign Name</TableHead>
-                          <TableHead>Type</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Recipients</TableHead>
-                          <TableHead>Delivered</TableHead>
-                          <TableHead>Created</TableHead>
-                          <TableHead>Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {campaigns.map((campaign) => (
-                          <TableRow key={campaign.id}>
-                            <TableCell className="font-medium">{campaign.name}</TableCell>
-                            <TableCell className="capitalize">{campaign.messageType}</TableCell>
-                            <TableCell>{getStatusBadge(campaign.status)}</TableCell>
-                            <TableCell>{campaign.stats.total}</TableCell>
-                            <TableCell>
-                              {campaign.stats.delivered} / {campaign.stats.sent}
-                            </TableCell>
-                            <TableCell>
-                              {format(new Date(campaign.createdAt), 'MMM dd, yyyy')}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-10 w-10"
-                                  onClick={() => handleViewCampaign(campaign)}
-                                  aria-label="View campaign"
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-10 w-10"
-                                  onClick={() => handleDeleteCampaign(campaign.id)}
-                                  aria-label="Delete campaign"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </ScrollArea>
-              )}
-            </CardContent>
-          </Card>
+            </div>
+          )}
 
           <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -1049,11 +1047,11 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Sent</p>
-                      <p className="font-medium text-success">{selectedCampaign.stats.sent}</p>
+                      <p className="font-medium text-emerald-600 dark:text-emerald-400">{selectedCampaign.stats.sent}</p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Failed</p>
-                      <p className="font-medium text-destructive">{selectedCampaign.stats.failed}</p>
+                      <p className="font-medium text-red-600 dark:text-red-400">{selectedCampaign.stats.failed}</p>
                     </div>
                   </div>
 
@@ -1069,11 +1067,11 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                       ) : (
                         <div className="space-y-2">
                           {campaignRecipients.map((recipient, idx) => (
-                            <div key={idx} className="flex justify-between text-sm p-2 bg-muted rounded">
+                            <div key={idx} className="flex justify-between text-sm p-2 bg-stone-50 dark:bg-stone-900/50 rounded border border-stone-200 dark:border-stone-800">
                               <span>{recipient.phone}</span>
-                              <Badge variant={recipient.status === 'sent' ? 'default' : 'destructive'}>
+                              <span className={`text-xs font-medium ${recipient.status === 'sent' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                                 {recipient.status}
-                              </Badge>
+                              </span>
                             </div>
                           ))}
                         </div>
@@ -1084,30 +1082,35 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
               )}
             </DialogContent>
           </Dialog>
-        </TabsContent>
+        </div>
+      )}
 
-        <TabsContent value="create" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Create New Campaign</CardTitle>
-              <CardDescription>
-                Create and send SMS bulk campaigns with DLT-approved templates
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="campaignName">Campaign Name</Label>
+      {activeTab === 'create' && (
+        <div className="space-y-4 mt-4">
+          {/* Create Campaign Header */}
+          <div>
+            <h3 className="font-semibold text-sm">Create New Campaign</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Create and send SMS bulk campaigns with DLT-approved templates</p>
+          </div>
+
+          {/* Two Column Layout: Form + Phone Preview */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Form Container - Takes 2 columns on large screens */}
+            <div className="lg:col-span-2 border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4 space-y-5">
+              <div className="space-y-1.5">
+                <Label htmlFor="campaignName" className="text-xs text-muted-foreground">Campaign Name</Label>
                 <Input
                   id="campaignName"
                   placeholder="e.g., Flash Sale Alert"
                   value={campaignName}
                   onChange={(e) => setCampaignName(e.target.value)}
+                  className="h-9"
                 />
               </div>
 
               <div className={`grid gap-4 ${(selectedPlatform === 'fast2sms' && dltTemplateId) ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
-                <div className="space-y-2">
-                  <Label htmlFor="platform">SMS Platform</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="platform" className="text-xs text-muted-foreground">SMS Platform</Label>
                   <Select value={selectedPlatform} onValueChange={(value) => {
                     setSelectedPlatform(value as 'msg91' | 'fast2sms' | 'twilio');
                     setTemplates([]);
@@ -1115,37 +1118,28 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                     setDltTemplateId('');
                     setTemplateId('');
                   }}>
-                    <SelectTrigger id="platform">
+                    <SelectTrigger id="platform" className="h-9">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="msg91">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="bg-success-muted">MSG91</Badge>
-                          <Badge variant="secondary" className="text-xs">India + Global</Badge>
-                        </div>
+                        <span className="text-sm">MSG91 <span className="text-muted-foreground text-xs">· India + Global</span></span>
                       </SelectItem>
                       <SelectItem value="fast2sms">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="bg-info-muted">Fast2SMS</Badge>
-                          <Badge variant="secondary" className="text-xs">India Only</Badge>
-                        </div>
+                        <span className="text-sm">Fast2SMS <span className="text-muted-foreground text-xs">· India Only</span></span>
                       </SelectItem>
                       <SelectItem value="twilio">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="bg-destructive-muted">Twilio</Badge>
-                          <Badge variant="secondary" className="text-xs">Global</Badge>
-                        </div>
+                        <span className="text-sm">Twilio <span className="text-muted-foreground text-xs">· Global</span></span>
                       </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 {!(selectedPlatform === 'fast2sms' && dltTemplateId) && (
-                  <div className="space-y-2">
-                    <Label htmlFor="messageType">Message Type</Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="messageType" className="text-xs text-muted-foreground">Message Type</Label>
                     <Select value={messageType} onValueChange={(value) => setMessageType(value as 'promotional' | 'transactional')}>
-                      <SelectTrigger id="messageType">
+                      <SelectTrigger id="messageType" className="h-9">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -1159,8 +1153,8 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
 
               {selectedPlatform === 'fast2sms' && (
                 <div className="space-y-3">
-                  <div className="p-4 bg-info-muted border border-info-border rounded-lg space-y-3">
-                    <Label className="flex items-center gap-3 cursor-pointer">
+                  <div className="p-3 bg-stone-50 dark:bg-stone-900/50 border border-stone-200 dark:border-stone-800 rounded-lg space-y-2">
+                    <label className="flex items-center gap-3 cursor-pointer">
                       <input
                         type="radio"
                         name="smsMode"
@@ -1171,131 +1165,91 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                           setDltTemplateId('');
                           setSelectedTemplate(null);
                         }}
-                        className="w-4 h-4"
+                        className="w-4 h-4 accent-foreground"
                       />
-                      <span className="text-sm font-medium">Quick SMS Mode (Higher cost, no template needed)</span>
-                    </Label>
-                    <Label className="flex items-center gap-3 cursor-pointer">
+                      <span className="text-sm">Quick SMS Mode <span className="text-muted-foreground text-xs">· Higher cost, no template</span></span>
+                    </label>
+                    <label className="flex items-center gap-3 cursor-pointer">
                       <input
                         type="radio"
                         name="smsMode"
                         value="dlt"
                         checked={!forceQuickSMS}
                         onChange={() => setForceQuickSMS(false)}
-                        className="w-4 h-4"
+                        className="w-4 h-4 accent-foreground"
                       />
-                      <span className="text-sm font-medium">DLT Template Mode (Cost-effective, TRAI compliant)</span>
-                    </Label>
+                      <span className="text-sm">DLT Template Mode <span className="text-muted-foreground text-xs">· Cost-effective, TRAI compliant</span></span>
+                    </label>
                   </div>
 
-                  <Alert variant={forceQuickSMS ? 'warning' : 'success'}>
-                    <MessageSquare className="h-4 w-4" />
-                    <AlertTitle>
-                      {forceQuickSMS ? 'Quick SMS Mode Active' : 'DLT Template Mode Active'}
-                    </AlertTitle>
-                    <AlertDescription className="text-sm">
-                      {forceQuickSMS ? (
-                        <div className="space-y-1">
-                          <p><strong>Higher Cost</strong> - For exact pricing, check your Fast2SMS dashboard</p>
-                          <p className="text-xs">Send any message anytime without template approval</p>
-                        </div>
-                      ) : (
-                        <div className="space-y-1">
-                          <p><strong>Cost-effective</strong> - For exact pricing, check your Fast2SMS dashboard</p>
-                          <p className="text-xs">Using TRAI-approved DLT template for compliance - Select template below</p>
-                        </div>
-                      )}
-                    </AlertDescription>
-                  </Alert>
+                  <div className="flex items-start gap-3 p-3 border border-stone-200 dark:border-stone-800 rounded-lg">
+                    <MessageSquare className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium">{forceQuickSMS ? 'Quick SMS Mode Active' : 'DLT Template Mode Active'}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {forceQuickSMS 
+                          ? 'Higher cost - Send any message without template approval'
+                          : 'Cost-effective - Using TRAI-approved DLT template'
+                        }
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="message">SMS Message</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="message" className="text-xs text-muted-foreground">SMS Message</Label>
                 <Textarea
                   id="message"
-                  placeholder={forceQuickSMS && selectedPlatform === 'fast2sms' ? "Enter your SMS message... (Use {name}, {phone}, {email} or other contact fields for personalization)" : "Enter your SMS message..."}
+                  placeholder={forceQuickSMS && selectedPlatform === 'fast2sms' ? "Enter your SMS message... (Use {name}, {phone}, {email} for personalization)" : "Enter your SMS message..."}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows={4}
                   className="resize-none"
                 />
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   {message.length} characters · {smsCount} SMS
-                  {smsCount > 1 && ' (Long message will be split)'}
+                  {smsCount > 1 && <span className="text-amber-500"> (Multi-segment)</span>}
                 </p>
               </div>
 
               {shouldShowQuickSMSMapping && (
-                <div className="space-y-3 p-4 bg-primary/5 rounded-lg border border-primary/20">
-                  <p className="text-xs font-medium text-foreground">Personalization with Variables</p>
-                  <p className="text-xs text-muted-foreground">Add these variables to your message to personalize for each contact:</p>
+                <div className="space-y-3 p-3 bg-stone-50 dark:bg-stone-900/50 rounded-lg border border-stone-200 dark:border-stone-800">
+                  <p className="text-xs font-medium text-foreground">Personalization Variables</p>
+                  <p className="text-xs text-muted-foreground">Click to add variables to your message:</p>
                   
-                  {loadedContacts.length > 0 && (
-                    <div className="p-2 bg-card rounded border border-primary/30">
-                      <p className="text-xs font-medium text-primary mb-1">Your Contact Fields:</p>
-                      <div className="text-xs text-muted-foreground space-y-1">
-                        {Object.keys(loadedContacts[0] || {})
-                          .filter(k => !['id', 'createdAt', 'updatedAt', 'listId', 'companyId'].includes(k))
-                          .map(key => {
-                            const value = loadedContacts[0][key as keyof typeof loadedContacts[0]];
-                            return (
-                              <div key={key} className="flex justify-between gap-2">
-                                <span className="font-mono text-primary">{key}:</span>
-                                <span className="text-muted-foreground">{String(value).substring(0, 30)}</span>
-                              </div>
-                            );
-                          })}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <p className="text-xs font-medium text-primary">Click to Add Variables to Message:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {['name', 'phone', 'email'].map((field) => (
+                  <div className="flex flex-wrap gap-2">
+                    {['name', 'phone', 'email'].map((field) => (
+                      <button
+                        key={field}
+                        type="button"
+                        onClick={() => setMessage(message + `{${field}}`)}
+                        className="px-2 py-1 bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-foreground text-xs rounded font-mono transition-colors"
+                      >
+                        {`{${field}}`}
+                      </button>
+                    ))}
+                    {loadedContacts.length > 0 && Object.keys(loadedContacts[0] || {})
+                      .filter(k => !['name', 'phone', 'email', 'phoneNumber', 'id', 'createdAt', 'updatedAt', 'listId', 'companyId'].includes(k))
+                      .map((field) => (
                         <button
                           key={field}
                           type="button"
-                          onClick={() => {
-                            const variable = `{${field}}`;
-                            setMessage(message + variable);
-                          }}
-                          className="px-2 py-1 bg-primary/10 hover:bg-primary/20 text-primary text-xs rounded font-mono"
+                          onClick={() => setMessage(message + `{${field}}`)}
+                          className="px-2 py-1 bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-foreground text-xs rounded font-mono transition-colors"
                         >
                           {`{${field}}`}
                         </button>
                       ))}
-                      {loadedContacts.length > 0 && Object.keys(loadedContacts[0] || {})
-                        .filter(k => !['name', 'phone', 'email', 'phoneNumber', 'id', 'createdAt', 'updatedAt', 'listId', 'companyId'].includes(k))
-                        .map((field) => (
-                          <button
-                            key={field}
-                            type="button"
-                            onClick={() => {
-                              const variable = `{${field}}`;
-                              setMessage(message + variable);
-                            }}
-                            className="px-2 py-1 bg-info-muted hover:bg-info/20 text-info text-xs rounded font-mono"
-                          >
-                            {`{${field}}`}
-                          </button>
-                        ))}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">Only fields shown above are available for personalization. Add more fields to your contacts to enable more variables.</p>
                   </div>
 
                   {quickSMSMappings.length > 0 && (
-                    <div className="space-y-3 pt-3 border-t border-primary/20">
-                      <p className="text-xs font-medium text-primary">Variable Mapping</p>
+                    <div className="space-y-2 pt-3 border-t border-stone-200 dark:border-stone-700">
+                      <p className="text-xs font-medium text-foreground">Variable Mapping</p>
                       <div className="space-y-2">
                         {quickSMSMappings.map((mapping) => (
-                          <div key={mapping.variableName} className="p-2 bg-card rounded border border-primary/20 space-y-2">
-                            <div className="flex items-center gap-2">
-                              <Badge variant="warning" className="font-mono text-xs">
-                                {`{${mapping.variableName}}`}
-                              </Badge>
-                            </div>
+                          <div key={mapping.variableName} className="p-2 bg-white dark:bg-stone-950 rounded border border-stone-200 dark:border-stone-800 space-y-2">
+                            <span className="font-mono text-xs text-foreground">{`{${mapping.variableName}}`}</span>
                             <div className="grid grid-cols-2 gap-2">
                               <Select 
                                 value={mapping.mappingType}
@@ -1342,12 +1296,12 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                   )}
 
                   {selectedListId && loadedContacts.length > 0 && message.includes('{') && (
-                    <div className="space-y-2 pt-2 border-t border-primary/20">
-                      <Label className="text-xs font-medium">Preview & Test Message</Label>
+                    <div className="space-y-2 pt-3 border-t border-stone-200 dark:border-stone-700">
+                      <p className="text-xs font-medium text-foreground">Preview & Test</p>
                       <div className="space-y-2">
                         <Select defaultValue={loadedContacts[0]?.id || ''}>
                           <SelectTrigger className="h-8 text-xs">
-                            <SelectValue placeholder="Select a contact to test with" />
+                            <SelectValue placeholder="Select a contact to preview" />
                           </SelectTrigger>
                           <SelectContent>
                             {loadedContacts.slice(0, 20).map((contact) => (
@@ -1359,8 +1313,8 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                         </Select>
 
                         {message.includes('{') && (
-                          <div className="p-2 bg-card rounded border border-primary/20">
-                            <p className="text-xs font-medium text-primary mb-1">Preview:</p>
+                          <div className="p-2 bg-stone-50 dark:bg-stone-900/50 rounded border border-stone-200 dark:border-stone-800">
+                            <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-1">Preview</p>
                             <p className="text-xs text-foreground whitespace-pre-wrap break-words">
                               {message.replace(/\{(\w+)\}/g, (match, field) => {
                                 const mapping = quickSMSMappings.find(m => m.variableName === field);
@@ -1413,36 +1367,38 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                 </div>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="scheduledDateTime">Schedule Message (Optional)</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="scheduledDateTime" className="text-xs text-muted-foreground">Schedule Message (Optional)</Label>
                 <Input
                   id="scheduledDateTime"
                   type="datetime-local"
                   value={scheduledDateTime}
                   onChange={(e) => setScheduledDateTime(e.target.value)}
-                  className="w-full"
+                  className="h-9"
                 />
                 <p className="text-xs text-muted-foreground">
                   {scheduledDateTime 
-                    ? `Message will be sent on ${new Date(scheduledDateTime).toLocaleString()}`
+                    ? `Scheduled: ${new Date(scheduledDateTime).toLocaleString()}`
                     : 'Leave empty to send immediately'}
                 </p>
               </div>
 
               {(!forceQuickSMS || selectedPlatform === 'msg91') && (
               <div className="space-y-3">
-                <Alert variant="destructive">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>DLT Approval Required</AlertTitle>
-                  <AlertDescription className="text-sm">
-                    In India, <strong>ALL SMS messages (both promotional AND transactional) MUST use DLT-approved templates</strong>. This is a TRAI requirement. Select a template below or enter your DLT Template ID.
-                  </AlertDescription>
-                </Alert>
+                <div className="flex items-start gap-3 p-3 border border-stone-200 dark:border-stone-800 rounded-lg">
+                  <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium">DLT Approval Required</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      In India, all SMS messages must use DLT-approved templates (TRAI requirement). Select a template below.
+                    </p>
+                  </div>
+                </div>
 
                 <div className="space-y-3">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between flex-wrap gap-2">
-                      <Label>Approved Templates</Label>
+                      <Label className="text-xs text-muted-foreground">Approved Templates</Label>
                       <div className="flex items-center gap-2">
                         {selectedPlatform === 'msg91' && appUser?.idToken && (
                           <AddTemplateDialog 
@@ -1455,9 +1411,10 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                           size="sm"
                           onClick={handleSyncTemplates}
                           disabled={isSyncingTemplates || isLoadingTemplates}
+                          className="h-8 text-xs"
                         >
                           <RefreshCw className={`h-3 w-3 mr-1.5 ${isSyncingTemplates ? 'animate-spin' : ''}`} />
-                          Sync Templates
+                          Sync
                         </Button>
                       </div>
                     </div>
@@ -1467,12 +1424,11 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                         const t = templates.find(t => t.id === templateId);
                         if (t) handleSelectTemplate(t);
                       }}>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-9">
                           <SelectValue placeholder="Select an approved template" />
                         </SelectTrigger>
                         <SelectContent>
                           {templates.map((template) => {
-                            // Safely get variable count
                             const varCount = typeof template.variables === 'number' 
                               ? template.variables 
                               : Array.isArray(template.variables) 
@@ -1480,55 +1436,52 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                               : 0;
                             return (
                               <SelectItem key={template.id} value={template.id}>
-                                <div className="flex items-center gap-2">
-                                  <span>{template.name || `Template ${template.templateId.substring(0, 8)}`}</span>
-                                  <Badge variant="secondary" className="text-xs">{varCount} var</Badge>
-                                </div>
+                                <span className="text-sm">{template.name || `Template ${template.templateId.substring(0, 8)}`} <span className="text-muted-foreground text-xs">· {varCount} var</span></span>
                               </SelectItem>
                             );
                           })}
                         </SelectContent>
                       </Select>
                     ) : (
-                      <div className="p-3 bg-muted rounded-lg text-sm text-muted-foreground">
-                        {isLoadingTemplates ? 'Loading templates...' : 'No templates found. Click "Sync Templates" to fetch your approved templates from ' + selectedPlatform.toUpperCase()}
+                      <div className="p-3 bg-stone-50 dark:bg-stone-900/50 rounded-lg text-xs text-muted-foreground">
+                        {isLoadingTemplates ? 'Loading templates...' : `No templates found. Click "Sync" to fetch from ${selectedPlatform.toUpperCase()}`}
                       </div>
                     )}
 
                     {selectedTemplate && (
                       <div className="space-y-3">
-                        <div className="p-3 bg-info-muted rounded-lg border border-info-border">
-                          <p className="text-xs font-medium text-foreground mb-2">Template Message:</p>
-                          <p className="text-sm text-muted-foreground">{selectedTemplate.text}</p>
+                        <div className="p-3 bg-stone-50 dark:bg-stone-900/50 rounded-lg border border-stone-200 dark:border-stone-800">
+                          <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-2">Template Message</p>
+                          <p className="text-sm text-foreground">{selectedTemplate.text}</p>
                         </div>
 
                         <div className="space-y-2">
-                          <Label className="text-sm font-semibold">Auto-Fetched Template IDs</Label>
+                          <p className="text-xs font-medium text-foreground">Auto-Fetched Template IDs</p>
                           
-                          <div className="p-3 bg-success-muted rounded-lg border border-success/30">
-                            <p className="text-xs font-medium text-success mb-1">DLT Template ID (TRAI Approval)</p>
+                          <div className="p-3 bg-stone-50 dark:bg-stone-900/50 rounded-lg border border-stone-200 dark:border-stone-800">
+                            <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-1">DLT Template ID</p>
                             <div className="flex items-center gap-2">
                               <input 
                                 type="text" 
                                 readOnly 
                                 value={dltTemplateId} 
-                                className="flex-1 px-2 py-1.5 text-sm font-mono bg-card border border-success/30 rounded text-foreground"
+                                className="flex-1 px-2 py-1.5 text-xs font-mono bg-white dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded text-foreground"
                               />
                               <button
                                 type="button"
                                 onClick={() => {
                                   navigator.clipboard.writeText(dltTemplateId);
-                                  toast({ title: 'Copied DLT ID', description: dltTemplateId });
+                                  toast({ title: 'Copied', description: dltTemplateId });
                                 }}
-                                className="px-2 py-1.5 bg-success-muted hover:bg-success/20 text-success text-xs font-medium rounded"
+                                className="px-2 py-1.5 bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-foreground text-xs font-medium rounded transition-colors"
                               >
                                 Copy
                               </button>
                             </div>
                           </div>
 
-                          <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
-                            <p className="text-xs font-medium text-primary mb-1">
+                          <div className="p-3 bg-stone-50 dark:bg-stone-900/50 rounded-lg border border-stone-200 dark:border-stone-800">
+                            <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-1">
                               {selectedPlatform === 'msg91' ? 'MSG91 Template ID' : 'Fast2SMS Template ID'}
                             </p>
                             <div className="flex items-center gap-2">
@@ -1536,15 +1489,15 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                                 type="text" 
                                 readOnly 
                                 value={templateId} 
-                                className="flex-1 px-2 py-1.5 text-sm font-mono bg-card border border-primary/30 rounded text-foreground"
+                                className="flex-1 px-2 py-1.5 text-xs font-mono bg-white dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded text-foreground"
                               />
                               <button
                                 type="button"
                                 onClick={() => {
                                   navigator.clipboard.writeText(templateId);
-                                  toast({ title: `Copied ${selectedPlatform.toUpperCase()} ID`, description: templateId });
+                                  toast({ title: 'Copied', description: templateId });
                                 }}
-                                className="px-2 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-medium rounded"
+                                className="px-2 py-1.5 bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-foreground text-xs font-medium rounded transition-colors"
                               >
                                 Copy
                               </button>
@@ -1562,19 +1515,10 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                           onMappingsChange={setVariableMappings}
                         />
 
-                        <div className={`mt-4 p-3 rounded-lg border space-y-3 ${
-                          selectedPlatform === 'fast2sms' && forceQuickSMS
-                            ? 'bg-destructive-muted border-destructive/30'
-                            : 'bg-info-muted border-info-border'
-                        }`}>
-                          <p className={`text-xs font-medium ${
-                            selectedPlatform === 'fast2sms' && forceQuickSMS
-                              ? 'text-destructive'
-                              : 'text-foreground'
-                          }`}>
-                            Test Send Before Campaign
-                            {selectedPlatform === 'fast2sms' && forceQuickSMS && ' - ₹5 charge'}
-                            {selectedPlatform === 'fast2sms' && !forceQuickSMS && dltTemplateId && ' - DLT'}
+                        <div className="mt-4 p-3 rounded-lg border border-stone-200 dark:border-stone-800 space-y-3">
+                          <p className="text-xs font-medium text-foreground">
+                            Test Send
+                            {selectedPlatform === 'fast2sms' && forceQuickSMS && <span className="text-amber-500"> · ₹5 charge</span>}
                           </p>
                           <div className="flex gap-2">
                             <Input
@@ -1582,13 +1526,14 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                               value={testPhoneNumber}
                               onChange={(e) => setTestPhoneNumber(e.target.value)}
                               disabled={isTestSending}
-                              className="flex-1"
+                              className="flex-1 h-9"
                             />
                             <Button
                               onClick={handleTestSend}
                               disabled={isTestSending || !message.trim()}
                               size="sm"
-                              variant={selectedPlatform === 'fast2sms' && forceQuickSMS ? 'destructive' : 'outline'}
+                              variant="outline"
+                              className="h-9"
                             >
                               {isTestSending ? (
                                 <>
@@ -1596,19 +1541,12 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                                   Sending...
                                 </>
                               ) : (
-                                'Send Test'
+                                'Test'
                               )}
                             </Button>
                           </div>
-                          <p className={`text-xs ${
-                            selectedPlatform === 'fast2sms' && forceQuickSMS
-                              ? 'text-destructive'
-                              : 'text-muted-foreground'
-                          }`}>
-                            {selectedPlatform === 'fast2sms' && forceQuickSMS
-                              ? 'Quick SMS charges ₹5 per message. This test will deduct ₹5 from your balance. Verify variables are correct before bulk send!'
-                              : 'Test your message with a single phone number before sending to the entire list.'
-                            }
+                          <p className="text-xs text-muted-foreground">
+                            Test your message before sending to the entire list.
                           </p>
                         </div>
                       </div>
@@ -1618,10 +1556,10 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
               </div>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="contactList">Select Contact List</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="contactList" className="text-xs text-muted-foreground">Select Contact List</Label>
                 <Select value={selectedListId} onValueChange={setSelectedListId}>
-                  <SelectTrigger id="contactList">
+                  <SelectTrigger id="contactList" className="h-9">
                     <SelectValue placeholder="Select a contact list" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1630,16 +1568,13 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                         <Loader2 className="h-4 w-4 animate-spin" />
                       </div>
                     ) : contactLists.length === 0 ? (
-                      <div className="p-4 text-sm text-muted-foreground">
+                      <div className="p-3 text-xs text-muted-foreground">
                         No contact lists found. Create one in WhatsApp Marketing first.
                       </div>
                     ) : (
                       contactLists.map((list) => (
                         <SelectItem key={list.id} value={list.id}>
-                          <div className="flex items-center gap-2">
-                            <span>{list.name}</span>
-                            <Badge variant="secondary" className="text-xs">{list.contactCount} contacts</Badge>
-                          </div>
+                          <span className="text-sm">{list.name} <span className="text-muted-foreground text-xs">· {list.contactCount} contacts</span></span>
                         </SelectItem>
                       ))
                     )}
@@ -1683,10 +1618,103 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                   </>
                 )}
               </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </div>
+
+            {/* Phone Preview - Sticky on desktop */}
+            <div className="lg:col-span-1">
+              <div className="lg:sticky lg:top-4">
+                <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-3">Live Preview</p>
+                
+                {/* Phone Frame */}
+                <div className="mx-auto w-[280px] h-[560px] bg-stone-900 rounded-[3rem] p-3 shadow-xl border-4 border-stone-800">
+                  {/* Phone Inner Frame */}
+                  <div className="w-full h-full bg-stone-950 rounded-[2.25rem] overflow-hidden flex flex-col">
+                    {/* Phone Notch */}
+                    <div className="flex justify-center pt-2 pb-1">
+                      <div className="w-20 h-5 bg-stone-900 rounded-full" />
+                    </div>
+                    
+                    {/* Phone Status Bar */}
+                    <div className="flex items-center justify-between px-6 py-1 text-[10px] text-stone-400">
+                      <span>9:41</span>
+                      <div className="flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"/></svg>
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M2 22h20V2z"/></svg>
+                      </div>
+                    </div>
+                    
+                    {/* Messages Header */}
+                    <div className="px-4 py-2 border-b border-stone-800">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-stone-700 flex items-center justify-center">
+                          <MessageSquare className="w-4 h-4 text-stone-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-medium text-stone-200">{campaignName || 'Campaign Name'}</p>
+                          <p className="text-[10px] text-stone-500">{selectedPlatform.toUpperCase()}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Messages Area */}
+                    <div className="flex-1 p-3 overflow-y-auto">
+                      {message ? (
+                        <div className="flex justify-start">
+                          <div className="max-w-[85%] bg-stone-800 rounded-2xl rounded-tl-sm px-3 py-2 shadow-sm">
+                            <p className="text-xs text-stone-200 whitespace-pre-wrap break-words leading-relaxed">
+                              {message.replace(/\{#VAR#\}|##[^#]+##|\{(\w+)\}/g, (match, varName) => {
+                                if (varName) {
+                                  const mapping = quickSMSMappings.find(m => m.variableName === varName);
+                                  if (mapping?.mappingType === 'static' && mapping.mappingValue) {
+                                    return mapping.mappingValue;
+                                  }
+                                  return `[${varName}]`;
+                                }
+                                return '[value]';
+                              })}
+                            </p>
+                            <p className="text-[9px] text-stone-500 mt-1 text-right">
+                              {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="h-full flex items-center justify-center">
+                          <div className="text-center">
+                            <MessageSquare className="w-8 h-8 text-stone-700 mx-auto mb-2" />
+                            <p className="text-xs text-stone-600">Enter your message to see preview</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Message Stats */}
+                    <div className="px-3 py-2 border-t border-stone-800 bg-stone-900/50">
+                      <div className="flex items-center justify-between text-[10px] text-stone-500">
+                        <span>{message.length} chars</span>
+                        <span>{smsCount} SMS segment{smsCount > 1 ? 's' : ''}</span>
+                        <span>{selectedListId ? (contactLists.find(l => l.id === selectedListId)?.contactCount || 0) : 0} recipients</span>
+                      </div>
+                    </div>
+                    
+                    {/* Home Indicator */}
+                    <div className="flex justify-center py-2">
+                      <div className="w-24 h-1 bg-stone-700 rounded-full" />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Preview Info */}
+                <div className="mt-4 p-3 bg-stone-50 dark:bg-stone-900/50 rounded-lg border border-stone-200 dark:border-stone-800">
+                  <p className="text-xs text-muted-foreground">
+                    This preview shows how your SMS will appear on recipients' devices. Variables like <code className="px-1 py-0.5 bg-stone-200 dark:bg-stone-800 rounded text-[10px]">{'{name}'}</code> will be replaced with actual contact data.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

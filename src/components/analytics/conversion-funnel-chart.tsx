@@ -6,12 +6,10 @@
  * Visual funnel showing customer journey stages with conversion rates and drop-offs
  */
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Icon } from '@iconify/react';
 import type { ConversionFunnel } from '@/types/analytics';
 import { formatNumber, formatCurrency, formatPercentage } from '@/lib/analytics-service';
-import { TrendingDown, Users, Eye, Mail, DollarSign, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface ConversionFunnelChartProps {
   funnel: ConversionFunnel;
@@ -23,105 +21,120 @@ export default function ConversionFunnelChart({ funnel }: ConversionFunnelChartP
   // Calculate widths for visual funnel (proportional to count)
   const maxCount = stages.views.count;
   const viewWidth = 100;
-  const leadWidth = (stages.leads.count / maxCount) * 100;
-  const engagedWidth = (stages.engaged.count / maxCount) * 100;
-  const revenueWidth = (stages.revenue.customerCount / maxCount) * 100;
+  const leadWidth = Math.max((stages.leads.count / maxCount) * 100, 5);
+  const engagedWidth = Math.max((stages.engaged.count / maxCount) * 100, 5);
+  const revenueWidth = Math.max((stages.revenue.customerCount / maxCount) * 100, 5);
   
   return (
-    <Card>
-      <CardHeader>
+    <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+      
+      {/* Header */}
+      <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              Conversion Funnel
+            <div className="flex items-center gap-2">
+              <Icon icon="solar:filter-linear" className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                Conversion Funnel
+              </span>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <Info className="h-4 w-4 text-muted-foreground" />
+                    <Icon icon="solar:info-circle-linear" className="h-3.5 w-3.5 text-muted-foreground" />
                   </TooltipTrigger>
                   <TooltipContent className="max-w-xs">
-                    <p>Track how visitors progress through your customer journey from initial view to revenue</p>
+                    <p className="text-xs">Track how visitors progress through your customer journey from initial view to revenue</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-            </CardTitle>
-            <CardDescription>Customer journey from views to revenue</CardDescription>
+            </div>
+            <p className="text-xs text-muted-foreground mt-0.5">Customer journey from views to revenue</p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-primary">
+            <div className="text-xl font-semibold text-foreground">
               {formatPercentage(overallConversionRate)}
             </div>
-            <div className="text-xs text-muted-foreground">Overall Conversion</div>
+            <div className="text-[10px] text-muted-foreground">Overall Conversion</div>
           </div>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-6">
+      </div>
+      
+      <div className="p-4 space-y-6">
         {/* Visual Funnel */}
         <div className="space-y-3">
           {/* Stage 1: Views */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-muted-foreground" />
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-1.5">
+                <Icon icon="solar:eye-linear" className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="font-medium">{stages.views.label}</span>
               </div>
               <span className="text-muted-foreground">
                 {formatNumber(stages.views.count)} ({formatNumber(stages.views.unique)} unique)
               </span>
             </div>
-            <div className="h-12 bg-gradient-to-r from-violet-500 to-violet-400 rounded-md flex items-center justify-center text-white font-semibold shadow-sm"
-                 style={{ width: `${viewWidth}%` }}>
+            <div 
+              className="h-10 bg-stone-200 dark:bg-stone-700 rounded-lg flex items-center justify-center text-foreground text-xs font-medium"
+              style={{ width: `${viewWidth}%` }}
+            >
               100%
             </div>
           </div>
           
           {/* Stage 2: Leads */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-success" />
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-1.5">
+                <Icon icon="solar:users-group-rounded-linear" className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="font-medium">{stages.leads.label}</span>
               </div>
               <span className="text-muted-foreground">
                 {formatNumber(stages.leads.count)} leads ({formatPercentage(stages.leads.conversionRate)} conversion)
               </span>
             </div>
-            <div className="h-12 bg-success rounded-md flex items-center justify-center text-success-foreground font-semibold shadow-sm"
-                 style={{ width: `${leadWidth}%` }}>
+            <div 
+              className="h-10 bg-stone-300 dark:bg-stone-600 rounded-lg flex items-center justify-center text-foreground text-xs font-medium"
+              style={{ width: `${leadWidth}%` }}
+            >
               {formatPercentage(stages.leads.conversionRate)}
             </div>
           </div>
           
           {/* Stage 3: Engaged */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-primary" />
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-1.5">
+                <Icon icon="solar:letter-linear" className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="font-medium">{stages.engaged.label}</span>
               </div>
               <span className="text-muted-foreground">
                 {formatNumber(stages.engaged.count)} engaged ({formatPercentage(stages.engaged.conversionRate)} conversion)
               </span>
             </div>
-            <div className="h-12 bg-primary rounded-md flex items-center justify-center text-primary-foreground font-semibold shadow-sm"
-                 style={{ width: `${engagedWidth}%` }}>
+            <div 
+              className="h-10 bg-stone-400 dark:bg-stone-500 rounded-lg flex items-center justify-center text-white dark:text-stone-950 text-xs font-medium"
+              style={{ width: `${engagedWidth}%` }}
+            >
               {formatPercentage(stages.engaged.conversionRate)}
             </div>
           </div>
           
           {/* Stage 4: Revenue */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-1.5">
+                <Icon icon="solar:wallet-linear" className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="font-medium">{stages.revenue.label}</span>
               </div>
               <span className="text-muted-foreground">
                 {formatNumber(stages.revenue.customerCount)} customers | {formatCurrency(stages.revenue.totalRevenue)}
               </span>
             </div>
-            <div className="h-12 bg-gradient-to-r from-orange-500 to-orange-400 rounded-md flex items-center justify-center text-white font-semibold shadow-sm"
-                 style={{ width: `${Math.max(revenueWidth, 15)}%` }}>
+            <div 
+              className="h-10 bg-stone-500 dark:bg-stone-400 rounded-lg flex items-center justify-center text-white dark:text-stone-950 text-xs font-medium"
+              style={{ width: `${revenueWidth}%` }}
+            >
               {formatPercentage(stages.revenue.conversionRate)}
             </div>
           </div>
@@ -130,45 +143,43 @@ export default function ConversionFunnelChart({ funnel }: ConversionFunnelChartP
         {/* Drop-off Alerts */}
         {dropOffPoints.length > 0 && (
           <div className="space-y-2">
-            <h4 className="text-sm font-semibold flex items-center gap-2">
-              <TrendingDown className="h-4 w-4 text-muted-foreground" />
+            <h4 className="text-xs font-semibold flex items-center gap-1.5 text-muted-foreground">
+              <Icon icon="solar:graph-down-linear" className="h-3.5 w-3.5" />
               Drop-off Points & Recommendations
             </h4>
             {dropOffPoints.map((point, idx) => (
-              <Alert key={idx} variant="default">
-                <AlertDescription className="space-y-1">
-                  <p className="font-medium">{point.stage} - {formatPercentage(point.dropOffRate)} drop-off</p>
-                  <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                    {point.recommendations.map((rec, i) => (
-                      <li key={i}>{rec}</li>
-                    ))}
-                  </ul>
-                </AlertDescription>
-              </Alert>
+              <div key={idx} className="border border-stone-200 dark:border-stone-800 rounded-lg p-3 bg-stone-50 dark:bg-stone-900">
+                <p className="text-xs font-medium text-foreground">{point.stage} - {formatPercentage(point.dropOffRate)} drop-off</p>
+                <ul className="list-disc list-inside text-[11px] text-muted-foreground space-y-0.5 mt-1.5">
+                  {point.recommendations.map((rec, i) => (
+                    <li key={i}>{rec}</li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
         )}
         
         {/* Summary Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4 border-t border-stone-200 dark:border-stone-800">
           <div className="text-center">
-            <div className="text-2xl font-bold">{formatNumber(stages.views.count)}</div>
-            <div className="text-xs text-muted-foreground">Total Views</div>
+            <div className="text-lg font-semibold tabular-nums">{formatNumber(stages.views.count)}</div>
+            <div className="text-[10px] text-muted-foreground">Total Views</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold">{formatNumber(stages.leads.count)}</div>
-            <div className="text-xs text-muted-foreground">Leads Captured</div>
+            <div className="text-lg font-semibold tabular-nums">{formatNumber(stages.leads.count)}</div>
+            <div className="text-[10px] text-muted-foreground">Leads Captured</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold">{formatNumber(stages.engaged.count)}</div>
-            <div className="text-xs text-muted-foreground">Engaged</div>
+            <div className="text-lg font-semibold tabular-nums">{formatNumber(stages.engaged.count)}</div>
+            <div className="text-[10px] text-muted-foreground">Engaged</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold">{formatCurrency(stages.revenue.totalRevenue)}</div>
-            <div className="text-xs text-muted-foreground">Revenue</div>
+            <div className="text-lg font-semibold tabular-nums">{formatCurrency(stages.revenue.totalRevenue)}</div>
+            <div className="text-[10px] text-muted-foreground">Revenue</div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

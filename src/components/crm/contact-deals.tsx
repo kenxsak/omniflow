@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Plus, DollarSign } from 'lucide-react';
+import { Plus } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import type { Deal } from '@/types/crm';
 import { getDealsForContact, deleteDeal } from '@/app/actions/deal-actions';
 import { DealCard } from './deal-card';
@@ -72,42 +72,48 @@ export function ContactDeals({ contactId, contactName, companyId }: ContactDeals
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Deals</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800">
+          <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            Deals
+          </span>
+        </div>
+        <div className="p-4 sm:p-5">
           <div className="flex justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <Icon icon="solar:refresh-linear" className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
     <>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+      <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg">Deals</CardTitle>
+            <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+              Deals
+            </span>
             {deals.length > 0 && (
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 Pipeline value: {formatCurrency(totalValue)}
               </p>
             )}
           </div>
-          <Button size="sm" onClick={() => setShowForm(true)}>
-            <Plus className="h-4 w-4 mr-1" />
+          <Button size="sm" onClick={() => setShowForm(true)} className="h-7 text-xs">
+            <Plus className="h-3 w-3 mr-1" />
             Add Deal
           </Button>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div className="p-4 sm:p-5">
           {deals.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <DollarSign className="h-10 w-10 mx-auto mb-2 opacity-50" />
-              <p>No deals yet</p>
-              <p className="text-sm">Create a deal to track opportunities with this contact</p>
+            <div className="text-center py-8">
+              <Icon icon="solar:dollar-linear" className="h-10 w-10 mx-auto text-muted-foreground/50 mb-2" />
+              <p className="text-sm text-muted-foreground">No deals yet</p>
+              <p className="text-xs text-muted-foreground mt-1">Create a deal to track opportunities with this contact</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -121,8 +127,8 @@ export function ContactDeals({ contactId, contactName, companyId }: ContactDeals
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <DealForm
         open={showForm}

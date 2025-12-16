@@ -1,20 +1,16 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { useCompanyApiKeys } from '@/hooks/use-company-api-keys';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Sparkles, Loader2, RefreshCw, ArrowLeft, ArrowRight, Send, Info, Mail, CheckCircle, AlertTriangle, Settings, Users, FileText, Save, BookmarkPlus } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
@@ -36,6 +32,13 @@ const EXAMPLE_PROMPTS = [
   "Holiday special event next Friday. Friendly tone. Include early bird discount. CTA: Reserve Your Spot",
 ];
 
+// Custom AI Email Icon
+const AIEmailIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" fill="currentColor" className={className}>
+    <path fillRule="evenodd" d="M1.537 1.26a.4.4 0 0 1 .088-.01h9.75q.045 0 .088.01L6.5 4.738zM.033 1.3A1.6 1.6 0 0 0 0 1.626v6.75A1.625 1.625 0 0 0 1.625 10H5a.625.625 0 1 0 0-1.25H1.625a.375.375 0 0 1-.375-.375V2.586l4.891 3.426a.63.63 0 0 0 .718 0l4.891-3.426v4.039a.625.625 0 1 0 1.25 0v-5A1.627 1.627 0 0 0 11.375 0h-9.75A1.625 1.625 0 0 0 .033 1.3m11.143 6.1c-.195-.87-1.428-.865-1.616.006l-.02.097A2.65 2.65 0 0 1 7.422 9.57c-.896.159-.896 1.453 0 1.612a2.65 2.65 0 0 1 2.118 2.066l.02.097c.188.87 1.42.877 1.616.007l.025-.113a2.67 2.67 0 0 1 2.126-2.056c.897-.159.897-1.455 0-1.614A2.67 2.67 0 0 1 11.2 7.512z" clipRule="evenodd" />
+  </svg>
+);
+
 interface BrevoList {
   id: number;
   name: string;
@@ -49,7 +52,6 @@ interface SenderList {
 }
 
 type DeliveryProvider = 'brevo' | 'sender' | 'smtp';
-
 type WizardStage = 1 | 2 | 3;
 
 export default function AICampaignStudioPage() {
@@ -110,20 +112,13 @@ export default function AICampaignStudioPage() {
             setSelectedBrevoListId(result.lists[0].id.toString());
           }
         }
-      } else {
-        console.error('Failed to fetch Brevo lists:', result.error);
-        toast({
-          title: 'Failed to Load Brevo Lists',
-          description: result.error || 'Could not load your Brevo email lists.',
-          variant: 'destructive',
-        });
       }
     } catch (error) {
       console.error('Error fetching Brevo lists:', error);
     } finally {
       setIsLoadingBrevoLists(false);
     }
-  }, [apiKeys, toast, selectedBrevoListId]);
+  }, [apiKeys, selectedBrevoListId]);
 
   const fetchSenderLists = useCallback(async () => {
     if (!apiKeys?.sender?.apiKey) return;
@@ -140,20 +135,13 @@ export default function AICampaignStudioPage() {
         if (result.lists.length > 0 && !selectedSenderListId) {
           setSelectedSenderListId(result.lists[0].id);
         }
-      } else {
-        console.error('Failed to fetch Sender lists:', result.error);
-        toast({
-          title: 'Failed to Load Sender Lists',
-          description: result.error || 'Could not load your Sender.net email lists.',
-          variant: 'destructive',
-        });
       }
     } catch (error) {
       console.error('Error fetching Sender lists:', error);
     } finally {
       setIsLoadingSenderLists(false);
     }
-  }, [apiKeys, toast, selectedSenderListId]);
+  }, [apiKeys, selectedSenderListId]);
 
   const fetchInternalLists = useCallback(async () => {
     if (!appUser?.idToken) return;
@@ -166,8 +154,6 @@ export default function AICampaignStudioPage() {
         if (result.lists.length > 0 && !selectedInternalListId) {
           setSelectedInternalListId(result.lists[0].id);
         }
-      } else {
-        console.error('Failed to fetch internal lists:', result.error);
       }
     } catch (error) {
       console.error('Error fetching internal lists:', error);
@@ -227,7 +213,6 @@ export default function AICampaignStudioPage() {
         
         if (result.success && result.draft) {
           const draft = result.draft;
-          
           setCampaignPrompt(draft.originalPrompt || '');
           setParsedBrief(draft.parsedBrief || null);
           setEmailContent(draft.emailContent || null);
@@ -238,31 +223,15 @@ export default function AICampaignStudioPage() {
             setStage(3);
             toast({
               title: 'Draft Loaded',
-              description: 'Your saved draft is ready to send. Select an email list and provider to continue.',
+              description: 'Your saved draft is ready to send.',
             });
           } else {
             setStage(1);
             setLoadedFromDraft(false);
-            toast({
-              title: 'Draft Missing Email Content',
-              description: 'This draft does not have complete email content. Please generate new content.',
-              variant: 'destructive',
-            });
           }
-        } else {
-          toast({
-            title: 'Draft Not Found',
-            description: result.error || 'Could not load the draft. It may have been deleted.',
-            variant: 'destructive',
-          });
         }
       } catch (error: any) {
         console.error('Error loading draft:', error);
-        toast({
-          title: 'Error Loading Draft',
-          description: error.message || 'Failed to load draft',
-          variant: 'destructive',
-        });
       } finally {
         setIsLoadingDraft(false);
       }
@@ -281,51 +250,26 @@ export default function AICampaignStudioPage() {
   const hasSmtpConfigured = Boolean(apiKeys?.smtp?.host);
   const hasAnyProvider = hasBrevoConfigured || hasSenderConfigured || hasSmtpConfigured;
 
-
   const handleGenerateCampaign = async () => {
-    if (!campaignPrompt.trim()) {
-      toast({
-        title: 'Prompt Required',
-        description: 'Please describe your campaign to get started',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (!appUser?.companyId || !appUser?.uid) {
-      toast({
-        title: 'Authentication Required',
-        description: 'Please sign in to generate campaigns',
-        variant: 'destructive',
-      });
-      return;
-    }
+    if (!campaignPrompt.trim() || !appUser?.companyId || !appUser?.uid) return;
 
     setIsGenerating(true);
     
     try {
       const result = await generateEmailCampaignAction(appUser.companyId, appUser.uid, campaignPrompt);
       
-      if (!result) {
+      if (!result?.success || !result.data) {
         toast({
           title: 'Generation Failed',
-          description: 'Server action failed. Please refresh the page and try again.',
-          variant: 'destructive',
-        });
-        return;
-      }
-      
-      if (!result.success || !result.data) {
-        toast({
-          title: 'Generation Failed',
-          description: result.error || 'Failed to generate campaign',
+          description: result?.error || 'Failed to generate campaign',
           variant: 'destructive',
         });
         return;
       }
 
-      setParsedBrief(result.parsedBrief || null);
-      
+      if (result.parsedBrief) {
+        setParsedBrief(result.parsedBrief as ParsedCampaignBrief);
+      }
       setEmailContent({
         subjectLines: result.data.subjectLineSuggestions,
         selectedSubjectIndex: 0,
@@ -338,41 +282,27 @@ export default function AICampaignStudioPage() {
           const draftResult = await createAICampaignDraftAction({
             idToken: appUser.idToken,
             originalPrompt: campaignPrompt,
-            parsedBrief: result.parsedBrief,
+            parsedBrief: result.parsedBrief as ParsedCampaignBrief | undefined,
             emailContent: {
               subjectLines: result.data.subjectLineSuggestions,
               selectedSubjectIndex: 0,
               htmlBody: result.data.htmlContent,
               ctaSuggestions: result.data.ctaSuggestions,
             },
-            selectedChannels: ['email'], // FIX Issue 2: Mark draft as email-only
+            selectedChannels: ['email'],
           });
 
           if (draftResult.success && draftResult.draft) {
             setCurrentDraftId(draftResult.draft.id);
-          } else {
-            console.error('Draft creation failed:', draftResult.error);
-            toast({
-              title: 'Warning: Draft Not Saved',
-              description: draftResult.error || 'Could not auto-save your campaign. You can still review and manually save it.',
-              variant: 'destructive',
-            });
           }
-        } catch (draftError: any) {
+        } catch (draftError) {
           console.error('Error creating draft:', draftError);
-          toast({
-            title: 'Warning: Draft Not Saved',
-            description: 'Could not auto-save your campaign. You can still review and manually save it before publishing.',
-            variant: 'destructive',
-          });
         }
       }
 
       showAIContentReadyToast(toast, "Email Campaign", result.quotaInfo);
-      
       setStage(2);
     } catch (error: any) {
-      console.error('Error generating campaign:', error);
       toast({
         title: 'Error',
         description: error.message || 'An unexpected error occurred',
@@ -381,14 +311,6 @@ export default function AICampaignStudioPage() {
     } finally {
       setIsGenerating(false);
     }
-  };
-
-  const handleUseExample = (example: string) => {
-    setCampaignPrompt(example);
-  };
-
-  const handleRegenerateCampaign = async () => {
-    await handleGenerateCampaign();
   };
 
   const handleSaveDraft = async () => {
@@ -402,40 +324,16 @@ export default function AICampaignStudioPage() {
         parsedBrief: parsedBrief || undefined,
         emailContent: emailContent || undefined,
       });
-
-      toast({
-        title: 'Draft Saved',
-        description: 'Your changes have been saved',
-      });
+      toast({ title: 'Draft Saved' });
     } catch (error: any) {
-      toast({
-        title: 'Save Failed',
-        description: error.message || 'Failed to save draft',
-        variant: 'destructive',
-      });
+      toast({ title: 'Save Failed', variant: 'destructive' });
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleOpenSaveTemplateDialog = () => {
-    const defaultName = parsedBrief?.campaignGoal || 'Email Template';
-    setTemplateName(defaultName);
-    setTemplateDescription('');
-    setSaveTemplateDialogOpen(true);
-  };
-
   const handleSaveAsTemplate = async () => {
-    if (!appUser?.idToken || !emailContent) return;
-    
-    if (!templateName.trim()) {
-      toast({
-        title: 'Name Required',
-        description: 'Please enter a name for the template',
-        variant: 'destructive',
-      });
-      return;
-    }
+    if (!appUser?.idToken || !emailContent || !templateName.trim()) return;
 
     setIsSavingTemplate(true);
     try {
@@ -452,56 +350,18 @@ export default function AICampaignStudioPage() {
       });
 
       if (result.success) {
-        toast({
-          title: 'Template Saved!',
-          description: 'You can now reuse this email design anytime without AI credits.',
-        });
+        toast({ title: 'Template Saved!' });
         setSaveTemplateDialogOpen(false);
-      } else {
-        toast({
-          title: 'Save Failed',
-          description: result.error || 'Failed to save template',
-          variant: 'destructive',
-        });
       }
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to save template',
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', variant: 'destructive' });
     } finally {
       setIsSavingTemplate(false);
     }
   };
 
   const handlePublishCampaigns = async () => {
-    if (!appUser?.idToken || !appUser?.companyId) {
-      toast({
-        title: 'Authentication Required',
-        description: 'Please sign in to publish campaigns',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (!selectedInternalListId) {
-      toast({
-        title: 'Email List Required',
-        description: 'Please select an email list from your OmniFlow contacts',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (!deliveryProvider) {
-      toast({
-        title: 'Delivery Provider Required',
-        description: 'Please select how you want to send your emails (Brevo, Sender, or SMTP)',
-        variant: 'destructive',
-      });
-      return;
-    }
+    if (!appUser?.idToken || !appUser?.companyId || !selectedInternalListId || !deliveryProvider) return;
 
     let draftIdToUse = currentDraftId;
     if (!draftIdToUse) {
@@ -518,19 +378,9 @@ export default function AICampaignStudioPage() {
           draftIdToUse = draftResult.draft.id;
           setCurrentDraftId(draftIdToUse);
         } else {
-          toast({
-            title: 'Cannot Publish',
-            description: draftResult.error || 'Please save your campaign as a draft first before publishing.',
-            variant: 'destructive',
-          });
           return;
         }
-      } catch (error: any) {
-        toast({
-          title: 'Cannot Publish',
-          description: 'Failed to save campaign. Please try saving manually first.',
-          variant: 'destructive',
-        });
+      } catch (error) {
         return;
       }
     }
@@ -543,16 +393,7 @@ export default function AICampaignStudioPage() {
       let providerListName: string | undefined;
       let syncedContactCount = 0;
 
-      if (deliveryProvider === 'brevo') {
-        if (!apiKeys?.brevo?.apiKey) {
-          throw new Error('Brevo API key not configured. Please set it up in Settings.');
-        }
-        
-        toast({
-          title: 'Syncing Contacts to Brevo...',
-          description: 'Please wait while we sync your contacts.',
-        });
-
+      if (deliveryProvider === 'brevo' && apiKeys?.brevo?.apiKey) {
         const syncResult = await syncEmailListToBrevoAction(
           selectedInternalListId,
           appUser.companyId,
@@ -561,32 +402,12 @@ export default function AICampaignStudioPage() {
           selectedBrevoListId === '__new__'
         );
 
-        if (!syncResult.success) {
-          throw new Error(syncResult.errorMessage || 'Failed to sync contacts to Brevo');
-        }
+        if (!syncResult.success) throw new Error(syncResult.errorMessage);
 
         providerListId = syncResult.providerListId;
         providerListName = syncResult.providerListName || selectedInternalList?.name;
         syncedContactCount = syncResult.syncedCount;
-
-        toast({
-          title: 'Contacts Synced!',
-          description: `${syncResult.syncedCount} contacts synced to Brevo${syncResult.skippedCount > 0 ? `, ${syncResult.skippedCount} skipped` : ''}.`,
-        });
-      } else if (deliveryProvider === 'sender') {
-        if (!apiKeys?.sender?.apiKey) {
-          throw new Error('Sender.net API key not configured. Please set it up in Settings.');
-        }
-
-        if (!selectedSenderListId) {
-          throw new Error('Please select a Sender.net list to sync contacts to.');
-        }
-
-        toast({
-          title: 'Syncing Contacts to Sender.net...',
-          description: 'Please wait while we sync your contacts.',
-        });
-
+      } else if (deliveryProvider === 'sender' && apiKeys?.sender?.apiKey) {
         const syncResult = await syncEmailListToSenderAction(
           selectedInternalListId,
           appUser.companyId,
@@ -594,18 +415,11 @@ export default function AICampaignStudioPage() {
           selectedSenderListId
         );
 
-        if (!syncResult.success) {
-          throw new Error(syncResult.errorMessage || 'Failed to sync contacts to Sender.net');
-        }
+        if (!syncResult.success) throw new Error(syncResult.errorMessage);
 
         providerListId = syncResult.providerListId;
         providerListName = senderLists.find(l => l.id === selectedSenderListId)?.name;
         syncedContactCount = syncResult.syncedCount;
-
-        toast({
-          title: 'Contacts Synced!',
-          description: `${syncResult.syncedCount} contacts synced to Sender.net${syncResult.skippedCount > 0 ? `, ${syncResult.skippedCount} skipped` : ''}.`,
-        });
       } else if (deliveryProvider === 'smtp') {
         providerListId = selectedInternalListId;
         providerListName = selectedInternalList?.name;
@@ -625,8 +439,6 @@ export default function AICampaignStudioPage() {
           listId: String(providerListId),
           listName: providerListName || 'Email List',
           recipientCount: syncedContactCount,
-          internalListId: selectedInternalListId,
-          internalListName: selectedInternalList?.name,
         },
       });
 
@@ -635,179 +447,129 @@ export default function AICampaignStudioPage() {
         draftId: draftIdToUse,
       });
 
-      if (!publishResult.success) {
+      if (publishResult.success) {
         toast({
-          title: 'Publishing Failed',
-          description: publishResult.error || 'Failed to publish campaigns',
-          variant: 'destructive',
+          title: 'Email Campaign Published!',
+          description: `Campaign will be sent to ${syncedContactCount} contacts.`,
         });
-        return;
-      }
 
-      if (publishResult.error) {
-        toast({
-          title: '⚠️ Partial Success',
-          description: `Email campaign published, but: ${publishResult.error}`,
-          variant: 'default',
-        });
-      } else {
-        try {
-          const confetti = (await import('canvas-confetti')).default;
-          confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 }
-          });
-        } catch (confettiError) {
-          console.warn('Confetti animation failed:', confettiError);
-        }
+        if (draftIdFromUrl) router.replace('/campaigns/ai-email');
         
-        toast({
-          title: '🎉 Email Campaign Published!',
-          description: `Your campaign will be sent to ${syncedContactCount} contacts. Check delivery status to track progress.`,
-        });
+        setTimeout(() => {
+          setCampaignPrompt('');
+          setParsedBrief(null);
+          setEmailContent(null);
+          setSelectedInternalListId('');
+          setDeliveryProvider(null);
+          setCurrentDraftId(null);
+          setLoadedFromDraft(false);
+          setAttemptedDraftId(null);
+          setStage(1);
+        }, 3000);
       }
-
-      if (draftIdFromUrl) {
-        router.replace('/campaigns/ai-email');
-      }
-      
-      setTimeout(() => {
-        setCampaignPrompt('');
-        setParsedBrief(null);
-        setEmailContent(null);
-        setEmailListId('');
-        setSelectedInternalListId('');
-        setDeliveryProvider(null);
-        setCurrentDraftId(null);
-        setLoadedFromDraft(false);
-        setAttemptedDraftId(null);
-        setStage(1);
-      }, 3000);
-
     } catch (error: any) {
-      console.error('Error publishing campaigns:', error);
-      toast({
-        title: 'Publishing Error',
-        description: error.message || 'An unexpected error occurred',
-        variant: 'destructive',
-      });
+      toast({ title: 'Publishing Error', description: error.message, variant: 'destructive' });
     } finally {
       setIsPublishing(false);
       setIsSyncing(false);
     }
   };
 
-  const progressPercentage = useMemo(() => {
-    if (stage === 1) return 33;
-    if (stage === 2) return 66;
-    return 100;
-  }, [stage]);
-
-  const canProceedToStage2 = useMemo(() => Boolean(parsedBrief && emailContent), [parsedBrief, emailContent]);
-  const canProceedToStage3 = canProceedToStage2;
+  const canProceedToStage3 = Boolean(parsedBrief && emailContent);
 
   if (isLoadingDraft) {
     return (
-      <div className="container mx-auto py-6 max-w-6xl">
-        <div className="flex flex-col items-center justify-center py-24">
-          <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-          <h2 className="text-xl font-semibold">Loading Your Draft...</h2>
-          <p className="text-muted-foreground mt-2">Preparing your saved campaign for sending</p>
-        </div>
+      <div className="flex flex-col items-center justify-center py-24">
+        <Icon icon="solar:refresh-linear" className="h-8 w-8 animate-spin text-muted-foreground mb-4" />
+        <p className="text-muted-foreground">Loading your draft...</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-4 sm:py-6 px-4 sm:px-6 max-w-6xl">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-            <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-            AI Email Campaign Studio
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground mt-1">
-            Create professional email campaigns from a single prompt using AI
+    <div className="space-y-6">
+      {/* Page Header */}
+      <header className="relative flex w-full flex-col gap-4">
+        <div className="flex justify-between gap-x-8 items-center">
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <h1 className="text-2xl font-semibold text-foreground flex items-center gap-2">
+              <AIEmailIcon className="h-6 w-6" />
+              AI Email Campaign Studio
+            </h1>
+            <p className="text-sm text-muted-foreground">Create professional email campaigns from a single prompt using AI</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" asChild className="h-8 shadow-sm">
+              <Link href="/campaigns/ai-email/saved-templates">
+                <Icon icon="solar:bookmark-linear" className="mr-1.5 h-4 w-4" />
+                Saved Templates
+              </Link>
+            </Button>
+            <Badge variant="secondary" className="text-xs">BETA</Badge>
+          </div>
+        </div>
+      </header>
+
+      {/* Draft Alert */}
+      {loadedFromDraft && (
+        <div className="p-3 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
+          <p className="text-sm text-muted-foreground">
+            <Icon icon="solar:document-text-linear" className="h-4 w-4 inline mr-2" />
+            Using saved draft - No AI credits will be used.
+            <Link href="/campaigns/ai-email/drafts" className="ml-2 underline">View all drafts</Link>
           </p>
         </div>
-        
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/campaigns/ai-email/saved-templates">
-              <BookmarkPlus className="mr-1 sm:mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Saved Templates</span>
-              <span className="sm:hidden">Templates</span>
-            </Link>
-          </Button>
-          <Badge variant="outline" className="text-xs sm:text-sm">
-            <span className="mr-1 sm:mr-2">🚀</span>
-            <span className="hidden sm:inline">BETA</span>
-          </Badge>
-        </div>
-      </div>
-
-      {loadedFromDraft && (
-        <Alert className="mb-6 border-green-500 bg-green-50 dark:bg-green-950">
-          <FileText className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-700 dark:text-green-300">
-            <strong>Using saved draft</strong> - No AI credits will be used. Select an email list and provider to send this campaign to a new audience.
-            <Link href="/campaigns/ai-email/drafts" className="ml-2 underline">
-              View all drafts
-            </Link>
-          </AlertDescription>
-        </Alert>
       )}
 
-      <Progress value={progressPercentage} className="mb-6" />
-
-      <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
-        <Card className={stage >= 1 ? 'border-primary' : ''}>
-          <CardHeader className="p-2 sm:pb-3 sm:p-6">
-            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
-              <div className={`rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm ${stage >= 1 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                1
-              </div>
-              <CardTitle className="text-xs sm:text-lg text-center sm:text-left">Describe</CardTitle>
-            </div>
-          </CardHeader>
-        </Card>
-
-        <Card className={stage >= 2 ? 'border-primary' : ''}>
-          <CardHeader className="p-2 sm:pb-3 sm:p-6">
-            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
-              <div className={`rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm ${stage >= 2 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                2
-              </div>
-              <CardTitle className="text-xs sm:text-lg text-center sm:text-left">Review</CardTitle>
-            </div>
-          </CardHeader>
-        </Card>
-
-        <Card className={stage >= 3 ? 'border-primary' : ''}>
-          <CardHeader className="p-2 sm:pb-3 sm:p-6">
-            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
-              <div className={`rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm ${stage >= 3 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                3
-              </div>
-              <CardTitle className="text-xs sm:text-lg text-center sm:text-left">Publish</CardTitle>
-            </div>
-          </CardHeader>
-        </Card>
+      {/* Progress Bar */}
+      <div className="h-1 bg-stone-200 dark:bg-stone-800 rounded-full overflow-hidden">
+        <div 
+          className="h-full bg-foreground transition-all duration-300" 
+          style={{ width: stage === 1 ? '33%' : stage === 2 ? '66%' : '100%' }}
+        />
       </div>
 
+      {/* Stage Indicators */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { num: 1, label: 'Describe' },
+          { num: 2, label: 'Review' },
+          { num: 3, label: 'Publish' },
+        ].map((s) => (
+          <div 
+            key={s.num}
+            className={`relative border rounded-xl p-3 transition-all ${
+              stage >= s.num 
+                ? 'border-foreground bg-white dark:bg-stone-950' 
+                : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <div className={`h-6 w-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                stage >= s.num 
+                  ? 'bg-foreground text-background' 
+                  : 'bg-stone-200 dark:bg-stone-800 text-muted-foreground'
+              }`}>
+                {s.num}
+              </div>
+              <span className="text-sm font-medium">{s.label}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+
+      {/* Stage 1: Describe */}
       {stage === 1 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Stage 1: Describe Your Email Campaign</CardTitle>
-            <CardDescription>
-              Tell us about your campaign in plain language. Our AI will generate a professional email with subject lines and content ready to send.
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="space-y-4">
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Stage 1: Describe Your Email Campaign</span>
+            <p className="text-xs text-muted-foreground mt-0.5">Tell us about your campaign in plain language</p>
+          </div>
+          <div className="p-4 space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="prompt">Campaign Description</Label>
+              <Label htmlFor="prompt" className="text-sm">Campaign Description</Label>
               <Textarea
                 id="prompt"
                 placeholder="Example: Flash sale - 50% off everything! Ends tonight. Target all customers. Urgent tone. CTA: Shop Now"
@@ -819,212 +581,199 @@ export default function AICampaignStudioPage() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm text-muted-foreground">Try an example:</Label>
+              <Label className="text-xs text-muted-foreground">Try an example:</Label>
               <div className="grid gap-2">
                 {EXAMPLE_PROMPTS.map((example, idx) => (
                   <Button
                     key={idx}
                     variant="outline"
-                    size="sm"
-                    onClick={() => handleUseExample(example)}
-                    className="justify-start h-auto py-2 text-left whitespace-normal"
+                    onClick={() => setCampaignPrompt(example)}
+                    className="h-auto py-2.5 px-3 justify-start text-left whitespace-normal"
                   >
-                    <Sparkles className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-current mr-2.5 shrink-0" />
                     <span className="text-sm">{example}</span>
                   </Button>
                 ))}
               </div>
             </div>
-          </CardContent>
-
-          <CardFooter className="flex justify-between">
-            <div />
+          </div>
+          <div className="px-4 py-3 border-t border-stone-200 dark:border-stone-800 flex justify-end">
             <Button 
               onClick={handleGenerateCampaign} 
               disabled={isGenerating || !campaignPrompt.trim()}
-              size="lg"
+              className="h-9 shadow-sm"
             >
               {isGenerating ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Icon icon="solar:refresh-linear" className="mr-2 h-4 w-4 animate-spin" />
                   Generating...
                 </>
               ) : (
                 <>
-                  <Sparkles className="mr-2 h-4 w-4" />
+                  <AIEmailIcon className="mr-2 h-4 w-4" />
                   Generate Campaign
                 </>
               )}
             </Button>
-          </CardFooter>
-        </Card>
+          </div>
+        </div>
       )}
 
+      {/* Stage 2: Review */}
       {stage === 2 && parsedBrief && emailContent && (
         <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Stage 2: Review & Customize Content</CardTitle>
-                  <CardDescription>
-                    Review and edit the AI-generated content for each channel
-                  </CardDescription>
-                </div>
-                <Button variant="outline" size="sm" onClick={handleRegenerateCampaign} disabled={isGenerating}>
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Regenerate
-                </Button>
+          <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+            <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+              <div>
+                <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Stage 2: Review & Customize Content</span>
+                <p className="text-xs text-muted-foreground mt-0.5">Review and edit the AI-generated content for each channel</p>
               </div>
-            </CardHeader>
+              <Button variant="outline" size="sm" onClick={handleGenerateCampaign} disabled={isGenerating} className="h-7 text-xs shadow-sm">
+                <Icon icon="solar:refresh-linear" className="mr-1.5 h-3.5 w-3.5" />
+                Regenerate
+              </Button>
+            </div>
 
-            <CardContent>
-              <div className="bg-muted p-4 rounded-lg mb-4 space-y-2">
-                <h3 className="font-semibold">Campaign Brief</h3>
+            <div className="p-4 space-y-4">
+              {/* Campaign Brief */}
+              <div className="p-4 rounded-lg bg-stone-50 dark:bg-stone-900/50 border border-stone-200 dark:border-stone-800">
+                <h3 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase mb-3">Campaign Brief</h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Goal:</span> {parsedBrief.campaignGoal}
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Audience:</span> {parsedBrief.targetAudience}
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Tone:</span> {parsedBrief.tone}
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">CTA:</span> {parsedBrief.callToAction}
-                  </div>
+                  <div><span className="text-muted-foreground">Goal:</span> {parsedBrief.campaignGoal}</div>
+                  <div><span className="text-muted-foreground">Audience:</span> {parsedBrief.targetAudience}</div>
+                  <div><span className="text-muted-foreground">Tone:</span> {parsedBrief.tone}</div>
+                  <div><span className="text-muted-foreground">CTA:</span> {parsedBrief.callToAction}</div>
                 </div>
               </div>
 
-              <Tabs defaultValue="email" className="w-full">
-                <TabsList className="grid w-full grid-cols-1">
-                  <TabsTrigger value="email" className="flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
-                    Email Content
-                  </TabsTrigger>
-                </TabsList>
+              {/* Email Content Tab */}
+              <div className="border-b border-stone-200 dark:border-stone-800 pb-2">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Icon icon="solar:letter-linear" className="h-4 w-4" />
+                  Email Content
+                </div>
+              </div>
 
-                <TabsContent value="email" className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label>Subject Line</Label>
-                    <Select
-                      value={String(emailContent.selectedSubjectIndex)}
-                      onValueChange={(value) =>
-                        setEmailContent({
-                          ...emailContent,
-                          selectedSubjectIndex: parseInt(value),
-                        })
-                      }
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm">Subject Line</Label>
+                  <Select
+                    value={String(emailContent.selectedSubjectIndex)}
+                    onValueChange={(value) =>
+                      setEmailContent({ ...emailContent, selectedSubjectIndex: parseInt(value) })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {emailContent.subjectLines.map((subject, idx) => (
+                        <SelectItem key={idx} value={String(idx)}>{subject}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm">Email Body (HTML)</Label>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => {
+                        navigator.clipboard.writeText(emailContent.htmlBody);
+                        toast({ title: 'Copied to clipboard' });
+                      }}
                     >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {emailContent.subjectLines.map((subject, idx) => (
-                          <SelectItem key={idx} value={String(idx)}>
-                            {subject}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      <Icon icon="solar:copy-linear" className="h-3.5 w-3.5 mr-1.5" />
+                      Copy
+                    </Button>
                   </div>
+                  <Textarea
+                    value={emailContent.htmlBody}
+                    onChange={(e) => setEmailContent({ ...emailContent, htmlBody: e.target.value })}
+                    rows={12}
+                    className="font-mono text-xs"
+                  />
+                </div>
+              </div>
+            </div>
 
-                  <div className="space-y-2">
-                    <Label>Email Body (HTML)</Label>
-                    <Textarea
-                      value={emailContent.htmlBody}
-                      onChange={(e) =>
-                        setEmailContent({ ...emailContent, htmlBody: e.target.value })
-                      }
-                      rows={12}
-                      className="font-mono text-sm"
-                    />
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-
-            <CardFooter className="flex justify-between">
-              <Button variant="outline" onClick={() => setStage(1)}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
+            <div className="px-4 py-3 border-t border-stone-200 dark:border-stone-800 flex justify-between">
+              <Button variant="outline" onClick={() => setStage(1)} className="h-8 shadow-sm">
+                <Icon icon="solar:arrow-left-linear" className="mr-2 h-4 w-4" />
                 Back
               </Button>
               
               <div className="flex gap-2">
-                <Button variant="outline" onClick={handleOpenSaveTemplateDialog}>
-                  <BookmarkPlus className="mr-2 h-4 w-4" />
+                <Button variant="outline" onClick={() => {
+                  setTemplateName(parsedBrief?.campaignGoal || 'Email Template');
+                  setTemplateDescription('');
+                  setSaveTemplateDialogOpen(true);
+                }} className="h-8 shadow-sm">
+                  <Icon icon="solar:bookmark-linear" className="mr-2 h-4 w-4" />
                   Save as Template
                 </Button>
-                <Button variant="outline" onClick={handleSaveDraft} disabled={isSaving}>
-                  {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                <Button variant="outline" onClick={handleSaveDraft} disabled={isSaving} className="h-8 shadow-sm">
+                  {isSaving && <Icon icon="solar:refresh-linear" className="mr-2 h-4 w-4 animate-spin" />}
                   Save Draft
                 </Button>
-                <Button onClick={() => setStage(3)} disabled={!canProceedToStage3}>
+                <Button onClick={() => setStage(3)} disabled={!canProceedToStage3} className="h-8 shadow-sm">
                   Continue
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <Icon icon="solar:arrow-right-linear" className="ml-2 h-4 w-4" />
                 </Button>
               </div>
-            </CardFooter>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
 
+      {/* Stage 3: Publish */}
       {stage === 3 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Stage 3: Select Audience & Send</CardTitle>
-            <CardDescription>
-              Choose your contacts and delivery provider to send your AI-generated campaign
-            </CardDescription>
-          </CardHeader>
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Stage 3: Select Audience & Send</span>
+            <p className="text-xs text-muted-foreground mt-0.5">Choose your contacts and delivery provider</p>
+          </div>
 
-          <CardContent className="space-y-6">
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertDescription>
-                <strong>Need SMS or WhatsApp?</strong> For SMS and WhatsApp campaigns, use the manual campaign tools with your approved message templates. AI Campaign Studio is email-only because SMS and WhatsApp require pre-approved templates that AI cannot generate.
-              </AlertDescription>
-            </Alert>
-
-            {/* Step 1: Select Your Audience (Internal List) */}
-            <div className="space-y-4 p-4 border rounded-lg">
-              <div className="flex items-center gap-2">
-                <div className="rounded-full w-6 h-6 flex items-center justify-center bg-primary text-primary-foreground text-sm font-medium">
-                  1
-                </div>
-                <Label className="text-base font-medium">Select Your Audience</Label>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Choose which contacts from your OmniFlow email lists to send this campaign to.
+          <div className="p-4 space-y-6">
+            {/* Info Alert */}
+            <div className="p-3 rounded-lg bg-stone-50 dark:bg-stone-900/50 border border-stone-200 dark:border-stone-800">
+              <p className="text-xs text-muted-foreground">
+                <Icon icon="solar:info-circle-linear" className="h-4 w-4 inline mr-2" />
+                For SMS and WhatsApp campaigns, use the manual campaign tools with your approved message templates.
               </p>
+            </div>
+
+            {/* Step 1: Select Audience */}
+            <div className="space-y-3 p-4 rounded-lg border border-stone-200 dark:border-stone-800">
+              <div className="flex items-center gap-2">
+                <div className="h-6 w-6 rounded-full bg-foreground text-background flex items-center justify-center text-xs font-medium">1</div>
+                <Label className="text-sm font-medium">Select Your Audience</Label>
+              </div>
+              <p className="text-xs text-muted-foreground">Choose which contacts to send this campaign to.</p>
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label>Email List</Label>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={fetchInternalLists}
-                    disabled={isLoadingInternalLists}
-                    className="h-8"
-                  >
-                    <RefreshCw className={`h-3 w-3 mr-1 ${isLoadingInternalLists ? 'animate-spin' : ''}`} />
+                  <Label className="text-xs">Email List</Label>
+                  <Button variant="ghost" size="sm" onClick={fetchInternalLists} disabled={isLoadingInternalLists} className="h-7 text-xs">
+                    <Icon icon="solar:refresh-linear" className={`h-3 w-3 mr-1 ${isLoadingInternalLists ? 'animate-spin' : ''}`} />
                     Refresh
                   </Button>
                 </div>
                 
                 {isLoadingInternalLists ? (
-                  <div className="flex items-center gap-2 p-3 border rounded-md bg-muted">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span className="text-sm text-muted-foreground">Loading your email lists...</span>
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-stone-50 dark:bg-stone-900/50">
+                    <Icon icon="solar:refresh-linear" className="h-4 w-4 animate-spin" />
+                    <span className="text-sm text-muted-foreground">Loading lists...</span>
                   </div>
                 ) : internalLists.length === 0 ? (
-                  <div className="p-4 border rounded-md bg-muted text-center">
-                    <Users className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground mb-2">
-                      No email lists found. Create one first to continue.
-                    </p>
+                  <div className="p-4 rounded-lg bg-stone-50 dark:bg-stone-900/50 text-center">
+                    <Icon icon="solar:users-group-two-rounded-linear" className="h-6 w-6 mx-auto text-muted-foreground/40 mb-2" />
+                    <p className="text-sm text-muted-foreground mb-2">No email lists found.</p>
                     <Button asChild size="sm" variant="outline">
                       <Link href="/campaigns/email-lists">Create Email List</Link>
                     </Button>
@@ -1045,19 +794,9 @@ export default function AICampaignStudioPage() {
                     </Select>
                     
                     {selectedInternalList && (
-                      <div className="flex items-center gap-2 p-3 border rounded-md bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900">
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                        <span className="text-sm text-green-800 dark:text-green-200">
-                          <strong>{selectedInternalList.contactCount.toLocaleString()}</strong> contacts will receive this campaign
-                        </span>
-                      </div>
-                    )}
-                    
-                    {selectedInternalList?.contactCount === 0 && (
-                      <div className="p-3 border border-amber-200 rounded-md bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900">
-                        <p className="text-xs text-amber-800 dark:text-amber-200">
-                          This list has 0 contacts. Add contacts before publishing.
-                        </p>
+                      <div className="flex items-center gap-2 p-3 rounded-lg bg-stone-50 dark:bg-stone-900/50">
+                        <Icon icon="solar:check-circle-linear" className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{selectedInternalList.contactCount.toLocaleString()} contacts will receive this campaign</span>
                       </div>
                     )}
                   </>
@@ -1065,144 +804,77 @@ export default function AICampaignStudioPage() {
               </div>
             </div>
 
-            {/* Step 2: Choose Delivery Provider */}
+            {/* Step 2: Delivery Provider */}
             {selectedInternalListId && (
-              <div className="space-y-4 p-4 border rounded-lg">
+              <div className="space-y-3 p-4 rounded-lg border border-stone-200 dark:border-stone-800">
                 <div className="flex items-center gap-2">
-                  <div className="rounded-full w-6 h-6 flex items-center justify-center bg-primary text-primary-foreground text-sm font-medium">
-                    2
-                  </div>
-                  <Label className="text-base font-medium">Choose Delivery Channel</Label>
+                  <div className="h-6 w-6 rounded-full bg-foreground text-background flex items-center justify-center text-xs font-medium">2</div>
+                  <Label className="text-sm font-medium">Choose Delivery Channel</Label>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Select which email service to use for sending. Contacts will be synced automatically.
-                </p>
+                <p className="text-xs text-muted-foreground">Select which email service to use for sending.</p>
 
                 {!hasAnyProvider ? (
-                  <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-900/20">
-                    <AlertTriangle className="h-4 w-4 text-amber-600" />
-                    <AlertDescription className="space-y-2">
-                      <p className="text-sm text-amber-800 dark:text-amber-200">
-                        No email providers configured. Set up at least one to send campaigns.
-                      </p>
-                      <Button asChild size="sm" className="mt-2">
-                        <Link href="/settings?tab=integrations">
-                          <Settings className="h-4 w-4 mr-2" />
-                          Configure Email Provider
-                        </Link>
-                      </Button>
-                    </AlertDescription>
-                  </Alert>
+                  <div className="p-4 rounded-lg bg-stone-50 dark:bg-stone-900/50 text-center">
+                    <Icon icon="solar:danger-triangle-linear" className="h-6 w-6 mx-auto text-muted-foreground/40 mb-2" />
+                    <p className="text-sm text-muted-foreground mb-2">No email providers configured.</p>
+                    <Button asChild size="sm" variant="outline">
+                      <Link href="/settings?tab=integrations">
+                        <Icon icon="solar:settings-linear" className="h-4 w-4 mr-2" />
+                        Configure Provider
+                      </Link>
+                    </Button>
+                  </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {/* Brevo Option */}
-                    <button
-                      type="button"
-                      onClick={() => setDeliveryProvider('brevo')}
-                      disabled={!hasBrevoConfigured}
-                      className={`p-4 border-2 rounded-lg text-left transition-all ${
-                        deliveryProvider === 'brevo' 
-                          ? 'border-primary bg-primary/5' 
-                          : hasBrevoConfigured 
-                            ? 'border-border hover:border-primary/50' 
-                            : 'border-border opacity-50 cursor-not-allowed'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-semibold">Brevo</h4>
-                        {hasBrevoConfigured ? (
-                          deliveryProvider === 'brevo' ? (
-                            <CheckCircle className="h-5 w-5 text-green-600" />
+                    {[
+                      { key: 'brevo', label: 'Brevo', desc: 'Send via Brevo with tracking', configured: hasBrevoConfigured },
+                      { key: 'sender', label: 'Sender.net', desc: 'Send via Sender.net', configured: hasSenderConfigured },
+                      { key: 'smtp', label: 'Custom SMTP', desc: 'Send via your SMTP server', configured: hasSmtpConfigured },
+                    ].map((provider) => (
+                      <button
+                        key={provider.key}
+                        type="button"
+                        onClick={() => setDeliveryProvider(provider.key as DeliveryProvider)}
+                        disabled={!provider.configured}
+                        className={`p-4 rounded-lg border-2 text-left transition-all ${
+                          deliveryProvider === provider.key 
+                            ? 'border-foreground' 
+                            : provider.configured 
+                              ? 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700' 
+                              : 'border-stone-200 dark:border-stone-800 opacity-50 cursor-not-allowed'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between mb-1">
+                          <span className="font-medium text-sm">{provider.label}</span>
+                          {provider.configured ? (
+                            deliveryProvider === provider.key ? (
+                              <Icon icon="solar:check-circle-linear" className="h-4 w-4" />
+                            ) : (
+                              <Badge variant="secondary" className="text-[10px]">Connected</Badge>
+                            )
                           ) : (
-                            <Badge variant="outline" className="text-xs">Connected</Badge>
-                          )
-                        ) : (
-                          <Badge variant="secondary" className="text-xs">Not Set Up</Badge>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Send via Brevo (Sendinblue) with tracking & analytics
-                      </p>
-                    </button>
-
-                    {/* Sender.net Option */}
-                    <button
-                      type="button"
-                      onClick={() => setDeliveryProvider('sender')}
-                      disabled={!hasSenderConfigured}
-                      className={`p-4 border-2 rounded-lg text-left transition-all ${
-                        deliveryProvider === 'sender' 
-                          ? 'border-primary bg-primary/5' 
-                          : hasSenderConfigured 
-                            ? 'border-border hover:border-primary/50' 
-                            : 'border-border opacity-50 cursor-not-allowed'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-semibold">Sender.net</h4>
-                        {hasSenderConfigured ? (
-                          deliveryProvider === 'sender' ? (
-                            <CheckCircle className="h-5 w-5 text-green-600" />
-                          ) : (
-                            <Badge variant="outline" className="text-xs">Connected</Badge>
-                          )
-                        ) : (
-                          <Badge variant="secondary" className="text-xs">Not Set Up</Badge>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Send via Sender.net with delivery reports
-                      </p>
-                    </button>
-
-                    {/* SMTP Option */}
-                    <button
-                      type="button"
-                      onClick={() => setDeliveryProvider('smtp')}
-                      disabled={!hasSmtpConfigured}
-                      className={`p-4 border-2 rounded-lg text-left transition-all ${
-                        deliveryProvider === 'smtp' 
-                          ? 'border-primary bg-primary/5' 
-                          : hasSmtpConfigured 
-                            ? 'border-border hover:border-primary/50' 
-                            : 'border-border opacity-50 cursor-not-allowed'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-semibold">Custom SMTP</h4>
-                        {hasSmtpConfigured ? (
-                          deliveryProvider === 'smtp' ? (
-                            <CheckCircle className="h-5 w-5 text-green-600" />
-                          ) : (
-                            <Badge variant="outline" className="text-xs">Connected</Badge>
-                          )
-                        ) : (
-                          <Badge variant="secondary" className="text-xs">Not Set Up</Badge>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Send via your own SMTP server
-                      </p>
-                    </button>
+                            <Badge variant="secondary" className="text-[10px]">Not Set Up</Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">{provider.desc}</p>
+                      </button>
+                    ))}
                   </div>
                 )}
 
-                {/* Brevo List Selection (optional - for syncing to existing list) */}
+                {/* Brevo List Selection */}
                 {deliveryProvider === 'brevo' && hasBrevoConfigured && (
-                  <div className="mt-4 p-3 bg-muted rounded-md space-y-2">
-                    <Label className="text-sm">Sync to Brevo List (optional)</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Leave empty to create a new list, or select an existing Brevo list to sync contacts to.
-                    </p>
+                  <div className="mt-4 p-3 rounded-lg bg-stone-50 dark:bg-stone-900/50 space-y-2">
+                    <Label className="text-xs">Sync to Brevo List (optional)</Label>
                     {isLoadingBrevoLists ? (
                       <div className="flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span className="text-sm">Loading Brevo lists...</span>
+                        <Icon icon="solar:refresh-linear" className="h-4 w-4 animate-spin" />
+                        <span className="text-sm">Loading...</span>
                       </div>
                     ) : (
                       <Select value={selectedBrevoListId} onValueChange={setSelectedBrevoListId}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Create new list (recommended)" />
+                          <SelectValue placeholder="Create new list" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="__new__">Create new list</SelectItem>
@@ -1217,29 +889,19 @@ export default function AICampaignStudioPage() {
                   </div>
                 )}
 
-                {/* Sender.net List Selection (required - must sync to existing list) */}
+                {/* Sender List Selection */}
                 {deliveryProvider === 'sender' && hasSenderConfigured && (
-                  <div className="mt-4 p-3 bg-muted rounded-md space-y-2">
-                    <Label className="text-sm">Sender.net Target List *</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Select which Sender.net list to sync your contacts to.
-                    </p>
+                  <div className="mt-4 p-3 rounded-lg bg-stone-50 dark:bg-stone-900/50 space-y-2">
+                    <Label className="text-xs">Sender.net Target List *</Label>
                     {isLoadingSenderLists ? (
                       <div className="flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span className="text-sm">Loading Sender.net lists...</span>
+                        <Icon icon="solar:refresh-linear" className="h-4 w-4 animate-spin" />
+                        <span className="text-sm">Loading...</span>
                       </div>
-                    ) : senderLists.length === 0 ? (
-                      <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-900/20">
-                        <AlertTriangle className="h-4 w-4 text-amber-600" />
-                        <AlertDescription className="text-xs text-amber-800 dark:text-amber-200">
-                          No lists found in Sender.net. Please create a list in your Sender.net dashboard first.
-                        </AlertDescription>
-                      </Alert>
                     ) : (
                       <Select value={selectedSenderListId} onValueChange={setSelectedSenderListId}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select Sender.net list..." />
+                          <SelectValue placeholder="Select list..." />
                         </SelectTrigger>
                         <SelectContent>
                           {senderLists.map((list) => (
@@ -1255,20 +917,20 @@ export default function AICampaignStudioPage() {
 
                 {/* SMTP Info */}
                 {deliveryProvider === 'smtp' && hasSmtpConfigured && (
-                  <Alert className="mt-4">
-                    <Info className="h-4 w-4" />
-                    <AlertDescription>
-                      Emails will be sent directly via your SMTP server. No contact sync required.
-                    </AlertDescription>
-                  </Alert>
+                  <div className="mt-4 p-3 rounded-lg bg-stone-50 dark:bg-stone-900/50">
+                    <p className="text-xs text-muted-foreground">
+                      <Icon icon="solar:info-circle-linear" className="h-4 w-4 inline mr-2" />
+                      Emails will be sent directly via your SMTP server.
+                    </p>
+                  </div>
                 )}
               </div>
             )}
-          </CardContent>
+          </div>
 
-          <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={() => setStage(2)}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
+          <div className="px-4 py-3 border-t border-stone-200 dark:border-stone-800 flex justify-between">
+            <Button variant="outline" onClick={() => setStage(2)} className="h-8 shadow-sm">
+              <Icon icon="solar:arrow-left-linear" className="mr-2 h-4 w-4" />
               Back to Review
             </Button>
             
@@ -1281,83 +943,77 @@ export default function AICampaignStudioPage() {
                 !deliveryProvider ||
                 (deliveryProvider === 'sender' && !selectedSenderListId)
               }
-              size="lg"
+              className="h-8 shadow-sm"
             >
               {isSyncing ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Syncing Contacts...
+                  <Icon icon="solar:refresh-linear" className="mr-2 h-4 w-4 animate-spin" />
+                  Syncing...
                 </>
               ) : isPublishing ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Icon icon="solar:refresh-linear" className="mr-2 h-4 w-4 animate-spin" />
                   Publishing...
                 </>
               ) : (
                 <>
-                  <Send className="mr-2 h-4 w-4" />
-                  Sync & Publish Campaign
+                  <Icon icon="solar:plain-linear" className="mr-2 h-4 w-4" />
+                  Sync & Publish
                 </>
               )}
             </Button>
-          </CardFooter>
-        </Card>
+          </div>
+        </div>
       )}
 
+      {/* Save Template Dialog */}
       <Dialog open={saveTemplateDialogOpen} onOpenChange={setSaveTemplateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle>Save as Reusable Template</DialogTitle>
-            <DialogDescription>
-              Save this email design as a template. You can reuse it later without consuming AI credits.
-            </DialogDescription>
+            <DialogTitle className="text-lg">Save as Reusable Template</DialogTitle>
+            <DialogDescription className="text-sm">Save this email design as a template to reuse later without AI credits.</DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="space-y-4 p-4 sm:p-6">
             <div className="space-y-2">
-              <Label htmlFor="template-name">Template Name</Label>
+              <Label htmlFor="template-name" className="text-sm">Template Name</Label>
               <Input
                 id="template-name"
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
-                placeholder="e.g., Flash Sale Announcement"
+                placeholder="e.g., Flash Sale"
+                className="h-9 text-sm w-full"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="template-description">Description (optional)</Label>
+              <Label htmlFor="template-description" className="text-sm">Description (optional)</Label>
               <Input
                 id="template-description"
                 value={templateDescription}
                 onChange={(e) => setTemplateDescription(e.target.value)}
-                placeholder="e.g., Great for weekend sales promotions"
+                placeholder="e.g., Weekend sales"
+                className="h-9 text-sm w-full"
               />
             </div>
           </div>
 
-          <DialogFooter className="flex justify-between sm:justify-between">
-            <Button variant="link" asChild className="px-0">
-              <Link href="/campaigns/ai-email/saved-templates">
-                View Saved Templates
-              </Link>
+          <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
+            <Button variant="outline" size="sm" onClick={() => setSaveTemplateDialogOpen(false)} disabled={isSavingTemplate} className="w-full sm:w-auto">
+              Cancel
             </Button>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setSaveTemplateDialogOpen(false)} disabled={isSavingTemplate}>
-                Cancel
-              </Button>
-              <Button onClick={handleSaveAsTemplate} disabled={isSavingTemplate || !templateName.trim()}>
-                {isSavingTemplate ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <BookmarkPlus className="mr-2 h-4 w-4" />
-                    Save Template
-                  </>
-                )}
-              </Button>
-            </div>
+            <Button size="sm" onClick={handleSaveAsTemplate} disabled={isSavingTemplate || !templateName.trim()} className="w-full sm:w-auto">
+              {isSavingTemplate ? (
+                <>
+                  <Icon icon="solar:refresh-linear" className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Icon icon="solar:bookmark-linear" className="mr-2 h-4 w-4" />
+                  Save Template
+                </>
+              )}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

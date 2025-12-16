@@ -77,7 +77,7 @@ const FacebookInstagramAdSectionComponent: React.FC<FacebookInstagramAdSectionPr
           ))}
           {output.audienceTargetingIdeas && output.audienceTargetingIdeas.length > 0 && (
             <div className="mt-4">
-              <h4 className="font-semibold mb-2 flex items-center"><UsersIcon className="mr-2 h-4 w-4 text-primary" />AI Suggested Audience Targeting Ideas:</h4>
+              <h4 className="font-semibold mb-2 flex items-center"><UsersIcon className="mr-2 h-4 w-4 text-muted-foreground" />AI Suggested Audience Targeting Ideas:</h4>
               <ul className="list-disc list-inside pl-4 space-y-1 text-sm text-muted-foreground bg-muted/30 p-3 rounded-md">
                 {output.audienceTargetingIdeas.map((idea, i) => <li key={i}>{idea}</li>)}
               </ul>

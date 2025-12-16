@@ -851,8 +851,8 @@ input[type="color"]::-moz-color-swatch {
   }
 
   *::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
   }
 
   *::-webkit-scrollbar-track {
@@ -866,6 +866,17 @@ input[type="color"]::-moz-color-swatch {
 
   *::-webkit-scrollbar-thumb:hover {
     background: rgba(120, 120, 120, 0.5);
+  }
+
+  /* Hide scrollbar arrows/buttons */
+  *::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
   }
 
   /* Dark mode scrollbar */
@@ -888,8 +899,8 @@ input[type="color"]::-moz-color-swatch {
   }
 
   .scrollbar-thin::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-track {

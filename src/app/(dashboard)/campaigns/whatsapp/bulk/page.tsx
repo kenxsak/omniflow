@@ -1,15 +1,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import PageTitle from '@/components/ui/page-title';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardFooter,
-} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,50 +11,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogBody,
+  DialogCloseButton,
 } from '@/components/ui/dialog';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
-import {
-  MessageCircle,
-  Plus,
-  Send,
-  Loader2,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Users,
-  Eye,
-  Trash2,
-  RefreshCw,
-  Sparkles,
-  Settings,
-  ArrowRight,
-  Info,
-  AlertTriangle,
-} from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 import type { WhatsAppCampaign, WhatsAppRecipient } from '@/types/messaging';
 import { getWhatsAppCampaigns, getWhatsAppCampaignRecipients, addWhatsAppCampaign, deleteWhatsAppCampaign } from '@/lib/messaging-campaigns-data';
 import { sendBulkWhatsAppViaAiSensyAction } from '@/app/actions/aisensy-actions';
@@ -74,8 +36,6 @@ import { getMSG91WhatsAppTemplatesAction, sendBulkWhatsAppViaMSG91Action } from 
 import { getFast2SMSWhatsAppTemplatesAction, sendBulkWhatsAppViaFast2SMSAction } from '@/app/actions/fast2sms-whatsapp-actions';
 import { getWhatsAppLists, getWhatsAppContacts } from '@/lib/whatsapp-marketing-data';
 import type { WhatsAppList, WhatsAppContact } from '@/types/whatsapp';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 import confetti from 'canvas-confetti';
 import Link from 'next/link';
@@ -120,23 +80,12 @@ export default function WhatsAppBulkCampaignsPage() {
 
     const interval = setInterval(function() {
       const timeLeft = animationEnd - Date.now();
-
       if (timeLeft <= 0) {
         return clearInterval(interval);
       }
-
       const particleCount = 50 * (timeLeft / duration);
-
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
-      });
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
-      });
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
     }, 250);
   };
 
@@ -156,11 +105,7 @@ export default function WhatsAppBulkCampaignsPage() {
       setCampaigns(campaignsList);
     } catch (error) {
       console.error('Error loading campaigns:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load campaigns',
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: 'Failed to load campaigns', variant: 'destructive' });
     } finally {
       setIsLoadingCampaigns(false);
     }
@@ -188,198 +133,51 @@ export default function WhatsAppBulkCampaignsPage() {
         if (result.success && result.templates) {
           const approvedTemplates = result.templates.filter((t: any) => t.status === 'APPROVED');
           setTemplates(approvedTemplates);
-          
-          if (approvedTemplates.length === 0 && result.templates.length > 0) {
-            toast({
-              title: 'Waiting for Approval',
-              description: `You have ${result.templates.length} message design(s) waiting for Meta approval. This usually takes 1-24 hours.`,
-              variant: 'default',
-            });
-          } else if (approvedTemplates.length === 0) {
-            toast({
-              title: 'No Templates Found',
-              description: 'No approved templates found in your Meta WhatsApp account. Please create and approve templates in Meta Business Manager first.',
-              variant: 'default',
-            });
+          if (approvedTemplates.length === 0) {
+            toast({ title: 'No Templates Found', description: 'No approved templates found. Create templates in Meta Business Manager first.', variant: 'default' });
           }
         } else {
           setTemplates([]);
-          // Show the actual error message from Meta API
-          toast({
-            title: 'Meta WhatsApp Connection Issue',
-            description: result.error || 'Could not load templates from Meta. Please check your API credentials in Settings.',
-            variant: 'destructive',
-          });
+          toast({ title: 'Meta WhatsApp Connection Issue', description: result.error || 'Could not load templates. Check your API credentials.', variant: 'destructive' });
         }
       } else if (selectedPlatform === 'gupshup') {
         const result = await getGupshupTemplatesAction(appUser.idToken);
         if (result.success && result.templates) {
           const approvedTemplates = result.templates.filter((t: any) => t.status === 'APPROVED');
           setTemplates(approvedTemplates);
-          
-          if (approvedTemplates.length === 0 && result.templates.length > 0) {
-            toast({
-              title: 'Waiting for Approval',
-              description: `You have ${result.templates.length} message design(s) waiting for approval. This usually takes 1-24 hours.`,
-              variant: 'default',
-            });
-          } else if (approvedTemplates.length === 0) {
-            toast({
-              title: 'No Templates Found',
-              description: 'No approved templates found in your Gupshup account. Please create and approve templates in your Gupshup dashboard first.',
-              variant: 'default',
-            });
-          }
         } else {
           setTemplates([]);
-          
-          // Check if it's a "not configured" error vs actual API error
-          const isNotConfigured = result.error?.includes('not configured') || 
-                                  result.error?.includes('Please add') ||
-                                  result.error?.includes('not found');
-          
-          // Only show destructive toast if credentials ARE configured but failing
-          // Show friendly setup message if not configured at all
-          if (isNotConfigured) {
-            toast({
-              title: 'Gupshup Setup Required',
-              description: 'Connect your Gupshup account in Settings → API Integrations to load templates.',
-              variant: 'default',
-            });
-          } else {
-            // Actual error with configured credentials - show as warning, not destructive
-            toast({
-              title: 'Could not load templates',
-              description: result.error || 'Please verify your Gupshup API Key and App Name in Settings.',
-              variant: 'default',
-            });
-          }
         }
       } else if (selectedPlatform === 'aisensy') {
-        // AiSensy doesn't have a templates fetch API
-        // Templates must be created in AiSensy dashboard and referenced by campaign name
         setTemplates([]);
-        toast({
-          title: 'Manual Template Entry',
-          description: 'AiSensy requires manual template entry. Create your template in AiSensy dashboard first, then enter the template name below.',
-          variant: 'default',
-        });
+        toast({ title: 'Manual Template Entry', description: 'AiSensy requires manual template entry. Create your template in AiSensy dashboard first.', variant: 'default' });
       } else if (selectedPlatform === 'authkey') {
-        // Fetch templates from WMart CPaaS
         const result = await getAuthkeyTemplatesAction(appUser.idToken);
         if (result.success && result.templates) {
           const approvedTemplates = result.templates.filter((t: any) => t.status === 'APPROVED');
           setTemplates(approvedTemplates);
-          
-          // Show helpful toast about templates and media
-          if (approvedTemplates.length > 0) {
-            const mediaTemplates = approvedTemplates.filter((t: any) => 
-              t.temp_header_type === 'IMAGE' || t.temp_header_type === 'VIDEO' || t.temp_header_type === 'DOCUMENT'
-            );
-            toast({
-              title: `${approvedTemplates.length} Template(s) Loaded`,
-              description: mediaTemplates.length > 0 
-                ? `Found ${mediaTemplates.length} media template(s). For media templates, paste the image/video URL from your WMart CPaaS Media Gallery.`
-                : 'Select a template and choose your recipient list to send.',
-              variant: 'default',
-            });
-          } else if (approvedTemplates.length === 0 && result.templates.length > 0) {
-            toast({
-              title: 'Waiting for Approval',
-              description: `You have ${result.templates.length} template(s) waiting for WhatsApp approval. This usually takes 1-24 hours.`,
-              variant: 'default',
-            });
-          } else if (approvedTemplates.length === 0) {
-            toast({
-              title: 'No Templates Found',
-              description: 'Create templates at cpaas.wmart.in → WhatsApp → Templates. Use {{1}} for contact name variable.',
-              variant: 'default',
-            });
-          }
         } else {
           setTemplates([]);
-          
-          // Check if it's a "not configured" error
-          const isNotConfigured = result.error?.includes('not configured') || 
-                                  result.error?.includes('Please add') ||
-                                  result.error?.includes('API Key');
-          
-          if (isNotConfigured) {
-            toast({
-              title: 'WMart CPaaS Setup Required',
-              description: 'Connect your WMart CPaaS account in Settings → API Integrations. Get your API key from cpaas.wmart.in',
-              variant: 'default',
-            });
-          } else {
-            toast({
-              title: 'Could not load templates',
-              description: result.error || 'Please verify your WMart CPaaS API Key in Settings.',
-              variant: 'default',
-            });
-          }
         }
       } else if (selectedPlatform === 'msg91WhatsApp') {
         const result = await getMSG91WhatsAppTemplatesAction(appUser.idToken);
         if (result.success && result.templates) {
           const approvedTemplates = result.templates.filter((t: any) => t.status === 'APPROVED');
           setTemplates(approvedTemplates);
-          
-          if (approvedTemplates.length === 0 && result.templates.length > 0) {
-            toast({
-              title: 'Waiting for Approval',
-              description: `You have ${result.templates.length} template(s) waiting for WhatsApp approval. This usually takes 1-24 hours.`,
-              variant: 'default',
-            });
-          } else if (approvedTemplates.length === 0) {
-            toast({
-              title: 'No Templates Found',
-              description: 'No approved templates found in your MSG91 WhatsApp account. Please create and approve templates in MSG91 dashboard first.',
-              variant: 'default',
-            });
-          }
         } else {
           setTemplates([]);
-          toast({
-            title: 'MSG91 WhatsApp Connection Issue',
-            description: result.error || 'Could not load templates from MSG91. Please check your API credentials in Settings.',
-            variant: 'destructive',
-          });
         }
       } else if (selectedPlatform === 'fast2smsWhatsApp') {
         const result = await getFast2SMSWhatsAppTemplatesAction(appUser.idToken);
         if (result.success && result.templates) {
           const approvedTemplates = result.templates.filter((t: any) => t.status === 'APPROVED');
           setTemplates(approvedTemplates);
-          
-          if (approvedTemplates.length === 0 && result.templates.length > 0) {
-            toast({
-              title: 'Waiting for Approval',
-              description: `You have ${result.templates.length} template(s) waiting for WhatsApp approval. This usually takes 1-24 hours.`,
-              variant: 'default',
-            });
-          } else if (approvedTemplates.length === 0) {
-            toast({
-              title: 'No Templates Found',
-              description: 'No approved templates found in your Fast2SMS WhatsApp account. Please create and approve templates in Fast2SMS dashboard first.',
-              variant: 'default',
-            });
-          }
         } else {
           setTemplates([]);
-          toast({
-            title: 'Fast2SMS WhatsApp Connection Issue',
-            description: result.error || 'Could not load templates from Fast2SMS. Please check your API credentials in Settings.',
-            variant: 'destructive',
-          });
         }
       }
     } catch (error) {
       console.error('Error loading templates:', error);
-      toast({
-        title: 'Connection Issue',
-        description: 'Could not load your message designs. Please check your connection in Settings.',
-        variant: 'destructive',
-      });
       setTemplates([]);
     } finally {
       setIsLoadingTemplates(false);
@@ -389,262 +187,108 @@ export default function WhatsAppBulkCampaignsPage() {
   useEffect(() => {
     if (activeTab === 'create' && appUser?.idToken) {
       loadTemplates();
-      setSelectedTemplate(''); // Reset template when platform changes
+      setSelectedTemplate('');
     }
   }, [activeTab, appUser?.idToken, selectedPlatform]);
 
   const handleCreateCampaign = async () => {
     if (!appUser?.companyId || !appUser?.uid || !appUser?.idToken) {
-      toast({
-        title: 'Authentication Required',
-        description: 'Please log in to create campaigns',
-        variant: 'destructive',
-      });
+      toast({ title: 'Authentication Required', description: 'Please log in to create campaigns', variant: 'destructive' });
       return;
     }
-
     if (!campaignName.trim()) {
-      toast({
-        title: 'Campaign Name Required',
-        description: 'Please enter a campaign name',
-        variant: 'destructive',
-      });
+      toast({ title: 'Campaign Name Required', description: 'Please enter a campaign name', variant: 'destructive' });
       return;
     }
-
     if (!selectedTemplate) {
-      toast({
-        title: 'Message Design Required',
-        description: 'Please choose a message design to send',
-        variant: 'destructive',
-      });
+      toast({ title: 'Message Design Required', description: 'Please choose a message design to send', variant: 'destructive' });
       return;
     }
-
     if (!selectedListId) {
-      toast({
-        title: 'Recipients Required',
-        description: 'Please select a contact list',
-        variant: 'destructive',
-      });
+      toast({ title: 'Recipients Required', description: 'Please select a contact list', variant: 'destructive' });
       return;
     }
-
-    // Gupshup-specific validation: phone number is required
     if (selectedPlatform === 'gupshup' && !company?.apiKeys?.gupshup?.phoneNumber) {
-      toast({
-        title: 'Phone Number Required',
-        description: 'Please add your Business WhatsApp Phone Number in Settings → API Integrations → Gupshup before sending campaigns.',
-        variant: 'destructive',
-      });
+      toast({ title: 'Phone Number Required', description: 'Please add your Business WhatsApp Phone Number in Settings.', variant: 'destructive' });
       return;
     }
 
     setIsSending(true);
     try {
-      // Load contacts from selected list
       const contacts = await getWhatsAppContacts(selectedListId, appUser.companyId);
-      
       if (contacts.length === 0) {
-        toast({
-          title: 'No Contacts',
-          description: 'The selected list has no contacts',
-          variant: 'destructive',
-        });
+        toast({ title: 'No Contacts', description: 'The selected list has no contacts', variant: 'destructive' });
         return;
       }
 
-      // Convert contacts to recipients
       const recipients: WhatsAppRecipient[] = contacts.map(contact => ({
         phone: contact.phoneNumber,
         name: contact.name,
         status: 'pending',
       }));
 
-      // Send bulk campaign via selected platform
       let result;
       if (selectedPlatform === 'aisensy') {
-        result = await sendBulkWhatsAppViaAiSensyAction({
-          idToken: appUser.idToken,
-          campaignName: selectedTemplate, // For AiSensy, template = campaign name
-          recipients,
-        });
+        result = await sendBulkWhatsAppViaAiSensyAction({ idToken: appUser.idToken, campaignName: selectedTemplate, recipients: recipients.map(r => ({ phone: r.phone, name: r.name })) });
       } else if (selectedPlatform === 'meta') {
-        result = await sendBulkWhatsAppViaMetaAction({
-          idToken: appUser.idToken,
-          templateName: selectedTemplate,
-          languageCode: 'en',
-          recipients: recipients.map(r => ({
-            phone: r.phone,
-            parameters: []
-          })),
-        });
+        result = await sendBulkWhatsAppViaMetaAction(appUser.idToken, { templateName: selectedTemplate, languageCode: 'en', recipients: recipients.map(r => ({ phone: r.phone, parameters: [] })) });
       } else if (selectedPlatform === 'authkey') {
-        result = await sendBulkWhatsAppViaAuthkeyAction(appUser.idToken, {
-          templateName: selectedTemplate,
-          templateType: templateType,
-          headerImageUrl: templateType === 'media' ? headerImageUrl : undefined,
-          recipients: recipients.map(r => ({
-            phone: r.phone,
-            parameters: r.name ? [r.name] : []
-          })),
-        });
+        result = await sendBulkWhatsAppViaAuthkeyAction(appUser.idToken, { templateName: selectedTemplate, templateType, headerImageUrl: templateType === 'media' ? headerImageUrl : undefined, recipients: recipients.map(r => ({ phone: r.phone, parameters: r.name ? [r.name] : [] })) });
       } else if (selectedPlatform === 'gupshup') {
-        result = await sendBulkWhatsAppViaGupshupAction({
-          idToken: appUser.idToken,
-          source: company.apiKeys.gupshup.phoneNumber,
-          templateId: selectedTemplate,
-          recipients: recipients.map(r => ({
-            phone: r.phone,
-            name: r.name,
-            params: []
-          })),
-        });
+        result = await sendBulkWhatsAppViaGupshupAction({ idToken: appUser.idToken, source: company!.apiKeys!.gupshup!.phoneNumber!, templateId: selectedTemplate, recipients: recipients.map(r => ({ phone: r.phone, name: r.name, params: [] })) });
       } else if (selectedPlatform === 'msg91WhatsApp') {
-        result = await sendBulkWhatsAppViaMSG91Action({
-          idToken: appUser.idToken,
-          templateName: selectedTemplate,
-          languageCode: 'en',
-          recipients: recipients.map(r => ({
-            phone: r.phone,
-            name: r.name,
-            parameters: r.name ? [r.name] : []
-          })),
-        });
+        result = await sendBulkWhatsAppViaMSG91Action({ idToken: appUser.idToken, templateName: selectedTemplate, languageCode: 'en', recipients: recipients.map(r => ({ phone: r.phone, name: r.name, parameters: r.name ? [r.name] : [] })) });
       } else if (selectedPlatform === 'fast2smsWhatsApp') {
-        result = await sendBulkWhatsAppViaFast2SMSAction({
-          idToken: appUser.idToken,
-          templateName: selectedTemplate,
-          recipients: recipients.map(r => ({
-            phone: r.phone,
-            name: r.name,
-            parameters: r.name ? [r.name] : []
-          })),
-        });
+        result = await sendBulkWhatsAppViaFast2SMSAction({ idToken: appUser.idToken, templateName: selectedTemplate, recipients: recipients.map(r => ({ phone: r.phone, name: r.name, parameters: r.name ? [r.name] : [] })) });
       } else {
         throw new Error('Invalid platform selected');
       }
 
-      console.log('Campaign send result:', { platform: selectedPlatform, success: result.success, error: result.error, result });
-
       if (result.success) {
-        // Update recipient statuses based on API response
-        const failedPhones = new Set(result.failedRecipients?.map(f => f.phone) || []);
-        const updatedRecipients = recipients.map(recipient => ({
-          ...recipient,
-          status: failedPhones.has(recipient.phone) ? ('failed' as const) : ('sent' as const),
-        }));
-
+        const failedPhones = new Set((result as any).failedRecipients?.map((f: { phone: string }) => f.phone) || []);
+        const updatedRecipients = recipients.map(recipient => ({ ...recipient, status: failedPhones.has(recipient.phone) ? ('failed' as const) : ('sent' as const) }));
         const successCount = recipients.length - failedPhones.size;
         const failedCount = failedPhones.size;
-
-        // Find template name for display (selectedTemplate is now UUID for platforms with dropdown)
         const selectedTemplateObj = templates.find(t => t.id === selectedTemplate);
         const templateNameForDisplay = selectedTemplateObj ? (selectedTemplateObj.elementName || selectedTemplateObj.name) : selectedTemplate;
 
-        // Save campaign to Firestore
+        // Map platform to valid type
+        const platformMap: Record<string, 'meta' | 'authkey' | 'wati' | 'aisensy' | 'interakt' | 'unified'> = {
+          'meta': 'meta',
+          'authkey': 'authkey',
+          'aisensy': 'aisensy',
+          'gupshup': 'unified',
+          'msg91WhatsApp': 'unified',
+          'fast2smsWhatsApp': 'unified',
+        };
+
         const campaign: Omit<WhatsAppCampaign, 'id' | 'createdAt'> = {
           companyId: appUser.companyId,
           name: campaignName,
-          platform: selectedPlatform,
+          platform: platformMap[selectedPlatform] || 'unified',
           templateId: selectedTemplate,
           templateName: templateNameForDisplay,
           recipients: updatedRecipients,
           status: 'completed',
           createdBy: appUser.uid,
           sentAt: new Date().toISOString(),
-          stats: {
-            total: recipients.length,
-            sent: successCount,
-            delivered: 0,
-            read: 0,
-            failed: failedCount,
-            replied: 0,
-          },
+          stats: { total: recipients.length, sent: successCount, delivered: 0, read: 0, failed: failedCount, replied: 0 },
         };
 
         await addWhatsAppCampaign(campaign);
-
-        // Trigger confetti celebration
         triggerConfetti();
-
-        toast({
-          title: 'Campaign Sent Successfully!',
-          description: `Sent to ${successCount} contacts${failedCount > 0 ? ` (${failedCount} failed)` : ''}`,
-        });
-
-        // Reset form and switch to campaigns tab
+        toast({ title: 'Campaign Sent Successfully!', description: `Sent to ${successCount} contacts${failedCount > 0 ? ` (${failedCount} failed)` : ''}` });
         setCampaignName('');
         setSelectedTemplate('');
         setSelectedListId('');
         setActiveTab('campaigns');
         loadCampaigns();
       } else {
-        // Extract error details with better fallback handling
-        const errorDetails = result.error || 
-                            (typeof result === 'object' && JSON.stringify(result) !== '{}' ? JSON.stringify(result) : null) ||
-                            'Campaign sending failed. Please check your API configuration and try again.';
-        
-        console.error('Campaign send failed:', { 
-          platform: selectedPlatform, 
-          error: errorDetails, 
-          fullResult: result,
-          recipients: recipients.length 
-        });
-        
-        let userFriendlyMessage = errorDetails;
-        let actionMessage = '';
-
-        // Platform-specific error handling
-        if (selectedPlatform === 'aisensy') {
-          if (errorDetails.includes('not configured') || errorDetails.includes('API key')) {
-            userFriendlyMessage = 'AiSensy is not connected to your account';
-            actionMessage = 'Go to Settings → API Integrations and add your AiSensy API key';
-          } else if (errorDetails.includes('campaign') || errorDetails.includes('Campaign')) {
-            userFriendlyMessage = `Campaign "${selectedTemplate}" not found in your AiSensy account`;
-            actionMessage = 'Log in to your AiSensy dashboard and create an API campaign with this exact name';
-          } else if (errorDetails.includes('template')) {
-            userFriendlyMessage = 'Template issue with AiSensy campaign';
-            actionMessage = 'Verify the campaign exists and is properly configured in AiSensy';
-          } else if (errorDetails.includes('All messages failed')) {
-            userFriendlyMessage = errorDetails;
-            actionMessage = 'Check the campaign name matches exactly and your phone numbers have country codes';
-          }
-        }
-
-        // Generic error messages
-        if (errorDetails.includes('Network') || errorDetails.includes('fetch')) {
-          userFriendlyMessage = 'Network error connecting to ' + selectedPlatform.toUpperCase();
-          actionMessage = 'Check your internet connection and try again';
-        }
-
-        throw new Error(userFriendlyMessage + (actionMessage ? '. ' + actionMessage : ''));
+        throw new Error(result.error || 'Campaign sending failed');
       }
     } catch (error: any) {
       console.error('Error sending campaign:', error);
-      
-      const errorMessage = error.message || 'Failed to send campaign';
-      const shouldShowDiagnostics = 
-        errorMessage.includes('not configured') || 
-        errorMessage.includes('not connected') ||
-        errorMessage.includes('API') ||
-        errorMessage.includes('template') ||
-        errorMessage.includes('campaign');
-
-      toast({
-        title: 'Campaign Failed',
-        description: (
-          <div className="space-y-2">
-            <p>{errorMessage}</p>
-            {shouldShowDiagnostics && (
-              <Link href="/whatsapp-diagnostics" className="text-sm underline">
-                Run diagnostics to troubleshoot →
-              </Link>
-            )}
-          </div>
-        ),
-        variant: 'destructive',
-      });
+      toast({ title: 'Campaign Failed', description: error.message || 'Failed to send campaign', variant: 'destructive' });
     } finally {
       setIsSending(false);
     }
@@ -652,21 +296,15 @@ export default function WhatsAppBulkCampaignsPage() {
 
   const handleViewCampaign = async (campaign: WhatsAppCampaign) => {
     if (!appUser?.companyId) return;
-    
     setSelectedCampaign(campaign);
     setShowDetailsDialog(true);
     setIsLoadingRecipients(true);
-    
     try {
       const recipients = await getWhatsAppCampaignRecipients(appUser.companyId, campaign.id);
       setCampaignRecipients(recipients);
     } catch (error) {
       console.error('Error loading recipients:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load campaign recipients',
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: 'Failed to load campaign recipients', variant: 'destructive' });
     } finally {
       setIsLoadingRecipients(false);
     }
@@ -674,603 +312,371 @@ export default function WhatsAppBulkCampaignsPage() {
 
   const handleDeleteCampaign = async (campaignId: string) => {
     if (!appUser?.companyId) return;
-    
     try {
       await deleteWhatsAppCampaign(appUser.companyId, campaignId);
-      toast({
-        title: 'Campaign Deleted',
-        description: 'Campaign has been removed',
-      });
+      toast({ title: 'Campaign Deleted', description: 'Campaign has been removed' });
       loadCampaigns();
     } catch (error) {
       console.error('Error deleting campaign:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete campaign',
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: 'Failed to delete campaign', variant: 'destructive' });
     }
   };
 
-  const getStatusBadge = (status: WhatsAppCampaign['status']) => {
-    const statusConfig = {
-      draft: { variant: 'secondary' as const, icon: Clock },
-      scheduled: { variant: 'default' as const, icon: Clock },
-      sending: { variant: 'default' as const, icon: Loader2 },
-      completed: { variant: 'default' as const, icon: CheckCircle },
-      failed: { variant: 'destructive' as const, icon: XCircle },
-    };
-
-    const config = statusConfig[status];
-    const Icon = config.icon;
-
-    return (
-      <Badge variant={config.variant} className="gap-1">
-        <Icon className="h-3 w-3" />
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </Badge>
-    );
+  const getStatusColor = (status: WhatsAppCampaign['status']) => {
+    switch (status) {
+      case 'completed': return 'text-emerald-600 dark:text-emerald-400';
+      case 'sending': return 'text-blue-600 dark:text-blue-400';
+      case 'scheduled': return 'text-amber-600 dark:text-amber-400';
+      case 'failed': return 'text-red-600 dark:text-red-400';
+      default: return 'text-muted-foreground';
+    }
   };
 
+  const selectedList = whatsappLists.find(l => l.id === selectedListId);
+  const selectedTemplateObj = templates.find(t => (t.id || t.name) === selectedTemplate);
+
   return (
-    <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
+    <div className="space-y-6 pb-20">
+      {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <PageTitle
-          title="Send to Many People"
-          subtitle="Send WhatsApp messages to hundreds or thousands of contacts at once"
-          icon={MessageCircle}
-        />
-        <Button asChild>
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight">WhatsApp Bulk Campaigns</h1>
+          <p className="text-sm text-muted-foreground mt-1">Send WhatsApp messages to hundreds or thousands of contacts at once</p>
+        </div>
+        <Button asChild size="sm" className="h-8 text-xs">
           <Link href="/campaigns/ai-email">
-            <Sparkles className="mr-2 h-4 w-4" /> Create with AI
+            <Icon icon="solar:magic-stick-3-linear" className="mr-1.5 h-3.5 w-3.5" />
+            Create with AI
           </Link>
         </Button>
       </div>
 
-      {/* Welcome Tip for First-Time Users */}
-      {campaigns.length === 0 && !isLoadingCampaigns && (
-        <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-          <Sparkles className="h-5 w-5 text-blue-600" />
-          <AlertTitle className="text-blue-900 dark:text-blue-100">Quick Start Guide</AlertTitle>
-          <AlertDescription className="text-blue-800 dark:text-blue-200">
-            <div className="space-y-2 mt-2">
-              <p className="text-sm">To send your first WhatsApp message to many people:</p>
-              <ol className="text-sm space-y-1 ml-4 list-decimal">
-                <li>Choose your platform (Gupshup, WMart CPaaS, or AiSensy) and connect it in Settings</li>
-                <li>Create a list of contacts in WhatsApp Marketing</li>
-                <li>Come back here and click "Create Campaign" to send</li>
-              </ol>
-              <div className="flex flex-col sm:flex-row gap-2 mt-3">
-                <Button asChild className="min-h-11" variant="outline">
-                  <Link href="/settings">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Set Up Connection
-                  </Link>
-                </Button>
-                <Button asChild className="min-h-11" variant="outline">
-                  <Link href="/whatsapp-marketing">
-                    <Users className="h-4 w-4 mr-2" />
-                    Manage Contacts
+      {/* Quick Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3">
+          <div className="flex items-center gap-2 mb-1">
+            <Icon icon="solar:plain-linear" className="h-4 w-4 text-muted-foreground" />
+            <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Campaigns</span>
+          </div>
+          <p className="text-xl font-semibold tabular-nums">{campaigns.length}</p>
+        </div>
+        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3">
+          <div className="flex items-center gap-2 mb-1">
+            <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4 text-muted-foreground" />
+            <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Lists</span>
+          </div>
+          <p className="text-xl font-semibold tabular-nums">{whatsappLists.length}</p>
+        </div>
+        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3">
+          <div className="flex items-center gap-2 mb-1">
+            <Icon icon="solar:check-circle-linear" className="h-4 w-4 text-muted-foreground" />
+            <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Sent</span>
+          </div>
+          <p className="text-xl font-semibold tabular-nums">{campaigns.reduce((acc, c) => acc + c.stats.sent, 0)}</p>
+        </div>
+        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3">
+          <div className="flex items-center gap-2 mb-1">
+            <Icon icon="solar:link-linear" className="h-4 w-4 text-muted-foreground" />
+            <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Platform</span>
+          </div>
+          <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">API Active</p>
+        </div>
+      </div>
+
+      {/* Clerk-style Tabs */}
+      <div className="border-b border-stone-200 dark:border-stone-800">
+        <nav className="flex gap-6" aria-label="Tabs">
+          <button
+            onClick={() => setActiveTab('campaigns')}
+            className={cn(
+              "relative py-2 text-sm font-medium transition-colors",
+              activeTab === 'campaigns' ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <span className="flex items-center gap-1.5">
+              <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4" />
+              My Campaigns
+            </span>
+            {activeTab === 'campaigns' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-t-full" />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('create')}
+            className={cn(
+              "relative py-2 text-sm font-medium transition-colors",
+              activeTab === 'create' ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <span className="flex items-center gap-1.5">
+              <Icon icon="solar:add-circle-linear" className="h-4 w-4" />
+              Create Campaign
+            </span>
+            {activeTab === 'create' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-t-full" />
+            )}
+          </button>
+        </nav>
+      </div>
+
+      {/* Campaigns Tab */}
+      {activeTab === 'campaigns' && (
+        <div className="space-y-4 mt-4">
+          {/* Welcome Tip for First-Time Users */}
+          {campaigns.length === 0 && !isLoadingCampaigns && (
+            <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4">
+              <div className="flex items-start gap-3">
+                <Icon icon="solar:magic-stick-3-linear" className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-sm">Quick Start Guide</h3>
+                  <p className="text-xs text-muted-foreground">To send your first WhatsApp message to many people:</p>
+                  <ol className="text-xs text-muted-foreground space-y-1 ml-4 list-decimal">
+                    <li>Choose your platform (Gupshup, WMart CPaaS, or AiSensy) and connect it in Settings</li>
+                    <li>Create a list of contacts in WhatsApp Marketing</li>
+                    <li>Come back here and click "Create Campaign" to send</li>
+                  </ol>
+                  <div className="flex flex-col sm:flex-row gap-2 mt-3">
+                    <Button asChild variant="outline" size="sm" className="h-8 text-xs">
+                      <Link href="/settings">
+                        <Icon icon="solar:settings-linear" className="h-3.5 w-3.5 mr-1.5" />
+                        Set Up Connection
+                      </Link>
+                    </Button>
+                    <Button asChild variant="outline" size="sm" className="h-8 text-xs">
+                      <Link href="/whatsapp-marketing">
+                        <Icon icon="solar:users-group-rounded-linear" className="h-3.5 w-3.5 mr-1.5" />
+                        Manage Contacts
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Diagnostics Tool Alert */}
+          {campaigns.length > 0 && (
+            <div className="flex items-start gap-3 p-3 border border-stone-200 dark:border-stone-800 rounded-lg">
+              <Icon icon="solar:info-circle-linear" className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+              <div className="flex-1 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <p className="text-xs text-muted-foreground">Having trouble sending messages? Use the diagnostics tool to test your WhatsApp connection.</p>
+                <Button asChild variant="outline" size="sm" className="h-7 text-xs">
+                  <Link href="/whatsapp-diagnostics">
+                    <Icon icon="solar:settings-linear" className="h-3.5 w-3.5 mr-1.5" />
+                    Run Diagnostics
                   </Link>
                 </Button>
               </div>
             </div>
-          </AlertDescription>
-        </Alert>
-      )}
+          )}
 
-      {/* Diagnostics Tool Alert */}
-      {campaigns.length > 0 && (
-        <Alert>
-          <Info className="h-4 w-4" />
-          <AlertTitle>Having trouble sending messages?</AlertTitle>
-          <AlertDescription className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <span>Use the diagnostics tool to test your WhatsApp connection and find issues.</span>
-            <Link href="/whatsapp-diagnostics">
-              <Button variant="outline" size="sm">
-                <Settings className="mr-2 h-4 w-4" />
-                Run Diagnostics
-              </Button>
-            </Link>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'campaigns' | 'create')}>
-        <TabsList>
-          <TabsTrigger value="campaigns">
-            <Users className="h-4 w-4 mr-2" />
-            My Campaigns
-          </TabsTrigger>
-          <TabsTrigger value="create">
-            <Plus className="h-4 w-4 mr-2" />
-            Create Campaign
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="campaigns" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Campaign History</CardTitle>
-                  <CardDescription>
-                    View and manage your WhatsApp bulk campaigns
-                  </CardDescription>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={loadCampaigns}
-                  disabled={isLoadingCampaigns}
-                >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingCampaigns ? 'animate-spin' : ''}`} />
-                  Refresh
-                </Button>
+          {/* Campaign History */}
+          <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+            <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+              <div>
+                <h3 className="font-semibold text-sm">Campaign History</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">View and manage your WhatsApp bulk campaigns</p>
               </div>
-            </CardHeader>
-            <CardContent>
+              <Button variant="outline" size="sm" onClick={loadCampaigns} disabled={isLoadingCampaigns} className="h-8 text-xs">
+                <Icon icon={isLoadingCampaigns ? "solar:refresh-linear" : "solar:refresh-linear"} className={cn("mr-1.5 h-3.5 w-3.5", isLoadingCampaigns && "animate-spin")} />
+                Refresh
+              </Button>
+            </div>
+            <div className="p-4">
               {isLoadingCampaigns ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <div className="flex justify-center items-center py-8">
+                  <Icon icon="solar:refresh-linear" className="animate-spin h-5 w-5 text-muted-foreground" />
                 </div>
               ) : campaigns.length === 0 ? (
                 <div className="text-center py-8">
-                  <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No campaigns yet</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Create your first WhatsApp bulk campaign to get started
-                  </p>
-                  <Button onClick={() => setActiveTab('create')}>
-                    <Plus className="h-4 w-4 mr-2" />
+                  <Icon icon="solar:chat-round-line-linear" className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
+                  <h3 className="text-sm font-medium mb-1">No campaigns yet</h3>
+                  <p className="text-xs text-muted-foreground mb-4">Create your first WhatsApp bulk campaign to get started</p>
+                  <Button size="sm" onClick={() => setActiveTab('create')} className="h-8 text-xs">
+                    <Icon icon="solar:add-circle-linear" className="mr-1.5 h-3.5 w-3.5" />
                     Create Campaign
                   </Button>
                 </div>
               ) : (
                 <ScrollArea className="w-full">
                   <div className="min-w-[800px]">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Campaign Name</TableHead>
-                          <TableHead>Message Design</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Recipients</TableHead>
-                          <TableHead>Delivered</TableHead>
-                          <TableHead>Created</TableHead>
-                          <TableHead>Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {campaigns.map((campaign) => (
-                          <TableRow key={campaign.id}>
-                            <TableCell className="font-medium">{campaign.name}</TableCell>
-                            <TableCell>{campaign.templateName}</TableCell>
-                            <TableCell>{getStatusBadge(campaign.status)}</TableCell>
-                            <TableCell>{campaign.stats.total}</TableCell>
-                            <TableCell>
-                              {campaign.stats.delivered} / {campaign.stats.sent}
-                            </TableCell>
-                            <TableCell>
-                              {format(new Date(campaign.createdAt), 'MMM dd, yyyy')}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-10 w-10"
-                                  onClick={() => handleViewCampaign(campaign)}
-                                  aria-label="View campaign"
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-10 w-10"
-                                  onClick={() => handleDeleteCampaign(campaign.id)}
-                                  aria-label="Delete campaign"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                    <div className="rounded-lg border border-stone-200 dark:border-stone-800 overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
+                            <th className="h-9 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Campaign Name</th>
+                            <th className="h-9 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Message Design</th>
+                            <th className="h-9 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Status</th>
+                            <th className="h-9 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Recipients</th>
+                            <th className="h-9 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Delivered</th>
+                            <th className="h-9 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Created</th>
+                            <th className="h-9 px-4 text-right align-middle text-xs font-medium text-muted-foreground w-[100px]"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {campaigns.map((campaign, index) => (
+                            <tr key={campaign.id} className={cn("hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors", index !== campaigns.length - 1 && "border-b border-stone-200 dark:border-stone-800")}>
+                              <td className="h-12 px-4 align-middle font-medium">{campaign.name}</td>
+                              <td className="h-12 px-4 align-middle text-muted-foreground">{campaign.templateName}</td>
+                              <td className="h-12 px-4 align-middle">
+                                <span className={cn("text-xs font-medium capitalize", getStatusColor(campaign.status))}>
+                                  {campaign.status}
+                                </span>
+                              </td>
+                              <td className="h-12 px-4 align-middle tabular-nums">{campaign.stats.total}</td>
+                              <td className="h-12 px-4 align-middle tabular-nums">{campaign.stats.delivered} / {campaign.stats.sent}</td>
+                              <td className="h-12 px-4 align-middle text-muted-foreground">{format(new Date(campaign.createdAt), 'MMM dd, yyyy')}</td>
+                              <td className="h-12 px-4 align-middle text-right">
+                                <div className="flex items-center justify-end gap-1">
+                                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleViewCampaign(campaign)}>
+                                    <Icon icon="solar:eye-linear" className="h-4 w-4" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-red-600" onClick={() => handleDeleteCampaign(campaign.id)}>
+                                    <Icon icon="solar:trash-bin-trash-linear" className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </ScrollArea>
               )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+          </div>
+        </div>
+      )}
 
-        <TabsContent value="create" className="space-y-3 sm:space-y-4">
-          <Card className="overflow-hidden">
-            <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="text-lg sm:text-xl">Create WhatsApp Campaign</CardTitle>
-              <CardDescription className="text-sm">
-                Send a WhatsApp message to many contacts at once
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 p-4 sm:p-6 pt-0 sm:pt-0">
-              {/* Platform Selector */}
-              <div className="space-y-2">
-                <Label>Select WhatsApp Platform</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedPlatform('authkey')}
-                    className={`p-3 sm:p-4 border-2 rounded-lg text-left transition-all ${
-                      selectedPlatform === 'authkey' 
-                        ? 'border-primary bg-primary/5' 
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
-                      <h4 className="font-semibold text-sm sm:text-base flex items-center gap-1 sm:gap-2 flex-wrap">
-                        WMart CPaaS
-                        <Badge variant="default" className="text-[10px] sm:text-xs bg-green-600">Recommended</Badge>
-                      </h4>
-                      {selectedPlatform === 'authkey' && company?.apiKeys?.authkey && (
-                        <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 shrink-0" />
-                      )}
-                      {selectedPlatform === 'authkey' && !company?.apiKeys?.authkey && (
-                        <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 shrink-0" />
-                      )}
-                    </div>
-                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
-                      Our multi-channel CPaaS supporting WhatsApp, SMS, Email, and Voice in one account
-                    </p>
-                  </button>
-                  
-                  <button
-                    type="button"
-                    onClick={() => setSelectedPlatform('meta')}
-                    className={`p-3 sm:p-4 border-2 rounded-lg text-left transition-all ${
-                      selectedPlatform === 'meta' 
-                        ? 'border-primary bg-primary/5' 
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
-                      <h4 className="font-semibold text-sm sm:text-base flex items-center gap-1 sm:gap-2 flex-wrap">
-                        Meta (Direct) 
-                        <Badge variant="secondary" className="text-[10px] sm:text-xs">Official API</Badge>
-                      </h4>
-                      {selectedPlatform === 'meta' && company?.apiKeys?.metaWhatsApp && (
-                        <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 shrink-0" />
-                      )}
-                      {selectedPlatform === 'meta' && !company?.apiKeys?.metaWhatsApp && (
-                        <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 shrink-0" />
-                      )}
-                    </div>
-                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
-                      Official WhatsApp Business API with best deliverability and reliability
-                    </p>
-                  </button>
-                  
-                  <button
-                    type="button"
-                    onClick={() => setSelectedPlatform('aisensy')}
-                    className={`p-3 sm:p-4 border-2 rounded-lg text-left transition-all ${
-                      selectedPlatform === 'aisensy' 
-                        ? 'border-primary bg-primary/5' 
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
-                      <h4 className="font-semibold text-sm sm:text-base flex items-center gap-1 sm:gap-2">
-                        AiSensy
-                      </h4>
-                      {selectedPlatform === 'aisensy' && company?.apiKeys?.aisensy && (
-                        <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 shrink-0" />
-                      )}
-                      {selectedPlatform === 'aisensy' && !company?.apiKeys?.aisensy && (
-                        <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 shrink-0" />
-                      )}
-                    </div>
-                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
-                      AI-powered WhatsApp platform with built-in chatbots and marketing automation
-                    </p>
-                  </button>
-                  
-                  <button
-                    type="button"
-                    onClick={() => setSelectedPlatform('gupshup')}
-                    className={`p-3 sm:p-4 border-2 rounded-lg text-left transition-all ${
-                      selectedPlatform === 'gupshup' 
-                        ? 'border-primary bg-primary/5' 
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
-                      <h4 className="font-semibold text-sm sm:text-base flex items-center gap-1 sm:gap-2 flex-wrap">
-                        Gupshup
-                        <Badge variant="secondary" className="text-[10px] sm:text-xs">Enterprise</Badge>
-                      </h4>
-                      {selectedPlatform === 'gupshup' && company?.apiKeys?.gupshup && (
-                        <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 shrink-0" />
-                      )}
-                      {selectedPlatform === 'gupshup' && !company?.apiKeys?.gupshup && (
-                        <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 shrink-0" />
-                      )}
-                    </div>
-                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
-                      Enterprise-grade platform with advanced automation, trusted by Fortune 500 companies
-                    </p>
-                  </button>
-                  
-                  <button
-                    type="button"
-                    onClick={() => setSelectedPlatform('msg91WhatsApp')}
-                    className={`p-3 sm:p-4 border-2 rounded-lg text-left transition-all ${
-                      selectedPlatform === 'msg91WhatsApp' 
-                        ? 'border-primary bg-primary/5' 
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
-                      <h4 className="font-semibold text-sm sm:text-base flex items-center gap-1 sm:gap-2">
-                        MSG91 WhatsApp
-                      </h4>
-                      {selectedPlatform === 'msg91WhatsApp' && company?.apiKeys?.msg91WhatsApp && (
-                        <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 shrink-0" />
-                      )}
-                      {selectedPlatform === 'msg91WhatsApp' && !company?.apiKeys?.msg91WhatsApp && (
-                        <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 shrink-0" />
-                      )}
-                    </div>
-                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
-                      Affordable WhatsApp Business API for India with pay-as-you-go pricing
-                    </p>
-                  </button>
-                  
-                  <button
-                    type="button"
-                    onClick={() => setSelectedPlatform('fast2smsWhatsApp')}
-                    className={`p-3 sm:p-4 border-2 rounded-lg text-left transition-all ${
-                      selectedPlatform === 'fast2smsWhatsApp' 
-                        ? 'border-primary bg-primary/5' 
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
-                      <h4 className="font-semibold text-sm sm:text-base flex items-center gap-1 sm:gap-2">
-                        Fast2SMS WhatsApp
-                      </h4>
-                      {selectedPlatform === 'fast2smsWhatsApp' && company?.apiKeys?.fast2smsWhatsApp && (
-                        <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 shrink-0" />
-                      )}
-                      {selectedPlatform === 'fast2smsWhatsApp' && !company?.apiKeys?.fast2smsWhatsApp && (
-                        <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 shrink-0" />
-                      )}
-                    </div>
-                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
-                      Zero setup fee WhatsApp platform, pay only for delivered messages
-                    </p>
-                  </button>
+      {/* Create Campaign Tab */}
+      {activeTab === 'create' && (
+        <div className="mt-4">
+          {/* Two Column Layout: Form + Phone Preview */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Form Column - Takes 2 columns */}
+            <div className="lg:col-span-2 space-y-4">
+              {/* Step 1: Select Platform */}
+              <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-stone-200 dark:bg-stone-800 text-[10px] font-semibold">1</span>
+                  <h3 className="font-semibold text-sm">Select WhatsApp Platform</h3>
                 </div>
-                
-                {/* AiSensy Not Connected Alert */}
-                {selectedPlatform === 'aisensy' && !company?.apiKeys?.aisensy && (
-                  <Alert className="mt-2 border-amber-200 bg-amber-50 dark:bg-amber-900/20">
-                    <AlertTriangle className="h-4 w-4 text-amber-600" />
-                    <AlertTitle className="text-amber-900 dark:text-amber-100">AiSensy Setup Required</AlertTitle>
-                    <AlertDescription className="space-y-3">
-                      <p className="text-sm text-amber-800 dark:text-amber-200">
-                        To send WhatsApp campaigns, you need to connect your AiSensy account first.
-                      </p>
-                      <div className="flex flex-col gap-2">
-                        <Button asChild className="w-full sm:w-auto" size="sm">
-                          <Link href="/settings?tab=integrations">
-                            <Settings className="h-4 w-4 mr-2" />
-                            Set Up AiSensy Connection
-                          </Link>
-                        </Button>
-                        <div className="text-xs text-amber-700 dark:text-amber-300 space-y-1">
-                          <p className="font-medium">You'll need:</p>
-                          <ul className="list-disc ml-4">
-                            <li>Your AiSensy API Key (from Dashboard → Project → Manage Page)</li>
-                            <li>Optional: A default campaign name you've already created in AiSensy</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
-                
-                {/* Meta Not Connected Alert */}
-                {selectedPlatform === 'meta' && !company?.apiKeys?.metaWhatsApp && (
-                  <Alert className="mt-2 border-amber-200 bg-amber-50 dark:bg-amber-900/20">
-                    <AlertTriangle className="h-4 w-4 text-amber-600" />
-                    <AlertTitle className="text-amber-900 dark:text-amber-100">Meta WhatsApp Setup Required</AlertTitle>
-                    <AlertDescription className="space-y-3">
-                      <p className="text-sm text-amber-800 dark:text-amber-200">
-                        To use Meta's WhatsApp Cloud API, you need to connect your Meta Business account first.
-                      </p>
-                      <div className="flex flex-col gap-2">
-                        <Button asChild className="w-full sm:w-auto" size="sm">
-                          <Link href="/settings?tab=integrations">
-                            <Settings className="h-4 w-4 mr-2" />
-                            Set Up Meta WhatsApp
-                          </Link>
-                        </Button>
-                        <div className="text-xs text-amber-700 dark:text-amber-300 space-y-1">
-                          <p className="font-medium">You'll need from Meta Business Manager:</p>
-                          <ul className="list-disc ml-4">
-                            <li>Phone Number ID (from WhatsApp → API Setup)</li>
-                            <li>Permanent Access Token (never expires)</li>
-                            <li>Optional: WABA ID (for template management)</li>
-                          </ul>
-                          <p className="font-medium mt-2">How to get these:</p>
-                          <ol className="list-decimal ml-4">
-                            <li>Go to Meta Business Manager</li>
-                            <li>Navigate to WhatsApp → API Setup</li>
-                            <li>Copy Phone Number ID and create Access Token</li>
-                          </ol>
-                        </div>
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
-                
-                {/* WMart CPaaS Not Connected Alert */}
-                {selectedPlatform === 'authkey' && !company?.apiKeys?.authkey && (
-                  <Alert className="mt-2 border-amber-200 bg-amber-50 dark:bg-amber-900/20">
-                    <AlertTriangle className="h-4 w-4 text-amber-600" />
-                    <AlertTitle className="text-amber-900 dark:text-amber-100">WMart CPaaS Setup Required</AlertTitle>
-                    <AlertDescription className="space-y-3">
-                      <p className="text-sm text-amber-800 dark:text-amber-200">
-                        To use our multi-channel CPaaS, you need to connect your WMart CPaaS account first.
-                      </p>
-                      <div className="flex flex-col gap-2">
-                        <Button asChild className="w-full sm:w-auto" size="sm">
-                          <Link href="/settings?tab=integrations">
-                            <Settings className="h-4 w-4 mr-2" />
-                            Set Up WMart CPaaS Connection
-                          </Link>
-                        </Button>
-                        <div className="text-xs text-amber-700 dark:text-amber-300 space-y-1">
-                          <p className="font-medium">You'll need:</p>
-                          <ul className="list-disc ml-4">
-                            <li>Your WMart CPaaS API Key from <a href="https://cpaas.wmart.in" target="_blank" className="underline">cpaas.wmart.in</a></li>
-                            <li>Get free credit when you sign up at <a href="https://wmart.in/cpaas/" target="_blank" className="underline">wmart.in/cpaas</a></li>
-                            <li>Same key works for WhatsApp, SMS, Email, and Voice!</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
-                
-                {/* WMart CPaaS Connected - Usage Guide */}
-                {selectedPlatform === 'authkey' && company?.apiKeys?.authkey && (
-                  <Alert className="mt-2 border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-                    <Info className="h-4 w-4 text-blue-600" />
-                    <AlertTitle className="text-blue-900 dark:text-blue-100">WMart CPaaS - Quick Guide</AlertTitle>
-                    <AlertDescription>
-                      <div className="text-xs space-y-3 text-blue-800 dark:text-blue-200 mt-2">
-                        <div>
-                          <p className="font-semibold mb-1">📝 Creating Templates with Variables:</p>
-                          <ul className="list-disc ml-4 space-y-1">
-                            <li>Go to <a href="https://cpaas.wmart.in" target="_blank" className="underline hover:text-blue-600">cpaas.wmart.in</a> → WhatsApp → Templates</li>
-                            <li>Use <code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">{'{{1}}'}</code> in your template for contact name (e.g., "Hi {'{{1}}'}, your order is ready!")</li>
-                            <li>Keep it simple: 1 variable for name works best for sales & marketing</li>
-                            <li>OmniFlow automatically replaces <code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">{'{{1}}'}</code> with each contact's name</li>
-                          </ul>
-                        </div>
-                        <div>
-                          <p className="font-semibold mb-1">📷 Sending Images/Videos/Documents:</p>
-                          <ul className="list-disc ml-4 space-y-1">
-                            <li>Create a <strong>Media Template</strong> in WMart CPaaS with IMAGE/VIDEO/DOCUMENT header</li>
-                            <li>Upload your media to WMart CPaaS Media Gallery first</li>
-                            <li>Copy the media URL (starts with https://wpgallery.s3...)</li>
-                            <li>Paste the URL once - it will be saved for future campaigns!</li>
-                          </ul>
-                        </div>
-                        <div className="pt-2 border-t border-blue-200 dark:border-blue-700">
-                          <p className="font-semibold mb-1">⚠️ Media Limits:</p>
-                          <span className="text-[11px]">Image: 5MB (JPEG/PNG) | Video: 16MB (MP4) | Document: 100MB (PDF)</span>
-                        </div>
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
-                
-                {/* Gupshup Not Connected Alert */}
-                {selectedPlatform === 'gupshup' && !company?.apiKeys?.gupshup && (
-                  <Alert className="mt-2 border-amber-200 bg-amber-50 dark:bg-amber-900/20">
-                    <AlertTriangle className="h-4 w-4 text-amber-600" />
-                    <AlertTitle className="text-amber-900 dark:text-amber-100">Gupshup Setup Required</AlertTitle>
-                    <AlertDescription className="space-y-3">
-                      <p className="text-sm text-amber-800 dark:text-amber-200">
-                        To use Gupshup's enterprise platform, you need to connect your Gupshup account first.
-                      </p>
-                      <div className="flex flex-col gap-2">
-                        <Button asChild className="w-full sm:w-auto" size="sm">
-                          <Link href="/settings?tab=integrations">
-                            <Settings className="h-4 w-4 mr-2" />
-                            Set Up Gupshup Connection
-                          </Link>
-                        </Button>
-                        <div className="text-xs text-amber-700 dark:text-amber-300 space-y-1">
-                          <p className="font-medium">You'll need from your Gupshup dashboard:</p>
-                          <ul className="list-disc ml-4">
-                            <li>Gupshup API Key (Settings → API Keys)</li>
-                            <li>Your WhatsApp Business App Name</li>
-                            <li>Business WhatsApp Phone Number (with country code)</li>
-                            <li>Approved message templates for campaigns</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="campaignName">
-                  {selectedPlatform === 'aisensy' ? 'Campaign Label (for your records)' : 'Campaign Name'}
-                </Label>
-                <Input
-                  id="campaignName"
-                  placeholder={selectedPlatform === 'aisensy' ? 'e.g., Diwali Campaign 2025' : 'e.g., Summer Sale 2025'}
-                  value={campaignName}
-                  onChange={(e) => setCampaignName(e.target.value)}
-                />
-                {selectedPlatform === 'aisensy' && (
-                  <p className="text-xs text-muted-foreground">
-                    This is just for your tracking in OmniFlow - not sent to AiSensy
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="template">
-                  {selectedPlatform === 'meta' || selectedPlatform === 'gupshup' ? 'Message Design' : 
-                   selectedPlatform === 'authkey' ? 'Template Name' :
-                   selectedPlatform === 'msg91WhatsApp' ? 'Template Name' :
-                   selectedPlatform === 'fast2smsWhatsApp' ? 'Template Name' : 
-                   'AiSensy API Campaign Name'}
-                </Label>
-                {selectedPlatform === 'meta' || selectedPlatform === 'gupshup' || (selectedPlatform === 'authkey' && templates.length > 0) ? (
-                  <>
-                    <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-                      <SelectTrigger id="template">
-                        <SelectValue placeholder="Choose a message design" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {isLoadingTemplates ? (
-                          <div className="p-2 text-sm text-muted-foreground">Loading...</div>
-                        ) : templates.length === 0 ? (
-                          <div className="p-4 text-sm">
-                            <p className="text-muted-foreground mb-2">No message designs found.</p>
-                            <p className="text-xs text-muted-foreground">
-                              {selectedPlatform === 'gupshup'
-                                ? 'Set up Gupshup in Settings to load your approved message templates.'
-                                : selectedPlatform === 'authkey'
-                                ? 'Set up WMart CPaaS in Settings to load your approved message templates.'
-                                : 'Set up Meta WhatsApp in Settings to load your approved message templates.'}
-                            </p>
-                          </div>
-                        ) : (
-                          templates.map((template) => (
-                            <SelectItem key={template.id || template.name} value={template.id || template.name}>
-                              {template.elementName || template.name} {template.id ? `(${template.id})` : ''}
-                            </SelectItem>
-                          ))
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {[
+                    { id: 'authkey', name: 'WMart CPaaS', badge: 'Recommended', badgeColor: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300', desc: 'Multi-channel CPaaS supporting WhatsApp, SMS, Email, and Voice', apiKey: company?.apiKeys?.authkey },
+                    { id: 'meta', name: 'Meta (Direct)', badge: 'Official API', badgeColor: 'bg-stone-100 dark:bg-stone-800 text-muted-foreground', desc: 'Official WhatsApp Business API with best deliverability', apiKey: company?.apiKeys?.metaWhatsApp },
+                    { id: 'aisensy', name: 'AiSensy', badge: null, badgeColor: '', desc: 'AI-powered WhatsApp platform with built-in chatbots', apiKey: company?.apiKeys?.aisensy },
+                    { id: 'gupshup', name: 'Gupshup', badge: 'Enterprise', badgeColor: 'bg-stone-100 dark:bg-stone-800 text-muted-foreground', desc: 'Enterprise-grade platform with advanced automation', apiKey: company?.apiKeys?.gupshup },
+                    { id: 'msg91WhatsApp', name: 'MSG91 WhatsApp', badge: null, badgeColor: '', desc: 'Affordable WhatsApp Business API for India', apiKey: company?.apiKeys?.msg91WhatsApp },
+                    { id: 'fast2smsWhatsApp', name: 'Fast2SMS WhatsApp', badge: null, badgeColor: '', desc: 'Zero setup fee WhatsApp platform', apiKey: company?.apiKeys?.fast2smsWhatsApp },
+                  ].map((platform) => (
+                    <button
+                      key={platform.id}
+                      type="button"
+                      onClick={() => setSelectedPlatform(platform.id as any)}
+                      className={cn(
+                        "p-3 border rounded-lg text-left transition-all",
+                        selectedPlatform === platform.id
+                          ? "border-stone-400 dark:border-stone-600 bg-stone-50 dark:bg-stone-900/50"
+                          : "border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-900/30"
+                      )}
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <h4 className="font-medium text-sm flex items-center gap-1.5 flex-wrap">
+                          {platform.name}
+                          {platform.badge && (
+                            <span className={cn("text-[9px] px-1.5 py-0.5 rounded", platform.badgeColor)}>{platform.badge}</span>
+                          )}
+                        </h4>
+                        {selectedPlatform === platform.id && platform.apiKey && (
+                          <Icon icon="solar:check-circle-bold" className="h-4 w-4 text-emerald-600 flex-shrink-0" />
                         )}
-                      </SelectContent>
-                    </Select>
+                        {selectedPlatform === platform.id && !platform.apiKey && (
+                          <Icon icon="solar:danger-triangle-linear" className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                        )}
+                      </div>
+                      <p className="text-[10px] text-muted-foreground line-clamp-2">{platform.desc}</p>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Platform Not Connected Alert */}
+                {selectedPlatform && !(company?.apiKeys as any)?.[selectedPlatform] && (
+                  <div className="mt-3 flex items-start gap-3 p-3 border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50">
+                    <Icon icon="solar:danger-triangle-linear" className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-xs font-medium">Setup Required</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">Connect your {selectedPlatform === 'authkey' ? 'WMart CPaaS' : selectedPlatform} account in Settings to send campaigns.</p>
+                      <Button asChild variant="outline" size="sm" className="h-7 text-xs mt-2">
+                        <Link href="/settings?tab=integrations">
+                          <Icon icon="solar:settings-linear" className="h-3.5 w-3.5 mr-1.5" />
+                          Set Up Connection
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Step 2: Campaign Name */}
+              <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-stone-200 dark:bg-stone-800 text-[10px] font-semibold">2</span>
+                  <h3 className="font-semibold text-sm">Campaign Name</h3>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="campaignName" className="text-xs text-muted-foreground">
+                    {selectedPlatform === 'aisensy' ? 'Campaign Label (for your records)' : 'Name'}
+                  </Label>
+                  <Input
+                    id="campaignName"
+                    placeholder={selectedPlatform === 'aisensy' ? 'e.g., Diwali Campaign 2025' : 'e.g., Summer Sale 2025'}
+                    value={campaignName}
+                    onChange={(e) => setCampaignName(e.target.value)}
+                    className="h-9"
+                  />
+                </div>
+              </div>
+
+              {/* Step 3: Select Template */}
+              <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-stone-200 dark:bg-stone-800 text-[10px] font-semibold">3</span>
+                  <h3 className="font-semibold text-sm">
+                    {selectedPlatform === 'aisensy' ? 'AiSensy API Campaign Name' : 'Message Template'}
+                  </h3>
+                </div>
+
+                {(selectedPlatform === 'meta' || selectedPlatform === 'gupshup' || (selectedPlatform === 'authkey' && templates.length > 0)) ? (
+                  <>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="template" className="text-xs text-muted-foreground">Select Template</Label>
+                      <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                        <SelectTrigger id="template" className="h-9">
+                          <SelectValue placeholder="Choose a message design" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {isLoadingTemplates ? (
+                            <div className="p-2 text-sm text-muted-foreground">Loading...</div>
+                          ) : templates.length === 0 ? (
+                            <div className="p-4 text-sm text-muted-foreground">No approved templates found.</div>
+                          ) : (
+                            templates.map((template) => (
+                              <SelectItem key={template.id || template.name} value={template.id || template.name}>
+                                {template.elementName || template.name}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
                     {selectedPlatform === 'authkey' && (
                       <>
-                        <div className="space-y-2 mt-3">
-                          <Label htmlFor="templateType">Template Type</Label>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="templateType" className="text-xs text-muted-foreground">Template Type</Label>
                           <Select value={templateType} onValueChange={(v) => setTemplateType(v as 'text' | 'media')}>
-                            <SelectTrigger id="templateType">
+                            <SelectTrigger id="templateType" className="h-9">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -1280,386 +686,312 @@ export default function WhatsAppBulkCampaignsPage() {
                           </Select>
                         </div>
                         {templateType === 'media' && (
-                          <div className="space-y-3 mt-3">
-                            <Label htmlFor="headerImage">Header Image/Video URL</Label>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="headerImage" className="text-xs text-muted-foreground">Header Image/Video URL</Label>
                             <Input
                               id="headerImage"
                               placeholder="https://wpgallery.s3.ap-south-1.amazonaws.com/gallery/..."
                               value={headerImageUrl}
                               onChange={(e) => setHeaderImageUrl(e.target.value)}
+                              className="h-9"
                             />
-                            <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-                              <Info className="h-4 w-4 text-blue-600" />
-                              <AlertDescription>
-                                <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">📷 How to Send Images with WMart CPaaS</p>
-                                <div className="text-xs space-y-2 text-blue-800 dark:text-blue-200">
-                                  <p className="font-medium">Getting your Media URL:</p>
-                                  <ol className="list-decimal ml-4 space-y-1.5">
-                                    <li>Log into <a href="https://cpaas.wmart.in" target="_blank" className="underline hover:text-blue-600">WMart CPaaS Dashboard</a></li>
-                                    <li>Go to <strong>WhatsApp → Templates</strong></li>
-                                    <li>Find your approved media template</li>
-                                    <li>Click on the template to view details</li>
-                                    <li>Copy the <strong>Header Media URL</strong> (starts with https://wpgallery.s3...)</li>
-                                    <li>Paste it in the field above</li>
-                                  </ol>
-                                  <div className="mt-3 pt-2 border-t border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/30 p-2 rounded">
-                                    <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">⚠️ Image Requirements & Limitations:</p>
-                                    <ul className="list-disc ml-4 space-y-1">
-                                      <li><strong>Use WMart CPaaS Media Gallery URLs only</strong> - External URLs will not work</li>
-                                      <li>Image size: Max <strong>5 MB</strong> (JPEG or PNG recommended)</li>
-                                      <li>Video size: Max <strong>16 MB</strong> (MP4 format only)</li>
-                                      <li>Document size: Max <strong>100 MB</strong> (PDF recommended)</li>
-                                      <li>URL format: Must start with <code className="bg-amber-100 dark:bg-amber-800 px-1 rounded">https://wpgallery.s3...</code></li>
-                                      <li>Upload your media in WMart CPaaS first, then use the generated URL</li>
-                                    </ul>
-                                  </div>
-                                  <div className="mt-3 pt-2 border-t border-blue-200 dark:border-blue-700">
-                                    <p className="font-medium mb-1">📚 Quick Tip:</p>
-                                    <p>If you don't have a media URL yet, upload your image/video in the WMart CPaaS Media Gallery first, then copy the URL from there.</p>
-                                  </div>
-                                </div>
-                              </AlertDescription>
-                            </Alert>
+                            <p className="text-[10px] text-muted-foreground">Upload media in WMart CPaaS Media Gallery first, then paste the URL here.</p>
                           </div>
                         )}
                       </>
                     )}
-                    <Alert className="mt-3">
-                      <Info className="h-4 w-4" />
-                      <AlertDescription>
-                        <p className="text-sm font-medium mb-1">Only WhatsApp-approved designs shown</p>
-                        <p className="text-xs text-muted-foreground mb-2">
-                          WhatsApp reviews all bulk message designs before you can use them. This usually takes 1-24 hours.
-                        </p>
-                        <div className="flex flex-col gap-1 text-xs">
-                          <Link href={selectedPlatform === 'authkey' ? 'https://cpaas.wmart.in' : selectedPlatform === 'gupshup' ? 'https://www.gupshup.io/whatsapp-api' : 'https://business.facebook.com/wa/manage/message-templates'} target="_blank" className="text-blue-600 hover:underline">
-                            → {selectedPlatform === 'gupshup' ? 'Create templates in Gupshup Dashboard' : selectedPlatform === 'authkey' ? 'Create templates in WMart CPaaS Dashboard' : 'Create message templates in Meta Business Manager'}
-                          </Link>
-                        </div>
-                      </AlertDescription>
-                    </Alert>
-                  </>
-                ) : (selectedPlatform === 'authkey' && templates.length === 0) || selectedPlatform === 'msg91WhatsApp' || selectedPlatform === 'fast2smsWhatsApp' ? (
-                  <>
-                    <Input
-                      id="template"
-                      placeholder={`Enter template ID (WID) from ${
-                        selectedPlatform === 'authkey' ? 'WMart CPaaS (e.g., 19137)' :
-                        selectedPlatform === 'msg91WhatsApp' ? 'MSG91' :
-                        'Fast2SMS'
-                      } dashboard`}
-                      value={selectedTemplate}
-                      onChange={(e) => setSelectedTemplate(e.target.value)}
-                    />
-                    {selectedPlatform === 'authkey' && (
-                      <>
-                        <div className="space-y-2 mt-3">
-                          <Label htmlFor="templateType">Template Type</Label>
-                          <Select value={templateType} onValueChange={(v) => setTemplateType(v as 'text' | 'media')}>
-                            <SelectTrigger id="templateType">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="text">Text Template</SelectItem>
-                              <SelectItem value="media">Media Template (with image/video)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        {templateType === 'media' && (
-                          <div className="space-y-3 mt-3">
-                            <Label htmlFor="headerImage">Header Image/Video URL</Label>
-                            <Input
-                              id="headerImage"
-                              placeholder="https://wpgallery.s3.ap-south-1.amazonaws.com/gallery/..."
-                              value={headerImageUrl}
-                              onChange={(e) => setHeaderImageUrl(e.target.value)}
-                            />
-                            <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-                              <Info className="h-4 w-4 text-blue-600" />
-                              <AlertDescription>
-                                <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">📷 How to Send Images with WMart CPaaS</p>
-                                <div className="text-xs space-y-2 text-blue-800 dark:text-blue-200">
-                                  <p className="font-medium">Getting your Media URL:</p>
-                                  <ol className="list-decimal ml-4 space-y-1.5">
-                                    <li>Log into <a href="https://cpaas.wmart.in" target="_blank" className="underline hover:text-blue-600">WMart CPaaS Dashboard</a></li>
-                                    <li>Go to <strong>WhatsApp → Templates</strong></li>
-                                    <li>Find your approved media template</li>
-                                    <li>Click on the template to view details</li>
-                                    <li>Copy the <strong>Header Media URL</strong> (starts with https://wpgallery.s3...)</li>
-                                    <li>Paste it in the field above</li>
-                                  </ol>
-                                  <div className="mt-3 pt-2 border-t border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/30 p-2 rounded">
-                                    <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">⚠️ Image Requirements & Limitations:</p>
-                                    <ul className="list-disc ml-4 space-y-1">
-                                      <li><strong>Use WMart CPaaS Media Gallery URLs only</strong> - External URLs will not work</li>
-                                      <li>Image size: Max <strong>5 MB</strong> (JPEG or PNG recommended)</li>
-                                      <li>Video size: Max <strong>16 MB</strong> (MP4 format only)</li>
-                                      <li>Document size: Max <strong>100 MB</strong> (PDF recommended)</li>
-                                      <li>URL format: Must start with <code className="bg-amber-100 dark:bg-amber-800 px-1 rounded">https://wpgallery.s3...</code></li>
-                                      <li>Upload your media in WMart CPaaS first, then use the generated URL</li>
-                                    </ul>
-                                  </div>
-                                  <div className="mt-3 pt-2 border-t border-blue-200 dark:border-blue-700">
-                                    <p className="font-medium mb-1">📚 Quick Tip:</p>
-                                    <p>If you don't have a media URL yet, upload your image/video in the WMart CPaaS Media Gallery first, then copy the URL from there.</p>
-                                  </div>
-                                </div>
-                              </AlertDescription>
-                            </Alert>
-                          </div>
-                        )}
-                      </>
-                    )}
-                    <Alert className="mt-3 border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-                      <Info className="h-4 w-4 text-blue-600" />
-                      <AlertDescription>
-                        <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                          📋 Using {selectedPlatform === 'authkey' ? 'WMart CPaaS' : selectedPlatform === 'msg91WhatsApp' ? 'MSG91' : 'Fast2SMS'} Templates
-                        </p>
-                        <div className="text-xs space-y-2 text-blue-800 dark:text-blue-200">
-                          <p className="font-medium">To send WhatsApp messages:</p>
-                          <ol className="list-decimal ml-4 space-y-1.5">
-                            <li>Log into your {selectedPlatform === 'authkey' ? 
-                              <a href="https://wmart.in/cpaas/" target="_blank" className="underline hover:text-blue-600">WMart CPaaS Dashboard</a> :
-                              selectedPlatform === 'msg91WhatsApp' ?
-                              <a href="https://control.msg91.com" target="_blank" className="underline hover:text-blue-600">MSG91 Dashboard</a> :
-                              <a href="https://www.fast2sms.com/dashboard" target="_blank" className="underline hover:text-blue-600">Fast2SMS Dashboard</a>
-                            }</li>
-                            <li>Navigate to WhatsApp Templates section</li>
-                            <li>Find your approved WhatsApp template</li>
-                            {selectedPlatform === 'authkey' && (
-                              <>
-                                <li><strong>Copy the WID number</strong> from the first column (e.g., 19137, not the template name)</li>
-                                <li>Select template type: Text or Media (check the "Template" column)</li>
-                                <li>If Media template, get the image URL from your template</li>
-                              </>
-                            )}
-                            {selectedPlatform !== 'authkey' && (
-                              <li>Note the exact template name or ID</li>
-                            )}
-                            <li>Enter the {selectedPlatform === 'authkey' ? 'WID number' : 'template name'} in the field above</li>
-                          </ol>
-                          <div className="mt-3 pt-2 border-t border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/30 p-2 rounded">
-                            <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">⚠️ Template Variables:</p>
-                            <ul className="list-disc ml-4 space-y-1">
-                              <li>If your template has a variable (like {'{'}{'{'}{'{'}1{'}'}{'}'}{'}'} for a name), OmniFlow will automatically use the contact's name</li>
-                              <li>For templates with one variable, the contact's first name will be sent</li>
-                              <li>Templates without variables will work as-is</li>
-                              <li>Keep templates simple for best WhatsApp approval rates</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </AlertDescription>
-                    </Alert>
                   </>
                 ) : (
-                  <>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="template" className="text-xs text-muted-foreground">
+                      {selectedPlatform === 'aisensy' ? 'Campaign Name' : 'Template ID'}
+                    </Label>
                     <Input
                       id="template"
-                      placeholder="Enter your AiSensy campaign name (e.g., welcome_message)"
+                      placeholder={selectedPlatform === 'aisensy' ? 'Enter your AiSensy campaign name' : 'Enter template ID from dashboard'}
                       value={selectedTemplate}
                       onChange={(e) => setSelectedTemplate(e.target.value)}
+                      className="h-9"
                     />
-                    <Alert className="mt-3 border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-                      <Info className="h-4 w-4 text-blue-600" />
-                      <AlertDescription>
-                        <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">📋 How AiSensy Works</p>
-                        <div className="text-xs space-y-2 text-blue-800 dark:text-blue-200">
-                          <p className="font-medium">AiSensy requires you to create API campaigns in their dashboard:</p>
-                          <ol className="list-decimal ml-4 space-y-1.5">
-                            <li>
-                              <strong>Create an API Campaign in AiSensy Dashboard:</strong>
-                              <ul className="list-disc ml-4 mt-1">
-                                <li>Log into <a href="https://app.aisensy.com" target="_blank" className="underline hover:text-blue-600">AiSensy Dashboard</a></li>
-                                <li>Go to: <strong>Campaigns → Launch Campaign → API Campaign</strong></li>
-                                <li>Choose your approved WhatsApp template</li>
-                                <li>Give your campaign a name (e.g., "diwali_offer_1")</li>
-                                <li>Save the campaign</li>
-                              </ul>
-                            </li>
-                            <li>
-                              <strong>Enter that exact campaign name</strong> in the field above
-                            </li>
-                            <li>
-                              <strong>Send your campaign</strong> - OmniFlow will use that campaign to send messages
-                            </li>
-                          </ol>
-                          <div className="mt-3 pt-2 border-t border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/30 p-2 rounded">
-                            <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">⚠️ Important Template Requirements:</p>
-                            <ul className="list-disc ml-4 space-y-1">
-                              <li><strong>Use only ONE variable</strong> in your WhatsApp template (e.g., just "FirstName" or "Name")</li>
-                              <li>OmniFlow automatically sends the contact's first name to fill this variable</li>
-                              <li>Multiple variables are not currently supported for bulk campaigns</li>
-                              <li>Keep templates simple for best approval rates from WhatsApp</li>
-                            </ul>
-                          </div>
-                          <div className="mt-3 pt-2 border-t border-blue-200 dark:border-blue-700">
-                            <p className="font-medium mb-1">📚 Helpful Resources:</p>
-                            <div className="flex flex-col gap-1">
-                              <Link href="https://wiki.aisensy.com/en/articles/11501891-how-to-setup-whatsapp-api-campaigns-in-aisensy" target="_blank" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-                                <ArrowRight className="h-3 w-3" />
-                                Complete guide: How to set up API campaigns in AiSensy
-                              </Link>
-                              <Link href="https://app.aisensy.com/campaigns" target="_blank" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-                                <ArrowRight className="h-3 w-3" />
-                                Open AiSensy Campaigns Dashboard
-                              </Link>
-                            </div>
-                          </div>
+                    {selectedPlatform === 'authkey' && (
+                      <>
+                        <div className="space-y-1.5 mt-3">
+                          <Label htmlFor="templateType" className="text-xs text-muted-foreground">Template Type</Label>
+                          <Select value={templateType} onValueChange={(v) => setTemplateType(v as 'text' | 'media')}>
+                            <SelectTrigger id="templateType" className="h-9">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="text">Text Template</SelectItem>
+                              <SelectItem value="media">Media Template (with image/video)</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
-                      </AlertDescription>
-                    </Alert>
-                  </>
+                        {templateType === 'media' && (
+                          <div className="space-y-1.5 mt-3">
+                            <Label htmlFor="headerImage" className="text-xs text-muted-foreground">Header Image/Video URL</Label>
+                            <Input
+                              id="headerImage"
+                              placeholder="https://wpgallery.s3.ap-south-1.amazonaws.com/gallery/..."
+                              value={headerImageUrl}
+                              onChange={(e) => setHeaderImageUrl(e.target.value)}
+                              className="h-9"
+                            />
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+
+                <div className="flex items-start gap-3 p-3 border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50">
+                  <Icon icon="solar:info-circle-linear" className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div className="text-[10px] text-muted-foreground">
+                    <p className="font-medium mb-1">Only WhatsApp-approved designs shown</p>
+                    <p>WhatsApp reviews all bulk message designs before you can use them. This usually takes 1-24 hours.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 4: Select Recipients */}
+              <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-stone-200 dark:bg-stone-800 text-[10px] font-semibold">4</span>
+                  <h3 className="font-semibold text-sm">Select Recipients</h3>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="recipientList" className="text-xs text-muted-foreground">Contact List</Label>
+                  <Select value={selectedListId} onValueChange={setSelectedListId}>
+                    <SelectTrigger id="recipientList" className="h-9">
+                      <SelectValue placeholder="Select a contact list" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {isLoadingLists ? (
+                        <div className="p-2 text-sm text-muted-foreground">Loading...</div>
+                      ) : whatsappLists.length === 0 ? (
+                        <div className="p-4 text-sm text-muted-foreground">No contact lists found. Create one in WhatsApp Marketing.</div>
+                      ) : (
+                        whatsappLists.map((list) => (
+                          <SelectItem key={list.id} value={list.id}>
+                            {list.name} ({list.contactCount || 0} contacts)
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {selectedList && (
+                  <div className="flex items-center gap-2 p-3 border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50">
+                    <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-xs">
+                      <strong>{selectedList.contactCount || 0}</strong> contacts will receive this message
+                    </span>
+                  </div>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="recipientList">Recipient List</Label>
-                <Select value={selectedListId} onValueChange={setSelectedListId}>
-                  <SelectTrigger id="recipientList">
-                    <SelectValue placeholder="Select a contact list" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {isLoadingLists ? (
-                      <div className="p-2 text-sm text-muted-foreground">Loading...</div>
-                    ) : whatsappLists.length === 0 ? (
-                      <div className="p-4 text-sm">
-                        <p className="text-muted-foreground mb-2">No contact lists found.</p>
-                        <p className="text-xs text-muted-foreground">Create a contact list in WhatsApp Marketing to get started.</p>
-                      </div>
-                    ) : (
-                      whatsappLists.map((list) => (
-                        <SelectItem key={list.id} value={list.id}>
-                          {list.name} ({list.contactCount || 0} contacts)
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {selectedListId && whatsappLists.find(l => l.id === selectedListId) && (
-                <div className="p-4 border rounded-lg bg-muted/50">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <span>
-                      <strong>
-                        {whatsappLists.find(l => l.id === selectedListId)?.contactCount || 0}
-                      </strong>{' '}
-                      contacts will receive this message
-                    </span>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-            <CardFooter>
+              {/* Send Button */}
               <Button
                 onClick={handleCreateCampaign}
                 disabled={isSending || !campaignName || !selectedTemplate || !selectedListId}
-                className="w-full min-h-11"
+                className="w-full h-10"
               >
                 {isSending ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Icon icon="solar:refresh-linear" className="h-4 w-4 mr-2 animate-spin" />
                     Sending Campaign...
                   </>
                 ) : (
                   <>
-                    <Send className="h-4 w-4 mr-2" />
+                    <Icon icon="solar:plain-linear" className="h-4 w-4 mr-2" />
                     Send Campaign
                   </>
                 )}
               </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </div>
+
+            {/* Phone Preview - Sticky on desktop */}
+            <div className="lg:col-span-1 hidden lg:block">
+              <div className="sticky top-4">
+                <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-3">Live Preview</p>
+                
+                {/* WhatsApp Phone Frame */}
+                <div className="mx-auto w-[280px] h-[560px] bg-stone-900 rounded-[3rem] p-3 shadow-xl border-4 border-stone-800">
+                  <div className="w-full h-full bg-[#0b141a] rounded-[2.25rem] overflow-hidden flex flex-col">
+                    {/* Phone Notch */}
+                    <div className="flex justify-center pt-2 pb-1">
+                      <div className="w-20 h-5 bg-stone-900 rounded-full" />
+                    </div>
+                    
+                    {/* WhatsApp Header */}
+                    <div className="px-3 py-2 bg-[#1f2c34] flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-[#25d366] flex items-center justify-center">
+                        <Icon icon="solar:user-bold" className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-white truncate">
+                          {selectedList ? `${selectedList.contactCount || 0} Recipients` : 'Contact Name'}
+                        </p>
+                        <p className="text-[10px] text-stone-400">online</p>
+                      </div>
+                      <Icon icon="solar:videocamera-linear" className="w-5 h-5 text-stone-400" />
+                      <Icon icon="solar:phone-linear" className="w-5 h-5 text-stone-400" />
+                    </div>
+                    
+                    {/* Chat Background */}
+                    <div className="flex-1 p-3 overflow-y-auto" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23182229\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }}>
+                      {selectedTemplate ? (
+                        <div className="flex justify-end">
+                          <div className="max-w-[85%] bg-[#005c4b] rounded-lg rounded-tr-sm px-3 py-2 shadow-sm">
+                            <p className="text-xs text-white whitespace-pre-wrap break-words leading-relaxed">
+                              {selectedTemplateObj?.body || selectedTemplateObj?.content || `Template: ${selectedTemplate}`}
+                            </p>
+                            <div className="flex items-center justify-end gap-1 mt-1">
+                              <p className="text-[9px] text-stone-300">
+                                {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                              <Icon icon="solar:check-read-bold" className="w-3 h-3 text-[#53bdeb]" />
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="h-full flex items-center justify-center">
+                          <div className="text-center">
+                            <Icon icon="solar:chat-round-line-linear" className="w-8 h-8 text-stone-600 mx-auto mb-2" />
+                            <p className="text-xs text-stone-500">Select a template to preview</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* WhatsApp Input Bar */}
+                    <div className="px-2 py-2 bg-[#1f2c34] flex items-center gap-2">
+                      <div className="flex-1 bg-[#2a3942] rounded-full px-3 py-2 flex items-center gap-2">
+                        <Icon icon="solar:sticker-smile-circle-linear" className="w-5 h-5 text-stone-400" />
+                        <span className="text-xs text-stone-500 flex-1">Type a message</span>
+                        <Icon icon="solar:paperclip-linear" className="w-5 h-5 text-stone-400" />
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-[#00a884] flex items-center justify-center">
+                        <Icon icon="solar:microphone-bold" className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                    
+                    {/* Home Indicator */}
+                    <div className="flex justify-center py-2 bg-[#0b141a]">
+                      <div className="w-24 h-1 bg-stone-700 rounded-full" />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Preview Stats */}
+                <div className="mt-4 p-3 bg-stone-50 dark:bg-stone-900/50 rounded-lg border border-stone-200 dark:border-stone-800 space-y-2">
+                  <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                    <span>Campaign: {campaignName || 'Not set'}</span>
+                    <span>{selectedList?.contactCount || 0} recipients</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                    <span>Platform: {selectedPlatform === 'authkey' ? 'WMart CPaaS' : selectedPlatform}</span>
+                    <span>Template: {selectedTemplate ? 'Selected' : 'Not selected'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Campaign Details Dialog */}
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader className="relative">
             <DialogTitle>{selectedCampaign?.name}</DialogTitle>
-            <DialogDescription>
-              Campaign details and delivery status
-            </DialogDescription>
+            <DialogDescription>Campaign details and delivery status</DialogDescription>
+            <DialogCloseButton />
           </DialogHeader>
-          
-          {selectedCampaign && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Status</p>
-                  <div className="font-medium">{getStatusBadge(selectedCampaign.status)}</div>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Message Design</p>
-                  <p className="font-medium">{selectedCampaign.templateName}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Recipients</p>
-                  <p className="font-medium">{selectedCampaign.stats.total}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Delivered</p>
-                  <p className="font-medium">
-                    {selectedCampaign.stats.delivered} ({Math.round((selectedCampaign.stats.delivered / selectedCampaign.stats.total) * 100)}%)
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Read</p>
-                  <p className="font-medium">{selectedCampaign.stats.read}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Failed</p>
-                  <p className="font-medium">{selectedCampaign.stats.failed}</p>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-medium mb-2">Recipients</h4>
-                {isLoadingRecipients ? (
-                  <div className="flex items-center justify-center py-4">
-                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <DialogBody>
+            {selectedCampaign && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-1">Status</p>
+                    <span className={cn("text-sm font-medium capitalize", getStatusColor(selectedCampaign.status))}>
+                      {selectedCampaign.status}
+                    </span>
                   </div>
-                ) : (
-                  <ScrollArea className="w-full">
-                    <div className="min-w-[400px]">
-                      <div className="border rounded-lg">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Name</TableHead>
-                              <TableHead>Phone</TableHead>
-                              <TableHead>Status</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {campaignRecipients.slice(0, 50).map((recipient, index) => (
-                              <TableRow key={index}>
-                                <TableCell>{recipient.name || '-'}</TableCell>
-                                <TableCell>{recipient.phone}</TableCell>
-                                <TableCell>
-                                  <Badge variant={recipient.status === 'delivered' ? 'default' : 'secondary'}>
-                                    {recipient.status}
-                                  </Badge>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                        {campaignRecipients.length > 50 && (
-                          <div className="p-2 text-sm text-center text-muted-foreground border-t">
-                            Showing first 50 of {campaignRecipients.length} recipients
-                          </div>
-                        )}
-                      </div>
+                  <div>
+                    <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-1">Template</p>
+                    <p className="text-sm font-medium">{selectedCampaign.templateName}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-1">Total</p>
+                    <p className="text-sm font-medium tabular-nums">{selectedCampaign.stats.total}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-1">Delivered</p>
+                    <p className="text-sm font-medium tabular-nums">
+                      {selectedCampaign.stats.delivered} ({Math.round((selectedCampaign.stats.delivered / selectedCampaign.stats.total) * 100)}%)
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-1">Read</p>
+                    <p className="text-sm font-medium tabular-nums">{selectedCampaign.stats.read}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-1">Failed</p>
+                    <p className="text-sm font-medium tabular-nums text-red-600 dark:text-red-400">{selectedCampaign.stats.failed}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-2">Recipients</h4>
+                  {isLoadingRecipients ? (
+                    <div className="flex items-center justify-center py-4">
+                      <Icon icon="solar:refresh-linear" className="h-5 w-5 animate-spin text-muted-foreground" />
                     </div>
-                  </ScrollArea>
-                )}
+                  ) : (
+                    <ScrollArea className="w-full">
+                      <div className="min-w-[400px]">
+                        <div className="rounded-lg border border-stone-200 dark:border-stone-800 overflow-hidden">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
+                                <th className="h-9 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Name</th>
+                                <th className="h-9 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Phone</th>
+                                <th className="h-9 px-4 text-left align-middle text-xs font-medium text-muted-foreground">Status</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {campaignRecipients.slice(0, 50).map((recipient, index) => (
+                                <tr key={index} className={cn("hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors", index !== Math.min(campaignRecipients.length, 50) - 1 && "border-b border-stone-200 dark:border-stone-800")}>
+                                  <td className="h-10 px-4 align-middle font-medium">{recipient.name || '-'}</td>
+                                  <td className="h-10 px-4 align-middle text-muted-foreground">{recipient.phone}</td>
+                                  <td className="h-10 px-4 align-middle">
+                                    <span className={cn(
+                                      "text-xs font-medium capitalize",
+                                      recipient.status === 'delivered' || recipient.status === 'sent' ? 'text-emerald-600 dark:text-emerald-400' :
+                                      recipient.status === 'failed' ? 'text-red-600 dark:text-red-400' :
+                                      'text-muted-foreground'
+                                    )}>
+                                      {recipient.status}
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                          {campaignRecipients.length > 50 && (
+                            <div className="p-2 text-xs text-center text-muted-foreground border-t border-stone-200 dark:border-stone-800">
+                              Showing first 50 of {campaignRecipients.length} recipients
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </ScrollArea>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </DialogBody>
         </DialogContent>
       </Dialog>
 

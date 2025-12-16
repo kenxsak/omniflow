@@ -29,7 +29,7 @@ const TiktokReelsAdSectionComponent: React.FC<TiktokReelsAdSectionProps> = ({
   return (
     <Card ref={tiktokReelsAdGeneratorRef}>
         <CardHeader>
-          <CardTitle className="flex items-center"><TiktokIcon className="mr-2 h-5 w-5 text-primary" />TikTok & Reels Ad Catalyst</CardTitle>
+          <CardTitle className="flex items-center"><TiktokIcon className="mr-2 h-5 w-5 text-muted-foreground" />TikTok & Reels Ad Catalyst</CardTitle>
           <CardDescription>
             AI for campaign planning, short-form video ad concepts, suggesting trending sounds/effects, snappy captions, and clear calls to action for TikTok and Instagram Reels.
           </CardDescription>

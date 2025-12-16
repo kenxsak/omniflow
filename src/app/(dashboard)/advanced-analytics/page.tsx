@@ -9,16 +9,15 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/use-auth';
-import PageTitle from '@/components/ui/page-title';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Download, RefreshCw, TrendingUp, Info, Calendar, BarChart3, Target, Sparkles, DollarSign } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { useToast } from '@/hooks/use-toast';
 import { Animated, AnimatedCounter } from '@/components/ui/animated';
+import { cn } from '@/lib/utils';
 import gsap from 'gsap';
 import type {
   AnalyticsPeriod,
@@ -52,10 +51,20 @@ import { Badge } from '@/components/ui/badge';
 import { formatCurrency, formatPercentage } from '@/lib/analytics-service';
 import { format } from 'date-fns';
 
+// Navigation tabs configuration
+const navTabs = [
+  { id: 'overview', label: 'Overview', icon: 'solar:chart-square-linear' },
+  { id: 'funnel', label: 'Funnel', icon: 'solar:filter-linear' },
+  { id: 'campaigns', label: 'Campaigns', icon: 'solar:target-linear' },
+  { id: 'predictions', label: 'Predictions', icon: 'solar:graph-up-linear' },
+  { id: 'attribution', label: 'Attribution', icon: 'solar:pie-chart-2-linear' },
+];
+
 export default function AdvancedAnalyticsPage() {
   const { appUser, company } = useAuth();
   const { toast } = useToast();
   
+  const [activeTab, setActiveTab] = useState('overview');
   const [period, setPeriod] = useState<AnalyticsPeriod>('30days');
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -79,7 +88,6 @@ export default function AdvancedAnalyticsPage() {
       const twilioSid = apiKeys.twilio?.accountSid;
       const twilioToken = apiKeys.twilio?.authToken;
       
-      // Load all analytics data in parallel
       const [
         funnelResult,
         campaignsResult,
@@ -114,7 +122,6 @@ export default function AdvancedAnalyticsPage() {
         setMetrics(metricsResult.data);
       }
       
-      // Get historical leads for chart
       const historicalResult = await getHistoricalLeadCounts(appUser.companyId);
       if (historicalResult.success && historicalResult.data) {
         setHistoricalLeads(historicalResult.data);
@@ -155,7 +162,6 @@ export default function AdvancedAnalyticsPage() {
     
     try {
       const XLSX = await import('xlsx');
-      // Prepare data for export
       const exportData = [
         ['Advanced Analytics Report'],
         ['Period', period],
@@ -205,7 +211,6 @@ export default function AdvancedAnalyticsPage() {
   
   const statsRef = useRef<HTMLDivElement>(null);
 
-  // GSAP animation for stats - instant
   useEffect(() => {
     if (statsRef.current && metrics) {
       const cards = statsRef.current.querySelectorAll('.stat-card');
@@ -221,7 +226,7 @@ export default function AdvancedAnalyticsPage() {
     return (
       <div className="container mx-auto py-8 px-4">
         <Alert>
-          <Info className="h-4 w-4" />
+          <Icon icon="solar:info-circle-linear" className="h-4 w-4" />
           <AlertDescription>Please log in to view analytics</AlertDescription>
         </Alert>
       </div>
@@ -229,52 +234,20 @@ export default function AdvancedAnalyticsPage() {
   }
   
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8 space-y-4 sm:space-y-6">
-      {/* Header */}
-      <Animated animation="fadeUp">
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Advanced Analytics
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Business intelligence, conversion tracking, and ROI calculations
-              </p>
-            </div>
-            
-            {/* Desktop Actions */}
-            <div className="hidden lg:flex items-center gap-3">
-              <Select value={period} onValueChange={handlePeriodChange}>
-                <SelectTrigger className="w-[180px]">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7days">Last 7 Days</SelectItem>
-                  <SelectItem value="30days">Last 30 Days</SelectItem>
-                  <SelectItem value="90days">Last 90 Days</SelectItem>
-                  <SelectItem value="12months">Last 12 Months</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <Button onClick={handleRefresh} variant="outline" disabled={isRefreshing}>
-                <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-                Refresh
-              </Button>
-              
-              <Button onClick={handleExport} variant="default" disabled={!metrics}>
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-            </div>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <header className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-semibold text-foreground">Advanced Analytics</h1>
+            <p className="text-xs text-muted-foreground">Business intelligence, conversion tracking, and ROI calculations</p>
           </div>
           
-          {/* Mobile Actions */}
-          <div className="flex lg:hidden gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+          {/* Desktop Actions */}
+          <div className="hidden lg:flex items-center gap-2">
             <Select value={period} onValueChange={handlePeriodChange}>
-              <SelectTrigger className="w-[140px] h-9 text-xs flex-shrink-0">
-                <Calendar className="mr-1.5 h-3.5 w-3.5" />
+              <SelectTrigger className="w-[160px] h-8 text-xs">
+                <Icon icon="solar:calendar-linear" className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -285,28 +258,57 @@ export default function AdvancedAnalyticsPage() {
               </SelectContent>
             </Select>
             
-            <Button onClick={handleRefresh} variant="outline" size="sm" disabled={isRefreshing} className="flex-shrink-0 h-9">
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <Button onClick={handleRefresh} variant="outline" size="sm" disabled={isRefreshing} className="h-8 text-xs">
+              <Icon icon={isRefreshing ? "solar:refresh-linear" : "solar:refresh-linear"} className={cn("h-3.5 w-3.5 mr-1.5", isRefreshing && "animate-spin")} />
+              Refresh
             </Button>
             
-            <Button onClick={handleExport} size="sm" disabled={!metrics} variant="default" className="flex-shrink-0 h-9">
-              <Download className="h-4 w-4 mr-1.5" />
+            <Button onClick={handleExport} size="sm" disabled={!metrics} className="h-8 text-xs">
+              <Icon icon="solar:download-linear" className="h-3.5 w-3.5 mr-1.5" />
               Export
             </Button>
           </div>
         </div>
-      </Animated>
+        
+        {/* Mobile Actions */}
+        <div className="flex lg:hidden gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <Select value={period} onValueChange={handlePeriodChange}>
+            <SelectTrigger className="w-[130px] h-8 text-xs flex-shrink-0">
+              <Icon icon="solar:calendar-linear" className="mr-1 h-3 w-3 text-muted-foreground" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7days">Last 7 Days</SelectItem>
+              <SelectItem value="30days">Last 30 Days</SelectItem>
+              <SelectItem value="90days">Last 90 Days</SelectItem>
+              <SelectItem value="12months">Last 12 Months</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Button onClick={handleRefresh} variant="outline" size="sm" disabled={isRefreshing} className="flex-shrink-0 h-8">
+            <Icon icon="solar:refresh-linear" className={cn("h-3.5 w-3.5", isRefreshing && "animate-spin")} />
+          </Button>
+          
+          <Button onClick={handleExport} size="sm" disabled={!metrics} className="flex-shrink-0 h-8">
+            <Icon icon="solar:download-linear" className="h-3.5 w-3.5 mr-1" />
+            Export
+          </Button>
+        </div>
+      </header>
       
       {/* Alerts */}
       {metrics && metrics.alerts.length > 0 && (
         <div className="space-y-2">
           {metrics.alerts.map((alert, idx) => (
-            <Alert key={idx} variant={alert.type === 'critical' ? 'destructive' : 'default'}>
-              <AlertDescription>
-                <strong>{alert.message}</strong>
-                {alert.action && <p className="text-sm mt-1">→ {alert.action}</p>}
-              </AlertDescription>
-            </Alert>
+            <div key={idx} className="relative border border-stone-200 dark:border-stone-800 rounded-lg bg-white dark:bg-stone-950 p-3">
+              <div className="flex items-start gap-2">
+                <Icon icon="solar:bell-linear" className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium">{alert.message}</p>
+                  {alert.action && <p className="text-xs text-muted-foreground mt-0.5">→ {alert.action}</p>}
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       )}
@@ -314,231 +316,267 @@ export default function AdvancedAnalyticsPage() {
       {/* Loading State */}
       {isLoading ? (
         <div className="space-y-6">
-          <Skeleton className="h-[400px] w-full" />
+          <Skeleton className="h-[400px] w-full rounded-xl" />
           <div className="grid md:grid-cols-2 gap-6">
-            <Skeleton className="h-[400px]" />
-            <Skeleton className="h-[400px]" />
+            <Skeleton className="h-[400px] rounded-xl" />
+            <Skeleton className="h-[400px] rounded-xl" />
           </div>
         </div>
       ) : (
         <>
-          {/* Tabs */}
-          <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
-            <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-              <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-5 h-auto p-1">
-                <TabsTrigger value="overview" className="text-xs sm:text-sm px-3 py-2">Overview</TabsTrigger>
-                <TabsTrigger value="funnel" className="text-xs sm:text-sm px-3 py-2">Funnel</TabsTrigger>
-                <TabsTrigger value="campaigns" className="text-xs sm:text-sm px-3 py-2">Campaigns</TabsTrigger>
-                <TabsTrigger value="predictions" className="text-xs sm:text-sm px-3 py-2">Predictions</TabsTrigger>
-                <TabsTrigger value="attribution" className="text-xs sm:text-sm px-3 py-2">Attribution</TabsTrigger>
-              </TabsList>
+          {/* Navigation Tabs - Clerk Style */}
+          <nav className="relative border-b border-stone-200 dark:border-stone-800">
+            <div className="flex items-center gap-1 overflow-x-auto pb-px scrollbar-hide">
+              {navTabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "relative flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors whitespace-nowrap",
+                    activeTab === tab.id
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Icon icon={tab.icon} className="h-3.5 w-3.5" />
+                  {tab.label}
+                  {activeTab === tab.id && (
+                    <div className="absolute inset-x-3 bottom-0 h-0.5 bg-foreground rounded-t-full" />
+                  )}
+                </button>
+              ))}
             </div>
-            
+          </nav>
+
+          {/* Tab Content */}
+          <div className="min-h-[50vh]">
             {/* Overview Tab */}
-            <TabsContent value="overview" className="space-y-4 sm:space-y-6">
-              {/* Key Metrics Cards */}
-              {metrics && (
-                <div ref={statsRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                  <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-primary/50 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6 relative">
-                      <div className="flex items-center justify-between">
-                        <CardDescription className="text-xs sm:text-sm">Total Leads</CardDescription>
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <Target className="w-4 h-4 text-primary" />
-                        </div>
-                      </div>
-                      <CardTitle className="text-xl sm:text-2xl lg:text-3xl">
-                        <AnimatedCounter value={metrics.kpis.totalLeads} />
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-3 sm:p-6 pt-0 relative">
-                      {metrics.periodComparison.leadsGrowth !== 0 && (
-                        <div className="flex items-center gap-1.5 text-xs sm:text-sm">
-                          <TrendingUp className={`h-3 w-3 sm:h-4 sm:w-4 ${metrics.periodComparison.leadsGrowth > 0 ? 'text-green-500' : 'text-red-500'}`} />
-                          <span className={metrics.periodComparison.leadsGrowth > 0 ? 'text-green-600' : 'text-red-600'}>
-                            {metrics.periodComparison.leadsGrowth > 0 ? '+' : ''}{metrics.periodComparison.leadsGrowth.toFixed(1)}%
+            {activeTab === 'overview' && (
+              <div className="space-y-6">
+                {/* Key Metrics Cards */}
+                {metrics && (
+                  <div ref={statsRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <div className="stat-card relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+                      <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+                      <div className="p-3 sm:p-4 pt-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                            Total Leads
                           </span>
+                          <Icon icon="solar:target-linear" className="h-4 w-4 text-muted-foreground/60" />
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-green-500/50 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6 relative">
-                      <div className="flex items-center justify-between">
-                        <CardDescription className="text-xs sm:text-sm">Total Revenue</CardDescription>
-                        <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-                          <DollarSign className="w-4 h-4 text-green-500" />
+                        <div className="text-lg sm:text-2xl font-semibold tabular-nums text-foreground">
+                          <AnimatedCounter value={metrics.kpis.totalLeads} />
                         </div>
+                        {metrics.periodComparison.leadsGrowth !== 0 && (
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                            <Icon 
+                              icon={metrics.periodComparison.leadsGrowth > 0 ? "solar:arrow-up-linear" : "solar:arrow-down-linear"} 
+                              className="h-3 w-3" 
+                            />
+                            <span>
+                              {metrics.periodComparison.leadsGrowth > 0 ? '+' : ''}{metrics.periodComparison.leadsGrowth.toFixed(1)}%
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      <CardTitle className="text-lg sm:text-xl lg:text-2xl truncate">{formatCurrency(metrics.kpis.totalRevenue)}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-3 sm:p-6 pt-0 relative">
-                      {metrics.periodComparison.revenueGrowth !== 0 && (
-                        <div className="flex items-center gap-1.5 text-xs sm:text-sm">
-                          <TrendingUp className={`h-3 w-3 sm:h-4 sm:w-4 ${metrics.periodComparison.revenueGrowth > 0 ? 'text-green-500' : 'text-red-500'}`} />
-                          <span className={metrics.periodComparison.revenueGrowth > 0 ? 'text-green-600' : 'text-red-600'}>
-                            {metrics.periodComparison.revenueGrowth > 0 ? '+' : ''}{metrics.periodComparison.revenueGrowth.toFixed(1)}%
+                    </div>
+                    
+                    <div className="stat-card relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+                      <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+                      <div className="p-3 sm:p-4 pt-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                            Total Revenue
                           </span>
+                          <Icon icon="solar:wallet-linear" className="h-4 w-4 text-muted-foreground/60" />
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-blue-500/50 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6 relative">
-                      <div className="flex items-center justify-between">
-                        <CardDescription className="text-xs sm:text-sm">Overall ROI</CardDescription>
-                        <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                          <BarChart3 className="w-4 h-4 text-blue-500" />
+                        <div className="text-lg sm:text-xl font-semibold tabular-nums text-foreground truncate">
+                          {formatCurrency(metrics.kpis.totalRevenue)}
                         </div>
+                        {metrics.periodComparison.revenueGrowth !== 0 && (
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                            <Icon 
+                              icon={metrics.periodComparison.revenueGrowth > 0 ? "solar:arrow-up-linear" : "solar:arrow-down-linear"} 
+                              className="h-3 w-3" 
+                            />
+                            <span>
+                              {metrics.periodComparison.revenueGrowth > 0 ? '+' : ''}{metrics.periodComparison.revenueGrowth.toFixed(1)}%
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      <CardTitle className="text-xl sm:text-2xl lg:text-3xl">{formatPercentage(metrics.kpis.overallROI, 0)}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-3 sm:p-6 pt-0 relative">
-                      <Badge variant={metrics.kpis.overallROI >= 200 ? 'default' : 'secondary'} className="text-xs">
-                        {metrics.kpis.overallROI >= 200 ? 'Excellent' : 'Good'}
-                      </Badge>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-purple-500/50 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6 relative">
-                      <div className="flex items-center justify-between">
-                        <CardDescription className="text-xs sm:text-sm">Marketing Spend</CardDescription>
-                        <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                          <Sparkles className="w-4 h-4 text-purple-500" />
+                    </div>
+                    
+                    <div className="stat-card relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+                      <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+                      <div className="p-3 sm:p-4 pt-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                            Overall ROI
+                          </span>
+                          <Icon icon="solar:chart-linear" className="h-4 w-4 text-muted-foreground/60" />
                         </div>
+                        <div className="text-lg sm:text-2xl font-semibold tabular-nums text-foreground">
+                          {formatPercentage(metrics.kpis.overallROI, 0)}
+                        </div>
+                        <Badge variant="secondary" className="text-[10px] mt-1">
+                          {metrics.kpis.overallROI >= 200 ? 'Excellent' : 'Good'}
+                        </Badge>
                       </div>
-                      <CardTitle className="text-lg sm:text-xl lg:text-2xl truncate">{formatCurrency(metrics.kpis.totalMarketingSpend)}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-3 sm:p-6 pt-0 relative">
-                      <div className="text-xs sm:text-sm text-muted-foreground">
-                        CPL: {formatCurrency(metrics.costs.costPerLead)}
+                    </div>
+                    
+                    <div className="stat-card relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+                      <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+                      <div className="p-3 sm:p-4 pt-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                            Marketing Spend
+                          </span>
+                          <Icon icon="solar:tag-price-linear" className="h-4 w-4 text-muted-foreground/60" />
+                        </div>
+                        <div className="text-lg sm:text-xl font-semibold tabular-nums text-foreground truncate">
+                          {formatCurrency(metrics.kpis.totalMarketingSpend)}
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-1">
+                          CPL: {formatCurrency(metrics.costs.costPerLead)}
+                        </p>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Funnel + ROI Calculator */}
+                <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
+                  {funnel && <ConversionFunnelChart funnel={funnel} />}
+                  <ROICalculator />
                 </div>
-              )}
-              
-              {/* Funnel + ROI Calculator */}
-              <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
-                {funnel && <ConversionFunnelChart funnel={funnel} />}
-                <ROICalculator />
               </div>
-            </TabsContent>
+            )}
             
             {/* Funnel Tab */}
-            <TabsContent value="funnel" className="space-y-6">
-              {funnel ? (
-                <ConversionFunnelChart funnel={funnel} />
-              ) : (
-                <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertDescription>No funnel data available for this period</AlertDescription>
-                </Alert>
-              )}
-            </TabsContent>
+            {activeTab === 'funnel' && (
+              <div className="space-y-6">
+                {funnel ? (
+                  <ConversionFunnelChart funnel={funnel} />
+                ) : (
+                  <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-6">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Icon icon="solar:info-circle-linear" className="h-4 w-4" />
+                      <span className="text-sm">No funnel data available for this period</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             
             {/* Campaigns Tab */}
-            <TabsContent value="campaigns" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Campaign Performance & ROI</CardTitle>
-                  <CardDescription>Detailed ROI analysis for your marketing campaigns</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {campaigns.length > 0 ? (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Campaign</TableHead>
-                          <TableHead className="text-right">Leads</TableHead>
-                          <TableHead className="text-right">Customers</TableHead>
-                          <TableHead className="text-right">Revenue</TableHead>
-                          <TableHead className="text-right">Spend</TableHead>
-                          <TableHead className="text-right">ROI</TableHead>
-                          <TableHead className="text-right">Rating</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {campaigns.map((campaign) => (
-                          <TableRow key={campaign.campaignId}>
-                            <TableCell className="font-medium">
-                              {campaign.campaignName}
-                              <div className="text-xs text-muted-foreground capitalize">
-                                {campaign.campaignType}
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right">{campaign.leadsGenerated}</TableCell>
-                            <TableCell className="text-right">{campaign.customersAcquired}</TableCell>
-                            <TableCell className="text-right font-semibold">
-                              {formatCurrency(campaign.revenue)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              {formatCurrency(campaign.marketingSpend + campaign.aiCostsUsed)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Badge variant={campaign.roi >= 200 ? 'default' : campaign.roi >= 100 ? 'secondary' : 'outline'}>
-                                {formatPercentage(campaign.roi, 0)}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Badge variant={
-                                campaign.performanceRating === 'excellent' ? 'default' :
-                                campaign.performanceRating === 'good' ? 'secondary' : 'outline'
-                              }>
-                                {campaign.performanceRating}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  ) : (
-                    <Alert>
-                      <Info className="h-4 w-4" />
-                      <AlertDescription>
-                        No campaign data available. Connect Brevo or Twilio to track campaign ROI.
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                </CardContent>
-              </Card>
-              
-              <ROICalculator />
-            </TabsContent>
+            {activeTab === 'campaigns' && (
+              <div className="space-y-6">
+                <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+                  <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-500" />
+                  <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+                    <div className="flex items-center gap-2">
+                      <Icon icon="solar:target-linear" className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                        Campaign Performance & ROI
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">Detailed ROI analysis for your marketing campaigns</p>
+                  </div>
+                  <div className="p-4">
+                    {campaigns.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-stone-50 dark:bg-stone-900">
+                              <TableHead className="text-[10px] uppercase tracking-wider">Campaign</TableHead>
+                              <TableHead className="text-[10px] uppercase tracking-wider text-right">Leads</TableHead>
+                              <TableHead className="text-[10px] uppercase tracking-wider text-right">Customers</TableHead>
+                              <TableHead className="text-[10px] uppercase tracking-wider text-right">Revenue</TableHead>
+                              <TableHead className="text-[10px] uppercase tracking-wider text-right">Spend</TableHead>
+                              <TableHead className="text-[10px] uppercase tracking-wider text-right">ROI</TableHead>
+                              <TableHead className="text-[10px] uppercase tracking-wider text-right">Rating</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {campaigns.map((campaign) => (
+                              <TableRow key={campaign.campaignId}>
+                                <TableCell className="font-medium text-sm">
+                                  {campaign.campaignName}
+                                  <div className="text-[10px] text-muted-foreground capitalize">
+                                    {campaign.campaignType}
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-right text-sm tabular-nums">{campaign.leadsGenerated}</TableCell>
+                                <TableCell className="text-right text-sm tabular-nums">{campaign.customersAcquired}</TableCell>
+                                <TableCell className="text-right text-sm font-medium tabular-nums">
+                                  {formatCurrency(campaign.revenue)}
+                                </TableCell>
+                                <TableCell className="text-right text-sm tabular-nums">
+                                  {formatCurrency(campaign.marketingSpend + campaign.aiCostsUsed)}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <Badge variant="secondary" className="text-[10px]">
+                                    {formatPercentage(campaign.roi, 0)}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <Badge variant="outline" className="text-[10px] capitalize">
+                                    {campaign.performanceRating}
+                                  </Badge>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <Icon icon="solar:chart-2-linear" className="h-10 w-10 text-muted-foreground/30 mb-3" />
+                        <p className="text-sm font-medium text-foreground">No Campaign Data Available</p>
+                        <p className="text-xs text-muted-foreground mt-1">Connect Brevo or Twilio to track campaign ROI</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <ROICalculator />
+              </div>
+            )}
             
             {/* Predictions Tab */}
-            <TabsContent value="predictions" className="space-y-6">
-              {predictive ? (
-                <PredictiveChart analytics={predictive} historicalLeads={historicalLeads} />
-              ) : (
-                <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertDescription>
-                    Insufficient data for predictions. Need at least 3 months of historical data.
-                  </AlertDescription>
-                </Alert>
-              )}
-            </TabsContent>
+            {activeTab === 'predictions' && (
+              <div className="space-y-6">
+                {predictive ? (
+                  <PredictiveChart analytics={predictive} historicalLeads={historicalLeads} />
+                ) : (
+                  <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-6">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Icon icon="solar:info-circle-linear" className="h-4 w-4" />
+                      <span className="text-sm">Insufficient data for predictions. Need at least 3 months of historical data.</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             
             {/* Attribution Tab */}
-            <TabsContent value="attribution" className="space-y-6">
-              {attribution ? (
-                <AttributionBreakdown attribution={attribution} />
-              ) : (
-                <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertDescription>No attribution data available for this period</AlertDescription>
-                </Alert>
-              )}
-            </TabsContent>
-          </Tabs>
+            {activeTab === 'attribution' && (
+              <div className="space-y-6">
+                {attribution ? (
+                  <AttributionBreakdown attribution={attribution} />
+                ) : (
+                  <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-6">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Icon icon="solar:info-circle-linear" className="h-4 w-4" />
+                      <span className="text-sm">No attribution data available for this period</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>

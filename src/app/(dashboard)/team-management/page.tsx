@@ -1,19 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import PageTitle from '@/components/ui/page-title';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { LogIn, LogOut, Loader2, User, Users, Clock, CheckCircle2 } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { useToast } from '@/hooks/use-toast';
 import type { AppUser, AttendanceRecord } from '@/types/saas';
-import { getCompanyUsers, logAttendance, getAttendanceForUser, getLastAttendanceRecord } from '@/lib/saas-data';
+import { getCompanyUsers, logAttendance, getLastAttendanceRecord } from '@/lib/saas-data';
 import { useAuth } from '@/hooks/use-auth';
 import { format, formatDistanceToNow } from 'date-fns';
-import { Animated, AnimatedCounter } from '@/components/ui/animated';
-import gsap from 'gsap';
 
 export default function TeamManagementPage() {
   const { appUser, isAdmin, isManager } = useAuth();
@@ -32,7 +28,7 @@ export default function TeamManagementPage() {
       
       const records: Record<string, AttendanceRecord | null> = {};
       for (const user of users) {
-          records[user.uid] = await getLastAttendanceRecord(user.uid);
+        records[user.uid] = await getLastAttendanceRecord(user.uid);
       }
       setAttendanceRecords(records);
       setIsLoading(false);
@@ -41,15 +37,14 @@ export default function TeamManagementPage() {
 
   useEffect(() => {
     loadData();
-    // Add a listener to refresh data if it's changed in another tab
-     const handleStorageChange = (event: StorageEvent) => {
-        if (event.key === 'omniFlowSaasUsers' || event.key === 'omniFlowAttendance') {
-            loadData();
-        }
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'omniFlowSaasUsers' || event.key === 'omniFlowAttendance') {
+        loadData();
+      }
     };
     window.addEventListener('storage', handleStorageChange);
     return () => {
-        window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, [loadData]);
   
@@ -66,7 +61,6 @@ export default function TeamManagementPage() {
       description: `Your status has been updated.`,
     });
     
-    // Refresh data for the current user and for the admin view
     await loadData();
     setIsClocking(false);
   };
@@ -75,163 +69,173 @@ export default function TeamManagementPage() {
   const isClockedIn = userLastRecord?.status === 'in';
   const canViewTeam = isAdmin || isManager;
 
-  const renderAdminView = () => (
-    <Animated animation="fadeUp">
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b p-4 sm:p-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Users className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="text-base sm:text-lg">Team Attendance Status</CardTitle>
-              <CardDescription className="text-xs sm:text-sm">View the current clock-in/out status of all users.</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0 sm:p-6">
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center h-32 gap-3">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Loader2 className="animate-spin h-6 w-6 text-primary"/>
-              </div>
-              <p className="text-sm text-muted-foreground">Loading team data...</p>
-            </div>
-          ) : (
-            <>
-              {/* Mobile Card View */}
-              <div className="block lg:hidden p-4 space-y-3">
-                {teamUsers.map(user => {
-                  const record = attendanceRecords[user.uid];
-                  return (
-                    <Card key={user.uid} className="overflow-hidden">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                              <User className="w-4 h-4 text-primary" />
-                            </div>
-                            <span className="font-medium text-sm truncate max-w-[150px]">{user.name || user.email}</span>
-                          </div>
-                          {record?.status === 'in' ? (
-                            <Badge className="bg-green-100 text-green-800 text-xs">In</Badge>
-                          ) : (
-                            <Badge variant="secondary" className="text-xs">Out</Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-between text-xs text-muted-foreground">
-                          <Badge variant="outline" className="capitalize text-[10px]">{user.type || 'office'}</Badge>
-                          <span>{record?.timestamp?.toDate ? formatDistanceToNow(record.timestamp.toDate(), { addSuffix: true }) : 'No activity'}</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )
-                })}
-              </div>
-
-              {/* Desktop Table View */}
-              <div className="hidden lg:block overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>User</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Last Activity</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {teamUsers.map(user => {
-                      const record = attendanceRecords[user.uid];
-                      return (
-                        <TableRow key={user.uid} className="hover:bg-muted/50">
-                          <TableCell className="font-medium">{user.name || user.email}</TableCell>
-                          <TableCell><Badge variant="outline" className="capitalize">{user.type || 'office'}</Badge></TableCell>
-                          <TableCell>
-                            {record?.status === 'in' ? (
-                              <Badge className="bg-green-100 text-green-800 hover:bg-green-100/80">Clocked In</Badge>
-                            ) : (
-                              <Badge variant="secondary">Clocked Out</Badge>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-xs text-muted-foreground">
-                            {record?.timestamp?.toDate ? formatDistanceToNow(record.timestamp.toDate(), { addSuffix: true }) : 'No activity yet'}
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </Animated>
-  );
-  
   const renderUserView = () => (
-    <Animated animation="fadeUp">
-      <Card className="max-w-md mx-auto overflow-hidden">
-        <CardHeader className="text-center bg-gradient-to-r from-primary/5 to-accent/5 border-b p-4 sm:p-6">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-            <Clock className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />
-          </div>
-          <CardTitle className="text-lg sm:text-xl">Your Attendance</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">Update your work status below.</CardDescription>
-        </CardHeader>
-        <CardContent className="text-center space-y-4 p-4 sm:p-6">
-          <div className="p-4 rounded-xl bg-muted/50">
-            <p className="text-xs sm:text-sm text-muted-foreground mb-2">Your current status:</p>
-            <Badge className={`text-base sm:text-lg px-4 py-1.5 ${isClockedIn ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-              {isClockedIn ? (
-                <><CheckCircle2 className="w-4 h-4 mr-1.5" /> Clocked In</>
-              ) : (
-                'Clocked Out'
-              )}
-            </Badge>
-          </div>
-          {userLastRecord && (
-            <p className="text-[10px] sm:text-xs text-muted-foreground">
-              Last activity: {userLastRecord.timestamp?.toDate ? format(userLastRecord.timestamp.toDate(), 'PPpp') : 'N/A'}
-            </p>
-          )}
-          <Button 
-            onClick={handleClockInOut} 
-            disabled={isClocking} 
-            size="lg" 
-            className={`w-full text-sm sm:text-base ${isClockedIn ? 'bg-red-500 hover:bg-red-600' : ''}`}
+    <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden max-w-md mx-auto">
+      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-500" />
+      
+      <div className="p-6 text-center border-b border-stone-200 dark:border-stone-800">
+        <div className="w-12 h-12 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto mb-3">
+          <Icon icon="solar:clock-circle-linear" className="w-6 h-6 text-muted-foreground" />
+        </div>
+        <h3 className="text-base font-semibold text-foreground">Your Attendance</h3>
+        <p className="text-xs text-muted-foreground mt-0.5">Update your work status below</p>
+      </div>
+      
+      <div className="p-6 space-y-4">
+        <div className="p-4 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-100 dark:border-stone-800 text-center">
+          <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-2">Your Current Status</p>
+          <Badge 
+            variant={isClockedIn ? "default" : "secondary"} 
+            className="text-sm px-4 py-1.5"
           >
-            {isClocking ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : (isClockedIn ? <LogOut className="mr-2 h-5 w-5" /> : <LogIn className="mr-2 h-5 w-5" />)}
-            {isClocking ? 'Updating...' : (isClockedIn ? 'Clock Out' : 'Clock In')}
-          </Button>
-        </CardContent>
-      </Card>
-    </Animated>
+            {isClockedIn ? (
+              <><Icon icon="solar:check-circle-linear" className="w-4 h-4 mr-1.5" /> Clocked In</>
+            ) : (
+              'Clocked Out'
+            )}
+          </Badge>
+        </div>
+        
+        {userLastRecord && (
+          <p className="text-[10px] text-muted-foreground text-center">
+            Last activity: {userLastRecord.timestamp?.toDate ? format(userLastRecord.timestamp.toDate(), 'PPpp') : 'N/A'}
+          </p>
+        )}
+        
+        <Button 
+          onClick={handleClockInOut} 
+          disabled={isClocking} 
+          variant={isClockedIn ? "outline" : "default"}
+          className="w-full h-10 text-sm"
+        >
+          {isClocking ? (
+            <Icon icon="solar:refresh-linear" className="mr-2 h-4 w-4 animate-spin" />
+          ) : isClockedIn ? (
+            <Icon icon="solar:logout-2-linear" className="mr-2 h-4 w-4" />
+          ) : (
+            <Icon icon="solar:login-2-linear" className="mr-2 h-4 w-4" />
+          )}
+          {isClocking ? 'Updating...' : (isClockedIn ? 'Clock Out' : 'Clock In')}
+        </Button>
+      </div>
+    </div>
+  );
+
+  const renderAdminView = () => (
+    <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-500" />
+      
+      <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+        <div className="flex items-center gap-2">
+          <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4 text-muted-foreground" />
+          <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            Team Attendance Status
+          </span>
+        </div>
+        <p className="text-xs text-muted-foreground mt-0.5">View the current clock-in/out status of all users</p>
+      </div>
+      
+      <div className="p-4">
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <Icon icon="solar:refresh-linear" className="h-8 w-8 text-muted-foreground/30 animate-spin mb-3" />
+            <p className="text-sm text-muted-foreground">Loading team data...</p>
+          </div>
+        ) : teamUsers.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <Icon icon="solar:users-group-rounded-linear" className="h-10 w-10 text-muted-foreground/30 mb-3" />
+            <p className="text-sm font-medium text-foreground">No Team Members</p>
+            <p className="text-xs text-muted-foreground mt-1">Invite team members to get started</p>
+          </div>
+        ) : (
+          <>
+            {/* Mobile Card View */}
+            <div className="block lg:hidden space-y-3">
+              {teamUsers.map(user => {
+                const record = attendanceRecords[user.uid];
+                return (
+                  <div key={user.uid} className="p-3 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-100 dark:border-stone-800">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-700 flex items-center justify-center">
+                          <Icon icon="solar:user-linear" className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                        <span className="font-medium text-sm truncate max-w-[150px]">{user.name || user.email}</span>
+                      </div>
+                      <Badge variant={record?.status === 'in' ? "default" : "secondary"} className="text-[10px]">
+                        {record?.status === 'in' ? 'Clocked In' : 'Clocked Out'}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                      <Badge variant="outline" className="capitalize text-[10px]">{user.type || 'office'}</Badge>
+                      <span>{record?.timestamp?.toDate ? formatDistanceToNow(record.timestamp.toDate(), { addSuffix: true }) : 'No activity'}</span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden lg:block border border-stone-200 dark:border-stone-800 rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-stone-50 dark:bg-stone-900">
+                    <TableHead className="text-[10px] uppercase tracking-wider">User</TableHead>
+                    <TableHead className="text-[10px] uppercase tracking-wider">Type</TableHead>
+                    <TableHead className="text-[10px] uppercase tracking-wider">Status</TableHead>
+                    <TableHead className="text-[10px] uppercase tracking-wider">Last Activity</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {teamUsers.map(user => {
+                    const record = attendanceRecords[user.uid];
+                    return (
+                      <TableRow key={user.uid}>
+                        <TableCell className="font-medium text-sm">{user.name || user.email}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="capitalize text-[10px]">{user.type || 'office'}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={record?.status === 'in' ? "default" : "secondary"} className="text-[10px]">
+                            {record?.status === 'in' ? 'Clocked In' : 'Clocked Out'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground tabular-nums">
+                          {record?.timestamp?.toDate ? formatDistanceToNow(record.timestamp.toDate(), { addSuffix: true }) : 'No activity yet'}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 
   return (
-    <div className="space-y-4 sm:space-y-6 px-4 sm:px-6 py-4 sm:py-6">
-      <Animated animation="fadeUp">
-        <div className="flex items-center gap-2 mb-1">
-          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Team Management
-          </h1>
-          <Badge variant="secondary" className="text-xs">
-            <Users className="w-3 h-3 mr-1" />
-            {teamUsers.length}
-          </Badge>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <header className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-semibold text-foreground">Team Management</h1>
+            <Badge variant="secondary" className="text-[10px]">
+              <Icon icon="solar:users-group-rounded-linear" className="w-3 h-3 mr-1" />
+              {teamUsers.length}
+            </Badge>
+          </div>
+          <p className="text-xs text-muted-foreground">Manage team attendance and view user activity</p>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Manage team attendance and view user activity.
-        </p>
-      </Animated>
+      </header>
       
       {canViewTeam ? (
-        <>
+        <div className="space-y-6">
           {renderUserView()}
           {renderAdminView()}
-        </>
+        </div>
       ) : (
         renderUserView()
       )}

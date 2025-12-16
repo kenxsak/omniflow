@@ -288,7 +288,7 @@ export function AddTemplateDialog({ idToken, onTemplateAdded, trigger }: AddTemp
                 <p className="text-sm">
                   A template with this Template ID or DLT ID already exists:
                 </p>
-                <div className="p-2 bg-card rounded border border-warning-border">
+                <div className="p-2 bg-stone-50 dark:bg-stone-900/50 rounded border border-stone-200 dark:border-stone-800">
                   <p className="text-sm font-medium text-foreground">{existingTemplate.name}</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     Template ID: {existingTemplate.templateId} | DLT ID: {existingTemplate.dltId}
@@ -299,7 +299,7 @@ export function AddTemplateDialog({ idToken, onTemplateAdded, trigger }: AddTemp
                     variant="outline"
                     size="sm"
                     onClick={handleUseExisting}
-                    className="border-success text-success hover:bg-success-muted"
+                    className="border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
                   >
                     <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
                     Use Existing
@@ -309,7 +309,7 @@ export function AddTemplateDialog({ idToken, onTemplateAdded, trigger }: AddTemp
                     size="sm"
                     onClick={handleUpdateExisting}
                     disabled={isSubmitting}
-                    className="border-info text-info hover:bg-info-muted"
+                    className="border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                   >
                     {isSubmitting ? (
                       <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />

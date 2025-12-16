@@ -1,13 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import {
@@ -17,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { parseTemplateVariables, replaceTemplateVariables, getValueFromContact, type TemplateVariable } from '@/lib/sms-templates-sync';
 import type { SMSTemplate } from '@/lib/sms-templates-sync';
 
@@ -147,7 +139,7 @@ export function VariableMapping({ template, provider, contacts = [], onMappingsC
     const pattern = provider === 'msg91' ? /##[^#]+##/g : /\{#[^}]+#\}/g;
     
     result = result.replace(pattern, (match) => {
-      return `<span class="bg-warning-muted text-warning-muted-foreground px-1 rounded font-medium">${match}</span>`;
+      return `<span class="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 px-1 rounded font-medium">${match}</span>`;
     });
     
     return result;
@@ -159,37 +151,35 @@ export function VariableMapping({ template, provider, contacts = [], onMappingsC
 
   if (parsedVariables.count === 0) {
     return (
-      <Card className="border-info-border bg-info-muted">
-        <CardContent className="pt-4">
-          <p className="text-sm text-foreground">
-            This template has no variables to map. The message will be sent as-is to all recipients.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="p-4 border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50">
+        <p className="text-sm text-foreground">
+          This template has no variables to map. The message will be sent as-is to all recipients.
+        </p>
+      </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            Variable Mapping
-            <Badge variant="secondary" className="text-xs">
+      <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+        <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium text-foreground">Variable Mapping</p>
+            <span className="px-1.5 py-0.5 text-xs font-medium bg-stone-100 dark:bg-stone-800 text-muted-foreground rounded">
               {parsedVariables.count} variable{parsedVariables.count > 1 ? 's' : ''}
-            </Badge>
-          </CardTitle>
-          <CardDescription>
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Map each variable to a contact field or enter a static value
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </p>
+        </div>
+        <div className="p-4 space-y-4">
           {mappings.map((mapping, index) => (
-            <div key={index} className="space-y-2 p-3 bg-muted/50 rounded-lg">
+            <div key={index} className="space-y-2 p-3 bg-stone-50 dark:bg-stone-900/50 rounded-lg border border-stone-200 dark:border-stone-800">
               <div className="flex items-center gap-2">
-                <Badge variant="warning" className="font-mono text-xs">
+                <span className="px-1.5 py-0.5 font-mono text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded">
                   {mapping.placeholder}
-                </Badge>
+                </span>
                 <span className="text-sm text-muted-foreground">
                   Variable {index + 1}
                 </span>
@@ -197,7 +187,7 @@ export function VariableMapping({ template, provider, contacts = [], onMappingsC
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label className="text-xs">Mapping Type</Label>
+                  <Label className="text-xs text-muted-foreground">Mapping Type</Label>
                   <Select
                     value={mapping.mappingType}
                     onValueChange={(value) => handleMappingTypeChange(index, value as 'field' | 'static')}
@@ -214,7 +204,7 @@ export function VariableMapping({ template, provider, contacts = [], onMappingsC
 
                 {mapping.mappingType === 'field' ? (
                   <div className="space-y-1">
-                    <Label className="text-xs">Select Field</Label>
+                    <Label className="text-xs text-muted-foreground">Select Field</Label>
                     <Select
                       value={mapping.fieldMapping || 'contact.name'}
                       onValueChange={(value) => handleFieldMappingChange(index, value)}
@@ -233,7 +223,7 @@ export function VariableMapping({ template, provider, contacts = [], onMappingsC
                   </div>
                 ) : (
                   <div className="space-y-1">
-                    <Label className="text-xs">Enter Value</Label>
+                    <Label className="text-xs text-muted-foreground">Enter Value</Label>
                     <Input
                       value={mapping.staticValue || ''}
                       onChange={(e) => handleStaticValueChange(index, e.target.value)}
@@ -248,38 +238,39 @@ export function VariableMapping({ template, provider, contacts = [], onMappingsC
 
           <div className="pt-2">
             <p className="text-xs text-muted-foreground">
-              <strong>Tip:</strong> Use "Contact Field" to personalize messages for each recipient, 
+              <span className="font-medium">Tip:</span> Use "Contact Field" to personalize messages for each recipient, 
               or "Static Value" to use the same value for everyone.
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card className="border-success-border bg-success-muted">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm text-success-muted-foreground">
-            📋 Template Preview
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
+      <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+        <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
+          <p className="text-sm font-medium text-foreground flex items-center gap-2">
+            <span className="text-muted-foreground">📋</span>
+            Template Preview
+          </p>
+        </div>
+        <div className="p-4 space-y-3">
           <div>
-            <p className="text-xs font-medium text-success-muted-foreground mb-1">Original Template:</p>
+            <p className="text-xs font-medium text-muted-foreground mb-1">Original Template:</p>
             <div 
-              className="text-sm text-foreground p-2 bg-card rounded border border-success-border"
+              className="text-sm text-foreground p-2 bg-stone-50 dark:bg-stone-900/50 rounded border border-stone-200 dark:border-stone-800"
               dangerouslySetInnerHTML={{ __html: highlightedTemplate || '' }}
             />
           </div>
           
           <div>
-            <p className="text-xs font-medium text-success-muted-foreground mb-1">
+            <p className="text-xs font-medium text-muted-foreground mb-1">
               Preview ({contacts[0]?.name || 'Sample Contact'}):
             </p>
-            <div className="text-sm text-foreground p-2 bg-card rounded border border-success-border">
+            <div className="text-sm text-foreground p-2 bg-stone-50 dark:bg-stone-900/50 rounded border border-stone-200 dark:border-stone-800">
               {previewMessage}
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

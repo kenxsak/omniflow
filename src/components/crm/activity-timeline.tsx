@@ -1,34 +1,30 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { format, formatDistanceToNow } from 'date-fns';
-import { 
-  Mail, MessageSquare, Phone, Calendar, StickyNote, 
-  DollarSign, TrendingUp, RefreshCw, Loader2, Plus,
-  MessageCircle, CheckSquare
-} from 'lucide-react';
+import { Icon } from '@iconify/react';
+import { Loader2, Plus } from 'lucide-react';
 import type { Activity, ActivityType } from '@/types/crm';
 import { ACTIVITY_TYPE_LABELS } from '@/types/crm';
 import { getActivitiesForContact, logNoteActivity } from '@/app/actions/activity-actions';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 
-const activityIcons: Record<ActivityType, React.ComponentType<{ className?: string }>> = {
-  email: Mail,
-  sms: MessageSquare,
-  whatsapp: MessageCircle,
-  call: Phone,
-  meeting: Calendar,
-  note: StickyNote,
-  task: CheckSquare,
-  deal_created: DollarSign,
-  deal_updated: TrendingUp,
-  status_change: RefreshCw,
+const activityIcons: Record<ActivityType, string> = {
+  email: 'solar:letter-linear',
+  sms: 'solar:chat-square-linear',
+  whatsapp: 'solar:chat-round-dots-linear',
+  call: 'solar:phone-linear',
+  meeting: 'solar:calendar-linear',
+  note: 'solar:document-text-linear',
+  task: 'solar:checklist-linear',
+  deal_created: 'solar:dollar-linear',
+  deal_updated: 'solar:graph-up-linear',
+  status_change: 'solar:refresh-linear',
 };
 
 const activityColors: Record<ActivityType, string> = {
@@ -116,51 +112,59 @@ export function ActivityTimeline({ contactId, companyId }: ActivityTimelineProps
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Activity Timeline</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800">
+          <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            Activity Timeline
+          </span>
+        </div>
+        <div className="p-4 sm:p-5">
           <div className="flex justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <Icon icon="solar:refresh-linear" className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg">Activity Timeline</CardTitle>
+    <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+      <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+      <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+        <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+          Activity Timeline
+        </span>
         <Button
           variant="outline"
           size="sm"
           onClick={() => setIsAddingNote(!isAddingNote)}
+          className="h-7 text-xs"
         >
-          <Plus className="h-4 w-4 mr-1" />
+          <Plus className="h-3 w-3 mr-1" />
           Add Note
         </Button>
-      </CardHeader>
-      <CardContent>
+      </div>
+      <div className="p-4 sm:p-5">
         {isAddingNote && (
-          <div className="mb-4 p-3 border rounded-lg bg-muted/50">
+          <div className="mb-4 p-3 border border-stone-200 dark:border-stone-700 rounded-lg bg-muted/30">
             <Textarea
               placeholder="Write a note..."
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
-              className="min-h-[80px] mb-2"
+              className="min-h-[80px] mb-2 bg-white dark:bg-stone-900"
             />
             <div className="flex justify-end gap-2">
-              <Button variant="ghost" size="sm" onClick={() => setIsAddingNote(false)}>
+              <Button variant="ghost" size="sm" onClick={() => setIsAddingNote(false)} className="h-7 text-xs">
                 Cancel
               </Button>
               <Button 
                 size="sm" 
                 onClick={handleAddNote}
                 disabled={isSaving || !newNote.trim()}
+                className="h-7 text-xs"
               >
-                {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+                {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
                 Save Note
               </Button>
             </div>
@@ -169,33 +173,33 @@ export function ActivityTimeline({ contactId, companyId }: ActivityTimelineProps
 
         <ScrollArea className="h-[400px] pr-4">
           {activities.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <StickyNote className="h-10 w-10 mx-auto mb-2 opacity-50" />
-              <p>No activities yet</p>
-              <p className="text-sm">Activities will appear here when you interact with this contact</p>
+            <div className="text-center py-8">
+              <Icon icon="solar:document-text-linear" className="h-10 w-10 mx-auto text-muted-foreground/50 mb-2" />
+              <p className="text-sm text-muted-foreground">No activities yet</p>
+              <p className="text-xs text-muted-foreground mt-1">Activities will appear here when you interact with this contact</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-1">
               {activities.map((activity, index) => {
-                const Icon = activityIcons[activity.type] || StickyNote;
+                const iconName = activityIcons[activity.type] || 'solar:document-text-linear';
                 const colorClass = activityColors[activity.type] || activityColors.note;
                 
                 return (
                   <div key={activity.id} className="flex gap-3">
                     <div className="flex flex-col items-center">
                       <div className={`p-2 rounded-full ${colorClass}`}>
-                        <Icon className="h-4 w-4" />
+                        <Icon icon={iconName} className="h-4 w-4" />
                       </div>
                       {index < activities.length - 1 && (
-                        <div className="w-px h-full bg-border flex-1 my-1" />
+                        <div className="w-px h-full bg-stone-200 dark:bg-stone-700 flex-1 my-1" />
                       )}
                     </div>
                     <div className="flex-1 pb-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Badge variant="secondary" className="text-xs">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-foreground">
                           {ACTIVITY_TYPE_LABELS[activity.type]}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
+                        </span>
+                        <span className="text-[10px] sm:text-xs text-muted-foreground">
                           {formatActivityDate(activity.occurredAt)}
                         </span>
                       </div>
@@ -205,7 +209,7 @@ export function ActivityTimeline({ contactId, companyId }: ActivityTimelineProps
                       <p className="text-sm text-muted-foreground line-clamp-3">
                         {activity.content}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                         by {activity.authorName || 'Unknown'}
                       </p>
                     </div>
@@ -215,7 +219,7 @@ export function ActivityTimeline({ contactId, companyId }: ActivityTimelineProps
             </div>
           )}
         </ScrollArea>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

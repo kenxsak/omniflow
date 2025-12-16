@@ -28,7 +28,7 @@ const GoogleSearchAdCopySectionComponent: React.FC<GoogleSearchAdCopySectionProp
   return (
     <Card ref={adCopyGeneratorRef}>
       <CardHeader>
-        <CardTitle className="flex items-center"><ListFilter className="mr-2 h-5 w-5 text-primary" />Google Ads: Search Ad Copy Generator</CardTitle>
+        <CardTitle className="flex items-center"><ListFilter className="mr-2 h-5 w-5 text-muted-foreground" />Google Ads: Search Ad Copy Generator</CardTitle>
         <CardDescription>AI to generate compelling headlines and descriptions for Google Search ads, respecting strict character limits.</CardDescription>
       </CardHeader>
       <form onSubmit={onSubmit}>

@@ -15,19 +15,19 @@ import { Alert, AlertDescription, AlertTitle as AlertTitleComponent } from "@/co
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 
-const getTwilioMessageStatusClass = (status: TwilioMessage['status']) => {
+const getTwilioMessageStatusColor = (status: TwilioMessage['status']) => {
   switch (status?.toLowerCase()) {
     case 'sent':
     case 'delivered':
-      return 'bg-success-muted text-success-muted-foreground';
+      return 'text-emerald-600 dark:text-emerald-400';
     case 'queued':
     case 'sending':
-      return 'bg-info-muted text-info-muted-foreground animate-pulse';
+      return 'text-blue-600 dark:text-blue-400';
     case 'failed':
     case 'undelivered':
-      return 'bg-destructive-muted text-destructive-muted-foreground';
+      return 'text-red-600 dark:text-red-400';
     default: // e.g., receiving, accepted
-      return 'bg-warning-muted text-warning-muted-foreground';
+      return 'text-amber-600 dark:text-amber-400';
   }
 };
 
@@ -35,15 +35,15 @@ const getTwilioMessageStatusIcon = (status: TwilioMessage['status']) => {
   switch (status?.toLowerCase()) {
     case 'sent':
     case 'delivered':
-      return <CheckCircle className="h-4 w-4 text-success" />;
+      return <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />;
     case 'queued':
     case 'sending':
-       return <Loader2 className="h-4 w-4 text-info animate-spin" />;
+       return <Loader2 className="h-4 w-4 text-blue-600 dark:text-blue-400 animate-spin" />;
     case 'failed':
     case 'undelivered':
-      return <XCircle className="h-4 w-4 text-destructive" />;
+      return <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />;
     default:
-      return <MessageSquare className="h-4 w-4 text-warning" />;
+      return <MessageSquare className="h-4 w-4 text-amber-600 dark:text-amber-400" />;
   }
 }
 
@@ -183,8 +183,8 @@ export default function TwilioSmsList() {
                     <TableRow key={msg.sid}>
                       <TableCell>
                           {msg.direction.startsWith('outbound') ? 
-                              <ArrowRight className="h-4 w-4 text-info" title="Outbound" /> : 
-                              <ArrowLeft className="h-4 w-4 text-success" title="Inbound" />}
+                              <ArrowRight className="h-4 w-4 text-blue-600 dark:text-blue-400" title="Outbound" /> : 
+                              <ArrowLeft className="h-4 w-4 text-emerald-600 dark:text-emerald-400" title="Inbound" />}
                       </TableCell>
                       <TableCell className="font-medium">{msg.from}</TableCell>
                       <TableCell>{msg.to}</TableCell>
@@ -192,10 +192,10 @@ export default function TwilioSmsList() {
                           {msg.body.length > 50 ? `${msg.body.substring(0, 47)}...` : msg.body}
                       </TableCell>
                       <TableCell>
-                        <Badge className={`${getTwilioMessageStatusClass(msg.status)} text-xs gap-1`} variant="outline">
+                        <span className={`flex items-center gap-1 text-xs font-medium ${getTwilioMessageStatusColor(msg.status)}`}>
                           {getTwilioMessageStatusIcon(msg.status)}
                           {msg.status}
-                        </Badge>
+                        </span>
                       </TableCell>
                       <TableCell className="hidden md:table-cell text-muted-foreground text-xs">
                         {format(new Date(msg.dateSent), 'PPp')}

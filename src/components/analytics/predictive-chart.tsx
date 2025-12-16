@@ -6,172 +6,209 @@
  * Line chart showing historical data and predicted future trends
  */
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Line, LineChart, XAxis, YAxis, CartesianGrid, Legend, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Area, XAxis, YAxis, CartesianGrid, Legend, Tooltip as RechartsTooltip, ResponsiveContainer, Line, ComposedChart } from 'recharts';
 import type { PredictiveAnalytics } from '@/types/analytics';
-import { TrendingUp, TrendingDown, Minus, Brain, Info } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Icon } from '@iconify/react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { formatNumber } from '@/lib/analytics-service';
 
 interface PredictiveChartProps {
   analytics: PredictiveAnalytics;
-  historicalLeads: number[]; // Last 6 months of actual data
+  historicalLeads: number[];
 }
 
 export default function PredictiveChart({ analytics, historicalLeads }: PredictiveChartProps) {
   const { leadForecast, revenueForecast, trends, recommendations, accuracy } = analytics;
   
-  // Build chart data (historical + predictions)
-  const chartData: Array<{
-    month: string;
-    leads: number | null;
-    predicted: number | null;
-  }> = historicalLeads.map((leads, index) => ({
+  // Check if we have any actual data
+  const hasData = historicalLeads.some(v => v > 0) || leadForecast.nextMonth.predicted > 0;
+  
+  // Build chart data
+  const chartData = historicalLeads.map((leads, index) => ({
     month: `M-${historicalLeads.length - index}`,
     leads,
-    predicted: null,
+    predicted: null as number | null,
   }));
   
   // Add next month prediction
   chartData.push({
     month: 'Next',
-    leads: null,
+    leads: null as unknown as number,
     predicted: leadForecast.nextMonth.predicted,
   });
-  
-  const getTrendIcon = (trend: 'increasing' | 'stable' | 'decreasing') => {
-    if (trend === 'increasing') return <TrendingUp className="h-4 w-4 text-success" />;
-    if (trend === 'decreasing') return <TrendingDown className="h-4 w-4 text-destructive" />;
-    return <Minus className="h-4 w-4 text-muted-foreground" />;
-  };
-  
-  const getTrendColor = (direction: 'up' | 'down' | 'stable') => {
-    if (direction === 'up') return 'text-success';
-    if (direction === 'down') return 'text-destructive';
-    return 'text-muted-foreground';
-  };
+
+  // Connect last actual point to prediction
+  if (chartData.length > 1 && historicalLeads.length > 0) {
+    chartData[chartData.length - 2].predicted = historicalLeads[historicalLeads.length - 1];
+  }
+
+  // Calculate Y domain
+  const allValues = [...historicalLeads, leadForecast.nextMonth.predicted].filter(v => v != null);
+  const maxValue = Math.max(...allValues, 1);
+  const yDomain = [0, Math.ceil(maxValue * 1.2)];
   
   return (
-    <Card>
-      <CardHeader>
+    <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+      
+      <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="flex items-center gap-2">
-              <Brain className="h-5 w-5" />
-              Predictive Insights
+          <div>
+            <div className="flex items-center gap-2">
+              <Icon icon="solar:graph-up-linear" className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                Predictive Insights
+              </span>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <Info className="h-4 w-4 text-muted-foreground" />
+                    <Icon icon="solar:info-circle-linear" className="h-3.5 w-3.5 text-muted-foreground" />
                   </TooltipTrigger>
                   <TooltipContent className="max-w-xs">
-                    <p>AI-powered forecasts based on your historical data. Accuracy improves with more data.</p>
+                    <p className="text-xs">AI-powered forecasts based on your historical data</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-            </CardTitle>
-            <CardDescription>
+            </div>
+            <p className="text-xs text-muted-foreground mt-0.5">
               Forecasts based on {analytics.historicalMonths} months of data
-            </CardDescription>
+            </p>
           </div>
-          <Badge variant={accuracy.reliability === 'high' ? 'default' : accuracy.reliability === 'medium' ? 'secondary' : 'outline'}>
+          <Badge variant="secondary" className="text-[10px]">
             {accuracy.score}% Confidence
           </Badge>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Accuracy Warning */}
+      </div>
+      
+      <div className="p-4 space-y-5">
         {accuracy.reliability === 'low' && accuracy.note && (
-          <Alert>
-            <AlertDescription>{accuracy.note}</AlertDescription>
-          </Alert>
+          <div className="p-3 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+            <div className="flex items-center gap-2">
+              <Icon icon="solar:info-circle-linear" className="h-4 w-4 text-muted-foreground" />
+              <p className="text-xs text-muted-foreground">{accuracy.note}</p>
+            </div>
+          </div>
         )}
         
-        {/* Chart */}
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <RechartsTooltip />
-              <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="leads" 
-                stroke="hsl(var(--chart-1))" 
-                strokeWidth={2}
-                name="Actual Leads"
-              />
-              <Line 
-                type="monotone" 
-                dataKey="predicted" 
-                stroke="hsl(var(--chart-2))" 
-                strokeWidth={2}
-                strokeDasharray="5 5"
-                name="Predicted"
-              />
-            </LineChart>
-          </ResponsiveContainer>
+        <div className="h-64 w-full">
+          {!hasData ? (
+            <div className="h-full flex flex-col items-center justify-center text-center">
+              <Icon icon="solar:chart-linear" className="h-10 w-10 text-muted-foreground/30 mb-3" />
+              <p className="text-sm text-muted-foreground">No historical data available</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">Start capturing leads to see predictions</p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="leadsGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#a8a29e" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#a8a29e" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#57534e" strokeOpacity={0.3} vertical={false} />
+                <XAxis 
+                  dataKey="month" 
+                  tick={{ fontSize: 10, fill: '#a8a29e' }} 
+                  axisLine={{ stroke: '#57534e', strokeOpacity: 0.5 }}
+                  tickLine={false}
+                  dy={5}
+                />
+                <YAxis 
+                  tick={{ fontSize: 10, fill: '#a8a29e' }} 
+                  axisLine={false}
+                  tickLine={false}
+                  width={35}
+                  domain={yDomain}
+                />
+                <RechartsTooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1c1917',
+                    border: '1px solid #44403c',
+                    borderRadius: '8px',
+                    fontSize: '11px',
+                    padding: '8px 12px',
+                    color: '#fafaf9'
+                  }}
+                  labelStyle={{ color: '#fafaf9' }}
+                  itemStyle={{ color: '#a8a29e' }}
+                />
+                <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '12px' }} iconType="plainline" iconSize={16} />
+                <Area 
+                  type="monotone" 
+                  dataKey="leads" 
+                  stroke="#fafaf9" 
+                  strokeWidth={2}
+                  fill="url(#leadsGradient)"
+                  name="Actual Leads"
+                  dot={{ fill: '#fafaf9', strokeWidth: 0, r: 4 }}
+                  connectNulls={false}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="predicted" 
+                  stroke="#78716c" 
+                  strokeWidth={2}
+                  strokeDasharray="6 4"
+                  name="Predicted"
+                  dot={{ fill: '#78716c', strokeWidth: 0, r: 4 }}
+                  connectNulls
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
+          )}
         </div>
         
-        {/* Forecasts */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="p-4 bg-violet-50 dark:bg-violet-950/20 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              {getTrendIcon(leadForecast.next3Months.trend)}
-              <h4 className="font-semibold">Lead Forecast</h4>
+        <div className="grid md:grid-cols-2 gap-3">
+          <div className="p-4 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+            <div className="flex items-center gap-2 mb-3">
+              <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4 text-muted-foreground" />
+              <h4 className="text-sm font-medium">Lead Forecast</h4>
             </div>
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">
-                Next Month: <span className="font-bold text-foreground">{formatNumber(leadForecast.nextMonth.predicted)}</span>
-                <span className="text-xs ml-2">({leadForecast.nextMonth.range.min}-{leadForecast.nextMonth.range.max})</span>
+            <div className="space-y-1.5">
+              <p className="text-xs text-muted-foreground">
+                Next Month: <span className="font-semibold text-foreground">{formatNumber(leadForecast.nextMonth.predicted)}</span>
+                <span className="text-[10px] ml-1.5">({leadForecast.nextMonth.range.min}-{leadForecast.nextMonth.range.max})</span>
               </p>
-              <p className="text-sm text-muted-foreground">
-                Next 3 Months: <span className="font-bold text-foreground">{formatNumber(leadForecast.next3Months.predicted)}</span>
+              <p className="text-xs text-muted-foreground">
+                Next 3 Months: <span className="font-semibold text-foreground">{formatNumber(leadForecast.next3Months.predicted)}</span>
               </p>
-              <Badge variant="outline" className="mt-2">
-                {leadForecast.nextMonth.confidence} confidence
-              </Badge>
+              <Badge variant="outline" className="mt-2 text-[10px]">{leadForecast.nextMonth.confidence} confidence</Badge>
             </div>
           </div>
           
-          <div className="p-4 bg-success-muted rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              {getTrendIcon(revenueForecast.next3Months.trend)}
-              <h4 className="font-semibold">Revenue Forecast</h4>
+          <div className="p-4 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+            <div className="flex items-center gap-2 mb-3">
+              <Icon icon="solar:wallet-linear" className="h-4 w-4 text-muted-foreground" />
+              <h4 className="text-sm font-medium">Revenue Forecast</h4>
             </div>
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">
-                Next Month: <span className="font-bold text-foreground">${formatNumber(revenueForecast.nextMonth.predicted)}</span>
-                <span className="text-xs ml-2">(${revenueForecast.nextMonth.range.min}-${revenueForecast.nextMonth.range.max})</span>
+            <div className="space-y-1.5">
+              <p className="text-xs text-muted-foreground">
+                Next Month: <span className="font-semibold text-foreground">${formatNumber(revenueForecast.nextMonth.predicted)}</span>
+                <span className="text-[10px] ml-1.5">(${revenueForecast.nextMonth.range.min}-${revenueForecast.nextMonth.range.max})</span>
               </p>
-              <p className="text-sm text-muted-foreground">
-                Next 3 Months: <span className="font-bold text-foreground">${formatNumber(revenueForecast.next3Months.predicted)}</span>
+              <p className="text-xs text-muted-foreground">
+                Next 3 Months: <span className="font-semibold text-foreground">${formatNumber(revenueForecast.next3Months.predicted)}</span>
               </p>
-              <Badge variant="outline" className="mt-2">
-                {revenueForecast.nextMonth.confidence} confidence
-              </Badge>
+              <Badge variant="outline" className="mt-2 text-[10px]">{revenueForecast.nextMonth.confidence} confidence</Badge>
             </div>
           </div>
         </div>
         
-        {/* Trends */}
-        <div>
-          <h4 className="font-semibold mb-3">Key Trends</h4>
+        <div className="pt-3 border-t border-stone-200 dark:border-stone-800">
+          <h4 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase mb-3">Key Trends</h4>
           <div className="space-y-2">
             {trends.map((trend, idx) => (
-              <div key={idx} className="flex items-start gap-3 p-3 bg-muted/50 rounded-md">
-                <div className={`font-bold ${getTrendColor(trend.direction)}`}>
-                  {trend.direction === 'up' ? '↗' : trend.direction === 'down' ? '↘' : '→'}
-                </div>
+              <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-100 dark:border-stone-800">
+                <Icon 
+                  icon={trend.direction === 'up' ? 'solar:arrow-right-up-linear' : trend.direction === 'down' ? 'solar:arrow-right-down-linear' : 'solar:arrow-right-linear'} 
+                  className="h-4 w-4 text-muted-foreground mt-0.5" 
+                />
                 <div className="flex-1">
-                  <p className="font-medium">{trend.metric}</p>
-                  <p className="text-sm text-muted-foreground">{trend.insight}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-sm font-medium text-foreground">{trend.metric}</p>
+                  <p className="text-xs text-muted-foreground">{trend.insight}</p>
+                  <p className="text-[10px] text-muted-foreground mt-1 tabular-nums">
                     {trend.percentage > 0 ? '+' : ''}{trend.percentage.toFixed(1)}% change
                   </p>
                 </div>
@@ -180,21 +217,20 @@ export default function PredictiveChart({ analytics, historicalLeads }: Predicti
           </div>
         </div>
         
-        {/* Recommendations */}
         {recommendations.length > 0 && (
-          <div>
-            <h4 className="font-semibold mb-3">Recommendations</h4>
-            <ul className="space-y-2">
+          <div className="pt-3 border-t border-stone-200 dark:border-stone-800">
+            <h4 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase mb-3">Recommendations</h4>
+            <ul className="space-y-1.5">
               {recommendations.map((rec, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm">
-                  <span className="text-primary">•</span>
+                <li key={idx} className="flex items-start gap-2 text-xs text-muted-foreground">
+                  <span className="text-muted-foreground/50 mt-0.5">•</span>
                   <span>{rec}</span>
                 </li>
               ))}
             </ul>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

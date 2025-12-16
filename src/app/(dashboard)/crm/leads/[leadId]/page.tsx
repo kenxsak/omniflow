@@ -1,19 +1,16 @@
-
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import PageTitle from '@/components/ui/page-title';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getStoredLeads, type Lead } from '@/lib/mock-data';
 import { getStoredTasks, type Task } from '@/lib/task-data';
 import { format } from 'date-fns';
-import { ArrowLeft, Loader2, AlertTriangle, UserCircle, Mail, Phone, Building, Briefcase, Calendar, Edit, ClipboardCheck, Link as LinkIcon, CheckCircle, Activity, DollarSign, Plus } from 'lucide-react';
+import { ArrowLeft, Loader2, AlertTriangle, CheckCircle, Link as LinkIcon, Plus } from 'lucide-react';
 import Link from 'next/link';
+import { Icon } from '@iconify/react';
 import { useAuth } from '@/hooks/use-auth';
 import { ActivityTimeline } from '@/components/crm/activity-timeline';
 import { ContactDeals } from '@/components/crm/contact-deals';
@@ -21,19 +18,19 @@ import { AppointmentDialog } from '@/components/appointments/appointment-dialog'
 import { LeadQuickActions } from '@/components/crm/lead-quick-actions';
 
 const statusColors: Record<Lead['status'], string> = {
-  New: 'bg-blue-500 hover:bg-blue-600',
-  Contacted: 'bg-yellow-500 hover:bg-yellow-600',
-  Qualified: 'bg-green-500 hover:bg-green-600',
-  Lost: 'bg-red-500 hover:bg-red-600',
-  Won: 'bg-purple-500 hover:bg-purple-600',
+  New: 'bg-info-muted text-info-muted-foreground border border-info-border',
+  Contacted: 'bg-warning-muted text-warning-muted-foreground border border-warning-border',
+  Qualified: 'bg-success-muted text-success-muted-foreground border border-success-border',
+  Lost: 'bg-destructive-muted text-destructive-muted-foreground border border-destructive-border',
+  Won: 'bg-success-muted text-success-muted-foreground border border-success-border',
 };
 
 const syncStatusColors: Record<NonNullable<Lead['brevoSyncStatus'] | Lead['hubspotSyncStatus']>, string> = {
-    synced: 'text-green-600 dark:text-green-400',
-    pending: 'text-yellow-600 dark:text-yellow-400',
-    failed: 'text-red-600 dark:text-red-400',
-    unsynced: 'text-gray-500 dark:text-gray-400',
-    syncing: 'text-blue-500 dark:text-blue-400 animate-pulse',
+    synced: 'text-success-muted-foreground',
+    pending: 'text-warning-muted-foreground',
+    failed: 'text-destructive-muted-foreground',
+    unsynced: 'text-muted-foreground',
+    syncing: 'text-info-muted-foreground animate-pulse',
 };
 
 const syncStatusIcons: Record<NonNullable<Lead['brevoSyncStatus'] | Lead['hubspotSyncStatus']>, React.ElementType> = {
@@ -45,9 +42,9 @@ const syncStatusIcons: Record<NonNullable<Lead['brevoSyncStatus'] | Lead['hubspo
 };
 
 const taskPriorityColors: Record<Task['priority'], string> = {
-  High: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
-  Medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
-  Low: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+  High: 'bg-destructive-muted text-destructive-muted-foreground border border-destructive-border',
+  Medium: 'bg-warning-muted text-warning-muted-foreground border border-warning-border',
+  Low: 'bg-info-muted text-info-muted-foreground border border-info-border',
 };
 
 export default function LeadDossierPage() {
@@ -112,20 +109,22 @@ export default function LeadDossierPage() {
 
 
     if (isLoading) {
-        return <div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+        return (
+            <div className="flex justify-center items-center h-64">
+                <Icon icon="solar:refresh-linear" className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+        );
     }
 
     if (!lead) {
         return (
-            <Card>
-                <CardHeader>
-                    <CardTitle>Lead Not Found</CardTitle>
-                    <CardDescription>The lead with ID "{leadId}" could not be found.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Button asChild><Link href="/crm"><ArrowLeft className="mr-2 h-4 w-4" />Back to All Leads</Link></Button>
-                </CardContent>
-            </Card>
+            <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden p-6">
+                <h2 className="text-lg font-semibold mb-2">Lead Not Found</h2>
+                <p className="text-muted-foreground mb-4">The lead with ID "{leadId}" could not be found.</p>
+                <Button asChild>
+                    <Link href="/crm"><ArrowLeft className="mr-2 h-4 w-4" />Back to All Leads</Link>
+                </Button>
+            </div>
         );
     }
     
@@ -147,55 +146,126 @@ export default function LeadDossierPage() {
     const hubspotColor = syncStatusColors[hubspotSyncStatus];
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center gap-4">
-                <Button variant="outline" size="icon" asChild>
+        <div className="space-y-4 sm:space-y-6">
+            {/* Header */}
+            <div className="flex items-center gap-3 sm:gap-4">
+                <Button variant="outline" size="icon" asChild className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg">
                     <Link href="/crm"><ArrowLeft className="h-4 w-4" /></Link>
                 </Button>
-                <PageTitle title={lead.name} description={`Lead Dossier - A complete overview.`} />
-                 <Button variant="outline" asChild>
-                    <Link href={`/crm?editLeadId=${lead.id}`}><Edit className="mr-2 h-4 w-4"/>Edit Lead</Link>
+                <div className="flex-1 min-w-0">
+                    <h1 className="text-lg sm:text-xl font-semibold truncate">{lead.name}</h1>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Lead Dossier - A complete overview.</p>
+                </div>
+                <Button variant="outline" size="sm" asChild className="hidden sm:flex">
+                    <Link href={`/crm?editLeadId=${lead.id}`}>
+                        <Icon icon="solar:pen-linear" className="mr-2 h-4 w-4"/>
+                        Edit Lead
+                    </Link>
+                </Button>
+                <Button variant="outline" size="icon" asChild className="sm:hidden h-8 w-8">
+                    <Link href={`/crm?editLeadId=${lead.id}`}>
+                        <Icon icon="solar:pen-linear" className="h-4 w-4"/>
+                    </Link>
                 </Button>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
-                    <Card>
-                        <CardHeader><CardTitle className="text-lg">Lead Information</CardTitle></CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 text-sm">
-                                <div className="flex items-center gap-2"><UserCircle className="h-4 w-4 text-muted-foreground"/><strong>Assigned To:</strong> <span className="text-muted-foreground">{lead.assignedTo || 'Unassigned'}</span></div>
-                                <div className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground"/><strong>Email:</strong> <span className="text-muted-foreground">{lead.email}</span></div>
-                                <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground"/><strong>Phone:</strong> <span className="text-muted-foreground">{lead.phone || 'N/A'}</span></div>
-                                <div className="flex items-center gap-2"><Building className="h-4 w-4 text-muted-foreground"/><strong>Company:</strong> <span className="text-muted-foreground">{lead.attributes?.COMPANY_NAME || 'N/A'}</span></div>
-                                <div className="flex items-center gap-2"><Briefcase className="h-4 w-4 text-muted-foreground"/><strong>Role:</strong> <span className="text-muted-foreground">{lead.attributes?.ROLE || 'N/A'}</span></div>
-                                <div className="flex items-center gap-2"><LinkIcon className="h-4 w-4 text-muted-foreground"/><strong>Source:</strong> <span className="text-muted-foreground">{lead.source}</span></div>
-                                <div className="flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground"/><strong>Created:</strong> <span className="text-muted-foreground">{createdAtDate ? format(createdAtDate, 'PPp') : 'N/A'}</span></div>
-                                <div className="flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground"/><strong>Last Contact:</strong> <span className="text-muted-foreground">{lastContactedDate ? format(lastContactedDate, 'PPp') : 'N/A'}</span></div>
-                                <div className="flex items-center gap-2"><ClipboardCheck className="h-4 w-4 text-muted-foreground"/><strong>Status:</strong> <Badge className={`${statusColors[lead.status]} text-white`}>{lead.status}</Badge></div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                {/* Main Content */}
+                <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+                    {/* Lead Information Card */}
+                    <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+                        <div className="absolute inset-x-8 sm:inset-x-12 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+                        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800">
+                            <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                Lead Information
+                            </span>
+                        </div>
+                        <div className="p-4 sm:p-5">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="solar:user-circle-linear" className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
+                                    <span className="font-medium text-muted-foreground">Assigned To:</span>
+                                    <span className="text-foreground truncate">{lead.assignedTo || 'Unassigned'}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="solar:letter-linear" className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
+                                    <span className="font-medium text-muted-foreground">Email:</span>
+                                    <span className="text-foreground truncate">{lead.email}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="solar:phone-linear" className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
+                                    <span className="font-medium text-muted-foreground">Phone:</span>
+                                    <span className="text-foreground">{lead.phone || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="solar:buildings-linear" className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
+                                    <span className="font-medium text-muted-foreground">Company:</span>
+                                    <span className="text-foreground truncate">{lead.attributes?.COMPANY_NAME || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="solar:case-linear" className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
+                                    <span className="font-medium text-muted-foreground">Role:</span>
+                                    <span className="text-foreground">{lead.attributes?.ROLE || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="solar:link-linear" className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
+                                    <span className="font-medium text-muted-foreground">Source:</span>
+                                    <span className="text-foreground">{lead.source}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="solar:calendar-linear" className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
+                                    <span className="font-medium text-muted-foreground">Created:</span>
+                                    <span className="text-foreground text-xs">{createdAtDate ? format(createdAtDate, 'PPp') : 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="solar:calendar-linear" className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
+                                    <span className="font-medium text-muted-foreground">Last Contact:</span>
+                                    <span className="text-foreground text-xs">{lastContactedDate ? format(lastContactedDate, 'PPp') : 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center gap-2 sm:col-span-2">
+                                    <Icon icon="solar:clipboard-check-linear" className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
+                                    <span className="font-medium text-muted-foreground">Status:</span>
+                                    <Badge className={`${statusColors[lead.status]} text-xs`}>{lead.status}</Badge>
+                                </div>
                             </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
 
+                    {/* Tabs Section */}
                     <Tabs defaultValue="activity" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-                            <TabsTrigger value="activity" className="flex items-center gap-2">
-                                <Activity className="h-4 w-4" />
-                                Activity
-                            </TabsTrigger>
-                            <TabsTrigger value="deals" className="flex items-center gap-2">
-                                <DollarSign className="h-4 w-4" />
-                                Deals
-                            </TabsTrigger>
-                            <TabsTrigger value="tasks" className="flex items-center gap-2">
-                                <ClipboardCheck className="h-4 w-4" />
-                                Tasks
-                            </TabsTrigger>
-                            <TabsTrigger value="appointments" className="flex items-center gap-2">
-                                <Calendar className="h-4 w-4" />
-                                Appointments
-                            </TabsTrigger>
-                        </TabsList>
+                        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+                            <TabsList className="w-full h-auto p-0 bg-transparent border-b border-stone-200 dark:border-stone-800 rounded-none grid grid-cols-4">
+                                <TabsTrigger 
+                                    value="activity" 
+                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-xs sm:text-sm"
+                                >
+                                    <Icon icon="solar:chart-2-linear" className="h-4 w-4" />
+                                    <span className="hidden sm:inline">Activity</span>
+                                </TabsTrigger>
+                                <TabsTrigger 
+                                    value="deals" 
+                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-xs sm:text-sm"
+                                >
+                                    <Icon icon="solar:dollar-linear" className="h-4 w-4" />
+                                    <span className="hidden sm:inline">Deals</span>
+                                </TabsTrigger>
+                                <TabsTrigger 
+                                    value="tasks" 
+                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-xs sm:text-sm"
+                                >
+                                    <Icon icon="solar:checklist-linear" className="h-4 w-4" />
+                                    <span className="hidden sm:inline">Tasks</span>
+                                </TabsTrigger>
+                                <TabsTrigger 
+                                    value="appointments" 
+                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-xs sm:text-sm"
+                                >
+                                    <Icon icon="solar:calendar-linear" className="h-4 w-4" />
+                                    <span className="hidden sm:inline">Appointments</span>
+                                </TabsTrigger>
+                            </TabsList>
+                        </div>
+                        
                         <TabsContent value="activity" className="mt-4">
                             <ActivityTimeline 
                                 contactId={lead.id} 
@@ -210,109 +280,119 @@ export default function LeadDossierPage() {
                             />
                         </TabsContent>
                         <TabsContent value="tasks" className="mt-4">
-                            <Card>
-                                <CardHeader><CardTitle className="text-lg">Associated Tasks</CardTitle></CardHeader>
-                                <CardContent>
+                            <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+                                <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+                                <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800">
+                                    <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                        Associated Tasks
+                                    </span>
+                                </div>
+                                <div className="p-4 sm:p-5">
                                     {tasks.length > 0 ? (
-                                        <Table>
-                                            <TableHeader>
-                                                <TableRow>
-                                                    <TableHead>Title</TableHead>
-                                                    <TableHead>Priority</TableHead>
-                                                    <TableHead>Status</TableHead>
-                                                    <TableHead>Due Date</TableHead>
-                                                </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {tasks.map(task => (
-                                                    <TableRow key={task.id}>
-                                                        <TableCell className="font-medium">{task.title}</TableCell>
-                                                        <TableCell><Badge className={taskPriorityColors[task.priority]}>{task.priority}</Badge></TableCell>
-                                                        <TableCell><Badge variant="outline">{task.status}</Badge></TableCell>
-                                                        <TableCell>{task.dueDate ? format(new Date(task.dueDate), 'PP') : 'N/A'}</TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
+                                        <div className="divide-y divide-stone-200 dark:divide-stone-800">
+                                            {tasks.map((task) => (
+                                                <div key={task.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="font-medium text-sm truncate">{task.title}</p>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {task.dueDate ? format(new Date(task.dueDate), 'PP') : 'No due date'}
+                                                        </p>
+                                                    </div>
+                                                    <Badge className={`${taskPriorityColors[task.priority]} text-xs`}>
+                                                        {task.priority}
+                                                    </Badge>
+                                                    <Badge variant="outline" className="text-xs">
+                                                        {task.status}
+                                                    </Badge>
+                                                </div>
+                                            ))}
+                                        </div>
                                     ) : (
-                                        <p className="text-muted-foreground text-center py-4">No tasks associated with this lead.</p>
+                                        <div className="text-center py-6">
+                                            <Icon icon="solar:checklist-linear" className="h-10 w-10 mx-auto text-muted-foreground/50 mb-2" />
+                                            <p className="text-sm text-muted-foreground">No tasks associated with this lead.</p>
+                                        </div>
                                     )}
-                                </CardContent>
-                                <CardFooter>
-                                    <Button asChild variant="outline" size="sm">
-                                        <Link href="/tasks">View All Tasks</Link>
+                                </div>
+                                <div className="px-4 sm:px-5 py-3 border-t border-stone-200 dark:border-stone-800">
+                                    <Button asChild variant="ghost" size="sm" className="h-7 text-xs">
+                                        <Link href="/tasks" className="inline-flex items-center gap-1">
+                                            VIEW ALL TASKS
+                                            <Icon icon="solar:arrow-right-linear" className="h-3 w-3" />
+                                        </Link>
                                     </Button>
-                                </CardFooter>
-                            </Card>
+                                </div>
+                            </div>
                         </TabsContent>
                         <TabsContent value="appointments" className="mt-4">
-                            <Card>
-                                <CardHeader>
-                                    <div className="flex justify-between items-center">
-                                        <CardTitle className="text-lg">Appointments</CardTitle>
-                                        <Button size="sm" onClick={() => setShowAppointmentDialog(true)}>
-                                            <Plus className="mr-2 h-4 w-4" />
-                                            Schedule Appointment
-                                        </Button>
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
+                            <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+                                <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+                                <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+                                    <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                        Appointments
+                                    </span>
+                                    <Button size="sm" onClick={() => setShowAppointmentDialog(true)} className="h-7 text-xs">
+                                        <Plus className="mr-1 h-3 w-3" />
+                                        Schedule
+                                    </Button>
+                                </div>
+                                <div className="p-4 sm:p-5">
                                     {appointments.length > 0 ? (
-                                        <Table>
-                                            <TableHeader>
-                                                <TableRow>
-                                                    <TableHead>Title</TableHead>
-                                                    <TableHead>Date & Time</TableHead>
-                                                    <TableHead>Duration</TableHead>
-                                                    <TableHead>Status</TableHead>
-                                                    <TableHead>Actions</TableHead>
-                                                </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {appointments.map((appointment: any) => (
-                                                    <TableRow key={appointment.id}>
-                                                        <TableCell className="font-medium">{appointment.title}</TableCell>
-                                                        <TableCell>
+                                        <div className="divide-y divide-stone-200 dark:divide-stone-800">
+                                            {appointments.map((appointment: any) => (
+                                                <div key={appointment.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+                                                    <div className="flex-shrink-0 w-12 text-center">
+                                                        <div className="text-sm font-semibold tabular-nums">
                                                             {appointment.startTime 
-                                                                ? format(new Date(appointment.startTime), 'PPp')
+                                                                ? format(new Date(appointment.startTime), 'HH:mm')
+                                                                : '--:--'
+                                                            }
+                                                        </div>
+                                                        <div className="text-[10px] text-muted-foreground">
+                                                            {appointment.duration || '30'}m
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="font-medium text-sm truncate">{appointment.title}</p>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {appointment.startTime 
+                                                                ? format(new Date(appointment.startTime), 'MMM d, yyyy')
                                                                 : 'N/A'
                                                             }
-                                                        </TableCell>
-                                                        <TableCell>{appointment.duration || 'N/A'} min</TableCell>
-                                                        <TableCell>
-                                                            <Badge variant={
-                                                                appointment.status === 'completed' ? 'default' :
-                                                                appointment.status === 'cancelled' ? 'destructive' :
-                                                                'outline'
-                                                            }>
-                                                                {appointment.status || 'scheduled'}
-                                                            </Badge>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Button asChild variant="ghost" size="sm">
-                                                                <Link href={`/appointments?id=${appointment.id}`}>View</Link>
-                                                            </Button>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
+                                                        </p>
+                                                    </div>
+                                                    <Badge variant={
+                                                        appointment.status === 'completed' ? 'default' :
+                                                        appointment.status === 'cancelled' ? 'destructive' :
+                                                        'outline'
+                                                    } className="text-xs">
+                                                        {appointment.status || 'scheduled'}
+                                                    </Badge>
+                                                    <Button asChild variant="ghost" size="sm" className="h-7 text-xs">
+                                                        <Link href={`/appointments?id=${appointment.id}`}>View</Link>
+                                                    </Button>
+                                                </div>
+                                            ))}
+                                        </div>
                                     ) : (
-                                        <div className="text-center py-8">
-                                            <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                                            <p className="text-muted-foreground mb-4">No appointments scheduled for this contact.</p>
-                                            <Button variant="outline" onClick={() => setShowAppointmentDialog(true)}>
-                                                <Plus className="mr-2 h-4 w-4" />
+                                        <div className="text-center py-6">
+                                            <Icon icon="solar:calendar-linear" className="h-10 w-10 mx-auto text-muted-foreground/50 mb-2" />
+                                            <p className="text-sm text-muted-foreground mb-3">No appointments scheduled.</p>
+                                            <Button variant="outline" size="sm" onClick={() => setShowAppointmentDialog(true)} className="h-8 text-xs">
+                                                <Plus className="mr-1 h-3 w-3" />
                                                 Schedule First Appointment
                                             </Button>
                                         </div>
                                     )}
-                                </CardContent>
-                            </Card>
+                                </div>
+                            </div>
                         </TabsContent>
                     </Tabs>
                 </div>
-                <div className="space-y-6">
+
+                {/* Sidebar */}
+                <div className="space-y-4 sm:space-y-6">
+                    {/* Quick Actions */}
                     <LeadQuickActions 
                         lead={{
                             id: lead.id,
@@ -323,35 +403,61 @@ export default function LeadDossierPage() {
                         }}
                         onActivityLogged={loadData}
                     />
-                    <Card>
-                        <CardHeader><CardTitle className="text-lg">Sync Status</CardTitle></CardHeader>
-                        <CardContent className="space-y-3">
-                            <div className={`flex items-center gap-2 text-sm p-3 rounded-md border ${brevoSyncStatus === 'synced' ? 'border-green-200 bg-green-50' : brevoSyncStatus === 'failed' ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-gray-50'}`}>
+
+                    {/* Sync Status Card */}
+                    <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+                        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+                        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800">
+                            <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                Sync Status
+                            </span>
+                        </div>
+                        <div className="p-4 sm:p-5 space-y-3">
+                            <div className={`flex items-center gap-3 p-3 rounded-lg border ${
+                                brevoSyncStatus === 'synced' ? 'border-success-border bg-success-muted' : 
+                                brevoSyncStatus === 'failed' ? 'border-destructive-border bg-destructive-muted' : 
+                                'border-stone-200 dark:border-stone-700 bg-muted/50'
+                            }`}>
                                 <BrevoIcon className={`h-5 w-5 ${brevoColor}`} />
-                                <div>
-                                    <p className={`font-semibold ${brevoColor}`}>Brevo</p>
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-sm">Brevo</p>
                                     <p className={`text-xs capitalize ${brevoColor}`}>{brevoSyncStatus}</p>
-                                    {brevoSyncStatus === 'failed' && <p className="text-xs text-destructive">{lead.brevoErrorMessage}</p>}
+                                    {brevoSyncStatus === 'failed' && lead.brevoErrorMessage && (
+                                        <p className="text-xs text-destructive-muted-foreground mt-1 truncate">{lead.brevoErrorMessage}</p>
+                                    )}
                                 </div>
                             </div>
-                            <div className={`flex items-center gap-2 text-sm p-3 rounded-md border ${hubspotSyncStatus === 'synced' ? 'border-green-200 bg-green-50' : hubspotSyncStatus === 'failed' ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-gray-50'}`}>
+                            <div className={`flex items-center gap-3 p-3 rounded-lg border ${
+                                hubspotSyncStatus === 'synced' ? 'border-success-border bg-success-muted' : 
+                                hubspotSyncStatus === 'failed' ? 'border-destructive-border bg-destructive-muted' : 
+                                'border-stone-200 dark:border-stone-700 bg-muted/50'
+                            }`}>
                                 <HubspotIcon className={`h-5 w-5 ${hubspotColor}`} />
-                                <div>
-                                    <p className={`font-semibold ${hubspotColor}`}>HubSpot</p>
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-sm">HubSpot</p>
                                     <p className={`text-xs capitalize ${hubspotColor}`}>{hubspotSyncStatus}</p>
-                                    {hubspotSyncStatus === 'failed' && <p className="text-xs text-destructive">{lead.hubspotErrorMessage}</p>}
+                                    {hubspotSyncStatus === 'failed' && lead.hubspotErrorMessage && (
+                                        <p className="text-xs text-destructive-muted-foreground mt-1 truncate">{lead.hubspotErrorMessage}</p>
+                                    )}
                                 </div>
                             </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader><CardTitle className="text-lg">Notes</CardTitle></CardHeader>
-                        <CardContent>
-                            <div className="prose dark:prose-invert prose-sm max-h-80 overflow-y-auto p-3 bg-muted/50 rounded-md border">
-                                <pre className="whitespace-pre-wrap font-sans text-sm">{lead.notes || 'No notes yet.'}</pre>
+                        </div>
+                    </div>
+
+                    {/* Notes Card */}
+                    <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+                        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+                        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800">
+                            <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                Notes
+                            </span>
+                        </div>
+                        <div className="p-4 sm:p-5">
+                            <div className="p-3 bg-muted/50 rounded-lg border border-stone-200 dark:border-stone-700 max-h-40 overflow-y-auto">
+                                <pre className="whitespace-pre-wrap font-sans text-sm text-foreground">{lead.notes || 'No notes yet.'}</pre>
                             </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
                 </div>
             </div>
 

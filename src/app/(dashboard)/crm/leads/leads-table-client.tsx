@@ -2,22 +2,20 @@
 
 import { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import PageTitle from '@/components/ui/page-title';
 import type { Lead } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LeadActionsProvider, useLeadActions } from '@/components/crm/lead-actions-provider';
 import { ContactUsageIndicator } from '@/components/crm/contact-usage-indicator';
 import { BulkAssignDialog } from '@/components/crm/bulk-assign-dialog';
-import { Loader2 } from 'lucide-react';
 import { Icon } from '@iconify/react';
 import { AppointmentDialog } from '@/components/appointments/appointment-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { createLeadAction, updateLeadAction, bulkDeleteLeadsAction, deleteAllLeadsAction, loadMoreLeadsAction } from '@/app/actions/lead-actions';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const COUNTRY_CODES = [
   { code: '+1', country: 'US/Canada', flag: '🇺🇸' },
@@ -35,23 +33,13 @@ const COUNTRY_CODES = [
   { code: '+34', country: 'Spain', flag: '🇪🇸' },
   { code: '+55', country: 'Brazil', flag: '🇧🇷' },
   { code: '+52', country: 'Mexico', flag: '🇲🇽' },
-  { code: '+7', country: 'Russia', flag: '🇷🇺' },
-  { code: '+82', country: 'South Korea', flag: '🇰🇷' },
-  { code: '+62', country: 'Indonesia', flag: '🇮🇩' },
-  { code: '+60', country: 'Malaysia', flag: '🇲🇾' },
-  { code: '+63', country: 'Philippines', flag: '🇵🇭' },
-  { code: '+66', country: 'Thailand', flag: '🇹🇭' },
-  { code: '+92', country: 'Pakistan', flag: '🇵🇰' },
-  { code: '+880', country: 'Bangladesh', flag: '🇧🇩' },
-  { code: '+94', country: 'Sri Lanka', flag: '🇱🇰' },
-  { code: '+977', country: 'Nepal', flag: '🇳🇵' },
 ];
 
 const LeadTable = dynamic(() => import('@/components/crm/lead-table'), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <Icon icon="solar:refresh-linear" className="h-6 w-6 animate-spin text-muted-foreground" />
     </div>
   ),
 });
@@ -124,7 +112,6 @@ function LeadsTableInner({
         userId
       );
       
-      // Accumulate leads instead of replacing
       setAllLoadedLeads(prev => {
         const existingIds = new Set(prev.map(l => l.id));
         const newLeads = result.leads.filter(l => !existingIds.has(l.id));
@@ -136,22 +123,13 @@ function LeadsTableInner({
       console.error('Error loading more leads:', error);
       toast({
         title: 'Error',
-        description: 'Failed to load more contacts. Please try again.',
+        description: 'Failed to load more contacts.',
         variant: 'destructive',
       });
     } finally {
       setIsLoadingMore(false);
     }
   }, [companyId, pageSize, userRole, userId, isLoadingMore, hasMoreToLoad, allLoadedLeads.length, toast]);
-
-  const handleEdit = (lead: Lead) => {
-    openEditLeadDialog(lead);
-  };
-
-  const handleDelete = async (lead: Lead) => {
-    if (!confirm(`Delete contact ${lead.name}?`)) return;
-    await handleDeleteLead(lead.id);
-  };
 
   const handleScheduleAppointment = (lead: Lead) => {
     setSelectedLeadForAppointment(lead);
@@ -184,7 +162,6 @@ function LeadsTableInner({
           const worksheet = workbook.Sheets[sheetName];
           const jsonData = XLSX.utils.sheet_to_json<any>(worksheet);
           
-          // Batch process leads in groups of 20 to avoid memory overload
           const BATCH_SIZE = 20;
           for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
             const batch = jsonData.slice(i, i + BATCH_SIZE);
@@ -196,7 +173,6 @@ function LeadsTableInner({
               const company = row['Company'] || row['company'];
               const status = row['Status'] || row['status'] || 'New';
               
-              // Robust phone number parsing with string coercion
               if (phone !== undefined && phone !== null && phone !== '') {
                 let phoneStr = String(phone).trim();
                 phoneStr = phoneStr.replace(/[\s\-\(\)]/g, '');
@@ -221,7 +197,6 @@ function LeadsTableInner({
                   });
                   return { success: true };
                 } catch (error) {
-                  console.error('Error adding lead:', error);
                   return { success: false };
                 }
               } else {
@@ -235,17 +210,15 @@ function LeadsTableInner({
           }
           
           toast({ 
-            title: "✅ Import Complete!", 
-            description: `${addedCount} contacts added to your CRM. ${skippedCount} rows skipped.`,
-            duration: 5000
+            title: "Import Complete", 
+            description: `${addedCount} contacts added. ${skippedCount} rows skipped.`,
           });
           
           router.refresh();
         } catch (error) {
-          console.error("Error processing file:", error);
           toast({ 
             title: "Upload Failed", 
-            description: "Error processing file. Ensure it's a valid Excel or CSV.", 
+            description: "Error processing file.", 
             variant: "destructive" 
           });
         }
@@ -262,30 +235,17 @@ function LeadsTableInner({
     try {
       const XLSX = await import('xlsx');
       const templateData = [
-        {
-          'Name': 'John Doe',
-          'Email': 'john@example.com',
-          'Phone': '+1234567890',
-          'Company': 'Example Corp',
-          'Status': 'New'
-        },
-        {
-          'Name': 'Jane Smith',
-          'Email': 'jane@example.com',
-          'Phone': '+1987654321',
-          'Company': 'Sample Inc',
-          'Status': 'Qualified'
-        }
+        { 'Name': 'John Doe', 'Email': 'john@example.com', 'Phone': '+1234567890', 'Company': 'Example Corp', 'Status': 'New' },
+        { 'Name': 'Jane Smith', 'Email': 'jane@example.com', 'Phone': '+1987654321', 'Company': 'Sample Inc', 'Status': 'Qualified' }
       ];
       
       const worksheet = XLSX.utils.json_to_sheet(templateData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Contacts Template");
       XLSX.writeFile(workbook, "OmniFlow_CRM_Contacts_Template.xlsx");
-      toast({ title: "Template Downloaded", description: "Fill in the template and upload to import contacts" });
+      toast({ title: "Template Downloaded" });
     } catch (error) {
-      console.error("Error downloading template:", error);
-      toast({ title: "Download Failed", description: "Could not generate template file.", variant: "destructive" });
+      toast({ title: "Download Failed", variant: "destructive" });
     }
   };
 
@@ -340,10 +300,7 @@ function LeadsTableInner({
 
   const handleBulkDelete = async () => {
     const count = selectedLeadIds.size;
-    const confirmed = confirm(
-      `Delete ${count} selected contact${count !== 1 ? 's' : ''}?\n\n` +
-      `This action cannot be undone. This will permanently delete the selected contact${count !== 1 ? 's' : ''} from your database.`
-    );
+    const confirmed = confirm(`Delete ${count} selected contact${count !== 1 ? 's' : ''}?`);
     
     if (!confirmed) return;
     
@@ -352,19 +309,17 @@ function LeadsTableInner({
       const leadIdsArray = Array.from(selectedLeadIds);
       const result = await bulkDeleteLeadsAction(leadIdsArray);
       
-      const deletedCount = result?.deletedCount || count;
       toast({
         title: 'Contacts Deleted',
-        description: `Successfully deleted ${deletedCount} contact${deletedCount !== 1 ? 's' : ''}`,
+        description: `Successfully deleted ${result?.deletedCount || count} contacts`,
       });
       
       setSelectedLeadIds(new Set());
       router.refresh();
     } catch (error: any) {
-      console.error('Bulk delete error:', error);
       toast({
         title: 'Error',
-        description: error?.message || 'Failed to delete contacts. Please try again.',
+        description: error?.message || 'Failed to delete contacts.',
         variant: 'destructive',
       });
     } finally {
@@ -373,38 +328,22 @@ function LeadsTableInner({
   };
 
   const handleDeleteAll = async () => {
-    const filteredCount = filteredLeads.length;
-    
-    let confirmMessage = `⚠️ WARNING: Delete ALL ${totalLeads} contacts in your database?\n\n`;
-    confirmMessage += `This is an extremely destructive operation that will permanently delete ALL ${totalLeads} contacts from your entire company database, regardless of any search filters.\n\n`;
-    
-    if (searchTerm && filteredCount !== totalLeads) {
-      confirmMessage += `Note: You are currently viewing ${filteredCount} filtered contact${filteredCount !== 1 ? 's' : ''}, but this action will delete ALL ${totalLeads} contacts in your database.\n\n`;
-    }
-    
-    confirmMessage += `This action cannot be undone!\n\nAre you absolutely sure?`;
-    
-    const confirmed = confirm(confirmMessage);
-    
+    const confirmed = confirm(`Delete ALL ${totalLeads} contacts? This cannot be undone!`);
     if (!confirmed) return;
     
     setIsDeleting(true);
     try {
       const result = await deleteAllLeadsAction(companyId);
-      
-      const deletedCount = result?.deletedCount || totalLeads;
       toast({
         title: 'All Contacts Deleted',
-        description: `Successfully deleted ${deletedCount} contact${deletedCount !== 1 ? 's' : ''} from your entire database`,
+        description: `Deleted ${result?.deletedCount || totalLeads} contacts`,
       });
-      
       setSelectedLeadIds(new Set());
       router.refresh();
     } catch (error: any) {
-      console.error('Delete all error:', error);
       toast({
         title: 'Error',
-        description: error?.message || 'Failed to delete all contacts. Please try again.',
+        description: error?.message || 'Failed to delete contacts.',
         variant: 'destructive',
       });
     } finally {
@@ -412,73 +351,66 @@ function LeadsTableInner({
     }
   };
 
+  const myLeadsCount = allLoadedLeads.filter(l => l.assignedTo === userId).length;
+  const unassignedCount = allLoadedLeads.filter(l => !l.assignedTo || l.assignedTo === '_UNASSIGNED_').length;
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:gap-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <PageTitle 
-            title={userRole === 'user' ? 'My Leads' : 'All Leads'} 
-            description={userRole === 'user' 
-              ? 'View and manage leads assigned to you' 
-              : 'Select and manage your contacts with bulk actions'
-            } 
-          />
-          <Button onClick={openAddLeadDialog} size="sm" className="w-full sm:w-auto">
-            <Icon icon="solar:add-circle-linear" className="h-4 w-4 mr-2" />
-            Add Contact
-          </Button>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleDownloadTemplate} className="text-xs sm:text-sm h-8 sm:h-9">
-            <Icon icon="solar:download-linear" className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-            <span className="hidden xs:inline">Download </span>Template
-          </Button>
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <Select value={defaultCountryCode} onValueChange={setDefaultCountryCode}>
-              <SelectTrigger className="w-[100px] sm:w-[140px] h-8 sm:h-9 text-xs sm:text-sm">
-                <SelectValue placeholder="Code" />
-              </SelectTrigger>
-              <SelectContent>
-                {COUNTRY_CODES.map((cc) => (
-                  <SelectItem key={cc.code} value={cc.code}>
-                    {cc.flag} {cc.code}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => document.getElementById('csv-upload-input')?.click()}
-              disabled={isUploading}
-              className="text-xs sm:text-sm h-8 sm:h-9"
-            >
-              {isUploading ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 animate-spin" /> : <Icon icon="solar:upload-linear" className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />}
-              <span className="hidden xs:inline">Import </span>CSV
-            </Button>
-            <input 
-              type="file" 
-              id="csv-upload-input" 
-              accept=".csv, .xlsx, .xls" 
-              onChange={handleFileUpload} 
-              style={{ display: 'none' }} 
-            />
+    <div className="space-y-8">
+      {/* Page Header */}
+      <header className="relative flex w-full flex-col gap-4">
+        <div className="flex justify-between gap-x-8 items-center">
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <h1 className="text-2xl font-semibold text-foreground">Contacts</h1>
           </div>
         </div>
-      </div>
+      </header>
 
+      {/* Tabs - Clerk Style */}
       {userRole && userRole !== 'user' && (
-        <div className="overflow-x-auto -mx-1 px-1">
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'my' | 'all' | 'unassigned')}>
-            <TabsList className="inline-flex w-max sm:w-auto">
-              <TabsTrigger value="all" className="text-xs sm:text-sm px-2 sm:px-3">All ({totalLeads})</TabsTrigger>
-              <TabsTrigger value="my" className="text-xs sm:text-sm px-2 sm:px-3">My ({allLoadedLeads.filter(l => l.assignedTo === userId).length})</TabsTrigger>
-              <TabsTrigger value="unassigned" className="text-xs sm:text-sm px-2 sm:px-3">Unassigned ({allLoadedLeads.filter(l => !l.assignedTo || l.assignedTo === '_UNASSIGNED_').length})</TabsTrigger>
-            </TabsList>
-          </Tabs>
+        <div className="flex items-stretch gap-6 overflow-x-auto pb-px border-b border-stone-200 dark:border-stone-800">
+          <button
+            onClick={() => setActiveTab('all')}
+            className={`relative flex items-center gap-1.5 whitespace-nowrap py-2 text-sm transition-colors ${
+              activeTab === 'all' 
+                ? 'text-foreground' 
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {activeTab === 'all' && (
+              <span className="absolute left-0 top-full h-px w-full bg-foreground" />
+            )}
+            All
+          </button>
+          <button
+            onClick={() => setActiveTab('my')}
+            className={`relative flex items-center gap-1.5 whitespace-nowrap py-2 text-sm transition-colors ${
+              activeTab === 'my' 
+                ? 'text-foreground' 
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {activeTab === 'my' && (
+              <span className="absolute left-0 top-full h-px w-full bg-foreground" />
+            )}
+            My Contacts
+          </button>
+          <button
+            onClick={() => setActiveTab('unassigned')}
+            className={`relative flex items-center gap-1.5 whitespace-nowrap py-2 text-sm transition-colors ${
+              activeTab === 'unassigned' 
+                ? 'text-foreground' 
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {activeTab === 'unassigned' && (
+              <span className="absolute left-0 top-full h-px w-full bg-foreground" />
+            )}
+            Unassigned
+          </button>
         </div>
       )}
 
+      {/* Usage Indicator */}
       {planMetadata && (
         <ContactUsageIndicator
           currentContactCount={totalLeads}
@@ -488,122 +420,159 @@ function LeadsTableInner({
         />
       )}
 
-      {selectedLeadIds.size > 0 && (
-        <div className="rounded-lg border bg-muted/50 p-3 sm:p-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-muted/50 flex items-center justify-center">
-                <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="font-medium text-sm">
-                  {selectedLeadIds.size} selected
-                </p>
-                <p className="text-xs text-muted-foreground hidden sm:block">Choose an action</p>
+      {/* Table Filters Section - Clerk Style */}
+      <section>
+        <header className="mb-4 flex gap-4 flex-col sm:flex-row sm:items-stretch sm:justify-between">
+          <div className="flex flex-grow flex-wrap items-center gap-2">
+            {/* Search Input - Clerk Style */}
+            <div className="flex-grow sm:max-w-[280px]">
+              <div className="flex items-center rounded-md transition bg-white dark:bg-stone-950 ring-1 ring-stone-200 dark:ring-stone-800 shadow-sm hover:ring-stone-300 dark:hover:ring-stone-700 focus-within:ring-2 focus-within:ring-primary">
+                <label className="flex items-center self-stretch pl-2.5">
+                  <Icon icon="solar:magnifer-linear" className="h-4 w-4 text-muted-foreground" />
+                </label>
+                <input
+                  type="search"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full flex-1 self-stretch px-2.5 bg-transparent text-foreground placeholder:text-muted-foreground py-1.5 text-sm outline-none"
+                />
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+
+            {/* Import Actions */}
+            <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
+              <Select value={defaultCountryCode} onValueChange={setDefaultCountryCode}>
+                <SelectTrigger className="w-[100px] h-8 text-xs shadow-sm px-2.5">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="min-w-[140px]">
+                  {COUNTRY_CODES.map((cc) => (
+                    <SelectItem key={cc.code} value={cc.code} className="text-xs">
+                      {cc.flag} {cc.code}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Button 
-                variant="default" 
-                size="sm"
-                onClick={handleAddToList}
-                disabled={isDeleting}
-                className="flex-1 sm:flex-none"
+                variant="outline" 
+                size="sm" 
+                onClick={() => document.getElementById('csv-upload-input')?.click()}
+                disabled={isUploading}
+                className="h-8 text-xs shadow-sm"
               >
-                <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4 mr-2" />
+                {isUploading ? (
+                  <Icon icon="solar:refresh-linear" className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Icon icon="solar:upload-linear" className="h-3.5 w-3.5" />
+                )}
+              </Button>
+              <input 
+                type="file" 
+                id="csv-upload-input" 
+                accept=".csv, .xlsx, .xls" 
+                onChange={handleFileUpload} 
+                style={{ display: 'none' }} 
+              />
+            </div>
+          </div>
+
+          {/* Create Button - Clerk Style Primary */}
+          <div className="flex-0 sm:ml-auto">
+            <Button 
+              onClick={openAddLeadDialog}
+              className="h-8 px-3 text-sm shadow-sm bg-primary hover:bg-primary/90"
+            >
+              <Icon icon="solar:add-circle-linear" className="h-4 w-4 mr-1.5" />
+              Create contact
+            </Button>
+          </div>
+        </header>
+
+        {/* Bulk Actions Bar */}
+        {selectedLeadIds.size > 0 && (
+          <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+            <span className="text-sm font-medium">{selectedLeadIds.size} selected</span>
+            <div className="flex items-center gap-2 ml-auto">
+              <Button variant="outline" size="sm" onClick={handleAddToList} disabled={isDeleting} className="h-7 text-xs">
+                <Icon icon="solar:users-group-two-rounded-linear" className="h-3.5 w-3.5 mr-1.5" />
                 Add to List
               </Button>
               {userRole && userRole !== 'user' && (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setIsAssignDialogOpen(true)}
-                  disabled={isDeleting}
-                  className="flex-1 sm:flex-none"
-                >
-                  <Icon icon="solar:user-plus-linear" className="h-4 w-4 mr-2" />
-                  Assign to Rep
+                <Button variant="outline" size="sm" onClick={() => setIsAssignDialogOpen(true)} disabled={isDeleting} className="h-7 text-xs">
+                  <Icon icon="solar:user-plus-linear" className="h-3.5 w-3.5 mr-1.5" />
+                  Assign
                 </Button>
               )}
-              <Button 
-                variant="destructive" 
-                size="sm"
-                onClick={handleBulkDelete}
-                disabled={isDeleting}
-                className="flex-1 sm:flex-none"
-              >
+              <Button variant="destructive" size="sm" onClick={handleBulkDelete} disabled={isDeleting} className="h-7 text-xs">
                 {isDeleting ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Icon icon="solar:refresh-linear" className="h-3.5 w-3.5 animate-spin" />
                 ) : (
-                  <Icon icon="solar:trash-bin-trash-linear" className="h-4 w-4 mr-2" />
+                  <Icon icon="solar:trash-bin-trash-linear" className="h-3.5 w-3.5 mr-1.5" />
                 )}
                 Delete
               </Button>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setSelectedLeadIds(new Set())}
-                disabled={isDeleting}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setSelectedLeadIds(new Set())} className="h-7 text-xs">
                 Clear
               </Button>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
-        <Input
-          placeholder="Search contacts..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full sm:max-w-sm h-8 sm:h-9 text-sm"
+        {/* Lead Table */}
+        <LeadTable
+          leads={filteredLeads}
+          onDeleteLead={handleDeleteLead}
+          onUpdateLead={handleUpdate}
+          selectedLeadIds={selectedLeadIds}
+          onSelectionChange={handleSelectionChange}
+          onSelectAll={handleSelectAll}
+          onSyncComplete={() => router.refresh()}
+          onEditLead={openEditLeadDialog}
+          onScheduleAppointment={handleScheduleAppointment}
         />
-        <div className="flex items-center justify-between sm:justify-end gap-2">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleDeleteAll}
-            disabled={isDeleting || totalLeads === 0}
-            className="text-xs sm:text-sm h-8 sm:h-9"
-          >
-            <Icon icon="solar:danger-triangle-linear" className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-            <span className="hidden xs:inline">Delete </span>All
-          </Button>
-          <div className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
-            {filteredLeads.length} {filteredLeads.length !== totalLeads && `/ ${totalLeads}`}
+
+        {/* Table Footer - Pagination */}
+        <footer className="flex flex-wrap items-center justify-between gap-4 px-4 py-3 text-xs text-muted-foreground mt-4">
+          <div className="flex items-center gap-3">
+            <span>{filteredLeads.length === totalLeads ? `1-${filteredLeads.length} of ${totalLeads}` : `${filteredLeads.length} of ${totalLeads}`}</span>
+            <span className="h-5 border-r border-stone-300 dark:border-stone-700" />
+            <span>Results per page</span>
+            <Select defaultValue="50">
+              <SelectTrigger className="w-[70px] h-7 text-xs bg-white dark:bg-stone-950 shadow-sm px-2.5">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </div>
-      </div>
-
-      <LeadTable
-        leads={filteredLeads}
-        onDeleteLead={handleDeleteLead}
-        onUpdateLead={handleUpdate}
-        selectedLeadIds={selectedLeadIds}
-        onSelectionChange={handleSelectionChange}
-        onSelectAll={handleSelectAll}
-        onSyncComplete={() => router.refresh()}
-        onEditLead={openEditLeadDialog}
-        onScheduleAppointment={handleScheduleAppointment}
-      />
-
-      {hasMoreToLoad && (
-        <div className="flex items-center justify-center border-t pt-4">
-          <Button
-            variant="outline"
-            onClick={loadMoreLeads}
-            disabled={isLoadingMore}
-          >
-            {isLoadingMore ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <Icon icon="solar:alt-arrow-right-linear" className="h-4 w-4 mr-2" />
-            )}
-            Load More ({totalLeads - allLoadedLeads.length} remaining)
-          </Button>
-        </div>
-      )}
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" disabled className="h-7 w-7">
+              <Icon icon="solar:double-alt-arrow-left-linear" className="h-3.5 w-3.5" />
+            </Button>
+            <Button variant="outline" size="icon" disabled className="h-7 w-7 shadow-sm">
+              <Icon icon="solar:alt-arrow-left-linear" className="h-3.5 w-3.5" />
+            </Button>
+            <span className="mx-2 tabular-nums">
+              <span className="text-foreground">1</span>/1
+            </span>
+            <Button variant="outline" size="icon" disabled={!hasMoreToLoad} onClick={loadMoreLeads} className="h-7 w-7 shadow-sm">
+              {isLoadingMore ? (
+                <Icon icon="solar:refresh-linear" className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Icon icon="solar:alt-arrow-right-linear" className="h-3.5 w-3.5" />
+              )}
+            </Button>
+            <Button variant="ghost" size="icon" disabled className="h-7 w-7">
+              <Icon icon="solar:double-alt-arrow-right-linear" className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </footer>
+      </section>
 
       <BulkAssignDialog
         isOpen={isAssignDialogOpen}

@@ -1,27 +1,23 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import PageTitle from '@/components/ui/page-title';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle as AlertTitleComponent } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Info, PlayCircle, Settings, Loader2, Wand2, Mail, Clock, Trash2, Timer, PlusCircle, Users, Sparkles, UserX, CreditCard, Gift, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 import { getEmailLists, getListTypeLabel, getListTypeColor } from '@/lib/email-list-data';
 import type { EmailList, EmailListType, EmailAutomationSequence, EmailAutomationStep, DeliveryProvider, AutomationDeliveryConfig } from '@/types/email-lists';
-import { generateEmailContent, type GenerateEmailContentInput } from '@/ai/flows/generate-email-content-flow';
+import { generateEmailContent } from '@/ai/flows/generate-email-content-flow';
 import { db } from '@/lib/firebase';
-import { collection, getDocs, doc, setDoc, updateDoc, serverTimestamp, addDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, serverTimestamp, addDoc, deleteDoc } from 'firebase/firestore';
 
 const DEFAULT_AUTOMATION_TEMPLATES: Omit<EmailAutomationSequence, 'id' | 'createdAt' | 'updatedAt' | 'companyId'>[] = [
   {
@@ -115,7 +111,6 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
   const hasSenderConfigured = !!company?.apiKeys?.sender?.apiKey;
   const hasSmtpConfigured = !!company?.apiKeys?.smtp?.host;
 
-  // Determine the best default provider based on what's configured
   const getDefaultProvider = (): DeliveryProvider => {
     if (automation.deliveryConfig?.provider) return automation.deliveryConfig.provider;
     if (hasBrevoConfigured) return 'brevo';
@@ -142,7 +137,6 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
       });
       
       setConfig(personalizedConfig);
-      // Use smart default: saved provider first, then first configured provider
       const savedProvider = automation.deliveryConfig?.provider;
       if (savedProvider) {
         setDeliveryProvider(savedProvider);
@@ -159,7 +153,7 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
         setSelectedListId(matchingLists[0].id);
       }
     }
-  }, [automation, isOpen, company, lists]);
+  }, [automation, isOpen, company, lists, hasBrevoConfigured, hasSenderConfigured, hasSmtpConfigured]);
 
   const handleStepChange = (index: number, field: keyof EmailAutomationStep, value: string | number) => {
     const newSteps = [...config.steps];
@@ -219,15 +213,26 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-4xl lg:max-w-5xl max-h-[95vh] sm:max-h-[90vh] flex flex-col p-4 sm:p-6">
-        <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="text-lg sm:text-xl pr-8">{config.name}</DialogTitle>
-          <DialogDescription className="text-xs sm:text-sm">{config.description}</DialogDescription>
-        </DialogHeader>
+      <DialogContent className="w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-4xl lg:max-w-5xl max-h-[95vh] sm:max-h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
+        {/* Header with accent bar */}
+        <div className="relative px-6 pt-6 pb-4 border-b border-stone-200 dark:border-stone-800">
+          <div className="absolute inset-x-12 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <DialogHeader className="space-y-1">
+            <DialogTitle className="text-lg font-semibold pr-8">{config.name}</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">{config.description}</DialogDescription>
+          </DialogHeader>
+        </div>
         
-        <div className="flex-1 overflow-y-auto space-y-4 pr-1 sm:pr-2 -mr-1 sm:-mr-2">
-          <div className="p-3 sm:p-4 bg-muted/50 rounded-lg">
-            <Label className="mb-2 block text-sm font-medium">Link to Email List</Label>
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
+          {/* Link to Email List Section */}
+          <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+            <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="p-4 pt-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Icon icon="solar:link-linear" className="h-4 w-4 text-muted-foreground" />
+                <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Link to Email List</span>
+              </div>
             <Select value={selectedListId} onValueChange={setSelectedListId}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select an email list" />
@@ -246,199 +251,247 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
                 )}
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground mt-2">
-              Only lists of type "{getListTypeLabel(config.listType)}" are shown. Create a matching list in the Email Lists page.
-            </p>
-          </div>
-
-          <div className="p-3 sm:p-4 bg-muted/50 rounded-lg">
-            <Label className="mb-2 block text-sm font-medium">Delivery Provider</Label>
-            <p className="text-xs text-muted-foreground mb-3">
-              Choose which email service to use when sending automation emails.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
-              <button
-                type="button"
-                onClick={() => setDeliveryProvider('brevo')}
-                className={cn(
-                  "p-2 sm:p-3 border-2 rounded-lg text-left transition-all",
-                  deliveryProvider === 'brevo' 
-                    ? 'border-primary bg-primary/5' 
-                    : 'border-border hover:border-primary/50'
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-sm">Brevo</span>
-                  {deliveryProvider === 'brevo' && <CheckCircle2 className="h-4 w-4 text-green-600" />}
-                </div>
-                <span className={cn("text-xs", hasBrevoConfigured ? "text-green-600" : "text-orange-500")}>
-                  {hasBrevoConfigured ? 'Configured' : 'Not configured'}
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setDeliveryProvider('sender')}
-                className={cn(
-                  "p-2 sm:p-3 border-2 rounded-lg text-left transition-all",
-                  deliveryProvider === 'sender' 
-                    ? 'border-primary bg-primary/5' 
-                    : 'border-border hover:border-primary/50'
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-sm">Sender.net</span>
-                  {deliveryProvider === 'sender' && <CheckCircle2 className="h-4 w-4 text-green-600" />}
-                </div>
-                <span className={cn("text-xs", hasSenderConfigured ? "text-green-600" : "text-orange-500")}>
-                  {hasSenderConfigured ? 'Configured' : 'Not configured'}
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setDeliveryProvider('smtp')}
-                className={cn(
-                  "p-2 sm:p-3 border-2 rounded-lg text-left transition-all",
-                  deliveryProvider === 'smtp' 
-                    ? 'border-primary bg-primary/5' 
-                    : 'border-border hover:border-primary/50'
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-sm">Custom SMTP</span>
-                  {deliveryProvider === 'smtp' && <CheckCircle2 className="h-4 w-4 text-green-600" />}
-                </div>
-                <span className={cn("text-xs", hasSmtpConfigured ? "text-green-600" : "text-orange-500")}>
-                  {hasSmtpConfigured ? 'Configured' : 'Not configured'}
-                </span>
-              </button>
-            </div>
-            {((deliveryProvider === 'brevo' && !hasBrevoConfigured) || 
-              (deliveryProvider === 'sender' && !hasSenderConfigured) || 
-              (deliveryProvider === 'smtp' && !hasSmtpConfigured)) && (
-              <p className="text-xs text-orange-600 mt-2 flex items-center gap-1">
-                <Info className="h-3 w-3 flex-shrink-0" />
-                <span>Go to Settings → API Integrations to add your {deliveryProvider === 'smtp' ? 'SMTP' : deliveryProvider === 'sender' ? 'Sender.net' : 'Brevo'} credentials.</span>
+              <p className="text-xs text-muted-foreground mt-2">
+                Only lists of type "{getListTypeLabel(config.listType)}" are shown.
               </p>
-            )}
+            </div>
           </div>
 
-          <div className="space-y-3 sm:space-y-4">
-            <h3 className="font-semibold text-sm text-muted-foreground">Email Sequence Steps</h3>
-            {config.steps.map((step, index) => (
-              <Card key={step.id} className="p-3 sm:p-4 relative group">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="absolute top-2 right-2 h-8 w-8 sm:h-7 sm:w-7 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-destructive/10" 
-                  onClick={() => handleDeleteStep(index)}
+          {/* Delivery Provider Section */}
+          <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+            <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="p-4 pt-5">
+              <div className="flex items-center gap-2 mb-1">
+                <Icon icon="solar:server-linear" className="h-4 w-4 text-muted-foreground" />
+                <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Delivery Provider</span>
+              </div>
+              <p className="text-xs text-muted-foreground mb-4">
+                Choose which email service to use for sending.
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setDeliveryProvider('brevo')}
+                  className={cn(
+                    "p-3 border rounded-lg text-left transition-all relative",
+                    deliveryProvider === 'brevo' 
+                      ? 'border-stone-500 dark:border-stone-500 bg-stone-50 dark:bg-stone-900' 
+                      : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'
+                  )}
                 >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-                
-                {step.type === 'email' ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 pr-10 sm:pr-0">
-                      <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
-                      <h4 className="font-semibold text-sm sm:text-base">Step {index + 1}: Send Email</h4>
+                  {deliveryProvider === 'brevo' && (
+                    <div className="absolute top-2 right-2">
+                      <Icon icon="solar:check-circle-bold" className="h-4 w-4 text-emerald-500" />
                     </div>
-                    <div>
-                      <Label className="text-xs sm:text-sm">Subject Line</Label>
-                      <Input 
-                        value={step.subject || ''} 
-                        onChange={(e) => handleStepChange(index, 'subject', e.target.value)} 
-                        className="text-sm"
-                      />
+                  )}
+                  <span className="font-medium text-sm block">Brevo</span>
+                  <span className={cn("text-[10px]", hasBrevoConfigured ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground")}>
+                    {hasBrevoConfigured ? 'Configured' : 'Not configured'}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeliveryProvider('sender')}
+                  className={cn(
+                    "p-3 border rounded-lg text-left transition-all relative",
+                    deliveryProvider === 'sender' 
+                      ? 'border-stone-500 dark:border-stone-500 bg-stone-50 dark:bg-stone-900' 
+                      : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'
+                  )}
+                >
+                  {deliveryProvider === 'sender' && (
+                    <div className="absolute top-2 right-2">
+                      <Icon icon="solar:check-circle-bold" className="h-4 w-4 text-emerald-500" />
                     </div>
-                    <div className="space-y-3">
-                      <div>
-                        <Label className="text-xs sm:text-sm">Email Content (HTML)</Label>
-                        <Textarea 
-                          value={step.content || ''} 
-                          onChange={(e) => handleStepChange(index, 'content', e.target.value)} 
-                          rows={6} 
-                          className="font-mono text-xs min-h-[150px] sm:min-h-[180px] w-full"
-                        />
+                  )}
+                  <span className="font-medium text-sm block">Sender.net</span>
+                  <span className={cn("text-[10px]", hasSenderConfigured ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground")}>
+                    {hasSenderConfigured ? 'Configured' : 'Not configured'}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeliveryProvider('smtp')}
+                  className={cn(
+                    "p-3 border rounded-lg text-left transition-all relative",
+                    deliveryProvider === 'smtp' 
+                      ? 'border-stone-500 dark:border-stone-500 bg-stone-50 dark:bg-stone-900' 
+                      : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'
+                  )}
+                >
+                  {deliveryProvider === 'smtp' && (
+                    <div className="absolute top-2 right-2">
+                      <Icon icon="solar:check-circle-bold" className="h-4 w-4 text-emerald-500" />
+                    </div>
+                  )}
+                  <span className="font-medium text-sm block">Custom SMTP</span>
+                  <span className={cn("text-[10px]", hasSmtpConfigured ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground")}>
+                    {hasSmtpConfigured ? 'Configured' : 'Not configured'}
+                  </span>
+                </button>
+              </div>
+              {((deliveryProvider === 'brevo' && !hasBrevoConfigured) || 
+                (deliveryProvider === 'sender' && !hasSenderConfigured) || 
+                (deliveryProvider === 'smtp' && !hasSmtpConfigured)) && (
+                <p className="text-xs text-amber-600 dark:text-amber-400 mt-3 flex items-center gap-1.5">
+                  <Icon icon="solar:info-circle-linear" className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span>Configure in Settings - API Integrations</span>
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Email Sequence Steps Section */}
+          <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+            <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="p-4 pt-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Icon icon="solar:list-check-linear" className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Email Sequence Steps</span>
+                </div>
+                <span className="text-xs text-muted-foreground">{config.steps.length} steps</span>
+              </div>
+              
+              <div className="space-y-3">
+                {config.steps.map((step, index) => (
+                  <div key={step.id} className="relative group border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50 overflow-hidden">
+                    <div className="p-4">
+                      <div className="flex items-start gap-3">
+                        {/* Step number badge */}
+                        <div className={cn(
+                          "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold",
+                          step.type === 'email' 
+                            ? "bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200" 
+                            : "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                        )}>
+                          {index + 1}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          {step.type === 'email' ? (
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-2">
+                                <Icon icon="solar:letter-linear" className="h-4 w-4 text-muted-foreground" />
+                                <span className="font-medium text-sm">Send Email</span>
+                              </div>
+                              <div>
+                                <Label className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-1.5 block">Subject Line</Label>
+                                <Input 
+                                  value={step.subject || ''} 
+                                  onChange={(e) => handleStepChange(index, 'subject', e.target.value)} 
+                                  className="text-sm h-9"
+                                  placeholder="Enter email subject..."
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-1.5 block">Email Content (HTML)</Label>
+                                <Textarea 
+                                  value={step.content || ''} 
+                                  onChange={(e) => handleStepChange(index, 'content', e.target.value)} 
+                                  rows={4} 
+                                  className="font-mono text-xs resize-none"
+                                  placeholder="<p>Your email content here...</p>"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-1.5 block">Preview</Label>
+                                <div 
+                                  className="p-3 border border-stone-200 dark:border-stone-700 rounded-lg bg-white dark:bg-stone-950 min-h-[100px] max-h-[150px] prose prose-sm dark:prose-invert max-w-none text-xs overflow-y-auto"
+                                  dangerouslySetInnerHTML={{ __html: step.content || '<p class="text-muted-foreground italic">Add content to see preview...</p>' }}
+                                />
+                              </div>
+                              <Button variant="outline" size="sm" onClick={() => handleGenerateAIStepContent(index)} disabled={isGenerating === index} className="h-8 text-xs">
+                                {isGenerating === index ? <Icon icon="solar:refresh-linear" className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Icon icon="solar:magic-stick-3-linear" className="mr-1.5 h-3.5 w-3.5" />}
+                                Generate with AI
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-2">
+                                <Icon icon="solar:clock-circle-linear" className="h-4 w-4 text-amber-500" />
+                                <span className="font-medium text-sm">Wait Period</span>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                  <Input 
+                                    type="number" 
+                                    value={step.delayDays || 0} 
+                                    onChange={(e) => handleStepChange(index, 'delayDays', parseInt(e.target.value, 10) || 0)} 
+                                    className="w-16 h-9 text-sm text-center" 
+                                    min="0" 
+                                  />
+                                  <span className="text-xs text-muted-foreground">days</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Input 
+                                    type="number" 
+                                    value={step.delayHours || 0} 
+                                    onChange={(e) => handleStepChange(index, 'delayHours', parseInt(e.target.value, 10) || 0)} 
+                                    className="w-16 h-9 text-sm text-center" 
+                                    min="0" 
+                                    max="23"
+                                  />
+                                  <span className="text-xs text-muted-foreground">hours</span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Delete button */}
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 opacity-50 hover:opacity-100 transition-opacity hover:bg-red-50 dark:hover:bg-red-950/30 flex-shrink-0" 
+                          onClick={() => handleDeleteStep(index)}
+                        >
+                          <Icon icon="solar:trash-bin-minimalistic-linear" className="h-4 w-4 text-red-500" />
+                        </Button>
                       </div>
-                      <div>
-                        <Label className="text-xs sm:text-sm">Preview</Label>
-                        <div 
-                          className="p-2 sm:p-3 border rounded-md bg-card min-h-[120px] sm:min-h-[150px] max-h-[200px] prose prose-sm dark:prose-invert max-w-none text-xs sm:text-sm overflow-y-auto"
-                          dangerouslySetInnerHTML={{ __html: step.content || '<p class="text-muted-foreground">Add content to see preview...</p>' }}
-                        />
-                      </div>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => handleGenerateAIStepContent(index)} disabled={isGenerating === index} className="w-full sm:w-auto">
-                      {isGenerating === index ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-                      Generate with AI
-                    </Button>
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 pr-10 sm:pr-0">
-                      <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500 flex-shrink-0" />
-                      <h4 className="font-semibold text-sm sm:text-base">Step {index + 1}: Wait</h4>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-                      <div className="flex items-center gap-2">
-                        <Input 
-                          type="number" 
-                          value={step.delayDays || 0} 
-                          onChange={(e) => handleStepChange(index, 'delayDays', parseInt(e.target.value, 10) || 0)} 
-                          className="w-16 sm:w-20 text-sm" 
-                          min="0" 
-                        />
-                        <span className="text-xs sm:text-sm">days</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Input 
-                          type="number" 
-                          value={step.delayHours || 0} 
-                          onChange={(e) => handleStepChange(index, 'delayHours', parseInt(e.target.value, 10) || 0)} 
-                          className="w-16 sm:w-20 text-sm" 
-                          min="0" 
-                          max="23"
-                        />
-                        <span className="text-xs sm:text-sm">hours</span>
-                      </div>
-                    </div>
+                ))}
+                
+                {config.steps.length === 0 && (
+                  <div className="text-center py-8 border-2 border-dashed border-stone-200 dark:border-stone-700 rounded-lg">
+                    <Icon icon="solar:inbox-linear" className="h-8 w-8 mx-auto text-muted-foreground/40 mb-2" />
+                    <p className="text-sm text-muted-foreground">No steps configured yet</p>
+                    <p className="text-xs text-muted-foreground mt-1">Add email or delay steps below</p>
                   </div>
                 )}
-              </Card>
-            ))}
-            
-            {config.steps.length === 0 && (
-              <div className="text-center text-muted-foreground py-8 sm:py-12 border-2 border-dashed rounded-lg">
-                <p className="font-semibold text-sm">No steps configured yet.</p>
-                <p className="text-xs sm:text-sm mt-1">Add email or delay steps to build your automation sequence.</p>
               </div>
-            )}
+            </div>
           </div>
         </div>
         
-        <DialogFooter className="flex-shrink-0 pt-4 border-t mt-4">
-          <div className="flex flex-col sm:flex-row w-full gap-2 sm:gap-3 sm:justify-between sm:items-center">
-            <div className="flex gap-2 order-2 sm:order-1">
-              <Button variant="outline" size="sm" onClick={() => handleAddStep('email')} className="flex-1 sm:flex-none text-xs sm:text-sm">
-                <Mail className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /> Add Email
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
+          <div className="flex items-center justify-between">
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => handleAddStep('email')} className="h-8 text-xs">
+                <Icon icon="solar:add-circle-linear" className="mr-1.5 h-3.5 w-3.5" /> Add Email
               </Button>
-              <Button variant="outline" size="sm" onClick={() => handleAddStep('delay')} className="flex-1 sm:flex-none text-xs sm:text-sm">
-                <Timer className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /> Add Delay
+              <Button variant="outline" size="sm" onClick={() => handleAddStep('delay')} className="h-8 text-xs">
+                <Icon icon="solar:clock-circle-linear" className="mr-1.5 h-3.5 w-3.5" /> Add Delay
               </Button>
             </div>
-            <div className="flex gap-2 order-1 sm:order-2">
-              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="flex-1 sm:flex-none text-xs sm:text-sm">
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="h-8 text-xs">
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleSave} disabled={!selectedListId && matchingLists.length > 0} className="flex-1 sm:flex-none text-xs sm:text-sm">
+              <Button size="sm" onClick={handleSave} disabled={!selectedListId && matchingLists.length > 0} className="h-8 text-xs">
+                <Icon icon="solar:diskette-linear" className="mr-1.5 h-3.5 w-3.5" />
                 Save Configuration
               </Button>
             </div>
           </div>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
 }
+
 
 export default function EmailAutomationsPage() {
   const { toast } = useToast();
@@ -488,7 +541,6 @@ export default function EmailAutomationsPage() {
           } as EmailAutomationSequence);
         }
       } else {
-        // De-duplicate automations by name - keep the first occurrence and delete duplicates
         const seenNames = new Map<string, EmailAutomationSequence>();
         const duplicateIds: string[] = [];
         
@@ -500,13 +552,11 @@ export default function EmailAutomationsPage() {
           }
         }
         
-        // Delete duplicates from Firestore
         if (duplicateIds.length > 0) {
           for (const duplicateId of duplicateIds) {
             const docRef = doc(db, 'companies', appUser.companyId, 'emailAutomationSequences', duplicateId);
             await deleteDoc(docRef);
           }
-          console.log(`Removed ${duplicateIds.length} duplicate automation(s)`);
           existingAutomations = Array.from(seenNames.values());
         }
       }
@@ -623,128 +673,188 @@ export default function EmailAutomationsPage() {
 
   const getAutomationIcon = (listType: EmailListType) => {
     switch (listType) {
-      case 'free-trial': return <Gift className="h-6 w-6 text-primary" />;
-      case 'paid-customer': return <CreditCard className="h-6 w-6 text-primary" />;
-      case 'churned': return <UserX className="h-6 w-6 text-primary" />;
-      case 'newsletter': return <Mail className="h-6 w-6 text-primary" />;
-      case 'prospects': return <Sparkles className="h-6 w-6 text-primary" />;
-      default: return <Users className="h-6 w-6 text-primary" />;
+      case 'free-trial': return <Icon icon="solar:gift-linear" className="h-5 w-5 text-muted-foreground" />;
+      case 'paid-customer': return <Icon icon="solar:card-linear" className="h-5 w-5 text-muted-foreground" />;
+      case 'churned': return <Icon icon="solar:user-cross-linear" className="h-5 w-5 text-muted-foreground" />;
+      case 'newsletter': return <Icon icon="solar:letter-linear" className="h-5 w-5 text-muted-foreground" />;
+      case 'prospects': return <Icon icon="solar:star-shine-linear" className="h-5 w-5 text-muted-foreground" />;
+      default: return <Icon icon="solar:users-group-rounded-linear" className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
+  const getStatusText = (status: string) => {
+    if (status === 'active') {
+      return <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Active</span>;
+    }
+    return <span className="text-xs font-medium text-muted-foreground">Inactive</span>;
+  };
+
+  const activeCount = automations.filter(a => a.status === 'active').length;
+  const totalEmails = automations.reduce((sum, a) => sum + a.steps.filter(s => s.type === 'email').length, 0);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <header className="relative flex w-full flex-col gap-4">
+          <div className="flex justify-between gap-x-8 items-center">
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <h1 className="text-2xl font-semibold text-foreground">Email Automations</h1>
+              <p className="text-sm text-muted-foreground">Set up automated email sequences for different customer segments</p>
+            </div>
+          </div>
+        </header>
+        <div className="flex justify-center py-12">
+          <Icon icon="solar:refresh-linear" className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" asChild>
-            <Link href="/campaigns/email-lists"><ArrowLeft className="h-4 w-4" /></Link>
-          </Button>
-          <PageTitle
-            title="Email Automations"
-            description="Set up automated email sequences for different customer segments."
-          />
+      {/* Page Header */}
+      <header className="relative flex w-full flex-col gap-4">
+        <div className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="icon" asChild className="h-8 w-8">
+              <Link href="/campaigns/email-lists"><Icon icon="solar:arrow-left-linear" className="h-4 w-4" /></Link>
+            </Button>
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <h1 className="text-2xl font-semibold text-foreground">Email Automations</h1>
+              <p className="text-sm text-muted-foreground">Set up automated email sequences for different customer segments</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Info Alert */}
+      <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-stone-50 dark:bg-stone-900/50 overflow-hidden">
+        <div className="p-4 flex gap-3">
+          <Icon icon="solar:info-circle-linear" className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+          <div className="space-y-2 text-sm">
+            <p className="font-medium">How Email Automations Work</p>
+            <div className="text-muted-foreground space-y-1 text-xs">
+              <p>1. Create Email Lists - Go to Email Lists and create lists for each customer segment (Free Trial, Paid, Churned, etc.)</p>
+              <p>2. Configure Automations - Customize the email sequences below and link them to your lists.</p>
+              <p>3. Activate - Turn on automations to start sending scheduled follow-up emails automatically.</p>
+              <p>4. Cron Job - The system checks for pending emails and sends them based on your configured delays.</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <Alert variant="info">
-        <Info className="h-4 w-4" />
-        <AlertTitleComponent>How Email Automations Work</AlertTitleComponent>
-        <AlertDescription className="space-y-1">
-          <p>1. <strong>Create Email Lists</strong> - Go to Email Lists and create lists for each customer segment (Free Trial, Paid, Churned, etc.)</p>
-          <p>2. <strong>Configure Automations</strong> - Customize the email sequences below and link them to your lists.</p>
-          <p>3. <strong>Activate</strong> - Turn on automations to start sending scheduled follow-up emails automatically.</p>
-          <p>4. <strong>Cron Job</strong> - The system checks for pending emails and sends them based on your configured delays.</p>
-        </AlertDescription>
-      </Alert>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="p-4 pt-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Total Automations</span>
+              <Icon icon="solar:robot-linear" className="h-4 w-4 text-muted-foreground/60" />
+            </div>
+            <p className="text-2xl font-semibold tabular-nums">{automations.length}</p>
+          </div>
+        </div>
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="p-4 pt-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Active</span>
+              <Icon icon="solar:play-circle-linear" className="h-4 w-4 text-muted-foreground/60" />
+            </div>
+            <p className="text-2xl font-semibold tabular-nums">{activeCount}</p>
+          </div>
+        </div>
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="p-4 pt-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Total Emails</span>
+              <Icon icon="solar:letter-linear" className="h-4 w-4 text-muted-foreground/60" />
+            </div>
+            <p className="text-2xl font-semibold tabular-nums">{totalEmails}</p>
+          </div>
+        </div>
+      </div>
 
-      {isLoading ? (
-        <div className="h-32 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {automations.map((automation) => {
-            const linkedList = emailLists.find(l => l.automationId === automation.id);
-            const emailStepsCount = automation.steps.filter(s => s.type === 'email').length;
-            
-            return (
-              <Card key={automation.id} className="flex flex-col">
-                <CardHeader>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-primary/10 rounded-full">
-                      {getAutomationIcon(automation.listType)}
+      {/* Automations Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {automations.map((automation) => {
+          const linkedList = emailLists.find(l => l.automationId === automation.id);
+          const emailStepsCount = automation.steps.filter(s => s.type === 'email').length;
+          
+          return (
+            <div key={automation.id} className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden flex flex-col">
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              
+              {/* Header */}
+              <div className="p-4 pt-5 flex-1">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="p-2 bg-stone-100 dark:bg-stone-800 rounded-lg">
+                    {getAutomationIcon(automation.listType)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-sm truncate">{automation.name}</h3>
+                    <span className={cn("text-[10px] font-medium", getListTypeColor(automation.listType))}>
+                      {getListTypeLabel(automation.listType)}
+                    </span>
+                  </div>
+                </div>
+                
+                <p className="text-xs text-muted-foreground mb-4 line-clamp-2">{automation.description}</p>
+                
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Icon icon="solar:letter-linear" className="h-3.5 w-3.5" />
+                    <span>{emailStepsCount} emails in sequence</span>
+                  </div>
+                  {linkedList ? (
+                    <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                      <Icon icon="solar:check-circle-linear" className="h-3.5 w-3.5" />
+                      <span className="truncate">Linked: {linkedList.name} ({linkedList.contactCount})</span>
                     </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">{automation.name}</CardTitle>
-                      <Badge className={cn("text-xs mt-1", getListTypeColor(automation.listType))}>
-                        {getListTypeLabel(automation.listType)}
-                      </Badge>
+                  ) : (
+                    <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                      <Icon icon="solar:info-circle-linear" className="h-3.5 w-3.5" />
+                      <span>No list linked yet</span>
                     </div>
-                  </div>
-                  <CardDescription className="text-sm">{automation.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Mail className="h-4 w-4" />
-                      <span>{emailStepsCount} emails in sequence</span>
-                    </div>
-                    {linkedList ? (
-                      <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-                        <CheckCircle2 className="h-4 w-4" />
-                        <span>Linked to: {linkedList.name} ({linkedList.contactCount} contacts)</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
-                        <Info className="h-4 w-4" />
-                        <span>No list linked yet</span>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-                <CardFooter className="flex flex-col gap-3 pt-4 border-t">
-                  <div className="flex items-center justify-between w-full">
-                    <Badge 
-                      variant={automation.status === 'active' ? "default" : "outline"} 
-                      className={cn(
-                        automation.status === 'active' 
-                          ? 'bg-green-100 text-green-700 border-green-200' 
-                          : 'text-gray-600 border-gray-300'
-                      )}
-                    >
-                      {automation.status === 'active' ? 'Active' : 'Inactive'}
-                    </Badge>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-                      onClick={() => openDeleteDialog(automation)}
-                      title="Delete automation"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="flex gap-2 w-full">
-                    <Button variant="outline" size="sm" onClick={() => handleConfigure(automation)} className="flex-1 text-xs sm:text-sm">
-                      <Settings className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                      Configure
-                    </Button>
-                    <Button 
-                      variant={automation.status === 'active' ? 'secondary' : 'default'} 
-                      size="sm" 
-                      onClick={() => handleToggleActivation(automation)}
-                      className="flex-1 text-xs sm:text-sm"
-                    >
-                      <PlayCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                      {automation.status === 'active' ? 'Pause' : 'Activate'}
-                    </Button>
-                  </div>
-                </CardFooter>
-              </Card>
-            );
-          })}
-        </div>
-      )}
+                  )}
+                </div>
+              </div>
+              
+              {/* Footer */}
+              <div className="px-4 py-3 border-t border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/30">
+                <div className="flex items-center justify-between mb-3">
+                  {getStatusText(automation.status)}
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-7 w-7 hover:bg-red-50 dark:hover:bg-red-950/30"
+                    onClick={() => openDeleteDialog(automation)}
+                  >
+                    <Icon icon="solar:trash-bin-minimalistic-linear" className="h-4 w-4 text-red-500" />
+                  </Button>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => handleConfigure(automation)} className="flex-1 h-8 text-xs">
+                    <Icon icon="solar:settings-linear" className="mr-1.5 h-3.5 w-3.5" />
+                    Configure
+                  </Button>
+                  <Button 
+                    variant={automation.status === 'active' ? 'secondary' : 'default'} 
+                    size="sm" 
+                    onClick={() => handleToggleActivation(automation)}
+                    className="flex-1 h-8 text-xs"
+                  >
+                    <Icon icon={automation.status === 'active' ? 'solar:pause-linear' : 'solar:play-linear'} className="mr-1.5 h-3.5 w-3.5" />
+                    {automation.status === 'active' ? 'Pause' : 'Activate'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
       {selectedAutomation && (
         <ConfigureAutomationDialog

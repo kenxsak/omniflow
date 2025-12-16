@@ -285,12 +285,12 @@ export function getListTypeLabel(type: EmailListType): string {
 
 export function getListTypeColor(type: EmailListType): string {
     switch (type) {
-        case 'free-trial': return 'bg-info-muted text-info-muted-foreground';
-        case 'paid-customer': return 'bg-success-muted text-success-muted-foreground';
-        case 'churned': return 'bg-destructive-muted text-destructive-muted-foreground';
-        case 'newsletter': return 'bg-primary/10 text-primary';
-        case 'prospects': return 'bg-warning-muted text-warning-muted-foreground';
-        case 'custom': return 'bg-muted text-muted-foreground';
-        default: return 'bg-muted text-muted-foreground';
+        case 'free-trial': return 'text-cyan-600 dark:text-cyan-400'; // trial/testing
+        case 'paid-customer': return 'text-emerald-600 dark:text-emerald-400'; // success/paying
+        case 'churned': return 'text-orange-600 dark:text-orange-400'; // warning/lost
+        case 'newsletter': return 'text-violet-600 dark:text-violet-400'; // communication
+        case 'prospects': return 'text-sky-600 dark:text-sky-400'; // potential/opportunity
+        case 'custom': return 'text-stone-500 dark:text-stone-400';
+        default: return 'text-stone-500 dark:text-stone-400';
     }
 }

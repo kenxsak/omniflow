@@ -1,12 +1,9 @@
 "use client";
 
-import PageTitle from '@/components/ui/page-title';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ContactUsageIndicator } from '@/components/crm/contact-usage-indicator';
 import { TeamPerformanceDashboard } from '@/components/crm/team-performance-dashboard';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, TrendingUp, CheckCircle, Target, DollarSign, Percent, Activity, ArrowUpRight, ArrowDownRight, UsersRound } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import type { DealStats, Activity as ActivityType } from '@/types/crm';
 import { ACTIVITY_TYPE_LABELS } from '@/types/crm';
 import type { Role, AppUser } from '@/types/saas';
@@ -64,7 +61,10 @@ export function DashboardClient({
 
   return (
     <div className="space-y-6">
-      <PageTitle title="Dashboard" description="Overview of your CRM performance" />
+      {/* Page Header */}
+      <header className="relative flex w-full flex-col gap-4">
+        <h1 className="text-2xl font-semibold text-foreground">CRM Analytics</h1>
+      </header>
 
       {planMetadata && (
         <ContactUsageIndicator
@@ -75,91 +75,116 @@ export function DashboardClient({
         />
       )}
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20 border-blue-200/50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pipeline Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+      {/* Main Stats Grid */}
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+        {/* Pipeline Value */}
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="p-3 sm:p-4 pt-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                Pipeline Value
+              </span>
+              <Icon icon="solar:wallet-linear" className="h-4 w-4 text-muted-foreground/60" />
+            </div>
+            <div className="text-lg sm:text-2xl font-semibold tabular-nums text-foreground">
               {formatCurrency(pipelineValue)}
             </div>
-            <p className="text-xs text-blue-600/70 dark:text-blue-400/70">
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
               Weighted: {formatCurrency(weightedPipeline)}
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/30 dark:to-green-900/20 border-green-200/50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Won Revenue</CardTitle>
-            <Target className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-700 dark:text-green-300">
+        {/* Won Revenue */}
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="p-3 sm:p-4 pt-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                Won Revenue
+              </span>
+              <Icon icon="solar:cup-star-linear" className="h-4 w-4 text-muted-foreground/60" />
+            </div>
+            <div className="text-lg sm:text-2xl font-semibold tabular-nums text-foreground">
               {formatCurrency(wonValue)}
             </div>
-            <p className="text-xs text-green-600/70 dark:text-green-400/70 flex items-center gap-1">
-              <ArrowUpRight className="h-3 w-3" />
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 flex items-center gap-1">
+              <Icon icon="solar:arrow-up-linear" className="h-3 w-3" />
               {dealStats?.wonDeals || 0} deals closed
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-950/30 dark:to-purple-900/20 border-purple-200/50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
-            <Percent className="h-4 w-4 text-purple-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+        {/* Conversion Rate */}
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="p-3 sm:p-4 pt-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                Conversion Rate
+              </span>
+              <Icon icon="solar:chart-linear" className="h-4 w-4 text-muted-foreground/60" />
+            </div>
+            <div className="text-lg sm:text-2xl font-semibold tabular-nums text-foreground">
               {conversionRate.toFixed(1)}%
             </div>
-            <p className="text-xs text-purple-600/70 dark:text-purple-400/70">
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
               {dealStats?.openDeals || 0} deals in pipeline
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Contacts</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-muted-foreground">
+        {/* Total Contacts */}
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="p-3 sm:p-4 pt-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                Total Contacts
+              </span>
+              <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4 text-muted-foreground/60" />
+            </div>
+            <div className="text-lg sm:text-2xl font-semibold tabular-nums text-foreground">
+              {stats.total}
+            </div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
               {stats.new} new this period
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
+      {/* Activity & Distribution */}
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
-              Recent Activity
-            </CardTitle>
-            <CardDescription>Latest interactions with your contacts</CardDescription>
-          </CardHeader>
-          <CardContent>
+        {/* Recent Activity */}
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-primary" />
+          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+            <div className="flex items-center gap-2">
+              <Icon icon="solar:chart-2-linear" className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                Recent Activity
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-0.5">Latest interactions with your contacts</p>
+          </div>
+          <div className="p-4">
             {recentActivities.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                No recent activities. Start engaging with your contacts!
-              </p>
+              <div className="text-center py-6">
+                <Icon icon="solar:chart-2-linear" className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
+                <p className="text-sm text-muted-foreground">No recent activities</p>
+              </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {recentActivities.map((activity) => (
-                  <div key={activity.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50">
-                    <Badge variant="secondary" className="text-xs shrink-0">
+                  <div key={activity.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/30 transition-colors">
+                    <Badge variant="secondary" className="text-[10px] shrink-0">
                       {ACTIVITY_TYPE_LABELS[activity.type]}
                     </Badge>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm truncate">{activity.content}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-[10px] text-muted-foreground">
                         {formatDistanceToNow(new Date(activity.occurredAt as string), { addSuffix: true })}
                       </p>
                     </div>
@@ -167,88 +192,78 @@ export function DashboardClient({
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Contact Status Distribution</CardTitle>
-            <CardDescription>Breakdown of contacts by pipeline stage</CardDescription>
-          </CardHeader>
-          <CardContent>
+        {/* Status Distribution */}
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+              Contact Status Distribution
+            </span>
+            <p className="text-xs text-muted-foreground mt-0.5">Breakdown of contacts by pipeline stage</p>
+          </div>
+          <div className="p-4">
             <div className="space-y-3">
               {statusDistribution.map(({ status, count, percentage }) => (
-                <div key={status} className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{status}</span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-24 bg-secondary rounded-full h-2">
+                <div key={status} className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-medium text-foreground">{status}</span>
+                  <div className="flex items-center gap-2 flex-1 max-w-[200px]">
+                    <div className="flex-1 bg-stone-100 dark:bg-stone-800 rounded-full h-1.5">
                       <div 
-                        className="bg-primary h-2 rounded-full transition-all" 
+                        className="bg-foreground h-1.5 rounded-full transition-all" 
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
-                    <span className="text-sm text-muted-foreground w-16 text-right">
+                    <span className="text-xs text-muted-foreground tabular-nums w-16 text-right">
                       {count} ({percentage}%)
                     </span>
                   </div>
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">New Contacts</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">{stats.new}</div>
-            <p className="text-xs text-muted-foreground">Awaiting first contact</p>
-          </CardContent>
-        </Card>
+      {/* Secondary Stats */}
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden p-4">
+          <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">New Contacts</span>
+          <div className="text-xl font-semibold tabular-nums mt-1">{stats.new}</div>
+          <p className="text-[10px] text-muted-foreground">Awaiting first contact</p>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Synced</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">{stats.synced}</div>
-            <p className="text-xs text-muted-foreground">Synced to platforms</p>
-          </CardContent>
-        </Card>
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden p-4">
+          <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Synced</span>
+          <div className="text-xl font-semibold tabular-nums mt-1">{stats.synced}</div>
+          <p className="text-[10px] text-muted-foreground">Synced to platforms</p>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Avg Deal Size</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">{formatCurrency(dealStats?.avgDealSize || 0)}</div>
-            <p className="text-xs text-muted-foreground">Per opportunity</p>
-          </CardContent>
-        </Card>
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden p-4">
+          <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Avg Deal Size</span>
+          <div className="text-xl font-semibold tabular-nums mt-1">{formatCurrency(dealStats?.avgDealSize || 0)}</div>
+          <p className="text-[10px] text-muted-foreground">Per opportunity</p>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Open Deals</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">{dealStats?.openDeals || 0}</div>
-            <p className="text-xs text-muted-foreground">In active pipeline</p>
-          </CardContent>
-        </Card>
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden p-4">
+          <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Open Deals</span>
+          <div className="text-xl font-semibold tabular-nums mt-1">{dealStats?.openDeals || 0}</div>
+          <p className="text-[10px] text-muted-foreground">In active pipeline</p>
+        </div>
       </div>
 
+      {/* Team Performance */}
       {isManagerOrAdmin && hasTeamMembers && (
         <div className="mt-8">
           <div className="flex items-center gap-3 mb-6">
-            <div className="h-8 w-8 rounded-xl bg-muted/60 dark:bg-white/[0.06] flex items-center justify-center">
-              <UsersRound className="h-4 w-4 text-muted-foreground" />
+            <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center">
+              <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4 text-muted-foreground" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold">Team Performance</h2>
-              <p className="text-sm text-muted-foreground">Manager view: Per-rep performance metrics</p>
+              <h2 className="text-lg font-semibold">Team Performance</h2>
+              <p className="text-xs text-muted-foreground">Manager view: Per-rep performance metrics</p>
             </div>
           </div>
           <TeamPerformanceDashboard leads={leads} teamMembers={teamMembers} />

@@ -49,7 +49,7 @@ Generate {{{numSuggestions}}} compelling email subject lines AND {{{numSuggestio
 
 **Instructions for Subject Lines:**
 - Keep them short and impactful, ideally under 50-60 characters.
-- Use emojis appropriately if they fit the tone and topic for subjects.
+- DO NOT use emojis - keep subject lines professional and clean.
 - Create a sense of urgency or curiosity where applicable.
 - Highlight benefits or key information if relevant.
 - Ensure variety in the subject line suggestions.

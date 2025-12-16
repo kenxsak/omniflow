@@ -1,22 +1,14 @@
-
 "use client";
 
 import React, { useState, type FormEvent, useRef, useCallback } from 'react';
-import PageTitle from '@/components/ui/page-title';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle as AlertTitleComponent } from "@/components/ui/alert";
-import { Lightbulb, ExternalLink, Info, Wand2, Loader2, Copy, ClipboardCopy, Facebook, Instagram, Linkedin, Youtube, Film, Users as UsersIcon, Briefcase, Award, Building, MessageCircle, Sparkles as TiktokIcon, BarChartBig, Mail } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from "@/components/ui/badge";
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { showAISuccessToast } from '@/lib/ai-toast-helpers';
+import { cn } from '@/lib/utils';
 
 import { KeywordPlannerSection } from '@/components/ai-ads-manager/keyword-planner-section';
 import { GoogleSearchAdCopySection } from '@/components/ai-ads-manager/google-search-ad-copy-section';
@@ -41,17 +33,27 @@ import type { GenerateLinkedInAdContentInput, GenerateLinkedInAdContentOutput } 
 import type { GenerateYouTubeAdContentInput, GenerateYouTubeAdContentOutput } from '@/ai/flows/generate-youtube-ad-content-flow';
 import type { GenerateTiktokReelsAdContentInput, GenerateTiktokReelsAdContentOutput } from '@/ai/flows/generate-tiktok-reels-ad-content-flow';
 
+// Navigation tabs configuration
+const navTabs = [
+  { id: 'keywords', label: 'Keyword Planner', icon: 'solar:magnifer-linear', platform: 'Google' },
+  { id: 'google', label: 'Google Ads', icon: 'solar:text-bold-linear', platform: 'Google' },
+  { id: 'facebook', label: 'Facebook & Instagram', icon: 'solar:gallery-linear', platform: 'Meta' },
+  { id: 'linkedin', label: 'LinkedIn', icon: 'solar:case-linear', platform: 'LinkedIn' },
+  { id: 'youtube', label: 'YouTube', icon: 'solar:play-circle-linear', platform: 'YouTube' },
+  { id: 'tiktok', label: 'TikTok & Reels', icon: 'solar:music-note-linear', platform: 'TikTok' },
+];
+
 export default function AiAdsManagerPage() {
   const { toast } = useToast();
   const router = useRouter();
   const { appUser } = useAuth();
+  const [activeTab, setActiveTab] = useState('keywords');
 
   const adCopyGeneratorRef = useRef<HTMLDivElement>(null);
   const facebookAdGeneratorRef = useRef<HTMLDivElement>(null);
   const linkedinAdGeneratorRef = useRef<HTMLDivElement>(null);
   const youtubeAdsGeneratorRef = useRef<HTMLDivElement>(null);
   const tiktokReelsAdGeneratorRef = useRef<HTMLDivElement>(null);
-
 
   // State for Google Ads Keyword Planner
   const [isGeneratingKeywords, setIsGeneratingKeywords] = useState(false);
@@ -155,7 +157,7 @@ export default function AiAdsManagerPage() {
     resultAccessor: (data: any) => any
   ) => {
     if (!appUser) {
-      toast({ title: "Authentication Error", description: "You must be logged in to use AI features.", variant: "destructive" });
+      toast({ title: "Authentication Error", description: "You must be logged in.", variant: "destructive" });
       return;
     }
     setIsLoading(true);
@@ -171,20 +173,12 @@ export default function AiAdsManagerPage() {
         throw new Error(response.error || 'AI generation failed.');
       }
     } catch (error: any) {
-      // Extract user-friendly error message from Genkit errors
       let errorMessage = error.message || 'An unknown error occurred.';
-      
-      // Parse Genkit validation errors for better UX
       if (errorMessage.includes('Schema validation failed')) {
         const match = errorMessage.match(/Parse Errors:\s*-\s*([^\n]+)/);
-        if (match && match[1]) {
-          errorMessage = `Validation error: ${match[1]}`;
-        } else {
-          errorMessage = 'The AI generated content that doesn\'t meet requirements. Please try again.';
-        }
+        errorMessage = match?.[1] ? `Validation error: ${match[1]}` : 'AI generated invalid content. Please try again.';
       }
-      
-      toast({ title: `AI for ${featureName} Failed`, description: errorMessage, variant: "destructive" });
+      toast({ title: `${featureName} Failed`, description: errorMessage, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -199,10 +193,7 @@ export default function AiAdsManagerPage() {
   const handleGenerateYouTubeAdContentSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const combinedVideoStyleAndLength = `${youtubeAdsInput.videoStyle} - ${youtubeAdsInput.videoFormat}`;
-    const payload: GenerateYouTubeAdContentInput = {
-      ...youtubeAdsInput,
-      desiredVideoStyleAndLength: combinedVideoStyleAndLength,
-    };
+    const payload: GenerateYouTubeAdContentInput = { ...youtubeAdsInput, desiredVideoStyleAndLength: combinedVideoStyleAndLength };
     await callTrackedAI(setIsGeneratingYouTubeAds, setYoutubeAdContentOutput, generateTrackedYouTubeAdAction, payload, "YouTube Ads", (data) => data);
   };
 
@@ -217,53 +208,44 @@ export default function AiAdsManagerPage() {
         ...generatedKeywordsOutput.longTailKeywords.map(kw => kw.keyword)
       ].filter(Boolean).join(', ');
       handleGoogleAdsInputChange('keywords', keywordsToUse);
-      toast({ title: "Keywords Pre-filled", description: "Keywords populated in Google Ad Copy Generator." });
-      if (adCopyGeneratorRef.current) {
-        scrollToRef(adCopyGeneratorRef);
-      }
+      toast({ title: "Keywords Pre-filled" });
+      setActiveTab('google');
     } else {
-      toast({ title: "No Keywords Generated", description: "Please generate keywords first.", variant: "destructive" });
+      toast({ title: "No Keywords Generated", variant: "destructive" });
     }
-  }, [generatedKeywordsOutput, handleGoogleAdsInputChange, scrollToRef, toast]);
+  }, [generatedKeywordsOutput, toast]);
 
   const copyToClipboard = useCallback((text: string | string[], type: string) => {
     const textToCopy = Array.isArray(text) ? text.join(type === "Hashtags" ? " " : '\n') : text;
     if (!textToCopy) return;
     navigator.clipboard.writeText(textToCopy)
-      .then(() => toast({ title: `${type} Copied!`, description: `${type} copied to clipboard.` }))
+      .then(() => toast({ title: `${type} Copied!` }))
       .catch(() => toast({ title: 'Copy Failed', variant: 'destructive' }));
   }, [toast]);
 
   const copyIndividualKeyword = useCallback((keywordObj: KeywordDetail) => {
-     const text = `${keywordObj.keyword}${keywordObj.estimatedCompetition ? ` [Comp: ${keywordObj.estimatedCompetition}]` : ''}${keywordObj.estimatedCpcRange ? ` [CPC: ${keywordObj.estimatedCpcRange}]` : ''}`;
-    if (!text) return;
+    const text = `${keywordObj.keyword}${keywordObj.estimatedCompetition ? ` [Comp: ${keywordObj.estimatedCompetition}]` : ''}${keywordObj.estimatedCpcRange ? ` [CPC: ${keywordObj.estimatedCpcRange}]` : ''}`;
     navigator.clipboard.writeText(text)
-      .then(() => toast({ title: `Keyword Data Copied!`, description: `"${text}" copied to clipboard.` }))
+      .then(() => toast({ title: `Keyword Copied!` }))
       .catch(() => toast({ title: 'Copy Failed', variant: 'destructive' }));
   }, [toast]);
   
   const copyAllKeywordsInCategory = useCallback((keywords: KeywordDetail[], categoryName: string) => {
     const textToCopy = keywords.map(kw => `${kw.keyword}${kw.estimatedCompetition ? ` [Comp: ${kw.estimatedCompetition}]` : ''}${kw.estimatedCpcRange ? ` [CPC: ${kw.estimatedCpcRange}]` : ''}`).join('\n');
-    copyToClipboard(textToCopy, `All ${categoryName} Details`);
+    copyToClipboard(textToCopy, `All ${categoryName}`);
   }, [copyToClipboard]);
   
   const useImagePromptAndGo = useCallback((promptText?: string | null) => {
     if (!promptText) {
-      toast({ title: "No Prompt", description: "Cannot use an empty image prompt.", variant: "destructive" });
+      toast({ title: "No Prompt", variant: "destructive" });
       return;
     }
-    const socialMediaAiPageUrl = '/social-media'; 
     navigator.clipboard.writeText(promptText)
       .then(() => {
         toast({
           title: "Image Prompt Copied!",
-          description: (
-            <span>
-              Image prompt copied. Go to the{" "}
-              <Link href={socialMediaAiPageUrl} className="underline">Social Media AI</Link> page to use the AI Image Generator.
-            </span>
-          ),
-          duration: 7000,
+          description: (<span>Go to <Link href="/social-media" className="underline">Content Factory</Link> to generate the image.</span>),
+          duration: 5000,
         });
       })
       .catch(() => toast({ title: "Copy Failed", variant: 'destructive' }));
@@ -271,116 +253,235 @@ export default function AiAdsManagerPage() {
 
   const handleUseAdForEmail = useCallback((details: { name: string; subject: string; content: string }) => {
     const htmlContent = `<h1>Hi {{ contact.FIRSTNAME }},</h1>\n\n<p>${details.content.replace(/\n/g, '<br />')}</p>\n\n<p>Best regards,</p>\n<p>[Your Company Name]</p>`;
-    const query = new URLSearchParams({
-        name: details.name,
-        subject: details.subject,
-        content: htmlContent,
-    });
+    const query = new URLSearchParams({ name: details.name, subject: details.subject, content: htmlContent });
     router.push(`/email-marketing/create-campaign?${query.toString()}`);
   }, [router]);
 
-
   return (
-    <div className="space-y-8">
-      <PageTitle
-        title="AI Ads Manager"
-        description="Leverage AI for ad campaign planning and creative generation across various platforms."
-      />
+    <div className="space-y-6">
+      {/* Page Header */}
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold text-foreground">AI Ads Manager</h1>
+          <p className="text-xs text-muted-foreground">Plan and generate ad creatives across multiple platforms</p>
+        </div>
+        <Link href="/social-media">
+          <Button variant="outline" size="sm" className="h-8 text-xs">
+            <Icon icon="solar:document-text-linear" className="mr-1.5 h-3.5 w-3.5" />
+            Content Factory
+          </Button>
+        </Link>
+      </header>
 
-      <Alert variant="info">
-        <Lightbulb className="mr-2 h-5 w-5" />
-        <AlertTitleComponent className="font-semibold">Comprehensive Ad Assistance</AlertTitleComponent>
-        <AlertDescription className="text-sm space-y-2">
-          <p>
-            This AI Ads Manager helps you plan and generate creatives for various ad platforms. Start with keyword planning for Google Ads, then generate ad copy. For other platforms, use the dedicated tools to get tailored content suggestions.
-          </p>
-          <p>
-             Tools on the <Link href="/social-media" className="font-medium underline hover:text-blue-700">Social Media AI</Link> page can also be adapted for ad creatives.
-          </p>
-        </AlertDescription>
-      </Alert>
+      {/* Navigation Tabs - Clerk Style */}
+      <nav className="relative border-b border-stone-200 dark:border-stone-800">
+        <div className="flex items-center gap-1 overflow-x-auto pb-px scrollbar-hide">
+          {navTabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                "relative flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors whitespace-nowrap",
+                activeTab === tab.id
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Icon icon={tab.icon} className="h-3.5 w-3.5" />
+              {tab.label}
+              {activeTab === tab.id && (
+                <div className="absolute inset-x-3 bottom-0 h-0.5 bg-foreground rounded-t-full" />
+              )}
+            </button>
+          ))}
+        </div>
+      </nav>
 
-      {/* Google Ads Keyword Planner */}
-      <KeywordPlannerSection
-        isLoading={isGeneratingKeywords}
-        inputs={keywordInputs}
-        output={generatedKeywordsOutput}
-        onInputChange={handleKeywordInputChange}
-        onSubmit={handleGenerateKeywordsSubmit}
-        onUseKeywordsForAdCopy={useKeywordsForAdCopy}
-        onCopyToClipboard={copyToClipboard}
-        onCopyIndividualKeyword={copyIndividualKeyword}
-        onCopyAllKeywordsInCategory={copyAllKeywordsInCategory}
-      />
+      {/* Tab Content */}
+      <div className="min-h-[60vh]">
+        {/* Keyword Planner Tab */}
+        {activeTab === 'keywords' && (
+          <div className="space-y-4">
+            <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="p-4 sm:p-6">
+                <div className="flex items-center gap-2 mb-1">
+                  <Icon icon="solar:magnifer-linear" className="h-4 w-4 text-muted-foreground" />
+                  <h2 className="text-sm font-semibold">Google Ads Keyword Planner</h2>
+                </div>
+                <p className="text-xs text-muted-foreground mb-4">Generate keyword ideas with AI-estimated competition and CPC ranges.</p>
+                
+                <div className="border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900/50 rounded-lg p-3 mb-4">
+                  <div className="flex items-start gap-2">
+                    <Icon icon="solar:info-circle-linear" className="h-4 w-4 text-muted-foreground mt-0.5" />
+                    <p className="text-xs text-muted-foreground">
+                      Competition and CPC data are AI-generated estimates for directional guidance only. Use Google's official Keyword Planner for accurate data.
+                    </p>
+                  </div>
+                </div>
 
-      {/* Google Ads Search Ad Copy Generator */}
-      <GoogleSearchAdCopySection
-        isLoading={isGeneratingGoogleAds}
-        inputs={googleAdsInput}
-        variations={googleAdCopyVariations}
-        onInputChange={handleGoogleAdsInputChange}
-        onSubmit={handleGenerateGoogleAdCopySubmit}
-        onCopyToClipboard={copyToClipboard}
-        adCopyGeneratorRef={adCopyGeneratorRef}
-      />
+                <KeywordPlannerSection
+                  isLoading={isGeneratingKeywords}
+                  inputs={keywordInputs}
+                  output={generatedKeywordsOutput}
+                  onInputChange={handleKeywordInputChange}
+                  onSubmit={handleGenerateKeywordsSubmit}
+                  onUseKeywordsForAdCopy={useKeywordsForAdCopy}
+                  onCopyToClipboard={copyToClipboard}
+                  onCopyIndividualKeyword={copyIndividualKeyword}
+                  onCopyAllKeywordsInCategory={copyAllKeywordsInCategory}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
-      {/* Facebook & Instagram Ads Strategist */}
-      <FacebookInstagramAdSection
-        isLoading={isGeneratingFacebookAds}
-        inputs={facebookAdsInput}
-        output={facebookAdContentOutput}
-        onInputChange={handleFacebookAdsInputChange}
-        onSubmit={handleGenerateFacebookAdContentSubmit}
-        onCopyToClipboard={copyToClipboard}
-        onUseImagePromptAndGo={useImagePromptAndGo}
-        onUseAdForEmail={handleUseAdForEmail}
-        facebookAdGeneratorRef={facebookAdGeneratorRef}
-      />
+        {/* Google Ads Tab */}
+        {activeTab === 'google' && (
+          <div className="space-y-4">
+            <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="p-4 sm:p-6">
+                <div className="flex items-center gap-2 mb-1">
+                  <Icon icon="solar:text-bold-linear" className="h-4 w-4 text-muted-foreground" />
+                  <h2 className="text-sm font-semibold">Google Search Ad Copy</h2>
+                </div>
+                <p className="text-xs text-muted-foreground mb-4">Generate headlines and descriptions for Google Search campaigns.</p>
 
-      {/* LinkedIn Ads Professional Suite */}
-      <LinkedInAdSection
-        isLoading={isGeneratingLinkedInAds}
-        inputs={linkedInAdsInput}
-        output={linkedInAdContentOutput}
-        onInputChange={handleLinkedInAdsInputChange}
-        onSubmit={handleGenerateLinkedInAdContentSubmit}
-        onCopyToClipboard={copyToClipboard}
-        onUseImagePromptAndGo={useImagePromptAndGo}
-        onUseAdForEmail={handleUseAdForEmail}
-        linkedinAdGeneratorRef={linkedinAdGeneratorRef}
-      />
+                <GoogleSearchAdCopySection
+                  isLoading={isGeneratingGoogleAds}
+                  inputs={googleAdsInput}
+                  variations={googleAdCopyVariations}
+                  onInputChange={handleGoogleAdsInputChange}
+                  onSubmit={handleGenerateGoogleAdCopySubmit}
+                  onCopyToClipboard={copyToClipboard}
+                  adCopyGeneratorRef={adCopyGeneratorRef}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
-      {/* YouTube Ads Campaign & Script Generator */}
-      <YouTubeAdSection
-        isLoading={isGeneratingYouTubeAds}
-        inputs={youtubeAdsInput}
-        output={youtubeAdContentOutput}
-        onInputChange={handleYouTubeAdsInputChange}
-        onSubmit={handleGenerateYouTubeAdContentSubmit}
-        onCopyToClipboard={copyToClipboard}
-        onUseImagePromptAndGo={useImagePromptAndGo}
-        youtubeAdsGeneratorRef={youtubeAdsGeneratorRef}
-      />
+        {/* Facebook & Instagram Tab */}
+        {activeTab === 'facebook' && (
+          <div className="space-y-4">
+            <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="p-4 sm:p-6">
+                <div className="flex items-center gap-2 mb-1">
+                  <Icon icon="solar:gallery-linear" className="h-4 w-4 text-muted-foreground" />
+                  <h2 className="text-sm font-semibold">Facebook & Instagram Ads</h2>
+                </div>
+                <p className="text-xs text-muted-foreground mb-4">Create engaging ad content for Meta platforms.</p>
 
-      {/* TikTok & Reels Ad Catalyst */}
-      <TiktokReelsAdSection
-        isLoading={isGeneratingTiktokReelsAds}
-        inputs={tiktokReelsAdsInput}
-        output={tiktokReelsAdContentOutput}
-        onInputChange={handleTiktokReelsAdsInputChange}
-        onSubmit={handleGenerateTiktokReelsAdContentSubmit}
-        onCopyToClipboard={copyToClipboard}
-        tiktokReelsAdGeneratorRef={tiktokReelsAdGeneratorRef}
-      />
+                <FacebookInstagramAdSection
+                  isLoading={isGeneratingFacebookAds}
+                  inputs={facebookAdsInput}
+                  output={facebookAdContentOutput}
+                  onInputChange={handleFacebookAdsInputChange}
+                  onSubmit={handleGenerateFacebookAdContentSubmit}
+                  onCopyToClipboard={copyToClipboard}
+                  onUseImagePromptAndGo={useImagePromptAndGo}
+                  onUseAdForEmail={handleUseAdForEmail}
+                  facebookAdGeneratorRef={facebookAdGeneratorRef}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
+        {/* LinkedIn Tab */}
+        {activeTab === 'linkedin' && (
+          <div className="space-y-4">
+            <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="p-4 sm:p-6">
+                <div className="flex items-center gap-2 mb-1">
+                  <Icon icon="solar:case-linear" className="h-4 w-4 text-muted-foreground" />
+                  <h2 className="text-sm font-semibold">LinkedIn Ads</h2>
+                </div>
+                <p className="text-xs text-muted-foreground mb-4">Generate professional B2B ad content for LinkedIn.</p>
 
-      <Alert variant="default" className="mt-8">
-        <ExternalLink className="mr-2 h-4 w-4" />
-        <AlertTitleComponent>Using Existing Tools for Ad Creatives</AlertTitleComponent>
-        <AlertDescription>
-          While these specialized tools are being developed, remember that many features on the <Link href="/social-media" className="font-medium underline">Social Media AI page</Link> (like the content generator, image prompt generator, and hashtag suggester) can be effectively used to create components for your ads right now.
-        </AlertDescription>
-      </Alert>
+                <LinkedInAdSection
+                  isLoading={isGeneratingLinkedInAds}
+                  inputs={linkedInAdsInput}
+                  output={linkedInAdContentOutput}
+                  onInputChange={handleLinkedInAdsInputChange}
+                  onSubmit={handleGenerateLinkedInAdContentSubmit}
+                  onCopyToClipboard={copyToClipboard}
+                  onUseImagePromptAndGo={useImagePromptAndGo}
+                  onUseAdForEmail={handleUseAdForEmail}
+                  linkedinAdGeneratorRef={linkedinAdGeneratorRef}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* YouTube Tab */}
+        {activeTab === 'youtube' && (
+          <div className="space-y-4">
+            <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="p-4 sm:p-6">
+                <div className="flex items-center gap-2 mb-1">
+                  <Icon icon="solar:play-circle-linear" className="h-4 w-4 text-muted-foreground" />
+                  <h2 className="text-sm font-semibold">YouTube Ads</h2>
+                </div>
+                <p className="text-xs text-muted-foreground mb-4">Create video ad scripts and campaign strategies for YouTube.</p>
+
+                <YouTubeAdSection
+                  isLoading={isGeneratingYouTubeAds}
+                  inputs={youtubeAdsInput}
+                  output={youtubeAdContentOutput}
+                  onInputChange={handleYouTubeAdsInputChange}
+                  onSubmit={handleGenerateYouTubeAdContentSubmit}
+                  onCopyToClipboard={copyToClipboard}
+                  onUseImagePromptAndGo={useImagePromptAndGo}
+                  youtubeAdsGeneratorRef={youtubeAdsGeneratorRef}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TikTok & Reels Tab */}
+        {activeTab === 'tiktok' && (
+          <div className="space-y-4">
+            <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="p-4 sm:p-6">
+                <div className="flex items-center gap-2 mb-1">
+                  <Icon icon="solar:music-note-linear" className="h-4 w-4 text-muted-foreground" />
+                  <h2 className="text-sm font-semibold">TikTok & Reels Ads</h2>
+                </div>
+                <p className="text-xs text-muted-foreground mb-4">Generate trendy short-form video ad concepts.</p>
+
+                <TiktokReelsAdSection
+                  isLoading={isGeneratingTiktokReelsAds}
+                  inputs={tiktokReelsAdsInput}
+                  output={tiktokReelsAdContentOutput}
+                  onInputChange={handleTiktokReelsAdsInputChange}
+                  onSubmit={handleGenerateTiktokReelsAdContentSubmit}
+                  onCopyToClipboard={copyToClipboard}
+                  tiktokReelsAdGeneratorRef={tiktokReelsAdGeneratorRef}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Info Footer */}
+      <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-stone-50 dark:bg-stone-900/50 p-4">
+        <div className="flex items-start gap-3">
+          <Icon icon="solar:info-circle-linear" className="h-4 w-4 text-muted-foreground mt-0.5" />
+          <div className="text-xs text-muted-foreground space-y-1">
+            <p><strong>Image Prompts:</strong> Copy prompts and use them in the <Link href="/social-media" className="underline">Content Factory</Link> to generate images.</p>
+            <p><strong>Email Campaigns:</strong> Use the "Use for Email" button to create email campaigns from your ad content.</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

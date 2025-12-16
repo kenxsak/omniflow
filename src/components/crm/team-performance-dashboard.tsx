@@ -3,12 +3,10 @@
 import React from 'react';
 import type { Lead } from '@/lib/mock-data';
 import type { AppUser } from '@/types/saas';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Users, Target, TrendingUp, AlertCircle } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { Icon } from '@iconify/react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface TeamPerformanceDashboardProps {
   leads: Lead[];
@@ -27,8 +25,6 @@ interface RepMetrics {
   lostLeads: number;
   conversionRate: number;
 }
-
-const COLORS = ['#3b82f6', '#22c55e', '#eab308', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
 
 export function TeamPerformanceDashboard({ leads, teamMembers }: TeamPerformanceDashboardProps) {
   const repMetrics: RepMetrics[] = teamMembers.map((member) => {
@@ -76,205 +72,226 @@ export function TeamPerformanceDashboard({ leads, teamMembers }: TeamPerformance
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-info-muted">
-                <Users className="h-6 w-6 text-info" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{teamMembers.length}</p>
-                <p className="text-sm text-muted-foreground">Team Members</p>
-              </div>
+      {/* Stats Grid */}
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="p-4 pt-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Team Members</span>
+              <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4 text-muted-foreground/60" />
             </div>
-          </CardContent>
-        </Card>
+            <p className="text-2xl font-semibold tabular-nums">{teamMembers.length}</p>
+          </div>
+        </div>
         
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-success-muted">
-                <Target className="h-6 w-6 text-success" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{avgLeadsPerRep}</p>
-                <p className="text-sm text-muted-foreground">Avg Leads/Rep</p>
-              </div>
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="p-4 pt-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Avg Leads/Rep</span>
+              <Icon icon="solar:target-linear" className="h-4 w-4 text-muted-foreground/60" />
             </div>
-          </CardContent>
-        </Card>
+            <p className="text-2xl font-semibold tabular-nums">{avgLeadsPerRep}</p>
+          </div>
+        </div>
         
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-primary/10">
-                <TrendingUp className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{leads.filter(l => l.status === 'Won').length}</p>
-                <p className="text-sm text-muted-foreground">Total Won</p>
-              </div>
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="p-4 pt-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Total Won</span>
+              <Icon icon="solar:cup-star-linear" className="h-4 w-4 text-muted-foreground/60" />
             </div>
-          </CardContent>
-        </Card>
+            <p className="text-2xl font-semibold tabular-nums">{leads.filter(l => l.status === 'Won').length}</p>
+          </div>
+        </div>
         
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-orange-100 dark:bg-orange-900">
-                <AlertCircle className="h-6 w-6 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{unassignedLeads}</p>
-                <p className="text-sm text-muted-foreground">Unassigned Leads</p>
-              </div>
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="p-4 pt-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Unassigned</span>
+              <Icon icon="solar:user-cross-linear" className="h-4 w-4 text-muted-foreground/60" />
             </div>
-          </CardContent>
-        </Card>
+            <p className="text-2xl font-semibold tabular-nums">{unassignedLeads}</p>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Lead Distribution</CardTitle>
-            <CardDescription>Leads assigned per team member</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[300px]">
+      {/* Charts Grid */}
+      <div className="grid gap-4 md:grid-cols-2">
+        {/* Lead Distribution Chart */}
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+              Lead Distribution
+            </span>
+            <p className="text-xs text-muted-foreground mt-0.5">Leads assigned per team member</p>
+          </div>
+          <div className="p-4 h-[300px]">
             {chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} />
-                  <Tooltip />
-                  <Bar dataKey="leads" name="Total Leads" radius={[4, 4, 0, 0]}>
-                    {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Bar>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#a8a29e' }} axisLine={{ stroke: '#292524' }} tickLine={{ stroke: '#292524' }} />
+                  <YAxis tick={{ fontSize: 11, fill: '#a8a29e' }} axisLine={{ stroke: '#292524' }} tickLine={{ stroke: '#292524' }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#0c0a09', 
+                      border: '1px solid #292524',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                      color: '#fafaf9'
+                    }}
+                    labelStyle={{ color: '#a8a29e' }}
+                    cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                  />
+                  <Bar dataKey="leads" name="Total Leads" radius={[4, 4, 0, 0]} fill="#a8a29e" />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-full flex items-center justify-center text-muted-foreground">
-                No team data available
+                <div className="text-center">
+                  <Icon icon="solar:chart-2-linear" className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
+                  <p className="text-sm">No team data available</p>
+                </div>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Team Leaderboard</CardTitle>
-            <CardDescription>Performance by team member</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+        {/* Team Leaderboard */}
+        <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+              Team Leaderboard
+            </span>
+            <p className="text-xs text-muted-foreground mt-0.5">Performance by team member</p>
+          </div>
+          <div className="p-4">
+            <div className="space-y-2">
               {sortedMetrics.slice(0, 5).map((rep, index) => (
-                <div key={rep.userId} className="flex items-center gap-4">
-                  <span className="text-lg font-bold text-muted-foreground w-6">#{index + 1}</span>
-                  <Avatar className="h-10 w-10">
-                    <AvatarFallback style={{ backgroundColor: COLORS[index % COLORS.length] + '30', color: COLORS[index % COLORS.length] }}>
+                <div key={rep.userId} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/30 transition-colors border border-transparent hover:border-stone-200 dark:hover:border-stone-800">
+                  <span className="text-sm font-semibold text-muted-foreground w-5">#{index + 1}</span>
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-stone-100 dark:bg-stone-800 text-foreground text-xs">
                       {getInitials(rep.userName)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{rep.userName}</p>
-                    <div className="flex gap-2 text-xs text-muted-foreground">
+                    <p className="font-medium text-sm truncate">{rep.userName}</p>
+                    <div className="flex gap-2 text-[10px] text-muted-foreground">
                       <span>{rep.totalLeads} leads</span>
-                      <span>|</span>
-                      <span className="text-success">{rep.wonLeads} won</span>
+                      <span>·</span>
+                      <span>{rep.wonLeads} won</span>
                       {rep.conversionRate > 0 && (
                         <>
-                          <span>|</span>
-                          <span>{rep.conversionRate}% conv.</span>
+                          <span>·</span>
+                          <span>{rep.conversionRate}%</span>
                         </>
                       )}
                     </div>
                   </div>
-                  <Badge variant={rep.totalLeads > avgLeadsPerRep ? 'default' : 'secondary'}>
+                  <Badge variant="secondary" className="text-[10px]">
                     {rep.totalLeads > avgLeadsPerRep ? 'High' : 'Normal'}
                   </Badge>
                 </div>
               ))}
               {sortedMetrics.length === 0 && (
-                <p className="text-center text-muted-foreground py-4">No team members found</p>
+                <div className="text-center py-6">
+                  <Icon icon="solar:users-group-two-rounded-linear" className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
+                  <p className="text-sm text-muted-foreground">No team members found</p>
+                </div>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Team Performance Details</CardTitle>
-          <CardDescription>Detailed breakdown by status for each team member</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-2">Team Member</th>
-                  <th className="text-center py-3 px-2">Total</th>
-                  <th className="text-center py-3 px-2">New</th>
-                  <th className="text-center py-3 px-2">Contacted</th>
-                  <th className="text-center py-3 px-2">Qualified</th>
-                  <th className="text-center py-3 px-2">Won</th>
-                  <th className="text-center py-3 px-2">Lost</th>
-                  <th className="text-center py-3 px-2">Conversion</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedMetrics.map((rep) => (
-                  <tr key={rep.userId} className="border-b hover:bg-muted/50">
-                    <td className="py-3 px-2">
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="text-xs">{getInitials(rep.userName)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{rep.userName}</p>
-                          <p className="text-xs text-muted-foreground">{rep.userEmail}</p>
+      {/* Performance Details Table */}
+      <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
+        <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+        <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+          <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            Team Performance Details
+          </span>
+          <p className="text-xs text-muted-foreground mt-0.5">Detailed breakdown by status for each team member</p>
+        </div>
+        <div className="p-4">
+          <div className="rounded-xl bg-stone-50 dark:bg-stone-900/50 p-1">
+            <div className="rounded-lg border border-stone-200 dark:border-stone-800 overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-stone-100/50 dark:bg-stone-800/50">
+                    <th className="text-left py-3 px-3 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Team Member</th>
+                    <th className="text-center py-3 px-2 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Total</th>
+                    <th className="text-center py-3 px-2 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">New</th>
+                    <th className="text-center py-3 px-2 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Contacted</th>
+                    <th className="text-center py-3 px-2 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Qualified</th>
+                    <th className="text-center py-3 px-2 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Won</th>
+                    <th className="text-center py-3 px-2 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Lost</th>
+                    <th className="text-center py-3 px-2 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Conversion</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white dark:bg-stone-950">
+                  {sortedMetrics.map((rep) => (
+                    <tr key={rep.userId} className="border-t border-stone-200 dark:border-stone-800 hover:bg-muted/30 transition-colors">
+                      <td className="py-3 px-3">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-7 w-7">
+                            <AvatarFallback className="text-[10px] bg-stone-100 dark:bg-stone-800">{getInitials(rep.userName)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium text-sm">{rep.userName}</p>
+                            <p className="text-[10px] text-muted-foreground">{rep.userEmail}</p>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="text-center py-3 px-2 font-medium">{rep.totalLeads}</td>
-                    <td className="text-center py-3 px-2">
-                      <Badge variant="info">{rep.newLeads}</Badge>
-                    </td>
-                    <td className="text-center py-3 px-2">
-                      <Badge variant="warning">{rep.contactedLeads}</Badge>
-                    </td>
-                    <td className="text-center py-3 px-2">
-                      <Badge variant="outline" className="bg-success-muted text-success-muted-foreground">{rep.qualifiedLeads}</Badge>
-                    </td>
-                    <td className="text-center py-3 px-2">
-                      <Badge variant="success">{rep.wonLeads}</Badge>
-                    </td>
-                    <td className="text-center py-3 px-2">
-                      <Badge variant="destructive">{rep.lostLeads}</Badge>
-                    </td>
-                    <td className="text-center py-3 px-2">
-                      <div className="flex items-center gap-2 justify-center">
-                        <Progress value={rep.conversionRate} className="h-2 w-16" />
-                        <span className="text-xs">{rep.conversionRate}%</span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {sortedMetrics.length === 0 && (
-                  <tr>
-                    <td colSpan={8} className="text-center py-8 text-muted-foreground">
-                      No team members found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                      </td>
+                      <td className="text-center py-3 px-2 font-medium tabular-nums">{rep.totalLeads}</td>
+                      <td className="text-center py-3 px-2">
+                        <Badge variant="secondary" className="text-[10px]">{rep.newLeads}</Badge>
+                      </td>
+                      <td className="text-center py-3 px-2">
+                        <Badge variant="secondary" className="text-[10px]">{rep.contactedLeads}</Badge>
+                      </td>
+                      <td className="text-center py-3 px-2">
+                        <Badge variant="secondary" className="text-[10px]">{rep.qualifiedLeads}</Badge>
+                      </td>
+                      <td className="text-center py-3 px-2">
+                        <Badge variant="secondary" className="text-[10px]">{rep.wonLeads}</Badge>
+                      </td>
+                      <td className="text-center py-3 px-2">
+                        <Badge variant="secondary" className="text-[10px]">{rep.lostLeads}</Badge>
+                      </td>
+                      <td className="text-center py-3 px-2">
+                        <div className="flex items-center gap-2 justify-center">
+                          <div className="h-1.5 w-12 bg-stone-200 dark:bg-stone-800 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-foreground rounded-full transition-all" 
+                              style={{ width: `${rep.conversionRate}%` }}
+                            />
+                          </div>
+                          <span className="text-[10px] tabular-nums text-muted-foreground">{rep.conversionRate}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {sortedMetrics.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="text-center py-8 text-muted-foreground">
+                        No team members found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

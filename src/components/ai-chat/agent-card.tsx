@@ -1,50 +1,73 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AIAgent } from '@/config/ai-agents';
-import { ArrowRight } from 'lucide-react';
+import { Icon } from '@iconify/react';
+import Link from 'next/link';
+
+// Map agent IDs to Solar icons (linear style for consistency)
+const agentIcons: Record<string, string> = {
+  'content-writer': 'solar:document-text-linear',
+  'ad-strategist': 'solar:chart-2-linear',
+  'visual-designer': 'solar:gallery-linear',
+  'seo-expert': 'solar:magnifer-linear',
+  'customer-service': 'solar:chat-round-dots-linear',
+  'video-producer': 'solar:videocamera-record-linear',
+  'general-assistant': 'solar:stars-linear',
+};
 
 interface AgentCardProps {
   agent: AIAgent;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 export default function AgentCard({ agent, onClick }: AgentCardProps) {
-  const Icon = agent.icon;
+  const iconName = agentIcons[agent.id] || 'solar:stars-linear';
 
-  return (
-    <Card 
-      className="hover:border-primary cursor-pointer transition-all hover:shadow-lg group h-full"
+  const cardContent = (
+    <div 
+      className="border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-900 p-5 hover:border-stone-300 dark:hover:border-stone-700 cursor-pointer transition-all group h-full flex flex-col"
       onClick={onClick}
     >
-      <CardHeader className="pb-3">
-        <div className={`w-12 h-12 rounded-lg ${agent.bgColor} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
-          <Icon className={`h-6 w-6 ${agent.color}`} />
-        </div>
-        <CardTitle className="text-xl">{agent.name}</CardTitle>
-        <CardDescription className="text-sm">
-          {agent.description}
-        </CardDescription>
-      </CardHeader>
+      {/* Icon */}
+      <div className={`w-10 h-10 rounded-xl ${agent.bgColor} flex items-center justify-center mb-4 group-hover:scale-105 transition-transform`}>
+        <Icon icon={iconName} className={`h-5 w-5 ${agent.color}`} />
+      </div>
       
-      <CardContent className="space-y-3">
-        <div className="space-y-1.5">
-          {agent.capabilities.slice(0, 4).map((capability, index) => (
-            <div key={index} className="text-xs text-muted-foreground flex items-center gap-1.5">
-              <span className="w-1 h-1 rounded-full bg-primary"></span>
-              {capability}
-            </div>
-          ))}
-        </div>
-        
-        <Button 
-          variant="outline" 
-          className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-          size="sm"
-        >
-          Get Started
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
-      </CardContent>
-    </Card>
+      {/* Title & Description */}
+      <h3 className="font-semibold text-base mb-1">{agent.name}</h3>
+      <p className="text-sm text-muted-foreground mb-4">
+        {agent.description}
+      </p>
+      
+      {/* Capabilities */}
+      <div className="space-y-1.5 mb-4 flex-1">
+        {agent.capabilities.slice(0, 4).map((capability, index) => (
+          <div key={index} className="text-xs text-muted-foreground flex items-start gap-2">
+            <span className="w-1 h-1 rounded-full bg-muted-foreground/50 mt-1.5 shrink-0"></span>
+            <span>{capability}</span>
+          </div>
+        ))}
+      </div>
+      
+      {/* Button */}
+      <Button 
+        variant="outline" 
+        className="w-full h-9 text-xs group-hover:bg-foreground group-hover:text-background transition-colors"
+        size="sm"
+      >
+        Get Started
+        <Icon icon="solar:arrow-right-linear" className="ml-2 h-3.5 w-3.5" />
+      </Button>
+    </div>
+  );
+
+  // If onClick is provided, use it; otherwise wrap in Link
+  if (onClick) {
+    return cardContent;
+  }
+
+  return (
+    <Link href={`/ai-chat/${agent.id}`}>
+      {cardContent}
+    </Link>
   );
 }

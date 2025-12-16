@@ -2,17 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { 
-  MessageSquarePlus, 
-  Search, 
-  Trash2, 
-  Loader2,
-  Clock,
-  Sparkles
-} from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { listChatSessions, deleteChatSession } from '@/lib/chat-session-service';
@@ -30,7 +20,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { getAgentById } from '@/config/ai-agents';
+
+// Map agent IDs to Solar icons (linear style)
+const agentIcons: Record<string, string> = {
+  'content-writer': 'solar:document-text-linear',
+  'ad-strategist': 'solar:chart-2-linear',
+  'visual-designer': 'solar:gallery-linear',
+  'seo-expert': 'solar:magnifer-linear',
+  'customer-service': 'solar:chat-round-dots-linear',
+  'video-producer': 'solar:videocamera-record-linear',
+  'general-assistant': 'solar:stars-linear',
+};
 
 interface ConversationHistorySidebarProps {
   currentSessionId?: string | null;
@@ -59,11 +59,7 @@ export default function ConversationHistorySidebar({
 
     setIsLoading(true);
     try {
-      const chatSessions = await listChatSessions(
-        appUser.companyId,
-        appUser.uid,
-        20
-      );
+      const chatSessions = await listChatSessions(appUser.companyId, appUser.uid, 20);
       setSessions(chatSessions);
     } catch (error: any) {
       toast({
@@ -81,21 +77,17 @@ export default function ConversationHistorySidebar({
 
     try {
       await deleteChatSession(sessionToDelete, appUser.companyId, appUser.uid);
-      
       setSessions(prev => prev.filter(s => s.id !== sessionToDelete));
       
       if (currentSessionId === sessionToDelete) {
         onNewChat();
       }
       
-      toast({
-        title: 'Conversation deleted',
-        description: 'The conversation has been permanently deleted',
-      });
+      toast({ title: 'Conversation deleted' });
     } catch (error: any) {
       toast({
-        title: 'Error deleting conversation',
-        description: error.message || 'Failed to delete conversation',
+        title: 'Error',
+        description: error.message || 'Failed to delete',
         variant: 'destructive'
       });
     } finally {
@@ -105,146 +97,166 @@ export default function ConversationHistorySidebar({
 
   const filteredSessions = sessions.filter(session => {
     if (!searchQuery.trim()) return true;
-    
     const query = searchQuery.toLowerCase();
-    const titleMatch = session.title?.toLowerCase().includes(query);
-    const summaryMatch = session.lastMessageSummary?.toLowerCase().includes(query);
-    
-    return titleMatch || summaryMatch;
+    return session.title?.toLowerCase().includes(query);
   });
 
   const formatTimestamp = (timestamp: any) => {
     if (!timestamp) return '';
-    
-    const date = timestamp instanceof Timestamp 
-      ? timestamp.toDate() 
-      : new Date(timestamp);
-    
+    const date = timestamp instanceof Timestamp ? timestamp.toDate() : new Date(timestamp);
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
     
-    if (diffInHours < 24) {
-      return format(date, 'h:mm a');
-    } else if (diffInHours < 168) {
-      return format(date, 'EEE h:mm a');
-    } else {
-      return format(date, 'MMM d, yyyy');
-    }
+    if (diffInHours < 24) return format(date, 'h:mm a');
+    if (diffInHours < 168) return format(date, 'EEE');
+    return format(date, 'MMM d');
   };
 
+  // Group sessions by date
+  const groupedSessions = filteredSessions.reduce((groups, session) => {
+    const timestamp = session.updatedAt instanceof Timestamp ? session.updatedAt.toDate() : new Date(session.updatedAt);
+    const now = new Date();
+    const diffInHours = (now.getTime() - timestamp.getTime()) / (1000 * 60 * 60);
+    
+    let group = 'Older';
+    if (diffInHours < 24) group = 'Today';
+    else if (diffInHours < 48) group = 'Yesterday';
+    else if (diffInHours < 168) group = 'This Week';
+    
+    if (!groups[group]) groups[group] = [];
+    groups[group].push(session);
+    return groups;
+  }, {} as Record<string, ChatSession[]>);
+
+  const groupOrder = ['Today', 'Yesterday', 'This Week', 'Older'];
+
   return (
-    <div className="flex flex-col h-full border-r bg-background">
-      <div className="p-4 border-b space-y-3">
+    <div className="flex flex-col h-full w-full overflow-hidden">
+      {/* Header */}
+      <div className="flex-shrink-0 p-3">
         <Button 
           onClick={onNewChat} 
-          className="w-full"
-          size="lg"
+          variant="outline"
+          className="w-full h-9 text-xs font-medium"
         >
-          <MessageSquarePlus className="h-4 w-4 mr-2" />
+          <Icon icon="solar:add-circle-linear" className="h-4 w-4 mr-2" />
           New Chat
         </Button>
-        
+      </div>
+
+      {/* Search */}
+      <div className="flex-shrink-0 px-3 pb-3">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search conversations..."
+          <Icon icon="solar:magnifer-linear" className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
+          <input
+            type="text"
+            placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
+            className="w-full h-8 pl-8 pr-3 text-xs bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-stone-300 dark:focus:ring-stone-700 transition-all"
           />
         </div>
       </div>
 
-      <ScrollArea className="flex-1">
-        <div className="p-2 space-y-1">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : filteredSessions.length === 0 ? (
-            <div className="text-center py-8 px-4">
-              <MessageSquarePlus className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">
-                {searchQuery ? 'No conversations found' : 'No conversations yet'}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {searchQuery ? 'Try a different search' : 'Start a new chat to begin'}
-              </p>
-            </div>
-          ) : (
-            filteredSessions.map((session) => {
-              const agent = session.agentId ? getAgentById(session.agentId) : null;
-              const isActive = session.id === currentSessionId;
-              
-              return (
-                <Card
-                  key={session.id}
-                  className={cn(
-                    "p-3 cursor-pointer transition-all hover:bg-accent group relative",
-                    isActive && "bg-accent border-primary"
-                  )}
-                  onClick={() => onSelectSession(session.id)}
-                >
-                  <div className="flex items-start gap-2">
-                    {agent && (
-                      <div className={`w-8 h-8 rounded-lg ${agent.bgColor} flex items-center justify-center flex-shrink-0`}>
-                        <agent.icon className={`h-4 w-4 ${agent.color}`} />
-                      </div>
-                    )}
+      {/* Sessions List */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-2">
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-8">
+            <Icon icon="solar:refresh-linear" className="h-4 w-4 animate-spin text-muted-foreground/60" />
+          </div>
+        ) : filteredSessions.length === 0 ? (
+          <div className="text-center py-8 px-3">
+            <Icon icon="solar:chat-round-dots-linear" className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
+            <p className="text-xs text-muted-foreground">
+              {searchQuery ? 'No results' : 'No chats yet'}
+            </p>
+          </div>
+        ) : (
+          groupOrder.map(group => {
+            const groupSessions = groupedSessions[group];
+            if (!groupSessions || groupSessions.length === 0) return null;
+            
+            return (
+              <div key={group} className="mb-3">
+                <p className="text-[9px] font-semibold tracking-wider text-muted-foreground/60 uppercase px-2 py-1.5">
+                  {group}
+                </p>
+                <div className="space-y-0.5">
+                  {groupSessions.map((session) => {
+                    const isActive = session.id === currentSessionId;
+                    const displayTitle = session.title 
+                      ? (session.title.length > 28 ? session.title.substring(0, 28) + '...' : session.title)
+                      : 'Untitled';
                     
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="text-sm font-medium truncate">
-                          {session.title || 'Untitled Conversation'}
-                        </h3>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                    return (
+                      <div
+                        key={session.id}
+                        className={cn(
+                          "group flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-colors",
+                          isActive 
+                            ? "bg-stone-100 dark:bg-stone-800" 
+                            : "hover:bg-stone-100/50 dark:hover:bg-stone-800/50"
+                        )}
+                        onClick={() => onSelectSession(session.id)}
+                      >
+                        <Icon 
+                          icon={session.agentId ? (agentIcons[session.agentId] || 'solar:chat-round-dots-linear') : 'solar:chat-round-dots-linear'} 
+                          className="h-3.5 w-3.5 text-muted-foreground/60 flex-shrink-0" 
+                        />
+                        
+                        <div className="flex-1 min-w-0">
+                          <p className={cn(
+                            "text-xs leading-tight truncate",
+                            isActive ? "font-medium text-foreground" : "text-muted-foreground"
+                          )}>
+                            {displayTitle}
+                          </p>
+                        </div>
+
+                        <span className="text-[9px] text-muted-foreground/50 flex-shrink-0">
+                          {formatTimestamp(session.updatedAt)}
+                        </span>
+
+                        <button
+                          className="flex-shrink-0 p-0.5 rounded opacity-0 group-hover:opacity-100 hover:text-red-500 transition-all"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSessionToDelete(session.id);
                           }}
                         >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
+                          <Icon icon="solar:trash-bin-minimalistic-linear" className="h-3 w-3" />
+                        </button>
                       </div>
-                      
-                      {session.lastMessageSummary && (
-                        <p className="text-xs text-muted-foreground truncate mt-1">
-                          {session.lastMessageSummary}
-                        </p>
-                      )}
-                      
-                      <div className="flex items-center gap-1 mt-2">
-                        <Clock className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">
-                          {formatTimestamp(session.updatedAt)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              );
-            })
-          )}
-        </div>
-      </ScrollArea>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
 
+      {/* Footer */}
+      <div className="flex-shrink-0 p-3 border-t border-stone-200 dark:border-stone-800">
+        <p className="text-[9px] text-muted-foreground/60 text-center">
+          {sessions.length} conversation{sessions.length !== 1 ? 's' : ''}
+        </p>
+      </div>
+
+      {/* Delete Dialog */}
       <AlertDialog open={!!sessionToDelete} onOpenChange={() => setSessionToDelete(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="sm:max-w-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Conversation?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete this conversation and all its messages. 
+            <AlertDialogTitle className="text-base">Delete conversation?</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm">
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="h-8 text-xs">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteSession}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="h-8 text-xs bg-red-600 text-white hover:bg-red-700"
             >
               Delete
             </AlertDialogAction>

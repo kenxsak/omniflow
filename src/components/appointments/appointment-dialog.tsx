@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Dialog,
   DialogContent,
@@ -38,7 +38,6 @@ export function AppointmentDialog({
 }: AppointmentDialogProps) {
   const { appUser } = useAuth();
   const { toast } = useToast();
-  const [isSubmitting] = useState(false);
 
   const handleSubmit = async (data: CreateAppointmentInput | UpdateAppointmentInput) => {
     if (!appUser?.idToken) {
@@ -87,25 +86,28 @@ export function AppointmentDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
-        <DialogHeader className="relative">
-          <DialogTitle>
-            {contact ? `Schedule Appointment with ${contact.name}` : 'Schedule New Appointment'}
-          </DialogTitle>
-          <DialogDescription>
-            {contact
-              ? 'Contact details are pre-filled. Set the appointment date, time, and reminders.'
-              : 'Create a new appointment with reminder settings'}
-          </DialogDescription>
-          <DialogCloseButton />
-        </DialogHeader>
-        <DialogBody className="max-h-[60vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-2xl p-0 gap-0 overflow-hidden">
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4 border-b border-stone-200 dark:border-stone-800">
+          <DialogHeader className="space-y-1">
+            <DialogTitle className="text-lg font-semibold">
+              {contact ? `Schedule Appointment with ${contact.name}` : 'Schedule New Appointment'}
+            </DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              {contact
+                ? 'Contact details are pre-filled. Set the appointment date, time, and reminders.'
+                : 'Create a new appointment with reminder settings'}
+            </DialogDescription>
+          </DialogHeader>
+        </div>
+        {/* Body */}
+        <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
           <AppointmentForm
             defaultContact={contact}
             onSubmit={handleSubmit}
             onCancel={() => onOpenChange(false)}
           />
-        </DialogBody>
+        </div>
       </DialogContent>
     </Dialog>
   );

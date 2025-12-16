@@ -2,12 +2,10 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -39,15 +37,11 @@ interface LeadQuickActionsProps {
 export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsProps) {
   const { toast } = useToast();
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
-  const [smsDialogOpen, setSmsDialogOpen] = useState(false);
   const [sending, setSending] = useState(false);
   
   // Email form state
   const [emailSubject, setEmailSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
-  
-  // SMS form state
-  const [smsMessage, setSmsMessage] = useState('');
 
   // Format phone for WhatsApp (remove spaces, dashes, etc.)
   const formatPhoneForWhatsApp = (phone: string) => {
@@ -72,13 +66,10 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
       toast({ title: 'No phone number', description: 'This contact has no phone number.', variant: 'destructive' });
       return;
     }
-    // This would integrate with your WhatsApp Business API
-    // For now, we'll open the WhatsApp Business template selector
     toast({ 
       title: 'WhatsApp Business API', 
       description: 'Opening WhatsApp Business template selector...' 
     });
-    // TODO: Implement WhatsApp Business API integration
     logActivity('whatsapp_business_opened', `Initiated WhatsApp Business message to ${lead.name}`);
   };
 
@@ -168,21 +159,26 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
 
   return (
     <>
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Icon icon="solar:chat-round-dots-linear" className="h-5 w-5 text-muted-foreground" />
+      <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800 flex items-center gap-2">
+          <Icon icon="solar:chat-round-dots-linear" className="h-4 w-4 text-muted-foreground" />
+          <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
             Quick Actions
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
+          </span>
+        </div>
+        <div className="p-4 sm:p-5 space-y-2">
           {/* WhatsApp Actions */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full justify-start gap-2" disabled={!lead.phone}>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start gap-2 h-10 border-stone-200 dark:border-stone-700 hover:bg-muted/50" 
+                disabled={!lead.phone}
+              >
                 <Icon icon="logos:whatsapp-icon" className="h-4 w-4" />
-                WhatsApp
-                <Icon icon="solar:alt-arrow-down-linear" className="h-3 w-3 ml-auto" />
+                <span className="flex-1 text-left text-sm">WhatsApp</span>
+                <Icon icon="solar:alt-arrow-down-linear" className="h-3 w-3 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
@@ -200,10 +196,14 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
           {/* Email Actions */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full justify-start gap-2" disabled={!lead.email}>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start gap-2 h-10 border-stone-200 dark:border-stone-700 hover:bg-muted/50" 
+                disabled={!lead.email}
+              >
                 <Icon icon="solar:letter-linear" className="h-4 w-4 text-muted-foreground" />
-                Email
-                <Icon icon="solar:alt-arrow-down-linear" className="h-3 w-3 ml-auto" />
+                <span className="flex-1 text-left text-sm">Email</span>
+                <Icon icon="solar:alt-arrow-down-linear" className="h-3 w-3 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
@@ -221,22 +221,24 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
           {/* Phone Call */}
           <Button 
             variant="outline" 
-            className="w-full justify-start gap-2" 
+            className="w-full justify-start gap-2 h-10 border-stone-200 dark:border-stone-700 hover:bg-muted/50" 
             onClick={handleCall}
             disabled={!lead.phone}
           >
             <Icon icon="solar:phone-linear" className="h-4 w-4 text-muted-foreground" />
-            Call {lead.phone ? lead.phone : '(No phone)'}
+            <span className="flex-1 text-left text-sm truncate">
+              Call {lead.phone ? lead.phone : '(No phone)'}
+            </span>
           </Button>
 
           {/* Quick Info */}
-          <div className="pt-2 border-t mt-3">
-            <p className="text-xs text-muted-foreground">
+          <div className="pt-3 mt-3 border-t border-stone-200 dark:border-stone-700">
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
               All communications are logged to the activity timeline.
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Email Compose Dialog */}
       <Dialog open={emailDialogOpen} onOpenChange={setEmailDialogOpen}>
@@ -250,7 +252,7 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label>To</Label>
-              <Input value={lead.email || ''} disabled />
+              <Input value={lead.email || ''} disabled className="bg-muted/50" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="subject">Subject</Label>
