@@ -26,231 +26,142 @@ interface NavItem {
 }
 
 const allNavItems: NavItem[] = [
+  // ============ MAIN ============
   {
     href: "/dashboard",
     label: "Dashboard",
     icon: "solar:home-2-linear",
-    tooltip: "View your business overview and quick stats",
+    tooltip: "Your business overview",
   },
 
+  // ============ BUSINESS ============
   {
     href: "/digital-card/manage",
     label: "Digital Cards",
-    icon: "solar:smartphone-linear",
-    tooltip: "Create digital business cards with Voice AI chatbot",
+    icon: "solar:card-2-linear",
+    tooltip: "Create digital business cards",
     featureId: "feat_digital_cards",
     badge: "FREE",
-    subItems: [
-      {
-        href: "/digital-card/manage",
-        label: "My Cards",
-        icon: "solar:clipboard-list-linear",
-        tooltip: "View and edit your business cards",
-      },
-      {
-        href: "/digital-card/create",
-        label: "Create New",
-        icon: "solar:add-circle-linear",
-        tooltip: "Make a new digital business card",
-      },
-    ],
   },
 
   {
     href: "/crm",
     label: "Contacts",
-    icon: "solar:user-circle-linear",
-    tooltip: "People interested in your business",
+    icon: "solar:users-group-rounded-linear",
+    tooltip: "Manage your contacts & leads",
     featureId: "feat_core_crm",
-    subItems: [
-      {
-        href: "/crm",
-        label: "All Contacts",
-        icon: "solar:users-group-two-rounded-linear",
-        tooltip: "View and manage contacts",
-      },
-      {
-        href: "/crm/pipeline",
-        label: "Sales Pipeline",
-        icon: "solar:widget-5-linear",
-        tooltip: "Track deals through stages",
-      },
-      {
-        href: "/appointments",
-        label: "Appointments",
-        icon: "solar:calendar-mark-linear",
-        tooltip: "Schedule appointments",
-      },
-    ],
+  },
+
+  {
+    href: "/crm/pipeline",
+    label: "Pipeline",
+    icon: "solar:widget-5-linear",
+    tooltip: "Track sales deals",
+    featureId: "feat_core_crm",
   },
 
   {
     href: "/tasks",
     label: "Tasks",
-    icon: "solar:clipboard-check-linear",
-    tooltip: "Create and track your to-do items",
+    icon: "solar:checklist-minimalistic-linear",
+    tooltip: "Manage your to-do list",
     featureId: "feat_core_crm",
   },
 
+  // ============ MARKETING ============
   {
     href: "/campaigns",
     label: "Campaigns",
-    icon: "solar:paper-plane-linear",
-    tooltip: "Send emails, SMS & WhatsApp",
+    icon: "solar:letter-linear",
+    tooltip: "Email, SMS & WhatsApp marketing",
     featureId: "feat_email_marketing",
     subItems: [
       {
         href: "/campaigns",
-        label: "Overview",
-        icon: "solar:widget-5-linear",
-        tooltip: "See all campaigns",
+        label: "All Campaigns",
+        icon: "solar:inbox-out-linear",
+        tooltip: "View all campaigns",
       },
       {
         href: "/campaigns/ai-email",
-        label: "AI Email",
-        icon: "solar:magic-stick-3-linear",
-        tooltip: "Create with AI",
-      },
-      {
-        href: "/campaigns/ai-email/drafts",
-        label: "Drafts",
-        icon: "solar:document-text-linear",
-        tooltip: "Saved drafts",
-      },
-      {
-        href: "/campaigns/ai-email/delivery",
-        label: "Delivery",
-        icon: "solar:checkmark-circle-linear",
-        tooltip: "Track delivery",
+        label: "Create Email",
+        icon: "solar:pen-new-square-linear",
+        tooltip: "AI-powered email creator",
       },
       {
         href: "/campaigns/email-lists",
         label: "Email Lists",
         icon: "solar:users-group-two-rounded-linear",
-        tooltip: "Manage lists",
-      },
-      {
-        href: "/campaigns/email-automations",
-        label: "Automations",
-        icon: "solar:robot-linear",
-        tooltip: "Auto sequences",
+        tooltip: "Manage subscriber lists",
       },
       {
         href: "/campaigns/messages",
-        label: "SMS",
-        icon: "solar:chat-square-linear",
-        tooltip: "SMS campaigns",
+        label: "SMS & WhatsApp",
+        icon: "solar:chat-round-line-linear",
+        tooltip: "Send text messages",
         featureId: "feat_sms_whatsapp",
-      },
-      {
-        href: "/campaigns/whatsapp",
-        label: "WhatsApp",
-        icon: "solar:chat-round-dots-linear",
-        tooltip: "WhatsApp campaigns",
-        featureId: "feat_sms_whatsapp",
-      },
-      {
-        href: "/campaigns/whatsapp/bulk",
-        label: "Bulk Send",
-        icon: "solar:paper-plane-linear",
-        tooltip: "Bulk WhatsApp",
-        featureId: "feat_sms_whatsapp",
-      },
-      {
-        href: "/campaigns/templates",
-        label: "Templates",
-        icon: "solar:document-text-linear",
-        tooltip: "All templates",
       },
     ],
   },
 
+  // ============ AI TOOLS ============
   {
     href: "/ai-chat",
-    label: "AI Tools",
-    icon: "solar:magic-stick-3-linear",
-    tooltip: "AI-powered features",
+    label: "AI Assistant",
+    icon: "solar:stars-linear",
+    tooltip: "AI-powered tools",
     featureId: "feat_ai_content_gen",
     subItems: [
       {
         href: "/ai-chat",
-        label: "Smart Chat",
+        label: "Chat",
         icon: "solar:chat-round-dots-linear",
-        tooltip: "AI assistant",
+        tooltip: "AI conversation",
       },
       {
         href: "/social-media",
         label: "Content Writer",
-        icon: "solar:pen-new-square-linear",
-        tooltip: "Auto-write content",
-      },
-      {
-        href: "/social-media/content-hub",
-        label: "Content Hub",
-        icon: "solar:clipboard-list-linear",
-        tooltip: "Saved content",
-      },
-      {
-        href: "/ai-campaign-manager",
-        label: "Ad Copy",
-        icon: "solar:chart-2-linear",
-        tooltip: "Generate ad copy",
-        featureId: "feat_ai_ads_manager",
+        icon: "solar:document-add-linear",
+        tooltip: "Generate content with AI",
       },
       {
         href: "/ai-usage",
         label: "AI Credits",
-        icon: "solar:wallet-money-linear",
-        tooltip: "Track usage",
+        icon: "solar:wallet-linear",
+        tooltip: "View AI usage",
       },
     ],
   },
 
+  // ============ INSIGHTS ============
   {
     href: "/advanced-analytics",
-    label: "Reports",
-    icon: "solar:graph-up-linear",
-    tooltip: "Business performance",
+    label: "Analytics",
+    icon: "solar:chart-2-linear",
+    tooltip: "Performance reports",
     featureId: "feat_advanced_analytics",
   },
 
+  // ============ TEAM ============
   {
     href: "/team-management",
     label: "Team",
     icon: "solar:users-group-two-rounded-linear",
     tooltip: "Manage team members",
     featureId: "feat_core_crm",
+    adminOnly: true,
   },
 
+  // ============ SETTINGS ============
   {
     href: "/settings",
     label: "Settings",
     icon: "solar:settings-linear",
-    tooltip: "Account settings",
-    subItems: [
-      {
-        href: "/settings",
-        label: "Account & Plan",
-        icon: "solar:card-linear",
-        tooltip: "Subscription",
-      },
-      {
-        href: "/crm/integrations",
-        label: "Integrations",
-        icon: "solar:link-minimalistic-2-linear",
-        tooltip: "Connect tools",
-      },
-      {
-        href: "/settings/enterprise",
-        label: "Enterprise",
-        icon: "solar:shield-check-linear",
-        tooltip: "Team settings",
-        adminOnly: true,
-        featureId: "feat_enterprise_team",
-      },
-    ],
+    tooltip: "Account & preferences",
   },
 ];
+
+
 
 const superAdminNavItems: NavItem[] = [
   {
@@ -401,7 +312,7 @@ export default function SidebarNav() {
                 sub.href.length > item.href.length)
           );
           const isActive = isAnySubItemActive || (isParentActive && item.href === pathname);
-          
+
           return (
             <SidebarMenuItem key={item.label} data-nav-item className="list-none">
               {/* AutoSend-style button with expandable submenu */}
@@ -411,8 +322,8 @@ export default function SidebarNav() {
                 data-state={isActive ? "on" : "off"}
                 className={cn(
                   "flex items-center gap-x-3 px-2 h-8 w-full border rounded-lg transition-all duration-100 cursor-pointer justify-between",
-                  isActive 
-                    ? "bg-card text-foreground border-border font-semibold" 
+                  isActive
+                    ? "bg-card text-foreground border-border font-semibold"
                     : "border-transparent text-muted-foreground hover:bg-card hover:text-foreground hover:border-border"
                 )}
               >
@@ -433,7 +344,7 @@ export default function SidebarNav() {
                   )}
                 />
               </button>
-              
+
               {/* Submenu with animation */}
               <div
                 className={cn(
@@ -456,8 +367,8 @@ export default function SidebarNav() {
                         onMouseEnter={() => prefetchRoute(subItem.href)}
                         className={cn(
                           "flex items-center gap-x-3 px-2 h-7 w-full border rounded-lg transition-all duration-100",
-                          isSubItemActive 
-                            ? "bg-card text-foreground border-border font-semibold" 
+                          isSubItemActive
+                            ? "bg-card text-foreground border-border font-semibold"
                             : "border-transparent text-muted-foreground hover:bg-card hover:text-foreground hover:border-border"
                         )}
                       >
@@ -478,8 +389,8 @@ export default function SidebarNav() {
                 data-state={isParentActive && !item.disabled ? "on" : "off"}
                 className={cn(
                   "flex items-center gap-x-3 px-2 h-8 w-full border rounded-lg transition-all duration-100",
-                  isParentActive && !item.disabled 
-                    ? "bg-card text-foreground border-border font-semibold" 
+                  isParentActive && !item.disabled
+                    ? "bg-card text-foreground border-border font-semibold"
                     : "border-transparent text-muted-foreground hover:bg-card hover:text-foreground hover:border-border",
                   item.disabled && "opacity-50 cursor-not-allowed hover:bg-transparent hover:border-transparent hover:text-muted-foreground"
                 )}
