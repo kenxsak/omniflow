@@ -11,13 +11,39 @@ export function ThemeToggle({ className }: { className?: string }) {
   React.useEffect(() => {
     setMounted(true);
     const stored = localStorage.getItem("theme");
-    if (stored === "dark" || stored === "light") {
-      setTheme(stored);
-      document.documentElement.classList.toggle("dark", stored === "dark");
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    if (stored === "dark") {
       setTheme("dark");
       document.documentElement.classList.add("dark");
+    } else if (stored === "light") {
+      setTheme("light");
+      document.documentElement.classList.remove("dark");
+    } else {
+      // System preference
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setTheme(prefersDark ? "dark" : "light");
+      document.documentElement.classList.toggle("dark", prefersDark);
     }
+
+    // Listen for storage changes (from preferences page)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "theme") {
+        if (e.newValue === "dark") {
+          setTheme("dark");
+          document.documentElement.classList.add("dark");
+        } else if (e.newValue === "light") {
+          setTheme("light");
+          document.documentElement.classList.remove("dark");
+        } else {
+          // System preference
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          setTheme(prefersDark ? "dark" : "light");
+          document.documentElement.classList.toggle("dark", prefersDark);
+        }
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   const toggleTheme = () => {

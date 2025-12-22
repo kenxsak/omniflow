@@ -96,9 +96,23 @@ const allNavItems: NavItem[] = [
       },
       {
         href: "/campaigns/messages",
-        label: "SMS & WhatsApp",
+        label: "SMS",
+        icon: "solar:chat-square-linear",
+        tooltip: "Bulk SMS marketing",
+        featureId: "feat_sms_whatsapp",
+      },
+      {
+        href: "/campaigns/whatsapp",
+        label: "WhatsApp",
         icon: "solar:chat-round-line-linear",
-        tooltip: "Send text messages",
+        tooltip: "WhatsApp marketing (wa.me)",
+        featureId: "feat_sms_whatsapp",
+      },
+      {
+        href: "/campaigns/whatsapp/bulk",
+        label: "WhatsApp Bulk",
+        icon: "solar:users-group-rounded-linear",
+        tooltip: "WhatsApp API campaigns",
         featureId: "feat_sms_whatsapp",
       },
     ],
@@ -354,11 +368,17 @@ export default function SidebarNav() {
               >
                 <div className="mt-1 ml-7 space-y-1">
                   {item.subItems.map((subItem) => {
-                    const isSubItemActive =
-                      pathname === subItem.href ||
-                      (subItem.href !== item.href &&
-                        pathname.startsWith(subItem.href) &&
-                        subItem.href.length > item.href.length);
+                    // Check for exact match first, then check startsWith but ensure no other subitem is a better (longer) match
+                    const isExactMatch = pathname === subItem.href;
+                    const startsWithMatch = subItem.href !== item.href && pathname.startsWith(subItem.href);
+                    // Check if another subitem is a better match (longer href that also matches)
+                    const hasBetterMatch = item.subItems?.some(
+                      (other) =>
+                        other.href !== subItem.href &&
+                        other.href.startsWith(subItem.href) &&
+                        pathname.startsWith(other.href)
+                    );
+                    const isSubItemActive = isExactMatch || (startsWithMatch && !hasBetterMatch);
                     return (
                       <Link
                         key={subItem.href}

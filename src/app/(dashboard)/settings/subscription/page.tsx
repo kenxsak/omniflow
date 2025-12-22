@@ -1,29 +1,507 @@
 'use client';
 
-import SubscriptionDetails from '@/components/settings/subscription-details';
-import { Animated } from '@/components/ui/animated';
+import { Icon } from '@iconify/react';
+import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { useState, useEffect, useCallback } from 'react';
+import { getCompany, getStoredPlans, getStoredFeatures } from '@/lib/saas-data';
+import { useCurrency } from '@/contexts/currency-context';
+import { getStripePortalUrl } from '@/app/actions/stripe-payment-actions';
+import type { Plan, Company, Feature } from '@/types/saas';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
+
+// Reusable Settings Card
+function SettingsCard({
+  title,
+  description,
+  icon,
+  children,
+  headerAction,
+  status,
+}: {
+  title: string;
+  description: string;
+  icon: string;
+  children: React.ReactNode;
+  headerAction?: React.ReactNode;
+  status?: 'active' | 'warning' | 'inactive';
+}) {
+  return (
+    <div className="border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-950 overflow-hidden shadow-sm">
+      <div className="px-5 py-4 border-b border-stone-100 dark:border-stone-800/60 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div
+            className={cn(
+              'h-9 w-9 rounded-xl flex items-center justify-center',
+              status === 'active'
+                ? 'bg-emerald-100 dark:bg-emerald-900/30'
+                : status === 'warning'
+                  ? 'bg-amber-100 dark:bg-amber-900/30'
+                  : 'bg-stone-100 dark:bg-stone-800'
+            )}
+          >
+            <Icon
+              icon={icon}
+              className={cn(
+                'h-4.5 w-4.5',
+                status === 'active'
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : status === 'warning'
+                    ? 'text-amber-600 dark:text-amber-400'
+                    : 'text-stone-500 dark:text-stone-400'
+              )}
+            />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
+              {title}
+            </h3>
+            <p className="text-xs text-stone-500 dark:text-stone-500">{description}</p>
+          </div>
+        </div>
+        {headerAction}
+      </div>
+      <div className="p-5">{children}</div>
+    </div>
+  );
+}
 
 export default function SubscriptionPage() {
-    return (
-        <article className="group space-y-8">
-            <header className="relative flex w-full flex-col gap-4 pb-6 border-b">
-                <Animated animation="fadeDown">
-                    <div className="flex justify-between gap-x-8 max-xs:flex-col xs:items-center gap-y-5">
-                        <div className="flex min-w-0 items-center gap-4">
-                            <div className="flex min-w-0 flex-col gap-2">
-                                <h1 className="min-w-0 text-2xl font-semibold truncate">Subscription & Billing</h1>
-                                <p className="text-sm text-muted-foreground">
-                                    Manage your subscription plan and billing information
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </Animated>
-            </header>
+  const { appUser } = useAuth();
+  const { toast } = useToast();
+  const { formatCurrency, convertFromUSD } = useCurrency();
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingPortal, setLoadingPortal] = useState(false);
+  const [company, setCompany] = useState<Company | null>(null);
+  const [currentPlan, setCurrentPlan] = useState<Plan | null>(null);
+  const [allFeatures, setAllFeatures] = useState<Feature[]>([]);
+  const [convertedPrice, setConvertedPrice] = useState(0);
 
-            <Animated animation="fadeUp">
-                <SubscriptionDetails />
-            </Animated>
-        </article>
+  const loadData = useCallback(async () => {
+    if (!appUser?.companyId) return;
+    setIsLoading(true);
+    try {
+      const [companyData, plans, features] = await Promise.all([
+        getCompany(appUser.companyId),
+        getStoredPlans(),
+        getStoredFeatures(),
+      ]);
+      setAllFeatures(features);
+      if (companyData) {
+        setCompany(companyData);
+        const plan = plans.find((p) => p.id === companyData.planId);
+        if (plan) {
+          setCurrentPlan(plan);
+          if (plan.priceMonthlyUSD > 0) {
+            const localPrice = await convertFromUSD(plan.priceMonthlyUSD);
+            setConvertedPrice(localPrice);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error loading subscription:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [appUser?.companyId, convertFromUSD]);
+
+  useEffect(() => {
+    if (appUser) {
+      loadData();
+    }
+  }, [appUser, loadData]);
+
+  const openBillingPortal = async () => {
+    if (!appUser?.idToken) return;
+    setLoadingPortal(true);
+    try {
+      const result = await getStripePortalUrl({ idToken: appUser.idToken });
+      if (result.success && result.url) {
+        window.open(result.url, '_blank');
+      } else {
+        toast({
+          title: 'Error',
+          description: result.error || 'Failed to open billing portal',
+          variant: 'destructive',
+        });
+      }
+    } catch {
+      toast({ title: 'Error', description: 'An error occurred', variant: 'destructive' });
+    } finally {
+      setLoadingPortal(false);
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch {
+      return '—';
+    }
+  };
+
+  const getDaysRemaining = (expiresAt: string) => {
+    try {
+      const now = new Date();
+      const expires = new Date(expiresAt);
+      const diff = Math.ceil((expires.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      return diff;
+    } catch {
+      return 0;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold text-stone-900 dark:text-stone-100">
+            Subscription
+          </h2>
+          <p className="text-sm text-stone-500 mt-1">Manage your plan and billing</p>
+        </div>
+        <div className="space-y-4">
+          <div className="h-48 animate-pulse bg-stone-100 dark:bg-stone-900 rounded-2xl" />
+          <div className="h-32 animate-pulse bg-stone-100 dark:bg-stone-900 rounded-2xl" />
+        </div>
+      </div>
     );
+  }
+
+  if (!currentPlan || !company) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold text-stone-900 dark:text-stone-100">
+            Subscription
+          </h2>
+          <p className="text-sm text-stone-500 mt-1">Manage your plan and billing</p>
+        </div>
+        <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-900/50 text-center">
+          <Icon
+            icon="solar:warning-triangle-linear"
+            className="h-8 w-8 text-amber-600 dark:text-amber-400 mx-auto mb-3"
+          />
+          <p className="text-sm text-amber-700 dark:text-amber-300">
+            Could not load subscription details. Please try again later.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const daysRemaining = getDaysRemaining(company.planExpiresAt);
+  const isExpiringSoon = daysRemaining <= 7 && daysRemaining > 0;
+  const isExpired = daysRemaining <= 0;
+
+  return (
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-stone-900 dark:text-stone-100">
+            Subscription
+          </h2>
+          <p className="text-sm text-stone-500 dark:text-stone-500 mt-1">
+            Manage your plan and billing settings
+          </p>
+        </div>
+        <Button asChild variant="outline" size="sm" className="h-9">
+          <Link href="/pricing">
+            <Icon icon="solar:widget-add-linear" className="h-4 w-4 mr-2" />
+            View All Plans
+          </Link>
+        </Button>
+      </div>
+
+      {/* Expiration Warning */}
+      {(isExpiringSoon || isExpired) && (
+        <div
+          className={cn(
+            'flex items-center gap-3 px-4 py-3 rounded-xl border',
+            isExpired
+              ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-900/50'
+              : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-900/50'
+          )}
+        >
+          <Icon
+            icon={isExpired ? 'solar:danger-triangle-linear' : 'solar:clock-circle-linear'}
+            className={cn(
+              'h-5 w-5',
+              isExpired
+                ? 'text-red-600 dark:text-red-400'
+                : 'text-amber-600 dark:text-amber-400'
+            )}
+          />
+          <p
+            className={cn(
+              'text-sm',
+              isExpired
+                ? 'text-red-700 dark:text-red-300'
+                : 'text-amber-700 dark:text-amber-300'
+            )}
+          >
+            {isExpired
+              ? 'Your subscription has expired. Please renew to continue using premium features.'
+              : `Your subscription expires in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}. Renew now to avoid interruption.`}
+          </p>
+        </div>
+      )}
+
+      {/* Current Plan */}
+      <SettingsCard
+        title="Current Plan"
+        description={`${company.name}'s active subscription`}
+        icon="solar:crown-linear"
+        status={isExpired ? 'warning' : 'active'}
+      >
+        <div className="space-y-5">
+          {/* Plan Header */}
+          <div className="flex items-center justify-between pb-4 border-b border-stone-100 dark:border-stone-800/60">
+            <div className="flex items-center gap-3">
+              <div
+                className={cn(
+                  'h-12 w-12 rounded-xl flex items-center justify-center',
+                  currentPlan.isFeatured
+                    ? 'bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/50 dark:to-amber-800/50'
+                    : 'bg-stone-100 dark:bg-stone-800'
+                )}
+              >
+                <Icon
+                  icon={
+                    currentPlan.isFeatured
+                      ? 'solar:star-bold'
+                      : 'solar:box-minimalistic-linear'
+                  }
+                  className={cn(
+                    'h-6 w-6',
+                    currentPlan.isFeatured
+                      ? 'text-amber-600 dark:text-amber-400'
+                      : 'text-stone-500'
+                  )}
+                />
+              </div>
+              <div>
+                <h4 className="text-lg font-bold text-stone-900 dark:text-stone-100">
+                  {currentPlan.name} Plan
+                </h4>
+                <p className="text-xs text-stone-500">{currentPlan.description}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-stone-900 dark:text-stone-100">
+                {currentPlan.priceMonthlyUSD === 0
+                  ? 'Free'
+                  : formatCurrency(convertedPrice || currentPlan.priceMonthlyUSD)}
+              </p>
+              {currentPlan.priceMonthlyUSD > 0 && (
+                <p className="text-xs text-stone-500">per month</p>
+              )}
+            </div>
+          </div>
+
+          {/* Plan Details */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="bg-stone-50 dark:bg-stone-900/50 rounded-xl p-3 border border-stone-200 dark:border-stone-800">
+              <Icon
+                icon="solar:users-group-two-rounded-linear"
+                className="h-5 w-5 text-blue-600 dark:text-blue-400 mb-2"
+              />
+              <p className="text-lg font-bold text-stone-900 dark:text-stone-100">
+                {currentPlan.maxUsers}
+              </p>
+              <p className="text-[10px] text-stone-500 uppercase">Max Users</p>
+            </div>
+            <div className="bg-stone-50 dark:bg-stone-900/50 rounded-xl p-3 border border-stone-200 dark:border-stone-800">
+              <Icon
+                icon="solar:cpu-bolt-linear"
+                className="h-5 w-5 text-purple-600 dark:text-purple-400 mb-2"
+              />
+              <p className="text-lg font-bold text-stone-900 dark:text-stone-100">
+                {(currentPlan.aiCreditsPerMonth || 0).toLocaleString()}
+              </p>
+              <p className="text-[10px] text-stone-500 uppercase">AI Credits/mo</p>
+            </div>
+            <div className="bg-stone-50 dark:bg-stone-900/50 rounded-xl p-3 border border-stone-200 dark:border-stone-800">
+              <Icon
+                icon="solar:gallery-circle-linear"
+                className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mb-2"
+              />
+              <p className="text-lg font-bold text-stone-900 dark:text-stone-100">
+                {(currentPlan.maxImagesPerMonth || 0).toLocaleString()}
+              </p>
+              <p className="text-[10px] text-stone-500 uppercase">Images/mo</p>
+            </div>
+            <div className="bg-stone-50 dark:bg-stone-900/50 rounded-xl p-3 border border-stone-200 dark:border-stone-800">
+              <Icon
+                icon="solar:calendar-linear"
+                className="h-5 w-5 text-amber-600 dark:text-amber-400 mb-2"
+              />
+              <p className="text-sm font-bold text-stone-900 dark:text-stone-100">
+                {formatDate(company.planExpiresAt).split(',')[0]}
+              </p>
+              <p className="text-[10px] text-stone-500 uppercase">Expires</p>
+            </div>
+          </div>
+
+          {/* Features */}
+          <div>
+            <h5 className="text-xs font-semibold text-stone-500 uppercase mb-3">
+              Included Features
+            </h5>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {currentPlan.featureIds
+                .map((id) => allFeatures.find((f) => f.id === id))
+                .filter((f) => f && f.active)
+                .map(
+                  (feature) =>
+                    feature && (
+                      <div key={feature.id} className="flex items-center gap-2">
+                        <Icon
+                          icon="solar:check-circle-linear"
+                          className="h-4 w-4 text-emerald-500"
+                        />
+                        <span className="text-sm text-stone-700 dark:text-stone-300">
+                          {feature.name}
+                        </span>
+                      </div>
+                    )
+                )}
+            </div>
+          </div>
+
+          {/* BYOK Badge */}
+          {currentPlan.allowBYOK && (
+            <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-3 border border-purple-200 dark:border-purple-900/50">
+              <div className="flex items-center gap-2">
+                <Icon
+                  icon="solar:key-linear"
+                  className="h-5 w-5 text-purple-600 dark:text-purple-400"
+                />
+                <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                  BYOK Enabled
+                </span>
+              </div>
+              <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
+                Use your own Gemini API key for unlimited AI operations
+              </p>
+            </div>
+          )}
+        </div>
+      </SettingsCard>
+
+      {/* Billing */}
+      <SettingsCard
+        title="Billing"
+        description="Manage payment methods and invoices"
+        icon="solar:card-linear"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-between py-3 border-b border-stone-100 dark:border-stone-800/60">
+            <div>
+              <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
+                Billing Cycle
+              </p>
+              <p className="text-xs text-stone-500">Current billing period</p>
+            </div>
+            <span className="px-3 py-1 text-sm font-medium text-stone-700 dark:text-stone-300 bg-stone-100 dark:bg-stone-800 rounded-lg capitalize">
+              {company.billingCycle}
+            </span>
+          </div>
+
+          {company.stripeCustomerId && (
+            <div className="flex items-center justify-between py-3 border-b border-stone-100 dark:border-stone-800/60">
+              <div>
+                <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
+                  Manage Payment Methods
+                </p>
+                <p className="text-xs text-stone-500">
+                  Update cards, view invoices, and more
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-2"
+                onClick={openBillingPortal}
+                disabled={loadingPortal}
+              >
+                {loadingPortal ? (
+                  <>
+                    <Icon icon="solar:refresh-linear" className="h-4 w-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="solar:card-linear" className="h-4 w-4" />
+                    Billing Portal
+                    <Icon icon="solar:arrow-right-up-linear" className="h-3 w-3" />
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+
+          {/* Yearly Discount Promo */}
+          {company.billingCycle === 'monthly' &&
+            currentPlan.yearlyDiscountPercentage &&
+            currentPlan.yearlyDiscountPercentage > 0 && (
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-900/50">
+                <div className="flex items-center gap-2 mb-2">
+                  <Icon
+                    icon="solar:tag-price-linear"
+                    className="h-5 w-5 text-emerald-600 dark:text-emerald-400"
+                  />
+                  <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+                    Save {currentPlan.yearlyDiscountPercentage}% with yearly billing
+                  </span>
+                </div>
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 mb-3">
+                  Switch to yearly billing and save on your subscription
+                </p>
+                <Button size="sm" className="h-8 bg-emerald-600 hover:bg-emerald-700">
+                  Switch to Yearly
+                </Button>
+              </div>
+            )}
+        </div>
+      </SettingsCard>
+
+      {/* Usage */}
+      {company.aiUsageThisMonth && (
+        <SettingsCard
+          title="Usage This Month"
+          description="AI credits and operations consumed"
+          icon="solar:chart-linear"
+        >
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-stone-50 dark:bg-stone-900/50 rounded-xl p-4 border border-stone-200 dark:border-stone-800 text-center">
+              <p className="text-2xl font-bold text-stone-900 dark:text-stone-100">
+                {company.aiUsageThisMonth.operations.toLocaleString()}
+              </p>
+              <p className="text-xs text-stone-500">Operations</p>
+            </div>
+            <div className="bg-stone-50 dark:bg-stone-900/50 rounded-xl p-4 border border-stone-200 dark:border-stone-800 text-center">
+              <p className="text-2xl font-bold text-stone-900 dark:text-stone-100">
+                {company.aiUsageThisMonth.creditsUsed.toLocaleString()}
+              </p>
+              <p className="text-xs text-stone-500">Credits Used</p>
+            </div>
+            <div className="bg-stone-50 dark:bg-stone-900/50 rounded-xl p-4 border border-stone-200 dark:border-stone-800 text-center">
+              <p className="text-2xl font-bold text-stone-900 dark:text-stone-100">
+                {formatCurrency(company.aiUsageThisMonth.estimatedCost)}
+              </p>
+              <p className="text-xs text-stone-500">Est. Cost</p>
+            </div>
+          </div>
+        </SettingsCard>
+      )}
+    </div>
+  );
 }
