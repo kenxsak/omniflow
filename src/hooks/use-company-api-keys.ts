@@ -36,7 +36,10 @@ export function useCompanyApiKeys(): UseCompanyApiKeysReturn {
       const company = await getCompany(appUser.companyId);
       
       if (!company) {
-        throw new Error('Company not found');
+        setIsLoading(false);
+        setApiKeys(null);
+        setCompanyName(null);
+        return;
       }
 
       setCompanyName(company.name || null);
@@ -57,12 +60,8 @@ export function useCompanyApiKeys(): UseCompanyApiKeysReturn {
           }
           
           if (typeof value === 'string' || (typeof value === 'object' && value !== null)) {
-            try {
-              decryptedKeys[serviceId as keyof StoredApiKeys]![fieldId] = await decryptApiKey(value);
-            } catch (err) {
-              console.warn(`Failed to decrypt ${serviceId}.${fieldId}, using empty string`, err);
-              decryptedKeys[serviceId as keyof StoredApiKeys]![fieldId] = '';
-            }
+            // Silently handle decryption - returns empty string on failure
+            decryptedKeys[serviceId as keyof StoredApiKeys]![fieldId] = await decryptApiKey(value);
           } else {
             decryptedKeys[serviceId as keyof StoredApiKeys]![fieldId] = String(value);
           }
@@ -73,7 +72,7 @@ export function useCompanyApiKeys(): UseCompanyApiKeysReturn {
 
     } catch (err) {
       console.error('Failed to fetch company API keys:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load API keys');
+      // Don't show error to user - just set empty keys
       setApiKeys(null);
     } finally {
       setIsLoading(false);

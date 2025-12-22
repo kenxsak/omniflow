@@ -16,9 +16,10 @@ function isBrowser(): boolean {
   return typeof window !== 'undefined' && typeof crypto !== 'undefined' && typeof crypto.subtle !== 'undefined';
 }
 
-async function getEncryptionKey(): Promise<CryptoKey> {
+async function getEncryptionKey(): Promise<CryptoKey | null> {
   if (!isBrowser()) {
-    throw new Error('Encryption is only available in browser environment');
+    console.warn('⚠️ Encryption is only available in browser environment');
+    return null;
   }
 
   if (cachedKey) {
@@ -29,14 +30,15 @@ async function getEncryptionKey(): Promise<CryptoKey> {
   
   if (!encryptionKeyBase64) {
     console.warn('⚠️ ENCRYPTION_KEY not found in environment variables. Encryption will not be available.');
-    throw new Error('ENCRYPTION_KEY environment variable is required for encryption');
+    return null;
   }
 
   try {
     const keyData = Uint8Array.from(atob(encryptionKeyBase64), c => c.charCodeAt(0));
     
     if (keyData.length !== 32) {
-      throw new Error(`Invalid ENCRYPTION_KEY length: expected 32 bytes, got ${keyData.length} bytes`);
+      console.warn(`⚠️ Invalid ENCRYPTION_KEY length: expected 32 bytes, got ${keyData.length} bytes`);
+      return null;
     }
 
     cachedKey = await crypto.subtle.importKey(
@@ -50,8 +52,8 @@ async function getEncryptionKey(): Promise<CryptoKey> {
     console.log('✅ Encryption key loaded successfully');
     return cachedKey;
   } catch (error) {
-    console.error('❌ Failed to load encryption key:', error);
-    throw new Error('Failed to load encryption key. Ensure ENCRYPTION_KEY is a valid 32-byte base64 string.');
+    console.error('⚠️ Failed to load encryption key:', error);
+    return null;
   }
 }
 
@@ -72,6 +74,10 @@ export async function encrypt(plaintext: string): Promise<EncryptedData> {
 
   try {
     const key = await getEncryptionKey();
+    
+    if (!key) {
+      throw new Error('Encryption key not available');
+    }
     
     const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH));
     
@@ -100,11 +106,17 @@ export async function encrypt(plaintext: string): Promise<EncryptedData> {
 
 export async function decrypt(data: EncryptedData): Promise<string> {
   if (!isEncrypted(data)) {
-    throw new Error('Invalid encrypted data format');
+    console.warn('⚠️ Invalid encrypted data format');
+    return '';
   }
 
   try {
     const key = await getEncryptionKey();
+    
+    if (!key) {
+      console.warn('⚠️ Encryption key not available - cannot decrypt');
+      return '';
+    }
     
     const ciphertext = Uint8Array.from(atob(data.ciphertext), c => c.charCodeAt(0));
     const iv = Uint8Array.from(atob(data.iv), c => c.charCodeAt(0));
@@ -118,11 +130,11 @@ export async function decrypt(data: EncryptedData): Promise<string> {
     const decoder = new TextDecoder();
     const plaintext = decoder.decode(decryptedData);
 
-    console.log('🔓 Data decrypted successfully');
     return plaintext;
   } catch (error) {
-    console.error('❌ Decryption failed:', error);
-    throw new Error(`Decryption failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    // If decryption fails (wrong key, corrupted data), return empty string
+    console.warn('⚠️ Decryption failed - data may have been encrypted with a different key');
+    return '';
   }
 }
 
@@ -137,7 +149,6 @@ export async function encryptApiKey(apiKey: string): Promise<EncryptedData> {
 
 export async function decryptApiKey(value: string | EncryptedData): Promise<string> {
   if (!value) {
-    console.warn('⚠️ Attempted to decrypt null/undefined value');
     return '';
   }
 
@@ -148,12 +159,8 @@ export async function decryptApiKey(value: string | EncryptedData): Promise<stri
 
   if (isEncrypted(value)) {
     console.log('🔍 Encrypted data detected, decrypting...');
-    try {
-      return await decrypt(value);
-    } catch (error) {
-      console.error('❌ Failed to decrypt API key, treating as plaintext:', error);
-      return '';
-    }
+    const decrypted = await decrypt(value);
+    return decrypted;
   }
 
   if (typeof value === 'string') {

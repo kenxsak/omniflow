@@ -43,9 +43,24 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
   const [emailSubject, setEmailSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
 
-  // Format phone for WhatsApp (remove spaces, dashes, etc.)
+  // Format phone for WhatsApp (remove spaces, dashes, etc. but keep the number clean)
   const formatPhoneForWhatsApp = (phone: string) => {
-    return phone.replace(/[\s\-\(\)]/g, '').replace(/^\+/, '');
+    // Remove all non-digit characters except +
+    return phone.replace(/[^\d+]/g, '').replace(/^\+/, '');
+  };
+
+  // Open WhatsApp via wa.me link (works on mobile and desktop)
+  const handleWhatsAppDirect = () => {
+    if (!lead.phone) {
+      toast({ title: 'No phone number', description: 'This contact has no phone number.', variant: 'destructive' });
+      return;
+    }
+    const phone = formatPhoneForWhatsApp(lead.phone);
+    const message = encodeURIComponent(`Hi ${lead.name}, `);
+    const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
+    window.open(whatsappUrl, '_blank') || (window.location.href = whatsappUrl);
+    toast({ title: 'Opening WhatsApp', description: `Starting chat with ${lead.name}` });
+    logActivity('whatsapp_opened', `Opened WhatsApp chat with ${lead.name}`);
   };
 
   // Open WhatsApp Web with pre-filled message
@@ -57,20 +72,7 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
     const phone = formatPhoneForWhatsApp(lead.phone);
     const message = encodeURIComponent(`Hi ${lead.name}, `);
     window.open(`https://web.whatsapp.com/send?phone=${phone}&text=${message}`, '_blank');
-    logActivity('whatsapp_opened', `Opened WhatsApp chat with ${lead.name}`);
-  };
-
-  // Open WhatsApp API (for business accounts)
-  const handleWhatsAppAPI = async () => {
-    if (!lead.phone) {
-      toast({ title: 'No phone number', description: 'This contact has no phone number.', variant: 'destructive' });
-      return;
-    }
-    toast({ 
-      title: 'WhatsApp Business API', 
-      description: 'Opening WhatsApp Business template selector...' 
-    });
-    logActivity('whatsapp_business_opened', `Initiated WhatsApp Business message to ${lead.name}`);
+    logActivity('whatsapp_web_opened', `Opened WhatsApp Web chat with ${lead.name}`);
   };
 
   // Send email via your email service
@@ -182,13 +184,13 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuItem onClick={handleWhatsAppDirect}>
+                <Icon icon="solar:link-linear" className="h-4 w-4 mr-2" />
+                Send via wa.me
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={handleWhatsAppWeb}>
                 <Icon icon="solar:monitor-linear" className="h-4 w-4 mr-2" />
                 Open WhatsApp Web
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleWhatsAppAPI}>
-                <Icon icon="solar:buildings-linear" className="h-4 w-4 mr-2" />
-                Send via Business API
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
