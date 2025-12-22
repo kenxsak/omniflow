@@ -38,17 +38,15 @@ function SettingsCard({
   headerAction?: React.ReactNode;
 }) {
   return (
-    <div className="border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-950 overflow-hidden shadow-sm">
-      <div className="px-5 py-4 border-b border-stone-100 dark:border-stone-800/60 flex items-center justify-between">
+    <div className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl bg-white dark:bg-stone-950 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      <div className="px-5 py-4 border-b border-stone-200/60 dark:border-stone-800/60 bg-stone-50/50 dark:bg-stone-900/30 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-            <Icon icon={icon} className="h-4.5 w-4.5 text-stone-500 dark:text-stone-400" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-stone-100 dark:bg-stone-800">
+            <Icon icon={icon} className="h-4 w-4 text-stone-600 dark:text-stone-400" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
-              {title}
-            </h3>
-            <p className="text-xs text-stone-500 dark:text-stone-500">{description}</p>
+            <h3 className="text-sm font-semibold">{title}</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
           </div>
         </div>
         {headerAction}
@@ -61,6 +59,7 @@ function SettingsCard({
 export default function NotificationsPage() {
   const { toast } = useToast();
   const { appUser } = useAuth();
+  const [activeTab, setActiveTab] = useState<'email' | 'push' | 'system'>('email');
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -252,32 +251,52 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-stone-900 dark:text-stone-100">
-            Notifications
-          </h2>
-          <p className="text-sm text-stone-500 dark:text-stone-500 mt-1">
+          <h2 className="text-lg font-semibold">Notifications</h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
             Choose how you want to be notified about activity
           </p>
         </div>
         {hasChanges && (
-          <Button onClick={handleSave} disabled={isSaving} size="sm" className="h-9">
+          <Button onClick={handleSave} disabled={isSaving} size="sm" className="h-8">
             {isSaving ? (
               <>
-                <Icon icon="solar:refresh-linear" className="h-4 w-4 mr-2 animate-spin" />
+                <Icon icon="solar:refresh-linear" className="h-3.5 w-3.5 mr-1.5 animate-spin" />
                 Saving...
               </>
             ) : (
-              <>
-                <Icon icon="solar:diskette-linear" className="h-4 w-4 mr-2" />
-                Save Changes
-              </>
+              'Save Changes'
             )}
           </Button>
         )}
+      </div>
+
+      {/* Horizontal Tabs */}
+      <div className="border-b border-stone-200/60 dark:border-stone-800/60">
+        <nav className="flex gap-1 overflow-x-auto pb-px" aria-label="Tabs">
+          {[
+            { id: 'email' as const, label: 'Email', icon: 'solar:letter-linear' },
+            { id: 'push' as const, label: 'Push', icon: 'solar:bell-linear' },
+            { id: 'system' as const, label: 'System', icon: 'solar:settings-linear' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                "relative flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium transition-all whitespace-nowrap",
+                activeTab === tab.id
+                  ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500"
+                  : "text-stone-600 dark:text-stone-400 border-b-2 border-transparent hover:text-stone-900 dark:hover:text-stone-200"
+              )}
+            >
+              <Icon icon={tab.icon} className="h-4 w-4" />
+              {tab.label}
+            </button>
+          ))}
+        </nav>
       </div>
 
       {/* Quick Actions */}
@@ -296,7 +315,6 @@ export default function NotificationsPage() {
             setHasChanges(true);
           }}
         >
-          <Icon icon="solar:check-circle-linear" className="h-3.5 w-3.5 mr-1.5" />
           Enable All
         </Button>
         <Button
@@ -313,13 +331,12 @@ export default function NotificationsPage() {
             setHasChanges(true);
           }}
         >
-          <Icon icon="solar:close-circle-linear" className="h-3.5 w-3.5 mr-1.5" />
           Disable All
         </Button>
       </div>
 
-      {/* Notification Categories */}
-      {categories.map((category) => {
+      {/* Tab Content - Notification Categories */}
+      {categories.filter(cat => cat.id === activeTab).map((category) => {
         const status = getCategoryStatus(category);
         return (
           <SettingsCard
@@ -329,16 +346,7 @@ export default function NotificationsPage() {
             icon={category.icon}
             headerAction={
               <div className="flex items-center gap-3">
-                <span
-                  className={cn(
-                    'text-[10px] font-semibold uppercase px-2 py-0.5 rounded-md',
-                    status === 'all'
-                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-                      : status === 'some'
-                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                        : 'bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-500'
-                  )}
-                >
+                <span className="text-[10px] font-medium text-muted-foreground">
                   {status === 'all'
                     ? 'All On'
                     : status === 'some'
@@ -352,19 +360,15 @@ export default function NotificationsPage() {
               </div>
             }
           >
-            <div className="divide-y divide-stone-100 dark:divide-stone-800/60">
+            <div className="divide-y divide-stone-200 dark:divide-stone-800">
               {category.settings.map((setting) => (
                 <div
                   key={setting.id}
-                  className="flex items-center justify-between px-5 py-4 hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors"
+                  className="flex items-center justify-between px-4 py-3 hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors"
                 >
                   <div className="flex-1 min-w-0 pr-4">
-                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
-                      {setting.title}
-                    </p>
-                    <p className="text-xs text-stone-500 dark:text-stone-500 mt-0.5">
-                      {setting.description}
-                    </p>
+                    <p className="text-sm font-medium">{setting.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{setting.description}</p>
                   </div>
                   <Switch
                     checked={setting.enabled}
@@ -380,18 +384,12 @@ export default function NotificationsPage() {
       {/* Email Delivery Info */}
       <div className="bg-stone-50 dark:bg-stone-900/50 rounded-xl p-4 border border-stone-200 dark:border-stone-800">
         <div className="flex items-start gap-3">
-          <div className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-            <Icon icon="solar:info-circle-linear" className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          </div>
+          <Icon icon="solar:info-circle-linear" className="h-4 w-4 text-muted-foreground mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
-              Email delivery address
-            </p>
-            <p className="text-xs text-stone-500 dark:text-stone-500 mt-0.5">
+            <p className="text-sm font-medium">Email delivery address</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
               All email notifications will be sent to{' '}
-              <span className="font-medium text-stone-700 dark:text-stone-300">
-                {appUser?.email || 'your registered email'}
-              </span>
+              <span className="font-medium">{appUser?.email || 'your registered email'}</span>
             </p>
           </div>
         </div>

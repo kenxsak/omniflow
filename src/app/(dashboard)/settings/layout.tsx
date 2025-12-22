@@ -30,7 +30,8 @@ interface NavGroup {
   items: NavItem[];
 }
 
-const navGroups: NavGroup[] = [
+// Dynamic navigation configuration
+const getNavGroups = (): NavGroup[] => [
   {
     id: 'account',
     label: 'Account',
@@ -121,23 +122,20 @@ function NavItemLink({
       href={item.href}
       onClick={onClick}
       className={cn(
-        'group flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] transition-all duration-200',
-        'hover:bg-stone-100 dark:hover:bg-stone-800/60',
+        'group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors',
         isActive
-          ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-sm'
-          : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
+          ? 'bg-stone-100 dark:bg-stone-800 text-foreground font-medium'
+          : 'text-muted-foreground hover:bg-stone-50 dark:hover:bg-stone-900 hover:text-foreground'
       )}
     >
       <Icon
         icon={item.icon}
         className={cn(
-          'h-4 w-4 shrink-0 transition-colors',
-          isActive
-            ? 'text-white dark:text-stone-900'
-            : 'text-stone-400 dark:text-stone-500 group-hover:text-stone-600 dark:group-hover:text-stone-300'
+          'h-4 w-4 shrink-0',
+          isActive ? 'text-foreground' : 'text-muted-foreground'
         )}
       />
-      <span className="font-medium">{item.label}</span>
+      <span>{item.label}</span>
     </Link>
   );
 }
@@ -160,6 +158,9 @@ function SettingsNavigation({ onItemClick }: { onItemClick?: () => void }) {
   const toggleGroup = (groupId: string) => {
     setOpenGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
   };
+
+  // Get dynamic navigation groups
+  const navGroups = getNavGroups();
 
   // Filter items based on role
   const filteredGroups = navGroups
@@ -248,8 +249,9 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  // Get current page title
+  // Get current page title dynamically
   const getCurrentPageTitle = () => {
+    const navGroups = getNavGroups();
     for (const group of navGroups) {
       for (const item of group.items) {
         if (item.href === '/settings' && pathname === '/settings') {
@@ -264,71 +266,64 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)]">
-      {/* Header */}
-      <div className="border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950">
-        <div className="px-4 lg:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-800 dark:to-stone-900 flex items-center justify-center shadow-sm">
-                <Icon
-                  icon="solar:settings-linear"
-                  className="h-5 w-5 text-stone-600 dark:text-stone-400"
-                />
+    <div className="h-full p-4 sm:p-6">
+      {/* Outer Rounded Container */}
+      <div className="h-full flex flex-col overflow-hidden bg-white dark:bg-stone-950 rounded-2xl border border-stone-200/60 dark:border-stone-800/60 shadow-sm">
+        {/* Header */}
+        <div className="border-b border-stone-200/60 dark:border-stone-800/60 shrink-0">
+          <div className="px-6 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-stone-100 dark:bg-stone-800">
+                  <Icon icon="solar:settings-linear" className="h-5 w-5 text-stone-600 dark:text-stone-400" />
+                </div>
+                <div>
+                  <h1 className="text-base font-semibold">Settings</h1>
+                  <p className="text-xs text-muted-foreground">
+                    Manage your account and workspace preferences
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-lg font-semibold text-stone-900 dark:text-stone-100">
-                  Settings
-                </h1>
-                <p className="text-xs text-stone-500 dark:text-stone-500">
-                  Manage your account and workspace preferences
-                </p>
-              </div>
-            </div>
 
-            {/* Mobile Menu Button */}
-            <div className="lg:hidden">
-              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-9 gap-2">
-                    <Icon icon="solar:hamburger-menu-linear" className="h-4 w-4" />
-                    {getCurrentPageTitle()}
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-72 p-0">
-                  <div className="p-4 border-b border-stone-200 dark:border-stone-800">
-                    <h2 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
-                      Settings
-                    </h2>
-                  </div>
-                  <div className="p-3 overflow-y-auto max-h-[calc(100vh-5rem)]">
-                    <SettingsNavigation
-                      onItemClick={() => setMobileMenuOpen(false)}
-                    />
-                  </div>
-                </SheetContent>
-              </Sheet>
+              {/* Mobile Menu Button */}
+              <div className="lg:hidden">
+                <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8 gap-2">
+                      <Icon icon="solar:hamburger-menu-linear" className="h-4 w-4" />
+                      {getCurrentPageTitle()}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-72 p-0">
+                    <div className="p-4 border-b border-stone-200 dark:border-stone-800">
+                      <h2 className="text-sm font-semibold">Settings</h2>
+                    </div>
+                    <div className="p-4 overflow-y-auto max-h-[calc(100vh-5rem)]">
+                      <SettingsNavigation onItemClick={() => setMobileMenuOpen(false)} />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="flex">
-        {/* Desktop Sidebar */}
-        <aside className="hidden lg:block w-60 shrink-0 border-r border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/30 min-h-[calc(100vh-8rem)]">
-          <div className="sticky top-0 p-4 overflow-y-auto max-h-[calc(100vh-8rem)]">
-            <SettingsNavigation />
-          </div>
-        </aside>
+        {/* Main Content */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Desktop Sidebar */}
+          <aside className="hidden lg:block w-64 shrink-0 border-r border-stone-200/60 dark:border-stone-800/60 bg-stone-50/30 dark:bg-stone-900/20">
+            <div className="h-full p-4 overflow-y-auto">
+              <SettingsNavigation />
+            </div>
+          </aside>
 
-        {/* Content Area */}
-        <main className="flex-1 min-w-0">
-          <div className="max-w-4xl mx-auto px-4 lg:px-8 py-6 lg:py-8">
+          {/* Content Area */}
+          <main className="flex-1 min-w-0 overflow-y-auto p-6">
             {children}
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
     </div>
   );
 }
+
