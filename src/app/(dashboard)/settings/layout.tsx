@@ -82,6 +82,13 @@ const getNavGroups = (): NavGroup[] => [
         icon: 'solar:card-linear',
         description: 'Plan & billing',
       },
+      {
+        href: '/settings/enterprise',
+        label: 'Enterprise',
+        icon: 'solar:shield-star-linear',
+        description: 'Enterprise features',
+        adminOnly: true,
+      },
     ],
   },
   {

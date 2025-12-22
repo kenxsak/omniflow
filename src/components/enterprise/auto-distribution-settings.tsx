@@ -1,24 +1,66 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Icon } from '@iconify/react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Users, Shuffle, BarChart3, Zap, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  getAutoDistributionConfigAction, 
+import {
+  getAutoDistributionConfigAction,
   saveAutoDistributionConfigAction,
   distributeUnassignedLeadsAction,
-  getEligibleRepsAction 
+  getEligibleRepsAction,
 } from '@/app/actions/enterprise-actions';
 import type { AutoDistributionConfig } from '@/types/enterprise';
 import type { AppUser } from '@/types/saas';
+
+// Reusable Settings Card matching the theme
+function SettingsCard({
+  title,
+  description,
+  icon,
+  children,
+  footer,
+}: {
+  title: string;
+  description: string;
+  icon: string;
+  children: React.ReactNode;
+  footer?: React.ReactNode;
+}) {
+  return (
+    <div className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl bg-white dark:bg-stone-950 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      <div className="px-5 py-4 border-b border-stone-200/60 dark:border-stone-800/60 bg-stone-50/50 dark:bg-stone-900/30">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-stone-100 dark:bg-stone-800">
+            <Icon icon={icon} className="h-4 w-4 text-stone-600 dark:text-stone-400" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold">{title}</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
+          </div>
+        </div>
+      </div>
+      <div className="p-5">{children}</div>
+      {footer && (
+        <div className="px-5 py-4 border-t border-stone-200/60 dark:border-stone-800/60 bg-stone-50/30 dark:bg-stone-900/20">
+          {footer}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function AutoDistributionSettings() {
   const [config, setConfig] = useState<AutoDistributionConfig>({
@@ -45,7 +87,7 @@ export function AutoDistributionSettings() {
       getAutoDistributionConfigAction(),
       getEligibleRepsAction(),
     ]);
-    
+
     if (savedConfig) {
       setConfig(savedConfig);
     }
@@ -100,30 +142,56 @@ export function AutoDistributionSettings() {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="flex items-center justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin" />
-        </CardContent>
-      </Card>
+      <SettingsCard
+        title="Auto-Distribution Settings"
+        description="Loading configuration..."
+        icon="solar:shuffle-linear"
+      >
+        <div className="flex items-center justify-center py-8">
+          <Icon icon="solar:refresh-linear" className="h-5 w-5 animate-spin text-muted-foreground" />
+        </div>
+      </SettingsCard>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Shuffle className="h-5 w-5" />
-          Auto-Distribution Settings
-        </CardTitle>
-        <CardDescription>
-          Automatically distribute new and unassigned leads fairly among your sales team
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <SettingsCard
+      title="Auto-Distribution Settings"
+      description="Automatically distribute new and unassigned leads fairly among your sales team"
+      icon="solar:shuffle-linear"
+      footer={
         <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label>Enable Auto-Distribution</Label>
-            <p className="text-sm text-muted-foreground">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8"
+            onClick={handleDistributeNow}
+            disabled={!config.enabled || isDistributing}
+          >
+            {isDistributing ? (
+              <Icon icon="solar:refresh-linear" className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+            ) : (
+              <Icon icon="solar:shuffle-linear" className="h-3.5 w-3.5 mr-1.5" />
+            )}
+            Distribute Unassigned Now
+          </Button>
+          <Button size="sm" className="h-8" onClick={handleSave} disabled={isSaving}>
+            {isSaving ? (
+              <Icon icon="solar:refresh-linear" className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+            ) : (
+              <Icon icon="solar:diskette-linear" className="h-3.5 w-3.5 mr-1.5" />
+            )}
+            Save Settings
+          </Button>
+        </div>
+      }
+    >
+      <div className="space-y-5">
+        {/* Enable Toggle */}
+        <div className="flex items-center justify-between py-3 border-b border-stone-200/60 dark:border-stone-800/60">
+          <div>
+            <Label className="text-sm font-medium">Enable Auto-Distribution</Label>
+            <p className="text-xs text-muted-foreground mt-0.5">
               Automatically assign unassigned leads to eligible team members
             </p>
           </div>
@@ -133,31 +201,34 @@ export function AutoDistributionSettings() {
           />
         </div>
 
-        <div className="space-y-3">
-          <Label>Distribution Method</Label>
+        {/* Distribution Method */}
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">Distribution Method</Label>
           <Select
             value={config.method}
-            onValueChange={(method: any) => setConfig({ ...config, method })}
+            onValueChange={(method: 'round_robin' | 'load_balanced' | 'random') =>
+              setConfig({ ...config, method })
+            }
           >
-            <SelectTrigger>
+            <SelectTrigger className="h-9">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="round_robin">
                 <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
+                  <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4" />
                   Round Robin - Equal distribution in order
                 </div>
               </SelectItem>
               <SelectItem value="load_balanced">
                 <div className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
+                  <Icon icon="solar:chart-2-linear" className="h-4 w-4" />
                   Load Balanced - Assign to rep with fewest leads
                 </div>
               </SelectItem>
               <SelectItem value="random">
                 <div className="flex items-center gap-2">
-                  <Zap className="h-4 w-4" />
+                  <Icon icon="solar:bolt-linear" className="h-4 w-4" />
                   Random - Random assignment
                 </div>
               </SelectItem>
@@ -165,27 +236,35 @@ export function AutoDistributionSettings() {
           </Select>
         </div>
 
-        <div className="space-y-3">
-          <Label>Eligible Roles</Label>
+        {/* Eligible Roles */}
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">Eligible Roles</Label>
           <div className="flex flex-wrap gap-3">
             {['user', 'manager', 'admin'].map((role) => (
-              <label key={role} className="flex items-center gap-2 cursor-pointer">
+              <label
+                key={role}
+                className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border border-stone-200/60 dark:border-stone-800/60 hover:bg-stone-50 dark:hover:bg-stone-900/50 transition-colors"
+              >
                 <Checkbox
                   checked={config.eligibleRoles.includes(role)}
                   onCheckedChange={() => toggleRole(role)}
                 />
-                <span className="capitalize">{role}</span>
+                <span className="text-sm capitalize">{role}</span>
               </label>
             ))}
           </div>
         </div>
 
+        {/* Max Leads Per Rep */}
         {config.method === 'load_balanced' && (
-          <div className="space-y-3">
-            <Label>Maximum Leads Per Rep (Optional)</Label>
+          <div className="space-y-2">
+            <Label className="text-xs text-muted-foreground">
+              Maximum Leads Per Rep (Optional)
+            </Label>
             <Input
               type="number"
               placeholder="No limit"
+              className="h-9"
               value={config.maxLeadsPerRep || ''}
               onChange={(e) =>
                 setConfig({
@@ -194,51 +273,32 @@ export function AutoDistributionSettings() {
                 })
               }
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[10px] text-muted-foreground">
               Stop assigning to a rep once they reach this limit
             </p>
           </div>
         )}
 
-        <div className="space-y-3">
-          <Label>Eligible Team Members ({eligibleReps.length})</Label>
-          <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 border rounded-md">
+        {/* Eligible Team Members */}
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">
+            Eligible Team Members ({eligibleReps.length})
+          </Label>
+          <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto p-3 rounded-lg border border-stone-200/60 dark:border-stone-800/60 bg-stone-50/50 dark:bg-stone-900/30">
             {eligibleReps.length > 0 ? (
               eligibleReps.map((rep) => (
-                <Badge key={rep.uid} variant="secondary">
+                <Badge key={rep.uid} variant="secondary" className="text-[10px]">
                   {rep.name || rep.email} ({rep.role})
                 </Badge>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 No eligible team members found. Check role settings above.
               </p>
             )}
           </div>
         </div>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button
-          variant="outline"
-          onClick={handleDistributeNow}
-          disabled={!config.enabled || isDistributing}
-        >
-          {isDistributing ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Shuffle className="h-4 w-4 mr-2" />
-          )}
-          Distribute Unassigned Now
-        </Button>
-        <Button onClick={handleSave} disabled={isSaving}>
-          {isSaving ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Save className="h-4 w-4 mr-2" />
-          )}
-          Save Settings
-        </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }

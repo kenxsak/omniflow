@@ -68,6 +68,14 @@ const allNavItems: NavItem[] = [
     featureId: "feat_core_crm",
   },
 
+  {
+    href: "/appointments",
+    label: "Appointments",
+    icon: "solar:calendar-linear",
+    tooltip: "Schedule & manage appointments",
+    featureId: "feat_core_crm",
+  },
+
   // ============ MARKETING ============
   {
     href: "/campaigns",
@@ -128,21 +136,57 @@ const allNavItems: NavItem[] = [
     subItems: [
       {
         href: "/ai-chat",
-        label: "Chat",
-        icon: "solar:chat-round-dots-linear",
-        tooltip: "AI conversation",
+        label: "All Agents",
+        icon: "solar:users-group-rounded-linear",
+        tooltip: "AI agents hub",
+      },
+      {
+        href: "/ai-chat/content-writer",
+        label: "Content Writer",
+        icon: "solar:document-text-linear",
+        tooltip: "Create blog posts, emails & more",
+      },
+      {
+        href: "/ai-chat/ad-strategist",
+        label: "Ad Strategist",
+        icon: "solar:chart-2-linear",
+        tooltip: "Plan winning ad campaigns",
+      },
+      {
+        href: "/ai-chat/visual-designer",
+        label: "Visual Designer",
+        icon: "solar:gallery-linear",
+        tooltip: "Generate stunning visuals",
+      },
+      {
+        href: "/ai-chat/seo-expert",
+        label: "SEO Expert",
+        icon: "solar:magnifer-linear",
+        tooltip: "Optimize for search",
+      },
+      {
+        href: "/ai-chat/video-producer",
+        label: "Video Producer",
+        icon: "solar:videocamera-record-linear",
+        tooltip: "Create video scripts",
       },
       {
         href: "/social-media",
-        label: "Content Writer",
-        icon: "solar:document-add-linear",
-        tooltip: "Generate content with AI",
+        label: "Content Factory",
+        icon: "solar:pen-new-square-linear",
+        tooltip: "Classic content generator",
+      },
+      {
+        href: "/ai-campaign-manager",
+        label: "Ad Manager",
+        icon: "solar:target-linear",
+        tooltip: "Classic ad campaign manager",
       },
       {
         href: "/ai-usage",
         label: "AI Credits",
         icon: "solar:wallet-linear",
-        tooltip: "View AI usage",
+        tooltip: "View AI usage & credits",
       },
     ],
   },

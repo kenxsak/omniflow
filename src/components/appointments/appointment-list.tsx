@@ -1,7 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, isToday } from 'date-fns';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  addDays,
+  isSameMonth,
+  isSameDay,
+  isToday,
+} from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,20 +21,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AppointmentCard } from './appointment-card';
-import {
-  Search,
-  CalendarIcon,
-  List,
-  LayoutGrid,
-  ChevronLeft,
-  ChevronRight,
-  CalendarDays,
-} from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 import type { Appointment, AppointmentStatus, AppointmentFilter } from '@/types/appointments';
 
@@ -49,6 +50,15 @@ const STATUS_OPTIONS: { value: AppointmentStatus | 'all'; label: string }[] = [
   { value: 'rescheduled', label: 'Rescheduled' },
 ];
 
+const STATUS_COLORS: Record<AppointmentStatus, string> = {
+  scheduled: 'bg-blue-500',
+  pending: 'bg-amber-500',
+  completed: 'bg-emerald-500',
+  cancelled: 'bg-red-500',
+  no_show: 'bg-stone-500',
+  rescheduled: 'bg-violet-500',
+};
+
 export function AppointmentList({
   appointments,
   isLoading = false,
@@ -59,7 +69,7 @@ export function AppointmentList({
   onDelete,
   onFilterChange,
 }: AppointmentListProps) {
-  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('calendar');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<AppointmentStatus | 'all'>('all');
   const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({});
@@ -112,9 +122,7 @@ export function AppointmentList({
   });
 
   const getAppointmentsForDay = (day: Date) => {
-    return filteredAppointments.filter((apt) =>
-      isSameDay(new Date(apt.startTime), day)
-    );
+    return filteredAppointments.filter((apt) => isSameDay(new Date(apt.startTime), day));
   };
 
   const renderCalendarView = () => {
@@ -131,43 +139,75 @@ export function AppointmentList({
       for (let i = 0; i < 7; i++) {
         const dayAppointments = getAppointmentsForDay(day);
         const currentDay = day;
+        const isCurrentMonth = isSameMonth(day, calendarMonth);
+        const isTodayDate = isToday(day);
 
         days.push(
           <div
             key={day.toISOString()}
             className={cn(
-              'min-h-[100px] border-r border-b p-1',
-              !isSameMonth(day, calendarMonth) && 'bg-muted/50',
-              isToday(day) && 'bg-primary/5'
+              'min-h-[110px] sm:min-h-[120px] border-b border-r border-stone-200/60 dark:border-stone-800/60 p-1.5 sm:p-2 transition-colors',
+              !isCurrentMonth && 'bg-stone-50/50 dark:bg-stone-900/30',
+              isTodayDate && 'bg-indigo-50/50 dark:bg-indigo-950/20'
             )}
           >
-            <div
-              className={cn(
-                'text-sm font-medium mb-1 px-1',
-                !isSameMonth(day, calendarMonth) && 'text-muted-foreground',
-                isToday(day) &&
-                  'bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center'
+            {/* Day Number */}
+            <div className="flex items-center justify-between mb-1.5">
+              <span
+                className={cn(
+                  'text-xs sm:text-sm font-medium',
+                  !isCurrentMonth && 'text-muted-foreground/50',
+                  isTodayDate &&
+                    'bg-indigo-600 text-white w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-[11px] sm:text-xs font-semibold'
+                )}
+              >
+                {format(day, 'd')}
+              </span>
+              {dayAppointments.length > 0 && !isTodayDate && (
+                <span className="text-[9px] text-muted-foreground bg-stone-100 dark:bg-stone-800 px-1.5 py-0.5 rounded-full">
+                  {dayAppointments.length}
+                </span>
               )}
-            >
-              {format(day, 'd')}
             </div>
+
+            {/* Appointments */}
             <div className="space-y-1">
-              {dayAppointments.slice(0, 3).map((apt) => (
+              {dayAppointments.slice(0, 2).map((apt) => (
                 <button
                   key={apt.id}
                   onClick={() => onView?.(apt)}
-                  className="w-full text-left text-xs p-1 rounded bg-primary/10 hover:bg-primary/20 truncate transition-colors"
+                  className={cn(
+                    'w-full text-left text-[10px] sm:text-xs px-1.5 sm:px-2 py-1 rounded-md truncate transition-all',
+                    'hover:ring-1 hover:ring-indigo-500/50 cursor-pointer',
+                    'bg-stone-100 dark:bg-stone-800/80 hover:bg-stone-200 dark:hover:bg-stone-700/80'
+                  )}
                 >
-                  <span className="font-medium">
-                    {format(new Date(apt.startTime), 'h:mm a')}
-                  </span>{' '}
-                  - {apt.clientName}
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className={cn(
+                        'w-1.5 h-1.5 rounded-full shrink-0',
+                        STATUS_COLORS[apt.status] || 'bg-stone-400'
+                      )}
+                    />
+                    <span className="font-medium text-foreground truncate">
+                      {format(new Date(apt.startTime), 'h:mm a')}
+                    </span>
+                    <span className="text-muted-foreground truncate hidden sm:inline">
+                      - {apt.clientName}
+                    </span>
+                  </div>
                 </button>
               ))}
-              {dayAppointments.length > 3 && (
-                <p className="text-xs text-muted-foreground px-1">
-                  +{dayAppointments.length - 3} more
-                </p>
+              {dayAppointments.length > 2 && (
+                <button
+                  onClick={() => {
+                    setCalendarMonth(currentDay);
+                    // Could open a modal with all appointments for this day
+                  }}
+                  className="text-[9px] sm:text-[10px] text-indigo-600 dark:text-indigo-400 font-medium px-1.5 hover:underline"
+                >
+                  +{dayAppointments.length - 2} more
+                </button>
               )}
             </div>
           </div>
@@ -183,45 +223,52 @@ export function AppointmentList({
     }
 
     return (
-      <div className="border rounded-lg overflow-hidden">
-        <div className="flex items-center justify-between p-4 border-b bg-muted/50">
+      <div className="border border-stone-200/60 dark:border-stone-800/60 rounded-xl overflow-hidden bg-white dark:bg-stone-950">
+        {/* Calendar Header */}
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-stone-200/60 dark:border-stone-800/60 bg-stone-50/50 dark:bg-stone-900/30">
           <Button
-            variant="outline"
-            size="icon"
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 hover:bg-stone-200 dark:hover:bg-stone-800"
             onClick={() =>
               setCalendarMonth(
                 new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1)
               )
             }
           >
-            <ChevronLeft className="h-4 w-4" />
+            <Icon icon="solar:alt-arrow-left-linear" className="h-4 w-4" />
           </Button>
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-sm sm:text-base font-semibold">
             {format(calendarMonth, 'MMMM yyyy')}
           </h2>
           <Button
-            variant="outline"
-            size="icon"
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 hover:bg-stone-200 dark:hover:bg-stone-800"
             onClick={() =>
               setCalendarMonth(
                 new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1)
               )
             }
           >
-            <ChevronRight className="h-4 w-4" />
+            <Icon icon="solar:alt-arrow-right-linear" className="h-4 w-4" />
           </Button>
         </div>
-        <div className="grid grid-cols-7 border-b">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+
+        {/* Day Headers */}
+        <div className="grid grid-cols-7 border-b border-stone-200/60 dark:border-stone-800/60">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((dayName) => (
             <div
-              key={day}
-              className="text-center text-sm font-medium p-2 border-r last:border-r-0 bg-muted/30"
+              key={dayName}
+              className="text-center text-[10px] sm:text-xs font-semibold text-muted-foreground py-2 sm:py-3 border-r border-stone-200/60 dark:border-stone-800/60 last:border-r-0 bg-stone-50/30 dark:bg-stone-900/20"
             >
-              {day}
+              {dayName}
             </div>
           ))}
         </div>
-        {rows}
+
+        {/* Calendar Grid */}
+        <div>{rows}</div>
       </div>
     );
   };
@@ -229,10 +276,12 @@ export function AppointmentList({
   const renderListView = () => {
     if (filteredAppointments.length === 0) {
       return (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <CalendarDays className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No appointments found</h3>
-          <p className="text-muted-foreground max-w-sm">
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="w-12 h-12 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center mb-4">
+            <Icon icon="solar:calendar-linear" className="h-6 w-6 text-muted-foreground" />
+          </div>
+          <h3 className="text-sm font-semibold mb-1">No appointments found</h3>
+          <p className="text-xs text-muted-foreground max-w-sm">
             {searchQuery || statusFilter !== 'all' || dateRange.from
               ? 'Try adjusting your filters to find appointments.'
               : 'Schedule your first appointment to get started.'}
@@ -261,13 +310,13 @@ export function AppointmentList({
   const renderLoadingSkeleton = () => {
     if (viewMode === 'calendar') {
       return (
-        <div className="border rounded-lg p-4">
-          <div className="flex justify-between items-center mb-4">
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-8 w-8" />
+        <div className="border border-stone-200/60 dark:border-stone-800/60 rounded-xl overflow-hidden">
+          <div className="flex justify-between items-center p-4 border-b border-stone-200/60 dark:border-stone-800/60 bg-stone-50/50 dark:bg-stone-900/30">
+            <Skeleton className="h-8 w-8 rounded-lg" />
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-8 w-8 rounded-lg" />
           </div>
-          <Skeleton className="h-[400px] w-full" />
+          <Skeleton className="h-[450px] w-full" />
         </div>
       );
     }
@@ -275,7 +324,10 @@ export function AppointmentList({
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className="border rounded-lg p-4 space-y-3">
+          <div
+            key={i}
+            className="border border-stone-200/60 dark:border-stone-800/60 rounded-xl p-4 space-y-3"
+          >
             <div className="flex justify-between">
               <Skeleton className="h-5 w-32" />
               <Skeleton className="h-5 w-20" />
@@ -298,45 +350,52 @@ export function AppointmentList({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-4">
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Icon
+            icon="solar:magnifer-linear"
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+          />
           <Input
             placeholder="Search by client name, email, or title..."
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            className="pl-10"
+            className="pl-9 h-9 text-sm bg-white dark:bg-stone-950 border-stone-200 dark:border-stone-800"
           />
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap sm:flex-nowrap">
+          {/* Status Filter */}
           <Select
             value={statusFilter}
-            onValueChange={(value) =>
-              handleStatusChange(value as AppointmentStatus | 'all')
-            }
+            onValueChange={(value) => handleStatusChange(value as AppointmentStatus | 'all')}
           >
-            <SelectTrigger className="w-[150px]">
+            <SelectTrigger className="w-full sm:w-[130px] h-9 text-xs bg-white dark:bg-stone-950 border-stone-200 dark:border-stone-800">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
               {STATUS_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
+                <SelectItem key={option.value} value={option.value} className="text-xs">
                   {option.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
+          {/* Date Range */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-[200px] justify-start">
-                <CalendarIcon className="mr-2 h-4 w-4" />
+              <Button
+                variant="outline"
+                className="w-full sm:w-[160px] h-9 justify-start text-xs bg-white dark:bg-stone-950 border-stone-200 dark:border-stone-800"
+              >
+                <Icon icon="solar:calendar-linear" className="mr-2 h-3.5 w-3.5" />
                 {dateRange.from ? (
                   dateRange.to ? (
                     <>
-                      {format(dateRange.from, 'MMM d')} -{' '}
-                      {format(dateRange.to, 'MMM d')}
+                      {format(dateRange.from, 'MMM d')} - {format(dateRange.to, 'MMM d')}
                     </>
                   ) : (
                     format(dateRange.from, 'MMM d, yyyy')
@@ -350,16 +409,14 @@ export function AppointmentList({
               <Calendar
                 mode="range"
                 selected={{ from: dateRange.from, to: dateRange.to }}
-                onSelect={(range) =>
-                  handleDateRangeChange({ from: range?.from, to: range?.to })
-                }
+                onSelect={(range) => handleDateRangeChange({ from: range?.from, to: range?.to })}
                 numberOfMonths={2}
               />
-              <div className="p-2 border-t">
+              <div className="p-2 border-t border-stone-200 dark:border-stone-800">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full"
+                  className="w-full h-8 text-xs"
                   onClick={() => handleDateRangeChange({})}
                 >
                   Clear Dates
@@ -368,35 +425,47 @@ export function AppointmentList({
             </PopoverContent>
           </Popover>
 
-          <Tabs
-            value={viewMode}
-            onValueChange={(v) => setViewMode(v as 'list' | 'calendar')}
-          >
-            <TabsList>
-              <TabsTrigger value="list">
-                <List className="h-4 w-4" />
-              </TabsTrigger>
-              <TabsTrigger value="calendar">
-                <LayoutGrid className="h-4 w-4" />
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          {/* View Toggle */}
+          <div className="flex border border-stone-200 dark:border-stone-800 rounded-lg overflow-hidden bg-white dark:bg-stone-950">
+            <button
+              onClick={() => setViewMode('list')}
+              className={cn(
+                'h-9 px-3 flex items-center justify-center transition-colors',
+                viewMode === 'list'
+                  ? 'bg-stone-100 dark:bg-stone-800 text-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-stone-50 dark:hover:bg-stone-900'
+              )}
+            >
+              <Icon icon="solar:list-linear" className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('calendar')}
+              className={cn(
+                'h-9 px-3 flex items-center justify-center transition-colors border-l border-stone-200 dark:border-stone-800',
+                viewMode === 'calendar'
+                  ? 'bg-stone-100 dark:bg-stone-800 text-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-stone-50 dark:hover:bg-stone-900'
+              )}
+            >
+              <Icon icon="solar:calendar-minimalistic-linear" className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="text-sm text-muted-foreground">
+      {/* Results Count */}
+      <div className="text-[11px] text-muted-foreground">
         {isLoading
           ? 'Loading...'
           : `${filteredAppointments.length} appointment${filteredAppointments.length !== 1 ? 's' : ''} found`}
       </div>
 
-      {isLoading ? (
-        renderLoadingSkeleton()
-      ) : viewMode === 'calendar' ? (
-        renderCalendarView()
-      ) : (
-        renderListView()
-      )}
+      {/* Content */}
+      {isLoading
+        ? renderLoadingSkeleton()
+        : viewMode === 'calendar'
+          ? renderCalendarView()
+          : renderListView()}
     </div>
   );
 }

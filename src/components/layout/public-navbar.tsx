@@ -25,7 +25,6 @@ export function PublicNavbar() {
           >
             <Icon icon="solar:smartphone-bold" className="w-4 h-4" />
             <span>Digital Card</span>
-            <Badge className="bg-success text-success-foreground text-xs font-semibold">FREE</Badge>
           </Link>
           <Link
             href="/#features"
@@ -97,7 +96,6 @@ export function PublicNavbar() {
           >
             <Icon icon="solar:smartphone-bold" className="w-4 h-4" />
             <span>Digital Card</span>
-            <Badge className="bg-success text-success-foreground text-xs font-semibold">FREE</Badge>
           </Link>
           <Link
             href="/#features"
