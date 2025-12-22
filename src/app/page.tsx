@@ -360,13 +360,13 @@ export default function HomePage() {
         {/* FREE Digital Card Section - Major Sales Magnet */}
         <section id="digital-card" className="py-20 px-4 bg-muted/30 line-b relative overflow-hidden">
           <div className="absolute top-4 right-4 md:top-8 md:right-8">
-            <Badge variant="default" className="bg-primary text-primary-foreground text-lg px-4 py-2">
+            <Badge className="bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-200 text-lg px-4 py-2 rounded-xl border border-stone-200/60 dark:border-stone-700/60">
               100% FREE Forever
             </Badge>
           </div>
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <Badge variant="default" className="mb-4">
+              <Badge className="mb-4 bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 px-3 py-1.5 rounded-xl border border-stone-200/60 dark:border-stone-700/60">
                 <Icon icon="solar:smartphone-bold" className="w-4 h-4 mr-1 inline" />
                 No Website? No Problem!
               </Badge>
@@ -405,13 +405,13 @@ export default function HomePage() {
                   <div className="grid grid-cols-2 gap-4">
                     {[
                       { icon: "solar:chat-square-bold", title: "Lead Capture Form", desc: "Collect inquiries 24/7", badge: "FREE" },
-                      { icon: "solar:bot-bold", title: "AI Voice Chatbot", desc: "14-day premium trial, then free", badge: "ONLY US" },
+                      { icon: "solar:microphone-3-bold", title: "AI Voice Chatbot", desc: "14-day premium trial, then free", badge: "ONLY US" },
                       { icon: "solar:calendar-bold", title: "Calendar Booking", desc: "Let clients schedule", badge: "FREE" },
                       { icon: "solar:database-bold", title: "Built-in CRM", desc: "All leads synced", badge: "FREE" },
                     ].map((item, i) => (
                       <Card key={i} className="glass-2">
                         <CardContent className="pt-4 pb-4 text-center">
-                          <Badge className={cn("mb-2", item.badge === "ONLY US" ? "bg-secondary text-secondary-foreground" : "bg-primary text-primary-foreground")}>{item.badge}</Badge>
+                          <Badge className={cn("mb-2 rounded-lg px-2 py-0.5 border", item.badge === "ONLY US" ? "bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 border-stone-300/60 dark:border-stone-600/60" : "bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200/60 dark:border-stone-700/60")}>{item.badge}</Badge>
                           <Icon icon={item.icon} className="w-8 h-8 mx-auto mb-2 text-primary" />
                           <p className="font-semibold text-sm">{item.title}</p>
                           <p className="text-xs text-muted-foreground">{item.desc}</p>
@@ -428,16 +428,16 @@ export default function HomePage() {
               <CardContent className="pt-6 pb-6">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <Icon icon="solar:bot-bold" className="w-10 h-10 text-primary" />
+                    <Icon icon="solar:microphone-3-bold" className="w-10 h-10 text-primary" />
                     <div>
                       <p className="font-bold text-lg">AI Voice Chatbot — No Competitor Has This!</p>
                       <p className="text-sm text-muted-foreground">14-day premium trial, then English FREE forever | 109+ languages on Pro</p>
                     </div>
                   </div>
                   <div className="flex gap-2 flex-wrap justify-center">
-                    <Badge>English FREE</Badge>
-                    <Badge variant="secondary">14-Day Premium Trial</Badge>
-                    <Badge variant="outline">109+ Languages Pro</Badge>
+                    <Badge className="bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 rounded-lg px-2.5 py-1 border border-stone-200/60 dark:border-stone-700/60">English FREE</Badge>
+                    <Badge className="bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 rounded-lg px-2.5 py-1 border border-stone-200/60 dark:border-stone-700/60">14-Day Premium Trial</Badge>
+                    <Badge className="bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 rounded-lg px-2.5 py-1 border border-stone-200/60 dark:border-stone-700/60">109+ Languages Pro</Badge>
                   </div>
                 </div>
               </CardContent>
@@ -447,7 +447,7 @@ export default function HomePage() {
             <div id="digital-card-features" className="grid md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
               {[
                 { icon: "solar:chat-square-bold", title: "Contact Form", desc: "Capture leads automatically" },
-                { icon: "solar:bot-bold", title: "AI Voice Chat", desc: "English free, upgrade for more" },
+                { icon: "solar:microphone-3-bold", title: "AI Voice Chat", desc: "English free, upgrade for more" },
                 { icon: "solar:target-bold", title: "QR Code", desc: "Share anywhere instantly" },
                 { icon: "solar:calendar-bold", title: "Calendar Link", desc: "Book meetings easily" },
                 { icon: "solar:stars-bold", title: "Custom Branding", desc: "Your colors & logo" },
@@ -683,7 +683,7 @@ export default function HomePage() {
                       { icon: "solar:chat-square-bold", label: "WhatsApp Business API" },
                       { icon: "solar:letter-bold", label: "Email Marketing" },
                       { icon: "solar:smartphone-bold", label: "SMS Campaigns" },
-                      { icon: "solar:bot-bold", label: "Voice Calls & IVR" },
+                      { icon: "solar:phone-calling-bold", label: "Voice Calls & IVR" },
                     ].map((item, i) => (
                       <div key={i} className="flex items-center gap-2 text-sm">
                         <Icon icon={item.icon} className="w-4 h-4 text-primary" />
@@ -751,7 +751,7 @@ export default function HomePage() {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
               <Badge variant="default" className="mb-4">
-                <Icon icon="solar:bot-bold" className="w-4 h-4 mr-1 inline" />
+                <Icon icon="solar:microphone-3-bold" className="w-4 h-4 mr-1 inline" />
                 AI Voice Assistant
               </Badge>
               <h2 className="text-3xl md:text-5xl font-bold mb-6">
@@ -766,7 +766,7 @@ export default function HomePage() {
               <Card className="glass-2">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Icon icon="solar:bot-bold" className="w-6 h-6 text-primary" />
+                    <Icon icon="solar:microphone-3-bold" className="w-6 h-6 text-primary" />
                     Voice Chat AI Features
                   </CardTitle>
                 </CardHeader>

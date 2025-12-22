@@ -105,8 +105,26 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="OmniFlow" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme');
+                  if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else if (theme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                  } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
       </head>
-      <body className={`${geistSans.variable} font-sans antialiased`}>
+      <body className={`${geistSans.variable} font-sans antialiased bg-background`}>
         {children}
         <script
           dangerouslySetInnerHTML={{
