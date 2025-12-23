@@ -87,7 +87,7 @@ const parseAndRenderScript = (scriptText: string, useImagePromptAndGo: (promptTe
 // Navigation tabs configuration
 const navTabs = [
   { id: 'trends', label: 'Trending Topics', icon: 'solar:lightbulb-linear' },
-  { id: 'enhancer', label: 'Prompt Enhancer', icon: 'solar:brain-linear' },
+  { id: 'enhancer', label: 'Prompt Enhancer', icon: 'solar:magic-stick-3-linear' },
   { id: 'content', label: 'Content Generator', icon: 'solar:document-text-linear' },
   { id: 'image', label: 'Image Generator', icon: 'solar:gallery-linear' },
   { id: 'hashtags', label: 'Hashtags', icon: 'solar:hashtag-linear' },
@@ -118,6 +118,9 @@ export default function SocialMediaPage() {
   const [selectedAspectRatio, setSelectedAspectRatio] = useState<ImageAspectRatio>("Default");
   const [generatedImageDataUri, setGeneratedImageDataUri] = useState<string | null>(null);
   const [promptForGeneratedImage, setPromptForGeneratedImage] = useState<string>('');
+  const [brandLogo, setBrandLogo] = useState<string | null>(null);
+  const [includeLogo, setIncludeLogo] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const [trendInputs, setTrendInputs] = useState<GetTrendingTopicSuggestionsInput>({
     businessNiche: '', contentType: 'BlogPost', planningHorizon: 'Weekly', targetRegion: 'Global',
@@ -385,6 +388,39 @@ export default function SocialMediaPage() {
     toast({ title: "Image Prompt Set", description: `Aspect ratio: ${parsedRatio}`});
   }, [parseAspectRatioFromPrompt, toast]);
 
+  // Handle logo upload for branding
+  const handleLogoUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({ title: 'Invalid File', description: 'Please upload an image file (PNG, JPG, SVG)', variant: 'destructive' });
+      return;
+    }
+    
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: 'File Too Large', description: 'Logo must be under 2MB', variant: 'destructive' });
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUri = event.target?.result as string;
+      setBrandLogo(dataUri);
+      setIncludeLogo(true);
+      toast({ title: 'Logo Uploaded', description: 'Your brand logo will be added to generated images' });
+    };
+    reader.readAsDataURL(file);
+  }, [toast]);
+
+  const removeLogo = useCallback(() => {
+    setBrandLogo(null);
+    setIncludeLogo(false);
+    if (logoInputRef.current) logoInputRef.current.value = '';
+  }, []);
+
   const handleImageGenerationSubmit = useCallback(async (e?: FormEvent) => {
     e?.preventDefault();
     if (!imagePrompt || !appUser) {
@@ -401,7 +437,19 @@ export default function SocialMediaPage() {
 
     setPromptForGeneratedImage(imagePrompt);
     try {
-      const result = await generateTrackedImageAction(appUser.companyId, appUser.uid, { prompt: imagePrompt, aspectRatio: aspectRatio as any });
+      // Build input with optional brand logo for AI-powered branding
+      const imageInput: any = { 
+        prompt: imagePrompt, 
+        aspectRatio: aspectRatio as any 
+      };
+      
+      // If brand logo is uploaded, pass it to the AI for branded image generation
+      if (brandLogo && includeLogo) {
+        imageInput.brandLogo = brandLogo;
+        imageInput.brandName = company?.name || undefined;
+      }
+      
+      const result = await generateTrackedImageAction(appUser.companyId, appUser.uid, imageInput);
 
       if (result.success && result.data?.imageDataUri) {
         setGeneratedImageDataUri(result.data.imageDataUri);
@@ -427,7 +475,7 @@ export default function SocialMediaPage() {
     } finally {
       setIsGeneratingImage(false);
     }
-  }, [imagePrompt, selectedAspectRatio, toast, generatedContent, appUser]);
+  }, [imagePrompt, selectedAspectRatio, toast, generatedContent, appUser, brandLogo, includeLogo, company]);
 
   const handleTrendFormSubmit = useCallback(async (e: FormEvent) => {
     e.preventDefault();
@@ -523,17 +571,110 @@ export default function SocialMediaPage() {
     }
   }, [toast]);
 
-  const downloadImage = useCallback(() => {
+  const downloadImage = useCallback(async () => {
     if (!generatedImageDataUri) return;
-    const link = document.createElement('a');
-    link.href = generatedImageDataUri;
-    const fileNamePromptPart = imagePrompt.substring(0, 20).replace(/\s+/g, '_').replace(/[^\w-]/g, '');
-    link.download = `omniflow-ai-image-${fileNamePromptPart || 'generated'}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast({ title: 'Image Download Started' });
-  }, [generatedImageDataUri, imagePrompt, toast]);
+    
+    // If no logo, download directly
+    if (!brandLogo || !includeLogo) {
+      const link = document.createElement('a');
+      link.href = generatedImageDataUri;
+      const fileNamePromptPart = imagePrompt.substring(0, 20).replace(/\s+/g, '_').replace(/[^\w-]/g, '');
+      link.download = `omniflow-ai-image-${fileNamePromptPart || 'generated'}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast({ title: 'Image Download Started' });
+      return;
+    }
+    
+    // With logo - composite the images using canvas
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas not supported');
+      
+      // Load the main image
+      const mainImg = new Image();
+      mainImg.crossOrigin = 'anonymous';
+      
+      await new Promise<void>((resolve, reject) => {
+        mainImg.onload = () => resolve();
+        mainImg.onerror = reject;
+        mainImg.src = generatedImageDataUri;
+      });
+      
+      // Set canvas size to main image
+      canvas.width = mainImg.width;
+      canvas.height = mainImg.height;
+      
+      // Draw main image
+      ctx.drawImage(mainImg, 0, 0);
+      
+      // Load and draw logo
+      const logoImg = new Image();
+      logoImg.crossOrigin = 'anonymous';
+      
+      await new Promise<void>((resolve, reject) => {
+        logoImg.onload = () => resolve();
+        logoImg.onerror = reject;
+        logoImg.src = brandLogo;
+      });
+      
+      // Calculate logo size (max 15% of image width, maintain aspect ratio)
+      const maxLogoWidth = canvas.width * 0.15;
+      const maxLogoHeight = canvas.height * 0.15;
+      let logoWidth = logoImg.width;
+      let logoHeight = logoImg.height;
+      
+      if (logoWidth > maxLogoWidth) {
+        const ratio = maxLogoWidth / logoWidth;
+        logoWidth = maxLogoWidth;
+        logoHeight = logoHeight * ratio;
+      }
+      if (logoHeight > maxLogoHeight) {
+        const ratio = maxLogoHeight / logoHeight;
+        logoHeight = maxLogoHeight;
+        logoWidth = logoWidth * ratio;
+      }
+      
+      // Position logo in bottom-right corner with padding
+      const padding = Math.min(canvas.width, canvas.height) * 0.03;
+      const logoX = canvas.width - logoWidth - padding;
+      const logoY = canvas.height - logoHeight - padding;
+      
+      // Draw semi-transparent background for logo
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      const bgPadding = 8;
+      ctx.beginPath();
+      ctx.roundRect(logoX - bgPadding, logoY - bgPadding, logoWidth + bgPadding * 2, logoHeight + bgPadding * 2, 8);
+      ctx.fill();
+      
+      // Draw logo
+      ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight);
+      
+      // Download the composited image
+      const dataUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      const fileNamePromptPart = imagePrompt.substring(0, 20).replace(/\s+/g, '_').replace(/[^\w-]/g, '');
+      link.download = `omniflow-branded-${fileNamePromptPart || 'generated'}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast({ title: 'Branded Image Downloaded', description: 'Your logo has been added to the image' });
+    } catch (error) {
+      console.error('Error compositing image:', error);
+      // Fallback to downloading without logo
+      const link = document.createElement('a');
+      link.href = generatedImageDataUri;
+      const fileNamePromptPart = imagePrompt.substring(0, 20).replace(/\s+/g, '_').replace(/[^\w-]/g, '');
+      link.download = `omniflow-ai-image-${fileNamePromptPart || 'generated'}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast({ title: 'Image Downloaded', description: 'Logo could not be added', variant: 'destructive' });
+    }
+  }, [generatedImageDataUri, imagePrompt, brandLogo, includeLogo, toast]);
   
   const useTrendSuggestionForContent = useCallback((topic: string, keywords: string[]) => {
     handleContentInputChange('topic', topic);
@@ -700,35 +841,92 @@ export default function SocialMediaPage() {
               <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
               <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Icon icon="solar:brain-linear" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:magic-stick-3-linear" className="h-4 w-4 text-muted-foreground" />
                   <h2 className="text-sm font-semibold">Prompt Enhancer</h2>
                 </div>
-                <p className="text-xs text-muted-foreground mb-4">Turn simple ideas into powerful, detailed prompts for AI tools.</p>
+                <p className="text-xs text-muted-foreground mb-4">Turn simple ideas into powerful, detailed prompts for AI image generation and content creation.</p>
                 <form onSubmit={handleEnhancedPromptSubmit} className="space-y-4">
                   <div>
                     <Label className="text-xs">Your Basic Idea *</Label>
-                    <Textarea value={enhancedPromptInputs.originalPrompt} onChange={(e) => handleEnhancedPromptInputChange('originalPrompt', e.target.value)} placeholder="e.g., A sales page for my SaaS company" required rows={3} className="mt-1.5 text-sm" />
+                    <Textarea 
+                      value={enhancedPromptInputs.originalPrompt} 
+                      onChange={(e) => handleEnhancedPromptInputChange('originalPrompt', e.target.value)} 
+                      placeholder={enhancedPromptInputs.promptGoal === 'ImageGeneration' 
+                        ? "e.g., A marketing image for my CRM software" 
+                        : "e.g., A sales page for my SaaS company"
+                      } 
+                      required 
+                      rows={3} 
+                      className="mt-1.5 text-sm" 
+                    />
                   </div>
                   <div>
                     <Label className="text-xs">Output Type *</Label>
                     <Select value={enhancedPromptInputs.promptGoal} onValueChange={(value: PromptGoal) => handleEnhancedPromptInputChange('promptGoal', value as string)}>
                       <SelectTrigger className="mt-1.5 h-9 text-sm"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="SalesPageBrief">Sales Page Brief</SelectItem>
-                        <SelectItem value="ImageGeneration">Image Generation</SelectItem>
-                        <SelectItem value="TextContent">Text Content</SelectItem>
-                        <SelectItem value="VideoScriptIdea">Video Script Idea</SelectItem>
+                        <SelectItem value="ImageGeneration">
+                          <div className="flex items-center gap-2">
+                            <Icon icon="solar:gallery-linear" className="h-3.5 w-3.5" />
+                            Image Generation
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="SalesPageBrief">
+                          <div className="flex items-center gap-2">
+                            <Icon icon="solar:document-text-linear" className="h-3.5 w-3.5" />
+                            Sales Page Brief
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="TextContent">
+                          <div className="flex items-center gap-2">
+                            <Icon icon="solar:pen-new-square-linear" className="h-3.5 w-3.5" />
+                            Text Content
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="VideoScriptIdea">
+                          <div className="flex items-center gap-2">
+                            <Icon icon="solar:video-frame-linear" className="h-3.5 w-3.5" />
+                            Video Script Idea
+                          </div>
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+                  
+                  {/* Contextual tips based on output type */}
+                  {enhancedPromptInputs.promptGoal === 'ImageGeneration' && (
+                    <div className="p-3 rounded-lg bg-stone-100 dark:bg-stone-800/50 border border-stone-200/50 dark:border-stone-700/50">
+                      <p className="text-xs text-muted-foreground flex items-start gap-2">
+                        <Icon icon="solar:lightbulb-linear" className="h-4 w-4 shrink-0 mt-0.5" />
+                        <span>For best results, mention: subject, style (photorealistic, illustration, 3D), colors, mood, and composition. The AI will expand your idea into a detailed image prompt.</span>
+                      </p>
+                    </div>
+                  )}
+                  
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label className="text-xs">Style/Tone (Optional)</Label>
-                      <Input value={enhancedPromptInputs.desiredStyle || ''} onChange={(e) => handleEnhancedPromptInputChange('desiredStyle', e.target.value)} placeholder="e.g., photorealistic, witty" className="mt-1.5 h-9 text-sm" />
+                      <Input 
+                        value={enhancedPromptInputs.desiredStyle || ''} 
+                        onChange={(e) => handleEnhancedPromptInputChange('desiredStyle', e.target.value)} 
+                        placeholder={enhancedPromptInputs.promptGoal === 'ImageGeneration' 
+                          ? "e.g., photorealistic, minimalist, neon" 
+                          : "e.g., professional, witty, casual"
+                        } 
+                        className="mt-1.5 h-9 text-sm" 
+                      />
                     </div>
                     <div>
                       <Label className="text-xs">Key Elements (Optional)</Label>
-                      <Input value={enhancedPromptInputs.keyElements || ''} onChange={(e) => handleEnhancedPromptInputChange('keyElements', e.target.value)} placeholder="e.g., futuristic, calm" className="mt-1.5 h-9 text-sm" />
+                      <Input 
+                        value={enhancedPromptInputs.keyElements || ''} 
+                        onChange={(e) => handleEnhancedPromptInputChange('keyElements', e.target.value)} 
+                        placeholder={enhancedPromptInputs.promptGoal === 'ImageGeneration' 
+                          ? "e.g., dark background, gradient, tech" 
+                          : "e.g., benefits, testimonials, CTA"
+                        } 
+                        className="mt-1.5 h-9 text-sm" 
+                      />
                     </div>
                   </div>
                   <Button type="submit" disabled={isEnhancingPrompt} size="sm" className="h-8">
@@ -743,18 +941,89 @@ export default function SocialMediaPage() {
             {enhancedPromptResult && (
               <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
                 <div className="p-4 sm:p-6 space-y-4">
-                  <h3 className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Enhanced Prompt</h3>
-                  <Textarea value={enhancedPromptResult.enhancedPrompt} readOnly rows={5} className="text-sm bg-stone-50 dark:bg-stone-900" />
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => copyToClipboard(enhancedPromptResult.enhancedPrompt, "Enhanced Prompt")}>
-                      <Icon icon="solar:copy-linear" className="mr-1 h-3 w-3" /> Copy
-                    </Button>
-                    <Button size="sm" className="h-7 text-xs" onClick={() => useEnhancedPrompt(enhancedPromptResult.enhancedPrompt, enhancedPromptInputs.promptGoal as PromptGoal)}>
-                      <Icon icon="solar:arrow-right-linear" className="mr-1 h-3 w-3" /> Use This Prompt
-                    </Button>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Enhanced Prompt</h3>
+                    {enhancedPromptInputs.promptGoal === 'ImageGeneration' && (
+                      <Badge variant="secondary" className="text-[9px]">Ready for Image Generation</Badge>
+                    )}
                   </div>
+                  <Textarea value={enhancedPromptResult.enhancedPrompt} readOnly rows={5} className="text-sm bg-stone-50 dark:bg-stone-900" />
+                  
+                  {/* Action buttons based on prompt goal */}
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => copyToClipboard(enhancedPromptResult.enhancedPrompt, "Enhanced Prompt")}>
+                      <Icon icon="solar:copy-linear" className="mr-1.5 h-3.5 w-3.5" /> Copy Prompt
+                    </Button>
+                    
+                    {enhancedPromptInputs.promptGoal === 'ImageGeneration' ? (
+                      <>
+                        <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => useEnhancedPrompt(enhancedPromptResult.enhancedPrompt, enhancedPromptInputs.promptGoal as PromptGoal)}>
+                          <Icon icon="solar:pen-new-square-linear" className="mr-1.5 h-3.5 w-3.5" /> Edit in Image Generator
+                        </Button>
+                        <Button size="sm" className="h-8 text-xs" onClick={async () => {
+                          // Direct image generation with enhanced prompt
+                          if (!appUser) return;
+                          setImagePrompt(enhancedPromptResult.enhancedPrompt);
+                          setActiveTab('image');
+                          setIsGeneratingImage(true);
+                          setGeneratedImageDataUri(null);
+                          setPromptForGeneratedImage(enhancedPromptResult.enhancedPrompt);
+                          
+                          try {
+                            const imageInput: any = { 
+                              prompt: enhancedPromptResult.enhancedPrompt, 
+                              aspectRatio: undefined 
+                            };
+                            if (brandLogo && includeLogo) {
+                              imageInput.brandLogo = brandLogo;
+                              imageInput.brandName = company?.name || undefined;
+                            }
+                            const result = await generateTrackedImageAction(appUser.companyId, appUser.uid, imageInput);
+                            if (result.success && result.data?.imageDataUri) {
+                              setGeneratedImageDataUri(result.data.imageDataUri);
+                              showAIImageGeneratedToast(toast, result.quotaInfo);
+                            } else {
+                              throw new Error(result.error || 'Image generation failed.');
+                            }
+                          } catch (error: any) {
+                            toast({ title: 'Image Generation Failed', description: error.message, variant: 'destructive' });
+                          } finally {
+                            setIsGeneratingImage(false);
+                          }
+                        }} disabled={isGeneratingImage}>
+                          {isGeneratingImage ? (
+                            <Icon icon="solar:refresh-linear" className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Icon icon="solar:gallery-add-linear" className="mr-1.5 h-3.5 w-3.5" />
+                          )}
+                          {brandLogo ? 'Generate Branded Image' : 'Generate Image Now'}
+                        </Button>
+                      </>
+                    ) : (
+                      <Button size="sm" className="h-8 text-xs" onClick={() => useEnhancedPrompt(enhancedPromptResult.enhancedPrompt, enhancedPromptInputs.promptGoal as PromptGoal)}>
+                        <Icon icon="solar:arrow-right-linear" className="mr-1.5 h-3.5 w-3.5" /> Use This Prompt
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {/* Brand logo indicator for image generation */}
+                  {enhancedPromptInputs.promptGoal === 'ImageGeneration' && brandLogo && (
+                    <div className="flex items-center gap-2 p-2.5 rounded-lg bg-stone-100 dark:bg-stone-800/50 border border-stone-200/50 dark:border-stone-700/50">
+                      <div className="h-8 w-8 rounded-md border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 p-0.5 flex items-center justify-center overflow-hidden">
+                        <NextImage src={brandLogo} alt="Brand logo" width={28} height={28} className="object-contain" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-medium">Brand logo will be used</p>
+                        <p className="text-[10px] text-muted-foreground">AI will incorporate your branding into the image</p>
+                      </div>
+                    </div>
+                  )}
+                  
                   {enhancedPromptResult.guidanceNotes && (
-                    <p className="text-xs text-muted-foreground p-2 bg-stone-50 dark:bg-stone-900 rounded-lg">{enhancedPromptResult.guidanceNotes}</p>
+                    <div className="p-3 bg-stone-50 dark:bg-stone-900 rounded-lg border border-stone-200/50 dark:border-stone-700/50">
+                      <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-1">AI Guidance</p>
+                      <p className="text-xs text-muted-foreground">{enhancedPromptResult.guidanceNotes}</p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -986,8 +1255,49 @@ export default function SocialMediaPage() {
                 </div>
                 <form onSubmit={handleImageGenerationSubmit} className="space-y-4">
                   <div>
-                    <Label className="text-xs">Image Prompt *</Label>
-                    <Textarea value={imagePrompt} onChange={(e) => setImagePrompt(e.target.value)} placeholder="Describe the image you want in detail..." rows={3} required className="mt-1.5 text-sm" />
+                    <div className="flex items-center justify-between mb-1.5">
+                      <Label className="text-xs">Image Prompt *</Label>
+                      {imagePrompt.length > 10 && (
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 text-xs text-muted-foreground hover:text-foreground"
+                          onClick={async () => {
+                            if (!appUser || !imagePrompt) return;
+                            setIsEnhancingPrompt(true);
+                            try {
+                              const result = await generateTrackedEnhancedPromptAction(appUser.companyId, appUser.uid, {
+                                originalPrompt: imagePrompt,
+                                promptGoal: 'ImageGeneration',
+                                desiredStyle: '',
+                                keyElements: ''
+                              });
+                              if (result.success && result.data?.enhancedPrompt) {
+                                setImagePrompt(result.data.enhancedPrompt);
+                                toast({ title: 'Prompt Enhanced', description: 'Your prompt has been improved for better image generation' });
+                              } else {
+                                throw new Error(result.error || 'Failed to enhance prompt');
+                              }
+                            } catch (error: any) {
+                              toast({ title: 'Enhancement Failed', description: error.message, variant: 'destructive' });
+                            } finally {
+                              setIsEnhancingPrompt(false);
+                            }
+                          }}
+                          disabled={isEnhancingPrompt}
+                        >
+                          {isEnhancingPrompt ? (
+                            <Icon icon="solar:refresh-linear" className="mr-1 h-3 w-3 animate-spin" />
+                          ) : (
+                            <Icon icon="solar:magic-stick-3-linear" className="mr-1 h-3 w-3" />
+                          )}
+                          Enhance Prompt
+                        </Button>
+                      )}
+                    </div>
+                    <Textarea value={imagePrompt} onChange={(e) => setImagePrompt(e.target.value)} placeholder="Describe the image you want in detail... (e.g., A modern SaaS dashboard with dark theme, showing analytics charts)" rows={3} required className="text-sm" />
+                    <p className="text-[10px] text-muted-foreground mt-1">Tip: Be specific about style, colors, composition, and mood for better results</p>
                   </div>
                   <div>
                     <Label className="text-xs">Aspect Ratio</Label>
@@ -1002,10 +1312,58 @@ export default function SocialMediaPage() {
                       </SelectContent>
                     </Select>
                   </div>
+                  
+                  {/* Brand Logo Section */}
+                  <div className="border border-dashed border-stone-300 dark:border-stone-700 rounded-lg p-3 bg-stone-50/50 dark:bg-stone-900/50">
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-xs flex items-center gap-1.5">
+                        <Icon icon="solar:magic-stick-3-linear" className="h-3.5 w-3.5" />
+                        Brand Logo
+                        <Badge variant="secondary" className="text-[9px] ml-1">AI Branding</Badge>
+                      </Label>
+                      {brandLogo && (
+                        <Button type="button" variant="ghost" size="sm" className="h-6 text-xs text-muted-foreground hover:text-destructive" onClick={removeLogo}>
+                          <Icon icon="solar:trash-bin-minimalistic-linear" className="h-3 w-3 mr-1" />
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {brandLogo ? (
+                      <div className="flex items-center gap-3">
+                        <div className="relative h-12 w-12 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 p-1 flex items-center justify-center overflow-hidden">
+                          <NextImage src={brandLogo} alt="Brand logo" width={40} height={40} className="object-contain" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs font-medium text-foreground">Logo ready for AI branding</p>
+                          <p className="text-[10px] text-muted-foreground">AI will analyze colors & style to create branded images</p>
+                        </div>
+                        <label className="cursor-pointer">
+                          <Button type="button" variant="outline" size="sm" className="h-7 text-xs" asChild>
+                            <span>
+                              <Icon icon="solar:refresh-linear" className="h-3 w-3 mr-1" />
+                              Change
+                            </span>
+                          </Button>
+                          <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                        </label>
+                      </div>
+                    ) : (
+                      <label className="cursor-pointer block">
+                        <div className="flex flex-col items-center justify-center gap-1.5 py-4 border border-dashed border-stone-300 dark:border-stone-600 rounded-lg hover:border-stone-400 dark:hover:border-stone-500 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 transition-colors">
+                          <Icon icon="solar:upload-linear" className="h-5 w-5 text-muted-foreground" />
+                          <span className="text-xs text-muted-foreground">Upload your brand logo</span>
+                          <span className="text-[10px] text-muted-foreground/70">AI will incorporate your branding into generated images</span>
+                        </div>
+                        <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                      </label>
+                    )}
+                  </div>
+
                   <Button type="submit" disabled={isGeneratingImage} size="sm" className="h-8">
                     {isGeneratingImage && <Icon icon="solar:refresh-linear" className="mr-2 h-3.5 w-3.5 animate-spin" />}
                     <Icon icon="solar:gallery-add-linear" className="mr-2 h-3.5 w-3.5" />
-                    Generate Image
+                    {brandLogo ? 'Generate Branded Image' : 'Generate Image'}
                   </Button>
                 </form>
               </div>
@@ -1022,26 +1380,87 @@ export default function SocialMediaPage() {
 
             {generatedImageDataUri && (
               <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-                <div className="p-4 sm:p-6 space-y-4">
-                  <h3 className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Generated Image</h3>
-                  <div className="border border-stone-200 dark:border-stone-800 rounded-lg p-2 bg-stone-50 dark:bg-stone-900 flex justify-center">
-                    <NextImage src={generatedImageDataUri} alt={promptForGeneratedImage || "AI generated"} width={300} height={300} className="rounded-lg object-contain max-h-[380px]" />
-                  </div>
-                  {promptForGeneratedImage && (
-                    <div>
-                      <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Prompt Used</span>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Input value={promptForGeneratedImage} readOnly className="h-8 text-xs bg-stone-50 dark:bg-stone-900" />
-                        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => copyToClipboard(promptForGeneratedImage, 'Prompt')}>
-                          <Icon icon="solar:copy-linear" className="h-3 w-3" />
+                <div className="p-4 sm:p-6">
+                  <h3 className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-4">Generated Image</h3>
+                  
+                  {/* Professional side-by-side layout */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Left: Image Preview */}
+                    <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl p-3 bg-stone-50 dark:bg-stone-900 flex items-center justify-center min-h-[300px]">
+                      <NextImage 
+                        src={generatedImageDataUri} 
+                        alt={promptForGeneratedImage || "AI generated"} 
+                        width={400} 
+                        height={400} 
+                        className="rounded-lg object-contain max-h-[400px] w-auto" 
+                      />
+                      {/* Logo overlay */}
+                      {brandLogo && includeLogo && (
+                        <div className="absolute bottom-5 right-5 h-12 w-12 rounded-lg bg-white/95 dark:bg-stone-900/95 p-1.5 shadow-lg border border-stone-200 dark:border-stone-700">
+                          <NextImage src={brandLogo} alt="Brand logo" width={40} height={40} className="object-contain w-full h-full" />
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Right: Details & Actions */}
+                    <div className="flex flex-col justify-between space-y-4">
+                      {/* Prompt Section */}
+                      {promptForGeneratedImage && (
+                        <div className="space-y-2">
+                          <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Prompt Used</span>
+                          <div className="relative">
+                            <Textarea 
+                              value={promptForGeneratedImage} 
+                              readOnly 
+                              rows={4}
+                              className="text-sm bg-stone-50 dark:bg-stone-900 resize-none pr-10" 
+                            />
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="absolute top-2 right-2 h-7 w-7 text-muted-foreground hover:text-foreground" 
+                              onClick={() => copyToClipboard(promptForGeneratedImage, 'Prompt')}
+                            >
+                              <Icon icon="solar:copy-linear" className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Info Section */}
+                      <div className="space-y-3">
+                        {brandLogo && includeLogo && (
+                          <div className="flex items-start gap-2 p-3 rounded-lg bg-stone-100/50 dark:bg-stone-800/50 border border-stone-200/50 dark:border-stone-700/50">
+                            <Icon icon="solar:magic-stick-3-linear" className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                            <div>
+                              <p className="text-xs font-medium">AI Branded Image</p>
+                              <p className="text-[10px] text-muted-foreground">Generated with your logo&apos;s colors and style</p>
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-start gap-2 p-3 rounded-lg bg-stone-100/50 dark:bg-stone-800/50 border border-stone-200/50 dark:border-stone-700/50">
+                          <Icon icon="solar:palette-linear" className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                          <div>
+                            <p className="text-xs font-medium">AI Generated</p>
+                            <p className="text-[10px] text-muted-foreground">Created with Gemini 2.5 Flash Image</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Action Buttons */}
+                      <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                        <Button variant="default" size="sm" className="h-9 flex-1" onClick={downloadImage}>
+                          <Icon icon="solar:download-linear" className="mr-2 h-4 w-4" />
+                          Download Image
+                        </Button>
+                        <Button variant="outline" size="sm" className="h-9" onClick={() => copyToClipboard(promptForGeneratedImage, 'Prompt')}>
+                          <Icon icon="solar:copy-linear" className="mr-2 h-4 w-4" />
+                          Copy Prompt
                         </Button>
                       </div>
                     </div>
-                  )}
-                  <Button variant="outline" size="sm" className="h-8 text-xs" onClick={downloadImage}>
-                    <Icon icon="solar:download-linear" className="mr-2 h-3.5 w-3.5" />
-                    Download Image
-                  </Button>
+                  </div>
                 </div>
               </div>
             )}

@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert, AlertDescription, AlertTitle as AlertTitleComponent } from '@/components/ui/alert';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
+import { useCompanyApiKeys } from '@/hooks/use-company-api-keys';
 
 const getBrevoCampaignStatusClass = (status: BrevoAPICampaign['status']) => {
   switch (status?.toLowerCase()) {
@@ -41,6 +42,7 @@ export default function BrevoCampaignList() {
   const [sendingCampaignId, setSendingCampaignId] = useState<number | null>(null);
   const { toast } = useToast();
   const { appUser, company } = useAuth();
+  const { apiKeys, isLoading: isLoadingApiKeys } = useCompanyApiKeys();
   
   const [currentPage, setCurrentPage] = useState(1);
   const [campaignsPerPage, setCampaignsPerPage] = useState(10);
@@ -50,11 +52,7 @@ export default function BrevoCampaignList() {
   const handleRefresh = useCallback(() => setRefreshTrigger(prev => prev + 1), []);
 
   useEffect(() => {
-    if (!appUser || !company) {
-      if (!company && appUser) {
-        setError("Could not load company data. API keys are unavailable.");
-        setIsLoading(false);
-      }
+    if (!appUser || isLoadingApiKeys) {
       return;
     }
 
@@ -62,10 +60,10 @@ export default function BrevoCampaignList() {
       setIsLoading(true);
       setError(null);
       
-      const brevoApiKey = company.apiKeys?.brevo?.apiKey;
+      const brevoApiKey = apiKeys?.brevo?.apiKey;
 
       if (!brevoApiKey) {
-          setError("Brevo API Key not configured. Please add it in the Settings page.");
+          setError("Key not found");
           setIsLoading(false);
           setCampaigns([]);
           return;
@@ -89,13 +87,12 @@ export default function BrevoCampaignList() {
     };
     
     loadCampaigns();
-  }, [refreshTrigger, appUser, company]);
+  }, [refreshTrigger, appUser, apiKeys, isLoadingApiKeys]);
   
   const handleSendCampaign = async (campaignId: number, campaignName: string) => {
-    if (!company) return;
     setSendingCampaignId(campaignId);
 
-    const brevoApiKey = company.apiKeys?.brevo?.apiKey;
+    const brevoApiKey = apiKeys?.brevo?.apiKey;
 
     if (!brevoApiKey) {
         toast({ title: "API Key Missing", description: "Cannot send campaign without a Brevo API key.", variant: "destructive" });

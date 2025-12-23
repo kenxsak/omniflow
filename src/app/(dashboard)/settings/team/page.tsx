@@ -2,6 +2,7 @@
 
 import { Icon } from '@iconify/react';
 import { useAuth } from '@/hooks/use-auth';
+import { useCompanyApiKeys } from '@/hooks/use-company-api-keys';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,6 +66,7 @@ function SettingsCard({
 
 export default function TeamPage() {
   const { appUser, isAdmin, isSuperAdmin } = useAuth();
+  const { apiKeys } = useCompanyApiKeys();
   const { toast } = useToast();
   const [users, setUsers] = useState<AppUser[]>([]);
   const [invitations, setInvitations] = useState<UserInvitation[]>([]);
@@ -133,10 +135,10 @@ export default function TeamPage() {
         inviterName: appUser.name,
         role: inviteRole,
         type: inviteType,
-        // Brevo API keys will be fetched from company if available
-        brevoApiKey: company.apiKeys?.brevo?.apiKey,
-        brevoSenderEmail: company.apiKeys?.brevo?.senderEmail,
-        brevoSenderName: company.apiKeys?.brevo?.senderName,
+        // Use decrypted API keys from hook
+        brevoApiKey: apiKeys?.brevo?.apiKey,
+        brevoSenderEmail: apiKeys?.brevo?.senderEmail,
+        brevoSenderName: apiKeys?.brevo?.senderName,
       });
 
       if (result.success) {

@@ -18,6 +18,8 @@ export type AIOperationType =
 export type AIModel = 
   | 'gemini-2.0-flash'
   | 'gemini-2.0-flash-lite'
+  | 'gemini-2.5-flash-image'  // Nano Banana - fast, cheap image gen
+  | 'gemini-3-pro-image'      // Nano Banana Pro - high quality image gen
   | 'imagen-3'
   | 'imagen-4'
   | 'gemini-tts'
@@ -36,9 +38,11 @@ export interface AIPricing {
   
   // Image generation (per image)
   imageGeneration: {
-    imagen3: number;       // $0.03 per image
-    imagen4: number;       // $0.04 per image
-    imagen4Ultra: number;  // $0.06 per image
+    nanoBanana: number;        // $0.02 per image (Gemini 2.5 Flash Image)
+    nanoBananaPro: number;     // $0.04 per image (Gemini 3 Pro Image)
+    imagen3: number;           // $0.03 per image (legacy)
+    imagen4: number;           // $0.04 per image (legacy)
+    imagen4Ultra: number;      // $0.06 per image (legacy)
   };
   
   // Text-to-speech (per character or per million tokens)
@@ -62,9 +66,11 @@ export const DEFAULT_AI_PRICING: AIPricing = {
     output: 0.40, // $0.40 per million output tokens
   },
   imageGeneration: {
-    imagen3: 0.03,      // $0.03 per image
-    imagen4: 0.04,      // $0.04 per image
-    imagen4Ultra: 0.06, // $0.06 per image
+    nanoBanana: 0.02,       // $0.02 per image (Gemini 2.5 Flash Image - DEFAULT)
+    nanoBananaPro: 0.04,    // $0.04 per image (Gemini 3 Pro Image)
+    imagen3: 0.03,          // $0.03 per image (legacy)
+    imagen4: 0.04,          // $0.04 per image (legacy)
+    imagen4Ultra: 0.06,     // $0.06 per image (legacy)
   },
   textToSpeech: {
     perCharacter: 0.000016,    // ~$0.000016 per character

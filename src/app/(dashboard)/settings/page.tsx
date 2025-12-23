@@ -334,7 +334,7 @@ export default function ProfileSettingsPage() {
 
       {/* Security Tab */}
       {activeTab === 'security' && (
-        <div className="max-w-3xl">
+        <div className="max-w-4xl">
           <SettingsCard
             title="Security"
             description="Manage your account security settings"
@@ -374,7 +374,7 @@ export default function ProfileSettingsPage() {
 
       {/* Danger Zone Tab */}
       {activeTab === 'danger' && (
-        <div className="max-w-3xl">
+        <div className="max-w-4xl">
           <SettingsCard
             title="Danger Zone"
             description="Irreversible account actions"

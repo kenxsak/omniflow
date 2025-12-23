@@ -17,7 +17,7 @@ export async function generateTrackedImageAction(
     companyId,
     userId,
     'image_generation',
-    'imagen-4',
+    'gemini-2.5-flash-image',  // Nano Banana - faster & cheaper
     'Image Generator',
     input,
     generateImageWithAiFlow

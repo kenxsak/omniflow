@@ -15,6 +15,7 @@ import { Loader2, Send, AlertTriangle, Wand2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
+import { useCompanyApiKeys } from '@/hooks/use-company-api-keys';
 import { showAITaskCompleteToast } from '@/lib/ai-toast-helpers';
 
 export default function SendEmailDialog({ lead, isOpen, onOpenChange, initialEmailPurpose = 'general' }: { lead: Lead | null, isOpen: boolean, onOpenChange: (open: boolean) => void, initialEmailPurpose?: 'welcome' | 'general' }) {
@@ -27,9 +28,10 @@ export default function SendEmailDialog({ lead, isOpen, onOpenChange, initialEma
   const [senderEmail, setSenderEmail] = useState('');
   const { toast } = useToast();
   const { appUser, company } = useAuth();
+  const { apiKeys, isLoading: isLoadingApiKeys } = useCompanyApiKeys();
   
   const getSenderDetails = useCallback(() => {
-    const defaultSenderEmail = company?.apiKeys?.brevo?.senderEmail || appUser?.email || "notifications@example.com";
+    const defaultSenderEmail = apiKeys?.brevo?.senderEmail || appUser?.email || "notifications@example.com";
     const defaultSenderName = appUser?.name || "Your Name";
     const profileBusinessName = company?.name || 'Your Company';
 
@@ -37,12 +39,11 @@ export default function SendEmailDialog({ lead, isOpen, onOpenChange, initialEma
     setSenderName(defaultSenderName);
 
     return { defaultSenderName, defaultSenderEmail, profileBusinessName };
-  }, [appUser, company]);
+  }, [appUser, company, apiKeys]);
 
   useEffect(() => {
-    if (isOpen && company?.apiKeys?.brevo) {
-        const key = company.apiKeys.brevo.apiKey;
-        setBrevoApiKey(key || '');
+    if (isOpen && apiKeys?.brevo?.apiKey && !isLoadingApiKeys) {
+        setBrevoApiKey(apiKeys.brevo.apiKey);
     }
 
     const { defaultSenderName, profileBusinessName } = getSenderDetails();

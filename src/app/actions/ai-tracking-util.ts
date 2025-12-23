@@ -39,7 +39,7 @@ export async function executeTrackedOperation<InputType, OutputType>(
   companyId: string,
   userId: string,
   operationType: 'text_generation' | 'image_generation' | 'text_to_speech',
-  model: 'gemini-2.0-flash' | 'imagen-4' | 'gemini-tts',
+  model: 'gemini-2.0-flash' | 'gemini-2.5-flash-image' | 'gemini-3-pro-image' | 'gemini-tts',
   feature: string,
   input: InputType,
   aiFunction: (input: InputType) => Promise<OutputType>

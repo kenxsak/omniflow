@@ -302,9 +302,19 @@ export default function CampaignsPage() {
                             {format(createdDate, 'MMM dd, yyyy')}
                           </td>
                           <td className="text-right py-3 px-3">
-                            <Button variant="ghost" size="icon" className="h-7 w-7 opacity-60 group-hover:opacity-100">
-                              <Icon icon="solar:eye-linear" className="h-4 w-4" />
-                            </Button>
+                            <Link 
+                              href={
+                                campaign.type === 'email' 
+                                  ? `/email-marketing/campaigns/${campaign.id}` 
+                                  : campaign.type === 'sms'
+                                  ? `/campaigns/messages/${campaign.id}`
+                                  : `/campaigns/whatsapp/${campaign.id}`
+                              }
+                            >
+                              <Button variant="ghost" size="icon" className="h-7 w-7 opacity-60 group-hover:opacity-100">
+                                <Icon icon="solar:eye-linear" className="h-4 w-4" />
+                              </Button>
+                            </Link>
                           </td>
                         </tr>
                       );

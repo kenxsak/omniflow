@@ -73,6 +73,7 @@ import {
 import { Alert, AlertDescription, AlertTitle as AlertTitleComponent } from "@/components/ui/alert";
 import type { StoredApiKeys } from '@/types/integrations';
 import { useAuth } from '@/hooks/use-auth';
+import { useCompanyApiKeys } from '@/hooks/use-company-api-keys';
 import { showAISuccessToast } from '@/lib/ai-toast-helpers';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import TemplateBrowser from '@/components/templates/template-browser';
@@ -117,6 +118,7 @@ export default function CreateEmailCampaignPage() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const { appUser, company } = useAuth();
+  const { apiKeys, isLoading: isLoadingApiKeys } = useCompanyApiKeys();
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [isGeneratingContent, setIsGeneratingContent] = useState(false);
@@ -159,11 +161,11 @@ export default function CreateEmailCampaignPage() {
 
   const getSenderDetails = useCallback(() => {
     // **REVISED LOGIC**: Prioritize the company name and default sender email from settings.
-    const defaultSenderEmail = company?.apiKeys?.brevo?.senderEmail || company?.apiKeys?.sender?.senderEmail || appUser?.email || "notifications@example.com";
+    const defaultSenderEmail = apiKeys?.brevo?.senderEmail || apiKeys?.sender?.senderEmail || appUser?.email || "notifications@example.com";
     // Use company name as sender name, falling back to user name if company name is not set
     const defaultSenderName = company?.name || appUser?.name || "Your Company";
     return { defaultSenderName, defaultSenderEmail };
-  }, [appUser, company]);
+  }, [appUser, company, apiKeys]);
   
   // Fetch contact lists for the selected provider
   const fetchContactLists = useCallback(async (provider: 'brevo' | 'sender') => {
@@ -227,23 +229,23 @@ export default function CreateEmailCampaignPage() {
   const watchedContent = watch('content');
 
   useEffect(() => {
-    if (appUser?.companyId) {
-      setValue('companyId', appUser.companyId);
-    }
+    if (!appUser?.companyId || isLoadingApiKeys) return;
+    
+    setValue('companyId', appUser.companyId);
     
     const providers: Array<'brevo' | 'sender'> = [];
     
-    // Check Brevo configuration
-    if (company?.apiKeys?.brevo?.apiKey) {
-        setBrevoApiKey(company.apiKeys.brevo.apiKey);
-        const listIdFromSettings = company.apiKeys.brevo.defaultListId;
-        setDefaultBrevoListId(listIdFromSettings && listIdFromSettings.trim() !== '' ? listIdFromSettings : '2');
+    // Check Brevo configuration using decrypted apiKeys
+    if (apiKeys?.brevo?.apiKey) {
+        setBrevoApiKey(apiKeys.brevo.apiKey);
+        const listIdFromSettings = apiKeys.brevo.defaultListId;
+        setDefaultBrevoListId(listIdFromSettings && typeof listIdFromSettings === 'string' && listIdFromSettings.trim() !== '' ? listIdFromSettings : '2');
         providers.push('brevo');
     }
     
-    // Check Sender.net configuration
-    if (company?.apiKeys?.sender?.apiKey) {
-        setSenderApiKey(company.apiKeys.sender.apiKey);
+    // Check Sender.net configuration using decrypted apiKeys
+    if (apiKeys?.sender?.apiKey) {
+        setSenderApiKey(apiKeys.sender.apiKey);
         providers.push('sender');
     }
     
@@ -253,7 +255,7 @@ export default function CreateEmailCampaignPage() {
     if (providers.length > 0 && !selectedProvider) {
       setSelectedProvider(providers[0]);
     }
-  }, [appUser, company, setValue, selectedProvider]);
+  }, [appUser, apiKeys, isLoadingApiKeys, setValue, selectedProvider]);
   
   // Fetch lists when selected provider changes
   useEffect(() => {

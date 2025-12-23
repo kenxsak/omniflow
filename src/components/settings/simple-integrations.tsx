@@ -5,12 +5,70 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Eye, EyeOff, ExternalLink, Save, AlertCircle, ChevronDown, Loader, Plus } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { fetchCompanyApiKeysAction, saveApiKeysAction } from '@/app/actions/api-keys-actions';
 import { getVoiceChatConfig, saveVoiceChatConfig } from '@/app/actions/voice-chat-actions';
+import { GeminiIcon, BrevoIcon, TwilioIcon, Fast2SMSIcon, WhatsAppIcon, ZohoIcon } from '@/components/icons/brand-icons';
+import NextImage from 'next/image';
+
+// Custom icon component that handles both Iconify and custom SVG icons
+const IntegrationIcon = ({
+  integrationId,
+  icon,
+  className,
+  size = 'sm',
+}: {
+  integrationId: string;
+  icon: string;
+  className?: string;
+  size?: 'sm' | 'lg';
+}) => {
+  // Map integration IDs to custom icons
+  const customIcons: Record<string, React.ReactNode> = {
+    googleAi: <GeminiIcon className={className} />,
+    brevo: <BrevoIcon className={className} />,
+    twilio: <TwilioIcon className={className} />,
+    fast2sms: <Fast2SMSIcon className={className} />,
+    metaWhatsApp: <WhatsAppIcon className={className} />,
+    zoho: <ZohoIcon className={className} />,
+  };
+
+  // External logo URLs for services that need images
+  const logoUrls: Record<string, string> = {
+    aisensy: 'https://unicorn-images.b-cdn.net/fd22de22-b00f-495c-bc0e-36d28dd817e6?optimizer=gif',
+    sender: 'https://www.sender.net/assets/brand-assets/sender-logo-default.png',
+    gupshup: 'https://stag-smapi.gupshup.io/developer/resources/img/assets/2019/logo_type3.png',
+    calcom: 'https://cal.com/logo.svg',
+    hubspot: 'https://www.hubspot.com/hubfs/HubSpot_Logos/HubSpot-Inversed-Favicon.png',
+    bitrix24: 'https://www.bitrix24.com/images/content_en/logo/logo-bitrix24.svg',
+  };
+
+  // Bigger sizes: sm = 24px for sidebar, lg = 32px for header
+  const imgSize = size === 'lg' ? 32 : 24;
+
+  if (customIcons[integrationId]) {
+    return <>{customIcons[integrationId]}</>;
+  }
+
+  if (logoUrls[integrationId]) {
+    return (
+      <NextImage
+        src={logoUrls[integrationId]}
+        alt={integrationId}
+        width={imgSize}
+        height={imgSize}
+        className="object-contain"
+        style={{ width: imgSize, height: imgSize, minWidth: imgSize, minHeight: imgSize }}
+        unoptimized
+      />
+    );
+  }
+
+  // Fallback to Iconify icon
+  return <Icon icon={icon} className={className} />;
+};
 
 interface Integration {
   id: string;
@@ -22,27 +80,22 @@ interface Integration {
   fields: { key: string; label: string; placeholder: string; help?: string }[];
 }
 
-// ============================================
-// ALL 20 INTEGRATIONS - PROPERLY CATEGORIZED
-// Each docLink follows "Create Account & Get API Key" guide format
-// ============================================
 const INTEGRATIONS: Integration[] = [
-  // ============= LLM AI (1) =============
+  // LLM AI
   {
     id: 'googleAi',
     name: 'Google AI (Gemini)',
-    icon: '🤖',
+    icon: 'solar:stars-linear',
     description: 'Bring your own API key for unlimited AI content generation, image creation, and automation',
     docLink: 'https://aistudio.google.com/app/apikey',
     category: 'LLM AI',
     fields: [{ key: 'apiKey', label: 'API Key', placeholder: 'AIzaSy...', help: 'Step 1: Sign in with Google. Step 2: Click "Create API Key". Step 3: Copy and paste here.' }]
   },
-
-  // ============= VOICE CHATBOT AI (1) =============
+  // Voice & Chatbot
   {
     id: 'voiceChat',
     name: 'Voice Chat AI Widget',
-    icon: '🎤',
+    icon: 'solar:microphone-3-linear',
     description: 'AI-powered voice chatbot for digital cards, websites, and customer interactions',
     docLink: 'https://app.voicechatai.wmart.in/dashboard?tab=embed',
     category: 'Voice & Chatbot',
@@ -51,12 +104,11 @@ const INTEGRATIONS: Integration[] = [
       { key: 'apiKey', label: 'Embed Script Code', placeholder: '<script src="https://app.voicechatai.wmart.in/widget.js?..."', help: 'Step 4: Go to "Embed Widget on Your Website". Step 5: Copy the full script code.' }
     ]
   },
-
-  // ============= EMAIL (3) =============
+  // Email
   {
     id: 'brevo',
     name: 'Brevo',
-    icon: '📧',
+    icon: 'solar:letter-linear',
     description: 'Send professional email campaigns with tracking and automation (Free: 300 emails/day)',
     docLink: 'https://app.brevo.com/settings/keys/api',
     category: 'Email',
@@ -70,7 +122,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'sender',
     name: 'Sender.net',
-    icon: '📨',
+    icon: 'solar:mailbox-linear',
     description: 'Email marketing with generous free tier (Free: 2,500 emails/month)',
     docLink: 'https://app.sender.net/settings/api',
     category: 'Email',
@@ -83,7 +135,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'smtp',
     name: 'Custom SMTP',
-    icon: '💌',
+    icon: 'solar:server-linear',
     description: 'Send emails using your own SMTP server (Gmail, Amazon SES, etc.)',
     docLink: 'https://support.google.com/accounts/answer/185833',
     category: 'Email',
@@ -96,13 +148,12 @@ const INTEGRATIONS: Integration[] = [
       { key: 'fromName', label: 'From Name', placeholder: 'Your Company' }
     ]
   },
-
-  // ============= SMS (3) =============
+  // SMS
   {
     id: 'twilio',
     name: 'Twilio',
-    icon: '📱',
-    description: 'Premium global SMS with high reliability ($0.0075/SMS)',
+    icon: 'solar:smartphone-linear',
+    description: 'Premium global SMS with high reliability',
     docLink: 'https://console.twilio.com/us1/account/keys-credentials/api-keys',
     category: 'SMS',
     fields: [
@@ -114,8 +165,8 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'msg91',
     name: 'MSG91',
-    icon: '💬',
-    description: 'Affordable bulk SMS for India & global with DLT compliance (~Rs 0.15/SMS)',
+    icon: 'solar:chat-square-linear',
+    description: 'Affordable bulk SMS for India & global with DLT compliance',
     docLink: 'https://control.msg91.com/app/settings/authkey',
     category: 'SMS',
     fields: [
@@ -126,8 +177,8 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'fast2sms',
     name: 'Fast2SMS',
-    icon: '⚡',
-    description: 'Fastest & cheapest SMS for India (~Rs 0.10/SMS)',
+    icon: 'solar:bolt-linear',
+    description: 'Fast & affordable SMS for India',
     docLink: 'https://www.fast2sms.com/dashboard/dev-api',
     category: 'SMS',
     fields: [
@@ -135,12 +186,11 @@ const INTEGRATIONS: Integration[] = [
       { key: 'senderId', label: 'Sender ID (Optional)', placeholder: 'e.g., FSTSMS', help: 'Register DLT Sender ID for promotional messages in India.' }
     ]
   },
-
-  // ============= WHATSAPP (6) =============
+  // WhatsApp
   {
     id: 'metaWhatsApp',
     name: 'Meta WhatsApp Cloud API',
-    icon: '💬',
+    icon: 'solar:chat-round-line-linear',
     description: 'Official WhatsApp Business API - Zero monthly fees, pay only per message',
     docLink: 'https://developers.facebook.com/apps/',
     category: 'WhatsApp',
@@ -153,7 +203,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'msg91WhatsApp',
     name: 'MSG91 WhatsApp',
-    icon: '📲',
+    icon: 'solar:chat-round-dots-linear',
     description: 'WhatsApp messaging through MSG91 for India',
     docLink: 'https://control.msg91.com/app/whatsapp-new/dashboard',
     category: 'WhatsApp',
@@ -165,7 +215,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'fast2smsWhatsApp',
     name: 'Fast2SMS WhatsApp',
-    icon: '📱',
+    icon: 'solar:chat-line-linear',
     description: 'WhatsApp via Fast2SMS for India',
     docLink: 'https://www.fast2sms.com/dashboard/whatsapp',
     category: 'WhatsApp',
@@ -174,8 +224,8 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'gupshup',
     name: 'Gupshup',
-    icon: '🌐',
-    description: 'Enterprise WhatsApp - Cheapest per-message cost for high volume',
+    icon: 'solar:global-linear',
+    description: 'Enterprise WhatsApp - Great for high volume messaging',
     docLink: 'https://www.gupshup.io/developer/home',
     category: 'WhatsApp',
     fields: [
@@ -188,8 +238,8 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'authkey',
     name: 'WMart CPaaS',
-    icon: '🔐',
-    description: 'Our multi-channel CPaaS platform - WhatsApp, SMS, Email, Voice in one API',
+    icon: 'solar:key-linear',
+    description: 'Multi-channel CPaaS platform - WhatsApp, SMS, Email, Voice in one API',
     docLink: 'https://wmart.in/cpaas/',
     category: 'All in One',
     fields: [{ key: 'apiKey', label: 'API Key', placeholder: '', help: 'Step 1: Visit wmart.in/cpaas. Step 2: Create your account. Step 3: Go to Settings > API Keys. Step 4: Create and copy your API Key.' }]
@@ -197,8 +247,8 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'aisensy',
     name: 'AiSensy',
-    icon: '🤖',
-    description: 'WhatsApp automation with AI chatbot - 42% cheaper than alternatives',
+    icon: 'solar:magic-stick-3-linear',
+    description: 'WhatsApp automation with AI chatbot capabilities',
     docLink: 'https://app.aisensy.com/settings/api-settings',
     category: 'WhatsApp',
     fields: [
@@ -206,12 +256,11 @@ const INTEGRATIONS: Integration[] = [
       { key: 'campaignName', label: 'Campaign Name (Optional)', placeholder: '', help: 'Step 4: Create a campaign and use its name for API calls.' }
     ]
   },
-
-  // ============= OTHER TOOLS (5) =============
+  // Other Tools
   {
     id: 'calcom',
     name: 'Cal.com',
-    icon: '📅',
+    icon: 'solar:calendar-linear',
     description: 'Automated appointment booking with calendar sync',
     docLink: 'https://app.cal.com/settings/developer/api-keys',
     category: 'Other Tools',
@@ -220,7 +269,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'hubspot',
     name: 'HubSpot',
-    icon: '🏢',
+    icon: 'solar:buildings-2-linear',
     description: 'Sync contacts and deals from HubSpot CRM',
     docLink: 'https://app.hubspot.com/private-apps',
     category: 'Other Tools',
@@ -232,7 +281,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'zoho',
     name: 'Zoho CRM',
-    icon: '📊',
+    icon: 'solar:chart-2-linear',
     description: 'Sync contacts and deals from Zoho CRM',
     docLink: 'https://api-console.zoho.com/',
     category: 'Other Tools',
@@ -246,7 +295,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'bitrix24',
     name: 'Bitrix24',
-    icon: '⚙️',
+    icon: 'solar:settings-linear',
     description: 'Sync contacts and deals from Bitrix24 CRM',
     docLink: 'https://helpdesk.bitrix24.com/open/12357770/',
     category: 'Other Tools',
@@ -257,15 +306,7 @@ const INTEGRATIONS: Integration[] = [
   }
 ];
 
-const CATEGORIES = [
-  'LLM AI',
-  'Voice & Chatbot',
-  'Email',
-  'SMS',
-  'WhatsApp',
-  'All in One',
-  'Other Tools'
-];
+const CATEGORIES = ['LLM AI', 'Voice & Chatbot', 'Email', 'SMS', 'WhatsApp', 'All in One', 'Other Tools'];
 
 interface IntegrationGroupProps {
   category: string;
@@ -279,36 +320,44 @@ function IntegrationGroup({ category, integrations, selectedId, onSelect, savedK
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-muted hover:bg-accent transition-all"
+        className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 transition-all"
       >
-        <span className="text-sm font-bold text-foreground uppercase tracking-wider">{category}</span>
-        <ChevronDown
+        <span className="text-xs font-semibold text-foreground uppercase tracking-wider">{category}</span>
+        <Icon
+          icon="solar:alt-arrow-down-linear"
           className={`h-4 w-4 text-muted-foreground transition-transform ${isExpanded ? 'rotate-180' : ''}`}
         />
       </button>
 
       {isExpanded && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 pl-2">
+        <div className="space-y-1 pl-1">
           {integrations.map(integration => {
             const hasKeys = savedKeys[integration.id] && Object.values(savedKeys[integration.id]).some(v => v);
             return (
               <button
                 key={integration.id}
                 onClick={() => onSelect(integration.id)}
-                className={`text-left px-3 py-3 rounded-lg transition-all flex items-start gap-2 border-2 ${
+                className={`w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-start gap-3 border ${
                   selectedId === integration.id
-                    ? 'border-primary bg-primary/10'
-                    : 'border-transparent hover:border-border bg-muted'
+                    ? 'border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-900'
+                    : 'border-transparent hover:bg-stone-50 dark:hover:bg-stone-900/50'
                 }`}
               >
-                <span className="text-xl mt-0.5">{integration.icon}</span>
+                <div className="w-10 h-10 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center shrink-0 mt-0.5">
+                  <IntegrationIcon integrationId={integration.id} icon={integration.icon} className="h-5 w-5 text-foreground" />
+                </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm text-foreground">{integration.name}</div>
+                  <div className="font-medium text-sm text-foreground">{integration.name}</div>
                   <div className="text-xs text-muted-foreground line-clamp-1">{integration.description}</div>
-                  {hasKeys && <div className="text-xs text-success font-medium mt-1">✓ Configured</div>}
+                  {hasKeys && (
+                    <div className="flex items-center gap-1 text-xs text-stone-600 dark:text-stone-400 font-medium mt-1">
+                      <Icon icon="solar:check-circle-linear" className="h-3 w-3" />
+                      Configured
+                    </div>
+                  )}
                 </div>
               </button>
             );
@@ -338,7 +387,6 @@ export default function SimpleIntegrations() {
         const result = await fetchCompanyApiKeysAction(appUser.companyId);
         const keys = result.success && result.apiKeys ? result.apiKeys : {};
 
-        // Load Voice Chat config separately
         const voiceChatResult = await getVoiceChatConfig(appUser.companyId);
         if (voiceChatResult.success && voiceChatResult.config) {
           const voiceChatConfig = voiceChatResult.config;
@@ -368,7 +416,6 @@ export default function SimpleIntegrations() {
               setFormData(result2.apiKeys);
             }
             localStorage.removeItem('api_keys');
-            console.log('✓ Migrated API keys from browser storage to secure server storage');
           } catch (migrationError) {
             console.error('Migration failed:', migrationError);
           }
@@ -394,59 +441,39 @@ export default function SimpleIntegrations() {
 
   const handleSave = async () => {
     if (!appUser?.companyId) {
-      toast({
-        title: 'Error',
-        description: 'Company ID not found',
-        variant: 'destructive'
-      });
+      toast({ title: 'Error', description: 'Company ID not found', variant: 'destructive' });
       return;
     }
 
     setSaving(true);
     try {
       if (selected === 'voiceChat') {
-        // Special handling for Voice Chat widget
         const widgetScript = data.apiKey || '';
         const result = await saveVoiceChatConfig(appUser.companyId, widgetScript);
         if (result.success) {
-          toast({
-            title: 'Success',
-            description: 'Voice Chat AI Widget saved securely',
-          });
+          toast({ title: 'Success', description: 'Voice Chat AI Widget saved securely' });
         } else {
-          toast({
-            title: 'Error',
-            description: result.message || 'Failed to save Voice Chat configuration',
-            variant: 'destructive'
-          });
+          toast({ title: 'Error', description: result.message || 'Failed to save Voice Chat configuration', variant: 'destructive' });
         }
       } else {
-        // Regular API keys
-        const result = await saveApiKeysAction(
-          appUser.companyId,
-          selected,
-          data
-        );
-
+        const result = await saveApiKeysAction(appUser.companyId, selected, data);
         if (result.success) {
-          toast({
-            title: 'Success',
-            description: `${currentIntegration.name} API keys saved securely`,
-          });
+          // Reload keys from database to confirm they were saved
+          const reloadResult = await fetchCompanyApiKeysAction(appUser.companyId);
+          if (reloadResult.success && reloadResult.apiKeys) {
+            setFormData(prev => ({
+              ...prev,
+              ...reloadResult.apiKeys
+            }));
+          }
+          toast({ title: 'Success', description: `${currentIntegration.name} API keys saved securely` });
         } else {
-          toast({
-            title: 'Error',
-            description: result.error || 'Failed to save API keys',
-            variant: 'destructive'
-          });
+          toast({ title: 'Error', description: result.error || 'Failed to save API keys', variant: 'destructive' });
         }
       }
     } catch (e) {
-      toast({
-        title: 'Error',
-        description: 'Failed to save configuration',
-        variant: 'destructive'
-      });
+      console.error('Save error:', e);
+      toast({ title: 'Error', description: 'Failed to save configuration', variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -471,7 +498,7 @@ export default function SimpleIntegrations() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center space-y-4">
-          <Loader className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <Icon icon="solar:refresh-linear" className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
           <p className="text-sm text-muted-foreground">Loading integrations...</p>
         </div>
       </div>
@@ -480,14 +507,9 @@ export default function SimpleIntegrations() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 pb-6">
-      {/* Left Sidebar - Categories & Integrations */}
+      {/* Left Sidebar */}
       <div className="lg:col-span-1">
-        <div className="sticky top-4 space-y-3 max-h-[calc(100vh-150px)] overflow-y-auto pr-2">
-          <div className="space-y-1">
-            <h3 className="text-sm font-bold text-foreground px-1">API INTEGRATIONS</h3>
-            <p className="text-xs text-muted-foreground px-1">Select an integration to configure</p>
-          </div>
-
+        <div className="sticky top-4 space-y-2 max-h-[calc(100vh-150px)] overflow-y-auto pr-2">
           {CATEGORIES.map(category => (
             <IntegrationGroup
               key={category}
@@ -498,53 +520,44 @@ export default function SimpleIntegrations() {
               savedKeys={formData}
             />
           ))}
-
-          <Alert variant="info" className="mt-4">
-            <Plus className="h-4 w-4" />
-            <AlertDescription className="text-xs">
-              <strong>Tip:</strong> New APIs can be added to categories. Contact support to add more integrations.
-            </AlertDescription>
-          </Alert>
         </div>
       </div>
 
-      {/* Right Panel - Form */}
+      {/* Right Panel */}
       <div className="lg:col-span-3">
-        <Card className="sticky top-4">
-          <CardHeader className="bg-muted/50 border-b">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-start gap-3 flex-1">
-                <span className="text-4xl">{currentIntegration.icon}</span>
-                <div className="flex-1">
-                  <CardTitle className="text-xl">{currentIntegration.name}</CardTitle>
-                  <CardDescription className="text-sm mt-1">{currentIntegration.description}</CardDescription>
-                </div>
+        <Card className="sticky top-4 border border-stone-200/60 dark:border-stone-800/60 rounded-2xl overflow-hidden">
+          <CardHeader className="bg-stone-50 dark:bg-stone-900/50 border-b border-stone-200/60 dark:border-stone-800/60 p-5">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+                <IntegrationIcon integrationId={currentIntegration.id} icon={currentIntegration.icon} className="h-7 w-7 text-foreground" size="lg" />
+              </div>
+              <div className="flex-1">
+                <CardTitle className="text-lg font-semibold">{currentIntegration.name}</CardTitle>
+                <CardDescription className="text-sm mt-1">{currentIntegration.description}</CardDescription>
               </div>
             </div>
           </CardHeader>
 
-          <CardContent className="pt-6 space-y-6">
+          <CardContent className="p-5 space-y-5">
             {/* Documentation Link */}
-            <div>
-              <a
-                href={currentIntegration.docLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-info-muted text-info text-sm font-medium hover:bg-info/20 transition-colors"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Get API Key Documentation
-              </a>
-            </div>
+            <a
+              href={currentIntegration.docLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 text-sm font-medium hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
+            >
+              <Icon icon="solar:square-arrow-right-up-linear" className="h-4 w-4" />
+              Get API Key Documentation
+            </a>
 
-            {/* API Key Form Fields */}
+            {/* Form Fields */}
             <div className="space-y-4">
               {currentIntegration.fields.map(field => (
                 <div key={field.key} className="space-y-2">
                   <Label className="text-sm font-medium">{field.label}</Label>
                   {field.help && (
-                    <p className="text-xs text-muted-foreground bg-muted p-2 rounded border border-border">
-                      💡 {field.help}
+                    <p className="text-xs text-muted-foreground bg-stone-50 dark:bg-stone-900 p-2.5 rounded-lg border border-stone-200/60 dark:border-stone-800/60">
+                      {field.help}
                     </p>
                   )}
                   <div className="relative">
@@ -553,18 +566,14 @@ export default function SimpleIntegrations() {
                       placeholder={field.placeholder}
                       value={data[field.key] || ''}
                       onChange={e => handleChange(field.key, e.target.value)}
-                      className="pr-10"
+                      className="pr-10 rounded-lg"
                     />
                     <button
                       type="button"
                       onClick={() => toggleShowKey(field.key)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     >
-                      {showKey.has(field.key) ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
+                      <Icon icon={showKey.has(field.key) ? 'solar:eye-closed-linear' : 'solar:eye-linear'} className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
@@ -572,28 +581,23 @@ export default function SimpleIntegrations() {
             </div>
 
             {/* Security Info */}
-            <Alert variant="warning">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-xs">
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800/60">
+              <Icon icon="solar:shield-check-linear" className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
+              <p className="text-xs text-muted-foreground">
                 API keys are encrypted and stored securely. Never share your API keys with others.
-              </AlertDescription>
-            </Alert>
+              </p>
+            </div>
 
             {/* Save Button */}
-            <Button
-              onClick={handleSave}
-              className="w-full"
-              disabled={saving}
-              size="lg"
-            >
+            <Button onClick={handleSave} className="w-full rounded-xl" disabled={saving} size="lg">
               {saving ? (
                 <>
-                  <Loader className="h-4 w-4 mr-2 animate-spin" />
+                  <Icon icon="solar:refresh-linear" className="h-4 w-4 mr-2 animate-spin" />
                   Saving...
                 </>
               ) : (
                 <>
-                  <Save className="h-4 w-4 mr-2" />
+                  <Icon icon="solar:diskette-linear" className="h-4 w-4 mr-2" />
                   Save API Keys
                 </>
               )}

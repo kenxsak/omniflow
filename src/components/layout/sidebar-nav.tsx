@@ -26,7 +26,7 @@ interface NavItem {
 }
 
 const allNavItems: NavItem[] = [
-  // ============ MAIN ============
+  // ─────────────── OVERVIEW ───────────────
   {
     href: "/dashboard",
     label: "Dashboard",
@@ -34,16 +34,7 @@ const allNavItems: NavItem[] = [
     tooltip: "Your business overview",
   },
 
-  // ============ BUSINESS ============
-  {
-    href: "/digital-card/manage",
-    label: "Digital Cards",
-    icon: "solar:card-2-linear",
-    tooltip: "Create digital business cards",
-    featureId: "feat_digital_cards",
-    badge: "FREE",
-  },
-
+  // ─────────────── CRM ───────────────
   {
     href: "/crm",
     label: "Contacts",
@@ -51,7 +42,6 @@ const allNavItems: NavItem[] = [
     tooltip: "Manage your contacts & leads",
     featureId: "feat_core_crm",
   },
-
   {
     href: "/crm/pipeline",
     label: "Pipeline",
@@ -59,7 +49,13 @@ const allNavItems: NavItem[] = [
     tooltip: "Track sales deals",
     featureId: "feat_core_crm",
   },
-
+  {
+    href: "/appointments",
+    label: "Appointments",
+    icon: "solar:calendar-linear",
+    tooltip: "Schedule & manage appointments",
+    featureId: "feat_core_crm",
+  },
   {
     href: "/tasks",
     label: "Tasks",
@@ -68,20 +64,12 @@ const allNavItems: NavItem[] = [
     featureId: "feat_core_crm",
   },
 
-  {
-    href: "/appointments",
-    label: "Appointments",
-    icon: "solar:calendar-linear",
-    tooltip: "Schedule & manage appointments",
-    featureId: "feat_core_crm",
-  },
-
-  // ============ MARKETING ============
+  // ─────────────── MARKETING ───────────────
   {
     href: "/campaigns",
-    label: "Campaigns",
+    label: "Marketing",
     icon: "solar:letter-linear",
-    tooltip: "Email, SMS & WhatsApp marketing",
+    tooltip: "Email, SMS & WhatsApp campaigns",
     featureId: "feat_email_marketing",
     subItems: [
       {
@@ -91,14 +79,20 @@ const allNavItems: NavItem[] = [
         tooltip: "View all campaigns",
       },
       {
-        href: "/campaigns/ai-email",
-        label: "Create Email",
-        icon: "solar:pen-new-square-linear",
-        tooltip: "AI-powered email creator",
+        href: "/email-marketing",
+        label: "Email",
+        icon: "solar:mailbox-linear",
+        tooltip: "Email marketing dashboard",
+      },
+      {
+        href: "/email-marketing/automations",
+        label: "Automations",
+        icon: "solar:bolt-linear",
+        tooltip: "Automated email sequences",
       },
       {
         href: "/campaigns/email-lists",
-        label: "Email Lists",
+        label: "Lists",
         icon: "solar:users-group-two-rounded-linear",
         tooltip: "Manage subscriber lists",
       },
@@ -113,7 +107,7 @@ const allNavItems: NavItem[] = [
         href: "/campaigns/whatsapp",
         label: "WhatsApp",
         icon: "solar:chat-round-line-linear",
-        tooltip: "WhatsApp marketing (wa.me)",
+        tooltip: "WhatsApp marketing",
         featureId: "feat_sms_whatsapp",
       },
       {
@@ -126,72 +120,42 @@ const allNavItems: NavItem[] = [
     ],
   },
 
-  // ============ AI TOOLS ============
+  // ─────────────── AI TOOLS ───────────────
   {
     href: "/ai-chat",
-    label: "AI Assistant",
+    label: "AI Tools",
     icon: "solar:stars-linear",
     tooltip: "AI-powered tools",
     featureId: "feat_ai_content_gen",
     subItems: [
       {
-        href: "/ai-chat",
-        label: "All Agents",
-        icon: "solar:users-group-rounded-linear",
-        tooltip: "AI agents hub",
-      },
-      {
-        href: "/ai-chat/content-writer",
-        label: "Content Writer",
-        icon: "solar:document-text-linear",
-        tooltip: "Create blog posts, emails & more",
-      },
-      {
-        href: "/ai-chat/ad-strategist",
-        label: "Ad Strategist",
-        icon: "solar:chart-2-linear",
-        tooltip: "Plan winning ad campaigns",
-      },
-      {
-        href: "/ai-chat/visual-designer",
-        label: "Visual Designer",
-        icon: "solar:gallery-linear",
-        tooltip: "Generate stunning visuals",
-      },
-      {
-        href: "/ai-chat/seo-expert",
-        label: "SEO Expert",
-        icon: "solar:magnifer-linear",
-        tooltip: "Optimize for search",
-      },
-      {
-        href: "/ai-chat/video-producer",
-        label: "Video Producer",
-        icon: "solar:videocamera-record-linear",
-        tooltip: "Create video scripts",
-      },
-      {
         href: "/social-media",
-        label: "Content Factory",
+        label: "Content Studio",
         icon: "solar:pen-new-square-linear",
-        tooltip: "Classic content generator",
+        tooltip: "AI content generator",
+      },
+      {
+        href: "/social-media/content-hub",
+        label: "Content Hub",
+        icon: "solar:folder-with-files-linear",
+        tooltip: "Manage generated content",
       },
       {
         href: "/ai-campaign-manager",
         label: "Ad Manager",
         icon: "solar:target-linear",
-        tooltip: "Classic ad campaign manager",
+        tooltip: "AI ad campaign manager",
       },
       {
         href: "/ai-usage",
-        label: "AI Credits",
+        label: "AI Usage",
         icon: "solar:wallet-linear",
         tooltip: "View AI usage & credits",
       },
     ],
   },
 
-  // ============ INSIGHTS ============
+  // ─────────────── INSIGHTS ───────────────
   {
     href: "/advanced-analytics",
     label: "Analytics",
@@ -200,7 +164,17 @@ const allNavItems: NavItem[] = [
     featureId: "feat_advanced_analytics",
   },
 
-  // ============ TEAM ============
+  // ─────────────── TOOLS ───────────────
+  {
+    href: "/digital-card/manage",
+    label: "Digital Card",
+    icon: "solar:card-2-linear",
+    tooltip: "Create digital business cards",
+    featureId: "feat_digital_cards",
+    badge: "FREE",
+  },
+
+  // ─────────────── TEAM (Admin Only) ───────────────
   {
     href: "/team-management",
     label: "Team",
@@ -208,14 +182,6 @@ const allNavItems: NavItem[] = [
     tooltip: "Manage team members",
     featureId: "feat_core_crm",
     adminOnly: true,
-  },
-
-  // ============ SETTINGS ============
-  {
-    href: "/settings",
-    label: "Settings",
-    icon: "solar:settings-linear",
-    tooltip: "Account & preferences",
   },
 ];
 

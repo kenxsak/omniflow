@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './use-auth';
-import { getCompany } from '@/lib/saas-data';
-import { decryptApiKey } from '@/lib/encryption';
+import { fetchCompanyApiKeysAction } from '@/app/actions/api-keys-actions';
 import type { StoredApiKeys } from '@/types/integrations';
 
 interface UseCompanyApiKeysReturn {
@@ -15,13 +14,13 @@ interface UseCompanyApiKeysReturn {
 }
 
 export function useCompanyApiKeys(): UseCompanyApiKeysReturn {
-  const { appUser } = useAuth();
+  const { appUser, company } = useAuth();
   const [apiKeys, setApiKeys] = useState<StoredApiKeys | null>(null);
   const [companyName, setCompanyName] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchApiKeys = async () => {
+  const fetchApiKeys = useCallback(async () => {
     if (!appUser?.companyId) {
       setIsLoading(false);
       setApiKeys(null);
@@ -33,55 +32,30 @@ export function useCompanyApiKeys(): UseCompanyApiKeysReturn {
     setError(null);
 
     try {
-      const company = await getCompany(appUser.companyId);
+      // Use server action to fetch and decrypt API keys
+      const result = await fetchCompanyApiKeysAction(appUser.companyId);
       
-      if (!company) {
-        setIsLoading(false);
+      if (result.success && result.apiKeys) {
+        setApiKeys(result.apiKeys as StoredApiKeys);
+      } else {
+        console.warn('Failed to fetch API keys:', result.error);
         setApiKeys(null);
-        setCompanyName(null);
-        return;
       }
-
-      setCompanyName(company.name || null);
-
-      const storedKeys = company.apiKeys || {};
       
-      const decryptedKeys: StoredApiKeys = {};
-      
-      for (const [serviceId, serviceKeys] of Object.entries(storedKeys)) {
-        if (!serviceKeys || typeof serviceKeys !== 'object') continue;
-        
-        decryptedKeys[serviceId as keyof StoredApiKeys] = {};
-        
-        for (const [fieldId, value] of Object.entries(serviceKeys as Record<string, any>)) {
-          if (value === null || value === undefined) {
-            decryptedKeys[serviceId as keyof StoredApiKeys]![fieldId] = '';
-            continue;
-          }
-          
-          if (typeof value === 'string' || (typeof value === 'object' && value !== null)) {
-            // Silently handle decryption - returns empty string on failure
-            decryptedKeys[serviceId as keyof StoredApiKeys]![fieldId] = await decryptApiKey(value);
-          } else {
-            decryptedKeys[serviceId as keyof StoredApiKeys]![fieldId] = String(value);
-          }
-        }
-      }
-
-      setApiKeys(decryptedKeys);
+      // Set company name from auth context
+      setCompanyName(company?.name || null);
 
     } catch (err) {
       console.error('Failed to fetch company API keys:', err);
-      // Don't show error to user - just set empty keys
       setApiKeys(null);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [appUser?.companyId, company?.name]);
 
   useEffect(() => {
     fetchApiKeys();
-  }, [appUser?.companyId]);
+  }, [fetchApiKeys]);
 
   return {
     apiKeys,

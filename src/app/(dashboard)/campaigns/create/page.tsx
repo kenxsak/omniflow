@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
+import { useCompanyApiKeys } from '@/hooks/use-company-api-keys';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import confetti from 'canvas-confetti';
@@ -46,6 +47,7 @@ interface RecipientGroup {
 
 export default function CreateCampaignPage() {
   const { appUser, company } = useAuth();
+  const { apiKeys, isLoading: isLoadingApiKeys } = useCompanyApiKeys();
   const { toast } = useToast();
   const router = useRouter();
   
@@ -84,26 +86,26 @@ export default function CreateCampaignPage() {
 
   // Initialize sender details from company settings
   useEffect(() => {
-    if (company) {
+    if (company && apiKeys && !isLoadingApiKeys) {
       setSenderName(company.name || '');
       // Priority: Company configured email > SMTP from email > User email
       const defaultSenderEmail = 
-        company.apiKeys?.brevo?.senderEmail || 
-        company.apiKeys?.sender?.senderEmail || 
-        company.apiKeys?.smtp?.fromEmail ||
+        apiKeys?.brevo?.senderEmail || 
+        apiKeys?.sender?.senderEmail || 
+        apiKeys?.smtp?.fromEmail ||
         appUser?.email || 
         '';
       setSenderEmail(defaultSenderEmail);
       
       // Determine available email providers
       const providers: Array<{id: 'brevo' | 'sender' | 'smtp', name: string}> = [];
-      if (company.apiKeys?.brevo?.apiKey) {
+      if (apiKeys?.brevo?.apiKey) {
         providers.push({ id: 'brevo', name: 'Brevo' });
       }
-      if (company.apiKeys?.sender?.apiKey) {
+      if (apiKeys?.sender?.apiKey) {
         providers.push({ id: 'sender', name: 'Sender.net' });
       }
-      if (company.apiKeys?.smtp?.host) {
+      if (apiKeys?.smtp?.host) {
         providers.push({ id: 'smtp', name: 'Custom SMTP' });
       }
       setAvailableEmailProviders(providers);
@@ -113,7 +115,7 @@ export default function CreateCampaignPage() {
         setEmailProvider(providers[0].id);
       }
     }
-  }, [company, appUser]);
+  }, [company, appUser, apiKeys, isLoadingApiKeys]);
 
   // Load recipient groups based on channel and email provider
   useEffect(() => {

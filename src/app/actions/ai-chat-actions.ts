@@ -1113,7 +1113,7 @@ async function handleImage(
     companyId,
     userId,
     operationType: 'image_generation',
-    model: 'imagen-4',
+    model: 'gemini-2.5-flash-image',  // Nano Banana - faster & cheaper
     feature: 'Image Generation',
     apiKeyType,
     operation: async () => {

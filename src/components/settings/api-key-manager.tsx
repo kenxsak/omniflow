@@ -41,7 +41,7 @@ const initialServices: ApiServiceIntegration[] = [
   {
     id: 'calcom',
     name: 'Cal.com',
-    description: '📅 Appointment booking & calendar sync for meetings and consultations. Connect your calendar and auto-sync bookings.',
+    description: 'Appointment booking & calendar sync for meetings and consultations. Connect your calendar and auto-sync bookings.',
     fields: [
       { id: 'apiKey', label: 'Cal.com API Key', value: '', isProtected: true, placeholder: 'cal_...', helperText: 'Get your API key from Cal.com Settings → Developer → API Keys. This enables appointment booking integration.' },
     ],
@@ -52,9 +52,9 @@ const initialServices: ApiServiceIntegration[] = [
   {
     id: 'googleAi',
     name: 'Google AI (Gemini) - BYOK',
-    description: '💎 Bring Your Own API Key for unlimited AI usage (Starter/Pro/Enterprise only). Use the platform key included in your plan or add your own for unlimited operations at Google\'s direct cost.',
+    description: 'Bring Your Own API Key for unlimited AI usage (Starter/Pro/Enterprise only). Use the platform key included in your plan or add your own for unlimited operations at Google\'s direct cost.',
     fields: [
-      { id: 'apiKey', label: apiKeyLabel.label, value: '', isProtected: true, placeholder: apiKeyLabel.placeholder, helperText: "🚀 BYOK: Add your own Gemini API key for unlimited AI operations. You'll pay Google directly (~$0.001/request) with no markup. Only available on paid plans." },
+      { id: 'apiKey', label: apiKeyLabel.label, value: '', isProtected: true, placeholder: apiKeyLabel.placeholder, helperText: "BYOK: Add your own Gemini API key for unlimited AI operations. You'll pay Google directly (~$0.001/request) with no markup. Only available on paid plans." },
     ],
     documentationLink: 'https://aistudio.google.com/app/apikey',
     isConfigured: false,
@@ -77,7 +77,7 @@ const initialServices: ApiServiceIntegration[] = [
   {
     id: 'sender',
     name: 'Sender.net',
-    description: '🎯 Alternative email provider with generous free tier (15,000 emails/month). Better deliverability in Europe and lower costs than Brevo. Great backup option.',
+    description: 'Alternative email provider with generous free tier (15,000 emails/month). Better deliverability in Europe and lower costs than Brevo. Great backup option.',
     fields: [
       { id: 'apiKey', label: apiKeyLabel.label, value: '', isProtected: true, placeholder: apiKeyLabel.placeholder, helperText: 'Get your API key from Sender.net Dashboard → Settings → API Tokens' },
       { id: 'senderEmail', label: senderEmailLabel.label, value: '', isProtected: false, placeholder: senderEmailLabel.placeholder, helperText: 'REQUIRED: This email must be verified in your Sender.net account.'},
@@ -142,7 +142,7 @@ const initialServices: ApiServiceIntegration[] = [
   {
     id: 'aisensy',
     name: 'AiSensy (WhatsApp Business)',
-    description: '💡 Smart WhatsApp automation with AI-powered chatbots. Send bulk campaigns with advanced features like automated responses, workflow builder, and analytics. Great for SMEs.',
+    description: 'Smart WhatsApp automation with AI-powered chatbots. Send bulk campaigns with advanced features like automated responses, workflow builder, and analytics. Great for SMEs.',
     fields: [
       { id: 'apiKey', label: 'AiSensy API Key', value: '', isProtected: true, placeholder: 'Enter your AiSensy API key', helperText: 'Get this from AiSensy Dashboard → Project → Manage Page → Copy API Key' },
       { id: 'campaignName', label: 'Default Campaign Name (Optional)', value: '', isProtected: false, placeholder: 'e.g., Marketing Campaign', helperText: 'Create an API campaign in AiSensy dashboard first, then enter its name here. If not set, we\'ll use "OmniFlow Campaign".' },
@@ -155,7 +155,7 @@ const initialServices: ApiServiceIntegration[] = [
   {
     id: 'msg91',
     name: 'MSG91 (Bulk SMS)',
-    description: '📱 Powerful bulk SMS platform for India and global markets. DLT compliance built-in, OTP services, SMS templates, and detailed analytics. Excellent deliverability rates.',
+    description: 'Powerful bulk SMS platform for India and global markets. DLT compliance built-in, OTP services, SMS templates, and detailed analytics. Excellent deliverability rates.',
     fields: [
       { id: 'authKey', label: 'MSG91 Auth Key', value: '', isProtected: true, placeholder: 'Enter your MSG91 Auth Key', helperText: 'Get this from your MSG91 dashboard (Settings → API Keys)' },
       { id: 'senderId', label: 'Sender ID', value: '', isProtected: false, placeholder: 'e.g., TXTIND', helperText: 'Your registered sender ID for SMS (6 characters for promotional, or your brand name)' },
@@ -168,7 +168,7 @@ const initialServices: ApiServiceIntegration[] = [
   {
     id: 'metaWhatsApp',
     name: 'Meta WhatsApp Cloud API (RECOMMENDED)',
-    description: '⭐ Official WhatsApp Business Platform by Meta. Direct integration with full control over your messaging. Enterprise-grade reliability, global reach, and comprehensive features. Best for businesses wanting direct Meta integration.',
+    description: 'Official WhatsApp Business Platform by Meta. Direct integration with full control over your messaging. Enterprise-grade reliability, global reach, and comprehensive features. Best for businesses wanting direct Meta integration.',
     fields: [
       { id: 'phoneNumberId', label: 'Phone Number ID (Required)', value: '', isProtected: false, placeholder: 'Your WhatsApp Business Phone Number ID', helperText: 'Get this from Meta Business Manager → WhatsApp → API Setup. This is NOT your phone number, but the Phone Number ID from Meta.' },
       { id: 'accessToken', label: 'Access Token (Required)', value: '', isProtected: true, placeholder: 'Permanent access token from Meta', helperText: 'Create a permanent access token in Meta Business Manager. Never expires unless manually revoked.' },
@@ -181,8 +181,8 @@ const initialServices: ApiServiceIntegration[] = [
   },
   {
     id: 'msg91WhatsApp',
-    name: 'MSG91 WhatsApp 🇮🇳',
-    description: '🇮🇳 RECOMMENDED FOR INDIA: Zero markup pricing - Only Meta\'s official rates (₹0.785/msg). Unified SMS + WhatsApp platform. Easier onboarding than Meta Cloud API, with local Indian support and DLT expertise built-in.',
+    name: 'MSG91 WhatsApp',
+    description: 'Recommended for India: Zero markup pricing - Only Meta\'s official rates. Unified SMS + WhatsApp platform. Easier onboarding than Meta Cloud API, with local Indian support and DLT expertise built-in.',
     fields: [
       { id: 'authKey', label: 'MSG91 Auth Key', value: '', isProtected: true, placeholder: 'Enter your MSG91 Auth Key', helperText: 'Get this from your MSG91 dashboard (Settings → API Keys)' },
       { id: 'integratedNumber', label: 'WhatsApp Business Number', value: '', isProtected: false, placeholder: 'Your registered WhatsApp number', helperText: 'Your WhatsApp Business number registered with MSG91 (e.g., 919876543210)' },
@@ -194,8 +194,8 @@ const initialServices: ApiServiceIntegration[] = [
   },
   {
     id: 'fast2smsWhatsApp',
-    name: 'Fast2SMS WhatsApp 🇮🇳',
-    description: '🇮🇳 RECOMMENDED FOR INDIA: Zero setup fee, pay only for delivered messages (₹0.785-₹0.882/msg). Simple pay-per-delivery model. No monthly fees, unified SMS + WhatsApp platform. Perfect for Indian SMEs.',
+    name: 'Fast2SMS WhatsApp',
+    description: 'Recommended for India: Zero setup fee, pay only for delivered messages. Simple pay-per-delivery model. No monthly fees, unified SMS + WhatsApp platform. Perfect for Indian SMEs.',
     fields: [
       { id: 'apiKey', label: 'Fast2SMS API Key', value: '', isProtected: true, placeholder: 'Enter your Fast2SMS API key', helperText: 'Get this from your Fast2SMS dashboard (Dev API → API Keys). Same key works for SMS and WhatsApp!' },
     ],
@@ -207,7 +207,7 @@ const initialServices: ApiServiceIntegration[] = [
   {
     id: 'authkey',
     name: 'WMart CPaaS (Multi-Channel)',
-    description: '🌐 Our all-in-one communication platform. Single API for WhatsApp, SMS, Email, and Voice calls. Pay-as-you-go model with no commitments. Free trial credits available. Perfect for multi-channel campaigns.',
+    description: 'Our all-in-one communication platform. Single API for WhatsApp, SMS, Email, and Voice calls. Pay-as-you-go model with no commitments. Free trial credits available. Perfect for multi-channel campaigns.',
     fields: [
       { id: 'apiKey', label: 'WMart CPaaS API Key', value: '', isProtected: true, placeholder: 'Enter your WMart CPaaS API key', helperText: 'Get free trial credits when you sign up at wmart.in/cpaas. Same API key works for WhatsApp, SMS, Email, and Voice!' },
     ],
@@ -219,7 +219,7 @@ const initialServices: ApiServiceIntegration[] = [
   {
     id: 'gupshup',
     name: 'Gupshup (WhatsApp Business)',
-    description: '💬 Enterprise-grade WhatsApp platform with advanced automation. Rich interactive templates, chatbot flows, and global reach. Trusted by Fortune 500 companies.',
+    description: 'Enterprise-grade WhatsApp platform with advanced automation. Rich interactive templates, chatbot flows, and global reach. Trusted by Fortune 500 companies.',
     fields: [
       { id: 'apiKey', label: 'Gupshup API Key', value: '', isProtected: true, placeholder: 'Enter your Gupshup API key', helperText: 'Get this from your Gupshup dashboard (Settings → API Keys)' },
       { id: 'appName', label: 'App ID (or App Name)', value: '', isProtected: false, placeholder: 'b6eb9204-70fd-45c5-89d3-250adcfe3ac9', helperText: 'For 2024 API: Enter the long "App ID" from Gupshup dashboard (UUID format like b6eb9204-70fd...). For legacy API: Use the short App Name instead.' },
@@ -234,7 +234,7 @@ const initialServices: ApiServiceIntegration[] = [
   {
     id: 'fast2sms',
     name: 'Fast2SMS',
-    description: '⚡ Lightning-fast bulk SMS delivery in India. DLT approved, OTP services, and instant delivery. Simple API with great deliverability rates.',
+    description: 'Lightning-fast bulk SMS delivery in India. DLT approved, OTP services, and instant delivery. Simple API with great deliverability rates.',
     fields: [
       { id: 'apiKey', label: 'Fast2SMS API Key', value: '', isProtected: true, placeholder: 'Enter your Fast2SMS API key', helperText: 'Get this from your Fast2SMS dashboard (Dev API → API Keys)' },
       { id: 'senderId', label: 'Sender ID (Optional)', value: '', isProtected: false, placeholder: 'e.g., FSTSMS', helperText: 'Your 6-character sender ID for promotional SMS (optional for transactional)' },
@@ -247,7 +247,7 @@ const initialServices: ApiServiceIntegration[] = [
   {
     id: 'smtp',
     name: 'Custom SMTP (Email)',
-    description: '📧 Connect your own SMTP server or email service. Works with Gmail, Outlook, SendGrid, or any SMTP provider. Full control over your email delivery.',
+    description: 'Connect your own SMTP server or email service. Works with Gmail, Outlook, SendGrid, or any SMTP provider. Full control over your email delivery.',
     fields: [
       { id: 'host', label: 'SMTP Host', value: '', isProtected: false, placeholder: 'e.g., smtp.gmail.com', helperText: 'Your SMTP server hostname' },
       { id: 'port', label: 'SMTP Port', value: '', isProtected: false, placeholder: 'e.g., 587 or 465', helperText: 'Usually 587 for TLS or 465 for SSL' },

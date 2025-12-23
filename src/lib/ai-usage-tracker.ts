@@ -90,8 +90,18 @@ export async function trackAIUsage(params: {
         margin = textCost.margin;
         creditsConsumed = calculateCreditsConsumed(operationType, DEFAULT_CREDIT_CONFIG, { tokens: inputTokens + outputTokens });
       } else if (operationType === 'image_generation') {
-        const modelType = model === 'imagen-4' ? 'imagen-4' : 'imagen-3';
-        const imageCost = calculateImageGenerationCost(imageCount, modelType);
+        // Map model to cost calculator model type
+        let costModel: 'nano-banana' | 'nano-banana-pro' | 'imagen-3' | 'imagen-4' | 'imagen-4-ultra' = 'nano-banana';
+        if (model === 'gemini-2.5-flash-image') {
+          costModel = 'nano-banana';
+        } else if (model === 'gemini-3-pro-image') {
+          costModel = 'nano-banana-pro';
+        } else if (model === 'imagen-4') {
+          costModel = 'imagen-4';
+        } else if (model === 'imagen-3') {
+          costModel = 'imagen-3';
+        }
+        const imageCost = calculateImageGenerationCost(imageCount, costModel);
         rawCost = imageCost.rawCost;
         platformCost = imageCost.platformCost;
         margin = imageCost.margin;

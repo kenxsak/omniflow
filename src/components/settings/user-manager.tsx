@@ -17,6 +17,7 @@ import { getCompanyUsers, getStoredInvitations, getStoredPlans } from '@/lib/saa
 import { createAndSendInvitation, revokeInvitation } from '@/app/actions/user-invitation-actions';
 import { deleteUser } from '@/app/actions/user-management-actions';
 import { useAuth } from '@/hooks/use-auth';
+import { useCompanyApiKeys } from '@/hooks/use-company-api-keys';
 import { format } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertTitle } from '../ui/alert';
@@ -24,6 +25,7 @@ import Link from 'next/link';
 
 export default function UserManager() {
   const { appUser, company, refreshAuthContext, isAdmin, isManager } = useAuth();
+  const { apiKeys } = useCompanyApiKeys();
   const [users, setUsers] = useState<AppUser[]>([]);
   const [invitations, setInvitations] = useState<UserInvitation[]>([]);
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -96,10 +98,10 @@ export default function UserManager() {
 
     setIsInviting(true);
     
-    // Get Brevo configuration from company settings (if configured)
-    const brevoApiKey = company.apiKeys?.brevo?.apiKey;
-    const brevoSenderEmail = company.apiKeys?.brevo?.senderEmail;
-    const brevoSenderName = company.apiKeys?.brevo?.senderName;
+    // Get Brevo configuration from decrypted API keys
+    const brevoApiKey = apiKeys?.brevo?.apiKey;
+    const brevoSenderEmail = apiKeys?.brevo?.senderEmail;
+    const brevoSenderName = apiKeys?.brevo?.senderName;
     
     // Create invitation and send email automatically
     const result = await createAndSendInvitation({
@@ -237,7 +239,7 @@ export default function UserManager() {
                     <Info className="h-4 w-4"/>
                     <AlertTitle className="font-semibold">Automated Email Invitations</AlertTitle>
                     <p className="mt-1">The invited person will receive a professional email with a direct link to sign up and join your company. They must use the email address you specify here when creating their account.</p>
-                    {(!company?.apiKeys?.brevo?.apiKey || !company?.apiKeys?.brevo?.senderEmail || !company?.apiKeys?.brevo?.senderName) && (
+                    {(!apiKeys?.brevo?.apiKey || !apiKeys?.brevo?.senderEmail || !apiKeys?.brevo?.senderName) && (
                       <p className="mt-2 text-warning font-medium">⚠️ Note: Configure your Brevo API key, sender email, and sender name in Settings → API Keys to enable automated emails.</p>
                     )}
                 </Alert>

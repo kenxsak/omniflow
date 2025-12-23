@@ -37,12 +37,16 @@ export function calculateTextGenerationCost(
  */
 export function calculateImageGenerationCost(
   imageCount: number,
-  model: 'imagen-3' | 'imagen-4' | 'imagen-4-ultra' = 'imagen-4',
+  model: 'nano-banana' | 'nano-banana-pro' | 'imagen-3' | 'imagen-4' | 'imagen-4-ultra' = 'nano-banana',
   pricing: AIPricing = DEFAULT_AI_PRICING
 ): { rawCost: number; platformCost: number; margin: number } {
-  let pricePerImage = pricing.imageGeneration.imagen4;
+  let pricePerImage = pricing.imageGeneration.nanoBanana; // Default to Nano Banana
   
-  if (model === 'imagen-3') {
+  if (model === 'nano-banana') {
+    pricePerImage = pricing.imageGeneration.nanoBanana;
+  } else if (model === 'nano-banana-pro') {
+    pricePerImage = pricing.imageGeneration.nanoBananaPro;
+  } else if (model === 'imagen-3') {
     pricePerImage = pricing.imageGeneration.imagen3;
   } else if (model === 'imagen-4') {
     pricePerImage = pricing.imageGeneration.imagen4;
