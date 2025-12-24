@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { fetchCompanyApiKeysAction, saveApiKeysAction } from '@/app/actions/api-keys-actions';
 import { getVoiceChatConfig, saveVoiceChatConfig } from '@/app/actions/voice-chat-actions';
-import { GeminiIcon, BrevoIcon, TwilioIcon, Fast2SMSIcon, WhatsAppIcon, ZohoIcon } from '@/components/icons/brand-icons';
+import { GeminiIcon, BrevoIcon, TwilioIcon, Fast2SMSIcon, WhatsAppIcon, ZohoIcon, CalComIcon } from '@/components/icons/brand-icons';
 import NextImage from 'next/image';
 
 // Custom icon component that handles both Iconify and custom SVG icons
@@ -33,16 +33,16 @@ const IntegrationIcon = ({
     fast2sms: <Fast2SMSIcon className={className} />,
     metaWhatsApp: <WhatsAppIcon className={className} />,
     zoho: <ZohoIcon className={className} />,
+    calcom: <CalComIcon className={className} />,
   };
 
-  // External logo URLs for services that need images
+  // External logo URLs for services where we need the original colored brand logo
+  // Using Clearbit Logo API for reliable official logos
   const logoUrls: Record<string, string> = {
-    aisensy: 'https://unicorn-images.b-cdn.net/fd22de22-b00f-495c-bc0e-36d28dd817e6?optimizer=gif',
-    sender: 'https://www.sender.net/assets/brand-assets/sender-logo-default.png',
-    gupshup: 'https://stag-smapi.gupshup.io/developer/resources/img/assets/2019/logo_type3.png',
-    calcom: 'https://cal.com/logo.svg',
-    hubspot: 'https://www.hubspot.com/hubfs/HubSpot_Logos/HubSpot-Inversed-Favicon.png',
-    bitrix24: 'https://www.bitrix24.com/images/content_en/logo/logo-bitrix24.svg',
+    aisensy: 'https://logo.clearbit.com/aisensy.com',
+    sender: 'https://logo.clearbit.com/sender.net',
+    gupshup: 'https://logo.clearbit.com/gupshup.io',
+    bitrix24: 'https://logo.clearbit.com/bitrix24.com',
   };
 
   // Bigger sizes: sm = 24px for sidebar, lg = 32px for header
@@ -59,7 +59,7 @@ const IntegrationIcon = ({
         alt={integrationId}
         width={imgSize}
         height={imgSize}
-        className="object-contain"
+        className="object-contain rounded-sm"
         style={{ width: imgSize, height: imgSize, minWidth: imgSize, minHeight: imgSize }}
         unoptimized
       />
@@ -108,7 +108,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'brevo',
     name: 'Brevo',
-    icon: 'solar:letter-linear',
+    icon: 'simple-icons:brevo',
     description: 'Send professional email campaigns with tracking and automation (Free: 300 emails/day)',
     docLink: 'https://app.brevo.com/settings/keys/api',
     category: 'Email',
@@ -122,7 +122,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'sender',
     name: 'Sender.net',
-    icon: 'solar:mailbox-linear',
+    icon: 'simple-icons:sender',
     description: 'Email marketing with generous free tier (Free: 2,500 emails/month)',
     docLink: 'https://app.sender.net/settings/api',
     category: 'Email',
@@ -152,7 +152,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'twilio',
     name: 'Twilio',
-    icon: 'solar:smartphone-linear',
+    icon: 'simple-icons:twilio',
     description: 'Premium global SMS with high reliability',
     docLink: 'https://console.twilio.com/us1/account/keys-credentials/api-keys',
     category: 'SMS',
@@ -190,7 +190,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'metaWhatsApp',
     name: 'Meta WhatsApp Cloud API',
-    icon: 'solar:chat-round-line-linear',
+    icon: 'simple-icons:whatsapp',
     description: 'Official WhatsApp Business API - Zero monthly fees, pay only per message',
     docLink: 'https://developers.facebook.com/apps/',
     category: 'WhatsApp',
@@ -224,7 +224,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'gupshup',
     name: 'Gupshup',
-    icon: 'solar:global-linear',
+    icon: 'solar:chat-square-call-linear',
     description: 'Enterprise WhatsApp - Great for high volume messaging',
     docLink: 'https://www.gupshup.io/developer/home',
     category: 'WhatsApp',
@@ -260,7 +260,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'calcom',
     name: 'Cal.com',
-    icon: 'solar:calendar-linear',
+    icon: 'simple-icons:calcom',
     description: 'Automated appointment booking with calendar sync',
     docLink: 'https://app.cal.com/settings/developer/api-keys',
     category: 'Other Tools',
@@ -269,7 +269,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'hubspot',
     name: 'HubSpot',
-    icon: 'solar:buildings-2-linear',
+    icon: 'simple-icons:hubspot',
     description: 'Sync contacts and deals from HubSpot CRM',
     docLink: 'https://app.hubspot.com/private-apps',
     category: 'Other Tools',
@@ -281,7 +281,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'zoho',
     name: 'Zoho CRM',
-    icon: 'solar:chart-2-linear',
+    icon: 'simple-icons:zoho',
     description: 'Sync contacts and deals from Zoho CRM',
     docLink: 'https://api-console.zoho.com/',
     category: 'Other Tools',
@@ -295,7 +295,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: 'bitrix24',
     name: 'Bitrix24',
-    icon: 'solar:settings-linear',
+    icon: 'simple-icons:bitrix24',
     description: 'Sync contacts and deals from Bitrix24 CRM',
     docLink: 'https://helpdesk.bitrix24.com/open/12357770/',
     category: 'Other Tools',
@@ -340,11 +340,10 @@ function IntegrationGroup({ category, integrations, selectedId, onSelect, savedK
               <button
                 key={integration.id}
                 onClick={() => onSelect(integration.id)}
-                className={`w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-start gap-3 border ${
-                  selectedId === integration.id
-                    ? 'border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-900'
-                    : 'border-transparent hover:bg-stone-50 dark:hover:bg-stone-900/50'
-                }`}
+                className={`w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-start gap-3 border ${selectedId === integration.id
+                  ? 'border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-900'
+                  : 'border-transparent hover:bg-stone-50 dark:hover:bg-stone-900/50'
+                  }`}
               >
                 <div className="w-10 h-10 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center shrink-0 mt-0.5">
                   <IntegrationIcon integrationId={integration.id} icon={integration.icon} className="h-5 w-5 text-foreground" />

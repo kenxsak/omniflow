@@ -28,41 +28,7 @@ import { getCompanyUsers, getStoredInvitations, deleteInvitation, getCompany } f
 import { createAndSendInvitation } from '@/app/actions/user-invitation-actions';
 import type { AppUser, UserInvitation, Role, UserType } from '@/types/saas';
 import { cn } from '@/lib/utils';
-
-// Reusable Settings Card
-function SettingsCard({
-  title,
-  description,
-  icon,
-  children,
-  headerAction,
-}: {
-  title: string;
-  description: string;
-  icon: string;
-  children: React.ReactNode;
-  headerAction?: React.ReactNode;
-}) {
-  return (
-    <div className="border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-950 overflow-hidden shadow-sm">
-      <div className="px-5 py-4 border-b border-stone-100 dark:border-stone-800/60 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-            <Icon icon={icon} className="h-4.5 w-4.5 text-stone-500 dark:text-stone-400" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
-              {title}
-            </h3>
-            <p className="text-xs text-stone-500 dark:text-stone-500">{description}</p>
-          </div>
-        </div>
-        {headerAction}
-      </div>
-      {children}
-    </div>
-  );
-}
+import { SettingsCard } from '@/components/settings/settings-ui';
 
 export default function TeamPage() {
   const { appUser, isAdmin, isSuperAdmin } = useAuth();
@@ -223,16 +189,8 @@ export default function TeamPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-stone-900 dark:text-stone-100">
-            Team Members
-          </h2>
-          <p className="text-sm text-stone-500 dark:text-stone-500 mt-1">
-            Manage your team members and their access levels
-          </p>
-        </div>
+      {/* Page Actions */}
+      <div className="flex items-center justify-end">
         {canInvite && (
           <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
             <DialogTrigger asChild>

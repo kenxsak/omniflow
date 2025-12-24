@@ -40,23 +40,19 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        // Base styles - AutoSend style
-        "fixed z-50 w-full border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950 shadow-xl overflow-hidden",
-        // Mobile: bottom sheet style
+        // Base styles
+        "fixed z-[60] w-full border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950 shadow-2xl duration-200",
+        // Mobile
         "inset-x-0 bottom-0 rounded-t-2xl max-h-[90vh] overflow-y-auto",
-        // Desktop: centered modal
+        // Desktop
         "sm:inset-auto sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%]",
-        "sm:max-w-lg sm:rounded-2xl sm:max-h-[85vh]",
+        "sm:max-w-lg sm:rounded-2xl sm:max-h-[85vh] sm:overflow-y-auto",
         // Animations
-        "duration-200 ease-out",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
-        // Mobile animations (slide up)
-        "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
-        // Desktop animations (fade + scale)
-        "sm:data-[state=closed]:fade-out-0 sm:data-[state=open]:fade-in-0",
-        "sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95",
-        "sm:data-[state=closed]:slide-out-to-left-1/2 sm:data-[state=closed]:slide-out-to-top-[48%]",
-        "sm:data-[state=open]:slide-in-from-left-1/2 sm:data-[state=open]:slide-in-from-top-[48%]",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]",
+        "data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
         className
       )}
       {...props}

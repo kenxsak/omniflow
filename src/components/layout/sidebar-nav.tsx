@@ -33,6 +33,14 @@ const allNavItems: NavItem[] = [
     icon: "solar:home-2-linear",
     tooltip: "Your business overview",
   },
+  {
+    href: "/digital-card/manage",
+    label: "Digital Card",
+    icon: "solar:card-2-linear",
+    tooltip: "Create digital business cards",
+    featureId: "feat_digital_cards",
+    badge: "FREE",
+  },
 
   // ─────────────── CRM ───────────────
   {
@@ -73,6 +81,12 @@ const allNavItems: NavItem[] = [
     featureId: "feat_email_marketing",
     subItems: [
       {
+        href: "/campaigns/email-lists",
+        label: "Lists",
+        icon: "solar:users-group-two-rounded-linear",
+        tooltip: "Manage subscriber lists",
+      },
+      {
         href: "/campaigns",
         label: "All Campaigns",
         icon: "solar:inbox-out-linear",
@@ -83,18 +97,6 @@ const allNavItems: NavItem[] = [
         label: "Email",
         icon: "solar:mailbox-linear",
         tooltip: "Email marketing dashboard",
-      },
-      {
-        href: "/email-marketing/automations",
-        label: "Automations",
-        icon: "solar:bolt-linear",
-        tooltip: "Automated email sequences",
-      },
-      {
-        href: "/campaigns/email-lists",
-        label: "Lists",
-        icon: "solar:users-group-two-rounded-linear",
-        tooltip: "Manage subscriber lists",
       },
       {
         href: "/campaigns/messages",
@@ -164,15 +166,6 @@ const allNavItems: NavItem[] = [
     featureId: "feat_advanced_analytics",
   },
 
-  // ─────────────── TOOLS ───────────────
-  {
-    href: "/digital-card/manage",
-    label: "Digital Card",
-    icon: "solar:card-2-linear",
-    tooltip: "Create digital business cards",
-    featureId: "feat_digital_cards",
-    badge: "FREE",
-  },
 
   // ─────────────── TEAM (Admin Only) ───────────────
   {

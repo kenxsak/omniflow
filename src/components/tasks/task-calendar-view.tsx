@@ -1,37 +1,54 @@
 
 "use client";
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { Calendar } from '@/components/ui/calendar';
-import type { Task } from '@/types/task';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import React, { useState, useMemo } from 'react';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  addMonths,
+  subMonths,
+  isSameMonth,
+  isSameDay,
+  isToday,
+} from 'date-fns';
+import { Icon } from '@iconify/react';
 import { Button } from '@/components/ui/button';
-import { format, isSameDay } from 'date-fns';
-import { Edit } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { Task } from '@/types/task';
 
 interface TaskCalendarViewProps {
   tasks: Task[];
   onEditTask: (task: Task) => void;
 }
 
-const priorityDotColors: Record<Task['priority'], string> = {
-  High: 'bg-destructive',
-  Medium: 'bg-warning',
-  Low: 'bg-info',
+const priorityDetails: Record<Task['priority'], string> = {
+  High: 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900 dark:hover:bg-rose-900/60',
+  Medium: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900 dark:hover:bg-amber-900/60',
+  Low: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900 dark:hover:bg-blue-900/60',
 };
 
-const TaskDot: React.FC<{ priority: Task['priority'] }> = ({ priority }) => (
-  <div className={`h-2 w-2 rounded-full ${priorityDotColors[priority]}`}></div>
-);
-
 export default function TaskCalendarView({ tasks, onEditTask }: TaskCalendarViewProps) {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const calendarDays = useMemo(() => {
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(monthStart);
+    const startDate = startOfWeek(monthStart);
+    const endDate = endOfWeek(monthEnd);
+
+    return eachDayOfInterval({ start: startDate, end: endDate });
+  }, [currentMonth]);
 
   const tasksByDate = useMemo(() => {
     const map = new Map<string, Task[]>();
     tasks.forEach(task => {
-      const dateKey = format(new Date(task.dueDate), 'yyyy-MM-dd');
+      const date = new Date(task.dueDate);
+      const dateKey = format(date, 'yyyy-MM-dd');
+
       if (!map.has(dateKey)) {
         map.set(dateKey, []);
       }
@@ -40,109 +57,123 @@ export default function TaskCalendarView({ tasks, onEditTask }: TaskCalendarView
     return map;
   }, [tasks]);
 
-  const tasksForSelectedDate = useMemo(() => {
-    if (!selectedDate) return [];
-    const dateKey = format(selectedDate, 'yyyy-MM-dd');
-    return tasksByDate.get(dateKey) || [];
-  }, [selectedDate, tasksByDate]);
-  
-  // Set initial selected date to today if there are tasks today, otherwise the first day with tasks
-  useEffect(() => {
-    const todayKey = format(new Date(), 'yyyy-MM-dd');
-    if (tasksByDate.has(todayKey)) {
-        setSelectedDate(new Date());
-    } else if (tasks.length > 0) {
-        // Find the earliest date with a task
-        const firstTaskDate = tasks.map(t => new Date(t.dueDate)).sort((a,b) => a.getTime() - b.getTime())[0];
-        setSelectedDate(firstTaskDate);
-    } else {
-        setSelectedDate(new Date());
-    }
-  }, [tasks, tasksByDate]);
+  const nextMonth = () => setCurrentMonth(prev => addMonths(prev, 1));
+  const prevMonth = () => setCurrentMonth(prev => subMonths(prev, 1));
+  const goToToday = () => setCurrentMonth(new Date());
 
-
-  const DayWithDots: React.FC<{ date: Date }> = ({ date }) => {
-    const dateKey = format(date, 'yyyy-MM-dd');
-    const dayTasks = tasksByDate.get(dateKey) || [];
-
-    return (
-      <div className="relative h-full w-full flex items-center justify-center">
-        <span>{date.getDate()}</span>
-        {dayTasks.length > 0 && (
-          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-0.5">
-            {dayTasks.slice(0, 3).map((task) => (
-              <TaskDot key={task.id} priority={task.priority} />
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
-  
-  const modifiers = useMemo(() => {
-    const modifiersMap: Record<string, Date[]> = {
-      hasTasks: [],
-    };
-    tasksByDate.forEach((_, dateKey) => {
-        modifiersMap.hasTasks.push(new Date(dateKey + 'T12:00:00')); // Use noon to avoid timezone issues
-    });
-    return modifiersMap;
-  }, [tasksByDate]);
-
-  const modifiersStyles = {
-    hasTasks: {
-        // We will use the custom component to render dots, so no specific style needed here
-        // But we could add a subtle background for days with tasks if we wanted
-        // backgroundColor: 'hsl(var(--muted))'
-    },
-  };
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <Card>
-      <CardContent className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 flex justify-center">
-           <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={setSelectedDate}
-              className="rounded-md border p-0"
-              components={{
-                 Day: (props) => <DayWithDots date={props.date} />
-              }}
-              modifiers={modifiers}
-              modifiersStyles={modifiersStyles}
-            />
+    <div className="flex flex-col h-[calc(100vh-220px)] min-h-[600px] bg-white dark:bg-stone-950 rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden shadow-sm">
+      {/* Calendar Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border-b border-stone-200 dark:border-stone-800 gap-4">
+        <div className="flex items-center gap-4">
+          <h2 className="text-xl font-bold text-foreground capitalize tracking-tight">
+            {format(currentMonth, 'MMMM yyyy')}
+          </h2>
+          <div className="flex items-center rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-0.5 shadow-sm">
+            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md hover:bg-stone-100 dark:hover:bg-stone-800" onClick={prevMonth}>
+              <Icon icon="solar:alt-arrow-left-linear" className="h-4.5 w-4.5" />
+            </Button>
+            <div className="w-px h-4 bg-stone-200 dark:bg-stone-800 mx-1" />
+            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md hover:bg-stone-100 dark:hover:bg-stone-800" onClick={nextMonth}>
+              <Icon icon="solar:alt-arrow-right-linear" className="h-4.5 w-4.5" />
+            </Button>
+          </div>
         </div>
-        <div>
-          <CardHeader className="p-1 mb-2">
-            <CardTitle className="text-lg">
-                Tasks for {selectedDate ? format(selectedDate, 'PPP') : '...'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-1 space-y-3 max-h-[350px] overflow-y-auto">
-            {tasksForSelectedDate.length > 0 ? (
-              tasksForSelectedDate.map(task => (
-                <div key={task.id} className="p-3 border rounded-md bg-muted/30">
-                  <div className="flex justify-between items-start">
-                    <p className="font-semibold text-sm flex-grow pr-2">{task.title}</p>
-                    <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={() => onEditTask(task)}>
-                        <Edit className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    <Badge className={priorityDotColors[task.priority]} />
-                    <span className="text-xs">{task.priority} Priority</span>
-                    <Badge variant="outline" className="text-xs">{task.status}</Badge>
-                  </div>
-                  {task.leadName && <p className="text-xs text-muted-foreground mt-1">Lead: {task.leadName}</p>}
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-10">No tasks due on this day.</p>
-            )}
-          </CardContent>
+
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={goToToday} className="text-xs font-medium h-8 border-stone-200 dark:border-stone-800">
+            Today
+          </Button>
+          {/* Legend (optional, but helpful) */}
+          <div className="hidden md:flex items-center gap-3 border-l border-stone-200 dark:border-stone-800 pl-3 ml-1">
+            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+              <span className="w-2 h-2 rounded-full bg-stone-400"></span> To Do
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+              <span className="w-2 h-2 rounded-full bg-amber-500"></span> In Progress
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Done
+            </div>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* Days Header */}
+      <div className="grid grid-cols-7 border-b border-stone-200 dark:border-stone-800 bg-stone-50/80 dark:bg-stone-900/40 backdrop-blur-sm">
+        {weekDays.map(day => (
+          <div key={day} className="py-3 text-center text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
+            {day}
+          </div>
+        ))}
+      </div>
+
+      {/* Calendar Grid */}
+      <div className="flex-1 grid grid-cols-7 grid-rows-5 md:grid-rows-6 bg-stone-200 dark:bg-stone-800 gap-px overflow-hidden">
+        {/* gap-px with background color creates the borders between cells */}
+
+        {calendarDays.map((day, idx) => {
+          const dateKey = format(day, 'yyyy-MM-dd');
+          const dayTasks = tasksByDate.get(dateKey) || [];
+          const isCurrentMonth = isSameMonth(day, currentMonth);
+          const isTodayDate = isToday(day);
+
+          return (
+            <div
+              key={day.toISOString()}
+              className={cn(
+                "relative bg-white dark:bg-stone-950 p-2 flex flex-col gap-1 transition-colors hover:bg-stone-50/50 dark:hover:bg-stone-900/30 min-h-[100px]",
+                !isCurrentMonth && "bg-stone-50/30 dark:bg-stone-900/10 text-muted-foreground/50"
+              )}
+            >
+              <div className="flex justify-between items-start">
+                <span
+                  className={cn(
+                    "text-xs font-semibold w-7 h-7 flex items-center justify-center rounded-full transition-all",
+                    isTodayDate
+                      ? "bg-primary text-primary-foreground shadow-md scale-110"
+                      : "text-muted-foreground"
+                  )}
+                >
+                  {format(day, 'd')}
+                </span>
+
+                {dayTasks.length > 0 && isCurrentMonth && (
+                  <span className="text-[10px] text-muted-foreground font-medium md:hidden">
+                    {dayTasks.length}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex-1 flex flex-col gap-1.5 mt-1 overflow-y-auto overflow-x-hidden scrollbar-none hover:scrollbar-thin scrollbar-thumb-stone-200 dark:scrollbar-thumb-stone-800 pr-0.5">
+                {dayTasks.map(task => (
+                  <div
+                    key={task.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditTask(task);
+                    }}
+                    className={cn(
+                      "group relative flex items-center gap-2 pl-2.5 pr-2 py-1.5 rounded-md cursor-pointer border text-[10px] mobile:text-[11px] font-medium transition-all shadow-sm hover:translate-x-0.5 hover:shadow-md",
+                      priorityDetails[task.priority],
+                    )}
+                  >
+                    {/* Status Indicator Bar */}
+                    <span className={cn("absolute left-0 top-0 bottom-0 w-[3px] rounded-l-md transition-colors",
+                      task.status === 'Done' ? 'bg-emerald-500' :
+                        task.status === 'In Progress' ? 'bg-amber-500' : 'bg-stone-400'
+                    )} />
+
+                    <span className="truncate line-clamp-1">{task.title}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }

@@ -12,10 +12,10 @@ export const metadata: Metadata = {
   applicationName: 'OmniFlow',
   keywords: [
     // Primary keywords
-    'ai marketing automation', 'crm for small business', 'email marketing platform', 
+    'ai marketing automation', 'crm for small business', 'email marketing platform',
     'whatsapp marketing', 'sms marketing tool', 'marketing automation software',
     // Feature keywords
-    'ai content generation', 'ai email campaigns', 'multi-channel marketing', 
+    'ai content generation', 'ai email campaigns', 'multi-channel marketing',
     'lead management software', 'sales automation', 'digital business cards',
     // Competitor comparison keywords
     'hubspot alternative', 'mailchimp alternative', 'activecampaign alternative',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     // Location-specific
     'marketing automation india', 'crm india', 'whatsapp business api india',
     // Long-tail keywords
-    'all in one marketing platform', 'ai powered marketing tools', 
+    'all in one marketing platform', 'ai powered marketing tools',
     'small business marketing software', 'startup marketing automation',
     'automated email campaigns', 'bulk whatsapp messaging', 'sms blast service'
   ],
@@ -124,7 +124,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${geistSans.variable} font-sans antialiased bg-background`}>
+      <body className={`${geistSans.variable} font-sans antialiased bg-background`} suppressHydrationWarning>
         {children}
         <script
           dangerouslySetInnerHTML={{

@@ -23,7 +23,7 @@ export async function fetchCompanyApiKeysAction(companyId: string): Promise<{
 
     const companyRef = doc(serverDb, 'companies', companyId);
     const companyDoc = await getDoc(companyRef);
-    
+
     if (!companyDoc.exists()) {
       console.error(`❌ Company ${companyId} not found`);
       return { success: false, error: 'Company not found' };
@@ -31,20 +31,20 @@ export async function fetchCompanyApiKeysAction(companyId: string): Promise<{
 
     const storedKeys = (companyDoc.data().apiKeys as Record<string, any>) || {};
     const decryptedKeys: Record<string, Record<string, string>> = {};
-    
+
     for (const [serviceId, serviceKeys] of Object.entries(storedKeys)) {
       if (!serviceKeys || typeof serviceKeys !== 'object') {
         console.warn(`⚠️ Invalid service keys for ${serviceId}`);
         continue;
       }
-      
+
       decryptedKeys[serviceId] = {};
-      
+
       for (const [fieldId, value] of Object.entries(serviceKeys as Record<string, any>)) {
         if (value === null || value === undefined) {
           continue; // Skip null/undefined values entirely
         }
-        
+
         try {
           const decrypted = decryptApiKeyServerSide(value);
           if (decrypted) {
@@ -55,7 +55,7 @@ export async function fetchCompanyApiKeysAction(companyId: string): Promise<{
           // Don't set empty string - just skip this field
         }
       }
-      
+
       // Remove service if no valid keys were decrypted
       if (Object.keys(decryptedKeys[serviceId]).length === 0) {
         delete decryptedKeys[serviceId];
@@ -80,22 +80,28 @@ export async function saveApiKeysAction(
       return { success: false, error: 'Database not initialized' };
     }
 
+    if (!companyId || !integrationId) {
+      return { success: false, error: 'Invalid parameters' };
+    }
+
     const companyRef = doc(serverDb, 'companies', companyId);
+
+    // We still need to read current data to handle merging if we want to be safe,
+    // though the UI sends the full form state. Let's merge for safety.
     const companyDoc = await getDoc(companyRef);
-    
     if (!companyDoc.exists()) {
       return { success: false, error: 'Company not found' };
     }
 
-    const storedKeys = (companyDoc.data().apiKeys as Record<string, any>) || {};
-    
-    // Get existing keys for this integration to merge with new data
-    const existingIntegrationKeys = storedKeys[integrationId] || {};
+    const currentApiKeys = (companyDoc.data().apiKeys as Record<string, any>) || {};
+    const existingIntegrationKeys = currentApiKeys[integrationId] || {};
+
+    // Prepare the new data object for this specific integration
     const encryptedData: Record<string, any> = { ...existingIntegrationKeys };
 
+    // Update with new values
     for (const [key, value] of Object.entries(apiKeyData)) {
-      if (value && value.trim()) {
-        // Only encrypt and save non-empty values
+      if (value && typeof value === 'string' && value.trim().length > 0) {
         try {
           encryptedData[key] = encryptServerSide(value.trim());
         } catch (encryptError) {
@@ -103,22 +109,28 @@ export async function saveApiKeysAction(
           return { success: false, error: `Failed to encrypt ${key}` };
         }
       } else {
-        // Remove empty values from stored data
+        // If value is empty/null, remove it from the stored object
         delete encryptedData[key];
       }
     }
 
-    // Only save if there's at least one key
+    // Determine the update operation
+    // If we have keys left, update the specific integration field
+    // If no keys left, delete the integration field entirely
     if (Object.keys(encryptedData).length > 0) {
-      storedKeys[integrationId] = encryptedData;
+      await updateDoc(companyRef, {
+        [`apiKeys.${integrationId}`]: encryptedData
+      });
     } else {
-      // Remove the integration entirely if no keys
-      delete storedKeys[integrationId];
+      // Use deleteField() to remove the integration key from the map
+      // We must import deleteField from firebase/firestore
+      const { deleteField } = await import('firebase/firestore');
+      await updateDoc(companyRef, {
+        [`apiKeys.${integrationId}`]: deleteField()
+      });
     }
-    
-    await updateDoc(companyRef, { apiKeys: storedKeys });
-    
-    console.log(`✅ API keys saved for ${integrationId} in company ${companyId}`);
+
+    console.log(`✅ API keys securely saved for ${integrationId} in company ${companyId}`);
     return { success: true };
   } catch (err) {
     console.error('Failed to save API keys:', err);

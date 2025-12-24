@@ -64,7 +64,7 @@ export default function TasksPage() {
         getLeadsForTaskDropdown(appUser.companyId),
         idToken ? getAppointmentsAction({ idToken }) : Promise.resolve({ success: false, appointments: [] }),
       ]);
-      
+
       setTasks(storedTasks);
       setAllLeads(leads);
       if (appointmentsResult.success && appointmentsResult.appointments) {
@@ -87,7 +87,7 @@ export default function TasksPage() {
       loadData();
     }
   }, [appUser, loadData]);
-  
+
   const handleCreateNew = () => {
     setEditingTask(null);
     setIsDialogOpen(true);
@@ -149,7 +149,7 @@ export default function TasksPage() {
               <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">To Do</p>
             </div>
           </div>
-          
+
           {/* In Progress */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
             <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
@@ -162,7 +162,7 @@ export default function TasksPage() {
               <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">In Progress</p>
             </div>
           </div>
-          
+
           {/* Done */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
             <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
@@ -192,18 +192,18 @@ export default function TasksPage() {
             </div>
             <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'table' | 'calendar')} className="w-full sm:w-auto">
               <TabsList className="h-9 p-1 bg-stone-100 dark:bg-stone-900 rounded-lg w-full sm:w-auto grid grid-cols-2 sm:flex">
-                <TabsTrigger value="table" className="text-xs px-4 py-1.5 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-stone-800 data-[state=active]:shadow-sm gap-1.5">
-                  <Icon icon="solar:list-linear" className="h-3.5 w-3.5" /> 
+                <TabsTrigger value="table" className="text-xs px-4 py-1.5 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-stone-800 data-[state=active]:shadow-sm gap-1.5 text-muted-foreground data-[state=active]:text-foreground transition-all">
+                  <Icon icon="solar:list-linear" className="h-3.5 w-3.5" />
                   <span>Table</span>
                 </TabsTrigger>
-                <TabsTrigger value="calendar" className="text-xs px-4 py-1.5 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-stone-800 data-[state=active]:shadow-sm gap-1.5">
-                  <Icon icon="solar:calendar-linear" className="h-3.5 w-3.5" /> 
+                <TabsTrigger value="calendar" className="text-xs px-4 py-1.5 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-stone-800 data-[state=active]:shadow-sm gap-1.5 text-muted-foreground data-[state=active]:text-foreground transition-all">
+                  <Icon icon="solar:calendar-linear" className="h-3.5 w-3.5" />
                   <span>Calendar</span>
                 </TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
-          
+
           {/* Card Content */}
           {viewMode === 'table' ? (
             <>

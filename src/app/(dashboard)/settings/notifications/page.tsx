@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
-import { cn } from '@/lib/utils';
+import { SettingsCard } from '@/components/settings/settings-ui';
 
 interface NotificationSetting {
   id: string;
@@ -23,43 +23,9 @@ interface NotificationCategory {
   settings: NotificationSetting[];
 }
 
-// Reusable Settings Card
-function SettingsCard({
-  title,
-  description,
-  icon,
-  children,
-  headerAction,
-}: {
-  title: string;
-  description: string;
-  icon: string;
-  children: React.ReactNode;
-  headerAction?: React.ReactNode;
-}) {
-  return (
-    <div className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl bg-white dark:bg-stone-950 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <div className="px-5 py-4 border-b border-stone-200/60 dark:border-stone-800/60 bg-stone-50/50 dark:bg-stone-900/30 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-stone-100 dark:bg-stone-800">
-            <Icon icon={icon} className="h-4 w-4 text-stone-600 dark:text-stone-400" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold">{title}</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
-          </div>
-        </div>
-        {headerAction}
-      </div>
-      <div>{children}</div>
-    </div>
-  );
-}
-
 export default function NotificationsPage() {
   const { toast } = useToast();
   const { appUser } = useAuth();
-  const [activeTab, setActiveTab] = useState<'email' | 'push' | 'system'>('email');
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -233,10 +199,6 @@ export default function NotificationsPage() {
         });
       });
       localStorage.setItem('notificationPreferences', JSON.stringify(prefs));
-
-      // In a real app, you would also save to the database here
-      // await saveNotificationPreferences({ userId: appUser?.uid, preferences: prefs });
-
       toast({ title: 'Notification preferences saved' });
       setHasChanges(false);
     } catch (error) {
@@ -251,15 +213,9 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold">Notifications</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Choose how you want to be notified about activity
-          </p>
-        </div>
+    <div className="space-y-6">
+      {/* Page Actions */}
+      <div className="flex items-center justify-end">
         {hasChanges && (
           <Button onClick={handleSave} disabled={isSaving} size="sm" className="h-8">
             {isSaving ? (
@@ -274,125 +230,97 @@ export default function NotificationsPage() {
         )}
       </div>
 
-      {/* Horizontal Tabs */}
-      <div className="border-b border-stone-200/60 dark:border-stone-800/60">
-        <nav className="flex gap-1 overflow-x-auto pb-px" aria-label="Tabs">
-          {[
-            { id: 'email' as const, label: 'Email', icon: 'solar:letter-linear' },
-            { id: 'push' as const, label: 'Push', icon: 'solar:bell-linear' },
-            { id: 'system' as const, label: 'System', icon: 'solar:settings-linear' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "relative flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium transition-all whitespace-nowrap",
-                activeTab === tab.id
-                  ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500"
-                  : "text-stone-600 dark:text-stone-400 border-b-2 border-transparent hover:text-stone-900 dark:hover:text-stone-200"
-              )}
-            >
-              <Icon icon={tab.icon} className="h-4 w-4" />
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="flex flex-wrap gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-8 text-xs"
-          onClick={() => {
-            setCategories((prev) =>
-              prev.map((cat) => ({
-                ...cat,
-                settings: cat.settings.map((s) => ({ ...s, enabled: true })),
-              }))
-            );
-            setHasChanges(true);
-          }}
-        >
-          Enable All
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-8 text-xs"
-          onClick={() => {
-            setCategories((prev) =>
-              prev.map((cat) => ({
-                ...cat,
-                settings: cat.settings.map((s) => ({ ...s, enabled: false })),
-              }))
-            );
-            setHasChanges(true);
-          }}
-        >
-          Disable All
-        </Button>
-      </div>
-
-      {/* Tab Content - Notification Categories */}
-      {categories.filter(cat => cat.id === activeTab).map((category) => {
-        const status = getCategoryStatus(category);
-        return (
-          <SettingsCard
-            key={category.id}
-            title={category.title}
-            description={category.description}
-            icon={category.icon}
-            headerAction={
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] font-medium text-muted-foreground">
-                  {status === 'all'
-                    ? 'All On'
-                    : status === 'some'
-                      ? `${category.settings.filter((s) => s.enabled).length}/${category.settings.length}`
-                      : 'Off'}
-                </span>
-                <Switch
-                  checked={status === 'all'}
-                  onCheckedChange={(checked) => toggleAllInCategory(category.id, checked)}
-                />
-              </div>
-            }
+      {/* Quick Actions & Info */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => {
+              setCategories((prev) =>
+                prev.map((cat) => ({
+                  ...cat,
+                  settings: cat.settings.map((s) => ({ ...s, enabled: true })),
+                }))
+              );
+              setHasChanges(true);
+            }}
           >
-            <div className="divide-y divide-stone-200 dark:divide-stone-800">
-              {category.settings.map((setting) => (
-                <div
-                  key={setting.id}
-                  className="flex items-center justify-between px-4 py-3 hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors"
-                >
-                  <div className="flex-1 min-w-0 pr-4">
-                    <p className="text-sm font-medium">{setting.title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{setting.description}</p>
-                  </div>
+            Enable All
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => {
+              setCategories((prev) =>
+                prev.map((cat) => ({
+                  ...cat,
+                  settings: cat.settings.map((s) => ({ ...s, enabled: false })),
+                }))
+              );
+              setHasChanges(true);
+            }}
+          >
+            Disable All
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+          <Icon icon="solar:letter-linear" className="h-4 w-4 text-muted-foreground" />
+          <p className="text-xs text-muted-foreground">
+            Emails sent to <span className="font-medium text-foreground">{appUser?.email || 'your email'}</span>
+          </p>
+        </div>
+      </div>
+
+      {/* Categories Grid */}
+      <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-4">
+        {categories.map((category) => {
+          const status = getCategoryStatus(category);
+          return (
+            <SettingsCard
+              key={category.id}
+              title={category.title}
+              description={category.description}
+              icon={category.icon}
+              action={
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-medium text-muted-foreground">
+                    {status === 'all'
+                      ? 'All On'
+                      : status === 'some'
+                        ? `${category.settings.filter((s) => s.enabled).length}/${category.settings.length}`
+                        : 'Off'}
+                  </span>
                   <Switch
-                    checked={setting.enabled}
-                    onCheckedChange={() => toggleSetting(category.id, setting.id)}
+                    checked={status === 'all'}
+                    onCheckedChange={(checked) => toggleAllInCategory(category.id, checked)}
                   />
                 </div>
-              ))}
-            </div>
-          </SettingsCard>
-        );
-      })}
-
-      {/* Email Delivery Info */}
-      <div className="bg-stone-50 dark:bg-stone-900/50 rounded-xl p-4 border border-stone-200 dark:border-stone-800">
-        <div className="flex items-start gap-3">
-          <Icon icon="solar:info-circle-linear" className="h-4 w-4 text-muted-foreground mt-0.5" />
-          <div>
-            <p className="text-sm font-medium">Email delivery address</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              All email notifications will be sent to{' '}
-              <span className="font-medium">{appUser?.email || 'your registered email'}</span>
-            </p>
-          </div>
-        </div>
+              }
+            >
+              <div className="divide-y divide-stone-200 dark:divide-stone-800">
+                {category.settings.map((setting) => (
+                  <div
+                    key={setting.id}
+                    className="flex items-center justify-between py-3"
+                  >
+                    <div className="flex-1 min-w-0 pr-4">
+                      <p className="text-sm font-medium">{setting.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{setting.description}</p>
+                    </div>
+                    <Switch
+                      checked={setting.enabled}
+                      onCheckedChange={() => toggleSetting(category.id, setting.id)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </SettingsCard>
+          );
+        })}
       </div>
     </div>
   );

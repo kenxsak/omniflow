@@ -7,20 +7,21 @@ import AppHeader from '@/components/layout/app-header';
 import AppSidebarHeader from '@/components/layout/app-sidebar-header';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
+import { cn } from '@/lib/utils';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { appUser } = useAuth();
   const pathname = usePathname();
   const mainRef = useRef<HTMLElement>(null);
   const prevPathname = useRef(pathname);
-  
+
   // Ultra-fast page transition - CSS only, no GSAP delay
   useLayoutEffect(() => {
     if (prevPathname.current !== pathname && mainRef.current) {
       // Instant opacity transition via CSS class
       mainRef.current.style.opacity = '0';
       mainRef.current.style.transform = 'translateY(4px)';
-      
+
       // Use requestAnimationFrame for instant visual update
       requestAnimationFrame(() => {
         if (mainRef.current) {
@@ -29,13 +30,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           mainRef.current.style.transform = 'translateY(0)';
         }
       });
-      
+
       prevPathname.current = pathname;
     }
   }, [pathname]);
 
   if (!appUser && pathname !== '/login' && pathname !== '/signup' && pathname !== '/pricing') {
-    return null; 
+    return null;
   }
 
   return (
@@ -54,11 +55,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </Sidebar>
       <SidebarInset className="flex flex-col min-h-screen">
         <AppHeader />
-        <main 
+        <main
           ref={mainRef}
           className="flex-1 p-4 sm:p-6 overflow-x-hidden"
         >
-          <div className="max-w-[1400px] mx-auto w-full">
+          <div className={cn(
+            "mx-auto w-full",
+            pathname.startsWith('/settings') ? "max-w-full" : "max-w-[1400px]"
+          )}>
             {children}
           </div>
         </main>
