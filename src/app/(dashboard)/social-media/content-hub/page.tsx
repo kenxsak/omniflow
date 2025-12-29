@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Edit3, Clock, Link as LinkIcon, ExternalLink, Rss, FileCode, Loader2, Eye, EyeOff, CheckSquare, Square, Trash, Calendar, AlertTriangle } from 'lucide-react';
+import { Trash2, Edit3, Link as LinkIcon, ExternalLink, Rss, FileCode, Loader2, Eye, EyeOff, Trash, Calendar, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import type { SocialMediaPost } from '@/types/social-media';
 import { getStoredSocialMediaPostsAction, deleteStoredSocialMediaPostAction, togglePostStatusAction, bulkDeleteSocialPostsAction, deleteAllDraftsAction, deleteOldPostsAction, checkSavedPostsLimitAction } from '@/app/actions/social-media-actions';
@@ -15,7 +15,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import SchedulePostDialog from '@/components/social-media/schedule-post-dialog';
+
 import { useAuth } from '@/hooks/use-auth';
 import { InlinePublishButton } from '@/components/social-media/quick-publish-buttons';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -27,7 +27,6 @@ export default function ContentHubPage() {
   const [posts, setPosts] = useState<SocialMediaPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
-  const [postToSchedule, setPostToSchedule] = useState<SocialMediaPost | null>(null);
   const { appUser, isSuperAdmin } = useAuth();
   
   // Bulk selection state
@@ -191,23 +190,10 @@ export default function ContentHubPage() {
         });
     }
   };
-  
-  const handleSaveSchedule = async (updatedPost: SocialMediaPost) => {
-    // This should use a server action as well
-    // For now, we'll assume a client-side update for demonstration, but this is not ideal.
-    // await updateStoredSocialMediaPost(updatedPost);
-    toast({
-        title: "Post Scheduled!",
-        description: `Your post has been scheduled. (Note: scheduling persistence requires server-side logic)`
-    });
-    await loadPosts();
-    setPostToSchedule(null);
-  }
 
   const getStatusBadgeVariant = (status: SocialMediaPost['status']) => {
     switch(status) {
       case 'Draft': return 'secondary';
-      case 'Scheduled': return 'default';
       case 'Posted': return 'outline';
       default: return 'secondary';
     }
@@ -295,12 +281,6 @@ export default function ContentHubPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          
-          <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
-            <Link href="/social-media/planner">
-              <Calendar className="mr-2 h-4 w-4" /> Planner
-            </Link>
-          </Button>
           
           <Button asChild size="sm" className="flex-1 sm:flex-none">
             <Link href="/social-media">
@@ -458,7 +438,7 @@ export default function ContentHubPage() {
                   <p className="text-xs text-muted-foreground line-clamp-2">{post.textContent.substring(0, 100)}...</p>
                   <div className="flex items-center justify-between pt-2 border-t">
                     <span className="text-[10px] text-muted-foreground">
-                      {post.scheduledAt ? format(new Date(post.scheduledAt), 'PP') : 'Not scheduled'}
+                      Created {format(new Date(post.createdAt || Date.now()), 'PP')}
                     </span>
                     <div className="flex items-center gap-1">
                       {/* Quick Publish for social media posts */}
@@ -475,9 +455,6 @@ export default function ContentHubPage() {
                           </Button>
                         </>
                       )}
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setPostToSchedule(post)}>
-                        <Clock className="h-3 w-3" />
-                      </Button>
                       <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
                         <Link href={`/social-media?editPostId=${post.id}`}><Edit3 className="h-3 w-3" /></Link>
                       </Button>
@@ -518,7 +495,7 @@ export default function ContentHubPage() {
                   <TableHead>Type</TableHead>
                   <TableHead className="w-[40%]">Content (Start)</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="hidden md:table-cell">Scheduled At</TableHead>
+                  <TableHead className="hidden md:table-cell">Created</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -577,7 +554,7 @@ export default function ContentHubPage() {
                         </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell text-muted-foreground text-xs">
-                        {post.scheduledAt ? format(new Date(post.scheduledAt), 'PPp') : 'Not scheduled'}
+                        {format(new Date(post.createdAt || Date.now()), 'PPp')}
                       </TableCell>
                       <TableCell className="text-right">
                          <TooltipProvider>
@@ -607,14 +584,6 @@ export default function ContentHubPage() {
                                 </Tooltip>
                                 </>
                             )}
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon" onClick={() => setPostToSchedule(post)}>
-                                    <Clock className="h-4 w-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent><p>Schedule Post</p></TooltipContent>
-                          </Tooltip>
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button variant="ghost" size="icon" asChild>
@@ -657,15 +626,6 @@ export default function ContentHubPage() {
           </div>
         </CardContent>
       </Card>
-      
-      {postToSchedule && (
-        <SchedulePostDialog
-            post={postToSchedule}
-            isOpen={!!postToSchedule}
-            onOpenChange={(isOpen) => !isOpen && setPostToSchedule(null)}
-            onSave={handleSaveSchedule}
-        />
-      )}
     </div>
   );
 }

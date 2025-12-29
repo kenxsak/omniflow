@@ -140,13 +140,7 @@ const allNavItems: NavItem[] = [
         href: "/social-media/content-hub",
         label: "Content Hub",
         icon: "solar:folder-with-files-linear",
-        tooltip: "Manage generated content",
-      },
-      {
-        href: "/social-media/planner",
-        label: "Content Planner",
-        icon: "solar:calendar-mark-linear",
-        tooltip: "Plan & schedule content",
+        tooltip: "Saved content & publishing",
       },
       {
         href: "/ai-campaign-manager",

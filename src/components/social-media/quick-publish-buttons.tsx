@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/react';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/use-auth';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,41 +20,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-
-// Helper function to get platform icon (client-safe)
-function getBufferServiceIcon(service: string): string {
-  const icons: Record<string, string> = {
-    facebook: 'logos:facebook',
-    instagram: 'skill-icons:instagram',
-    linkedin: 'logos:linkedin-icon',
-    twitter: 'ri:twitter-x-fill',
-    pinterest: 'logos:pinterest',
-    googlebusiness: 'logos:google-icon',
-    tiktok: 'logos:tiktok-icon',
-    youtube: 'logos:youtube-icon',
-    mastodon: 'logos:mastodon-icon',
-    threads: 'ri:threads-fill',
-  };
-  return icons[service?.toLowerCase()] || 'solar:share-circle-linear';
-}
 
 interface QuickPublishButtonsProps {
   content: string;
   imageUrl?: string;
   hashtags?: string[];
   compact?: boolean;
-}
-
-interface BufferProfile {
-  id: string;
-  service: string;
-  formattedService?: string;
-  formatted_service?: string;
-  username?: string;
-  formatted_username?: string;
-  avatar?: string;
 }
 
 interface SocialPlatform {
@@ -77,39 +47,13 @@ const SOCIAL_PLATFORMS: SocialPlatform[] = [
   { id: 'threads', name: 'Threads', icon: 'ri:threads-fill', color: '#000000', postUrl: 'https://www.threads.net/', characterLimit: 500, supportsImages: true, supportsHashtags: true },
   { id: 'pinterest', name: 'Pinterest', icon: 'logos:pinterest', color: '#E60023', postUrl: 'https://www.pinterest.com/pin-builder/', supportsImages: true, supportsHashtags: true },
   { id: 'tiktok', name: 'TikTok', icon: 'logos:tiktok-icon', color: '#000000', postUrl: 'https://www.tiktok.com/upload', supportsImages: false, supportsHashtags: true },
+  { id: 'youtube', name: 'YouTube', icon: 'logos:youtube-icon', color: '#FF0000', postUrl: 'https://studio.youtube.com/', supportsImages: false, supportsHashtags: true },
 ];
 
-export function QuickPublishButtons({ content, imageUrl, hashtags = [], compact = false }: QuickPublishButtonsProps) {
+export function QuickPublishButtons({ content, hashtags = [], compact = false }: QuickPublishButtonsProps) {
   const { toast } = useToast();
-  const { user, company } = useAuth();
   const [showInstructions, setShowInstructions] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState<SocialPlatform | null>(null);
-  const [bufferConnected, setBufferConnected] = useState(false);
-  const [bufferProfiles, setBufferProfiles] = useState<BufferProfile[]>([]);
-  const [publishing, setPublishing] = useState(false);
-  const [showBufferDialog, setShowBufferDialog] = useState(false);
-  const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (user?.uid && company?.id) {
-      loadBufferConnection();
-    }
-  }, [user?.uid, company?.id]);
-
-  const loadBufferConnection = async () => {
-    if (!user?.uid || !company?.id) return;
-    try {
-      // Dynamic import to avoid SSR issues
-      const { getBufferConnectionAction } = await import('@/app/actions/buffer-actions');
-      const result = await getBufferConnectionAction(user.uid, company.id);
-      if (result.success && result.data) {
-        setBufferConnected(result.data.connected);
-        setBufferProfiles(result.data.profiles || []);
-      }
-    } catch (error) {
-      console.error('Error loading Buffer connection:', error);
-    }
-  };
 
   const copyToClipboard = async (text: string, type: string = 'Content') => {
     try {
@@ -119,45 +63,6 @@ export function QuickPublishButtons({ content, imageUrl, hashtags = [], compact 
     } catch {
       toast({ title: 'Copy Failed', variant: 'destructive' });
       return false;
-    }
-  };
-
-  const handleBufferPublish = async (publishNow: boolean = true) => {
-    if (!user?.uid || !company?.id || selectedProfiles.length === 0) return;
-    
-    setPublishing(true);
-    try {
-      let finalContent = content;
-      if (hashtags.length > 0) {
-        finalContent = `${content}\n\n${hashtags.join(' ')}`;
-      }
-
-      // Dynamic import to avoid SSR issues
-      const { publishToBufferAction } = await import('@/app/actions/buffer-actions');
-      const result = await publishToBufferAction(user.uid, company.id, selectedProfiles, {
-        text: finalContent,
-        imageUrl,
-        publishNow,
-      });
-
-      if (result.success) {
-        toast({
-          title: publishNow ? 'Published!' : 'Added to Queue!',
-          description: `Your post has been ${publishNow ? 'published' : 'added to your Buffer queue'}.`,
-        });
-        setShowBufferDialog(false);
-        setSelectedProfiles([]);
-      } else {
-        toast({
-          title: 'Publish Failed',
-          description: result.error || 'Could not publish to Buffer.',
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      toast({ title: 'Error', description: 'Failed to publish content', variant: 'destructive' });
-    } finally {
-      setPublishing(false);
     }
   };
 
@@ -173,6 +78,7 @@ export function QuickPublishButtons({ content, imageUrl, hashtags = [], compact 
     const copied = await copyToClipboard(finalContent);
     if (!copied) return;
 
+    // For Twitter, we can pre-fill the tweet
     if (platformData.id === 'twitter') {
       const tweetUrl = `${platformData.postUrl}${encodeURIComponent(finalContent)}`;
       window.open(tweetUrl, '_blank', 'noopener,noreferrer');
@@ -191,14 +97,6 @@ export function QuickPublishButtons({ content, imageUrl, hashtags = [], compact 
     setShowInstructions(false);
   };
 
-  const toggleProfile = (profileId: string) => {
-    setSelectedProfiles(prev => 
-      prev.includes(profileId) 
-        ? prev.filter(id => id !== profileId)
-        : [...prev, profileId]
-    );
-  };
-
   if (compact) {
     return (
       <DropdownMenu>
@@ -209,21 +107,7 @@ export function QuickPublishButtons({ content, imageUrl, hashtags = [], compact 
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          {bufferConnected && bufferProfiles.length > 0 && (
-            <>
-              <DropdownMenuLabel className="text-xs">Publish via Buffer</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => setShowBufferDialog(true)}
-                className="cursor-pointer"
-              >
-                <Icon icon="solar:share-circle-linear" className="h-4 w-4 mr-2" />
-                Select Channels...
-                <Badge variant="secondary" className="ml-auto text-[10px]">{bufferProfiles.length}</Badge>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-            </>
-          )}
-          <DropdownMenuLabel className="text-xs">Quick Publish (Copy & Open)</DropdownMenuLabel>
+          <DropdownMenuLabel className="text-xs">Copy & Open Platform</DropdownMenuLabel>
           {SOCIAL_PLATFORMS.map(p => (
             <DropdownMenuItem key={p.id} onClick={() => handleQuickPublish(p)} className="cursor-pointer">
               <Icon icon={p.icon} className="h-4 w-4 mr-2" />
@@ -235,6 +119,12 @@ export function QuickPublishButtons({ content, imageUrl, hashtags = [], compact 
             <Icon icon="solar:copy-linear" className="h-4 w-4 mr-2" />
             Copy Text Only
           </DropdownMenuItem>
+          {hashtags.length > 0 && (
+            <DropdownMenuItem onClick={() => copyToClipboard(hashtags.join(' '), 'Hashtags')}>
+              <Icon icon="solar:hashtag-linear" className="h-4 w-4 mr-2" />
+              Copy Hashtags
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     );
@@ -248,37 +138,12 @@ export function QuickPublishButtons({ content, imageUrl, hashtags = [], compact 
           Quick Publish
         </div>
 
-        {/* Buffer Connected - Direct Publish */}
-        {bufferConnected && bufferProfiles.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="text-xs text-muted-foreground">Publish via Buffer</div>
-              <Badge variant="outline" className="text-[10px] text-green-600 border-green-500/30">
-                {bufferProfiles.length} channels
-              </Badge>
-            </div>
-            <Button
-              onClick={() => setShowBufferDialog(true)}
-              className="w-full justify-start gap-2"
-              variant="outline"
-            >
-              <div className="w-6 h-6 rounded bg-black flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="currentColor">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-              </div>
-              Publish to Buffer Channels
-              <Icon icon="solar:alt-arrow-right-linear" className="h-4 w-4 ml-auto" />
-            </Button>
-          </div>
-        )}
-
         {/* Platform Buttons Grid - Copy & Open */}
         <div className="space-y-2">
           <div className="text-xs text-muted-foreground">
-            {bufferConnected ? 'Or copy & open manually' : 'Copy & Open'}
+            Click to copy content & open platform
           </div>
-          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
             {SOCIAL_PLATFORMS.map(p => (
               <button
                 key={p.id}
@@ -308,81 +173,6 @@ export function QuickPublishButtons({ content, imageUrl, hashtags = [], compact 
         </div>
       </div>
 
-      {/* Buffer Publish Dialog */}
-      <Dialog open={showBufferDialog} onOpenChange={setShowBufferDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded bg-black flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="currentColor">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-              </div>
-              Publish via Buffer
-            </DialogTitle>
-            <DialogDescription>
-              Select which channels to publish to
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 py-4 max-h-64 overflow-y-auto">
-            {bufferProfiles.map(profile => (
-              <label
-                key={profile.id}
-                className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors"
-              >
-                <Checkbox
-                  checked={selectedProfiles.includes(profile.id)}
-                  onCheckedChange={() => toggleProfile(profile.id)}
-                />
-                {profile.avatar ? (
-                  <img src={profile.avatar} alt="" className="w-8 h-8 rounded-full" />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                    <Icon icon={getBufferServiceIcon(profile.service)} className="h-4 w-4" />
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">
-                    {profile.formatted_username || profile.username || profile.formattedService || profile.formatted_service}
-                  </p>
-                  <p className="text-xs text-muted-foreground capitalize">{profile.service}</p>
-                </div>
-              </label>
-            ))}
-          </div>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setShowBufferDialog(false)} 
-              className="w-full sm:w-auto"
-            >
-              Cancel
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={() => handleBufferPublish(false)} 
-              disabled={selectedProfiles.length === 0 || publishing}
-              className="w-full sm:w-auto"
-            >
-              <Icon icon="solar:clock-circle-linear" className="h-4 w-4 mr-2" />
-              Add to Queue
-            </Button>
-            <Button 
-              onClick={() => handleBufferPublish(true)} 
-              disabled={selectedProfiles.length === 0 || publishing}
-              className="w-full sm:w-auto"
-            >
-              {publishing ? (
-                <Icon icon="solar:spinner-linear" className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Icon icon="solar:upload-linear" className="h-4 w-4 mr-2" />
-              )}
-              Publish Now
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       {/* Instructions Dialog */}
       <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
         <DialogContent className="sm:max-w-md">
@@ -392,17 +182,21 @@ export function QuickPublishButtons({ content, imageUrl, hashtags = [], compact 
               Publish to {selectedPlatform?.name}
             </DialogTitle>
             <DialogDescription>
-              Your content has been copied to clipboard. Follow these steps:
+              Your content has been copied to clipboard!
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-4">
+            <div className="flex items-start gap-3">
+              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white text-xs font-bold flex-shrink-0">✓</div>
+              <p className="text-sm text-green-600 dark:text-green-400 font-medium">Content copied to clipboard</p>
+            </div>
             <div className="flex items-start gap-3">
               <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex-shrink-0">1</div>
               <p className="text-sm">Click "Open {selectedPlatform?.name}" below</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex-shrink-0">2</div>
-              <p className="text-sm">Create a new post on {selectedPlatform?.name}</p>
+              <p className="text-sm">Create a new post</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex-shrink-0">3</div>

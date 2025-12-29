@@ -102,7 +102,6 @@ const getNavGroups = (isSuperAdmin: boolean): NavGroup[] => {
       icon: 'solar:link-circle-linear',
       collapsible: true,
       items: [
-        { href: '/settings/connected-accounts', label: 'Social Media', icon: 'solar:share-circle-linear' },
         { href: '/settings/integrations', label: 'API Keys', icon: 'solar:key-linear', adminOnly: true },
         { href: '/settings/webhooks', label: 'Webhooks', icon: 'solar:programming-linear', adminOnly: true },
       ],
