@@ -257,6 +257,7 @@ const initialSaasPlans: Plan[] = [
     allowBulkImport: false,
     allowBulkExport: false,
     allowAdvancedFields: false,
+    isHidden: true, // Hidden by default - toggle from Super Admin to show for testing
   }
 ];
 

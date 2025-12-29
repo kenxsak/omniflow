@@ -20,7 +20,7 @@ import { CurrencySelector } from "@/components/ui/currency-selector";
 import { PlanFeaturesModal } from '@/components/pricing/plan-features-modal';
 
 export function PricingTable() {
-  const { appUser, company } = useAuth();
+  const { appUser, company, isSuperAdmin } = useAuth();
   const currentPlan = (company as any)?.planId || 'plan_free';
   
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -46,13 +46,21 @@ export function PricingTable() {
         getStoredPlans(),
         getStoredFeatures()
       ]);
-      const sortedPlans = storedPlans.sort((a, b) => a.priceMonthlyUSD - b.priceMonthlyUSD);
+      // Filter out hidden plans for regular users - Super Admin can see all
+      const filteredPlans = storedPlans.filter(plan => {
+        // If plan is marked as hidden, only show to super admin
+        if (plan.isHidden) {
+          return isSuperAdmin;
+        }
+        return true;
+      });
+      const sortedPlans = filteredPlans.sort((a, b) => a.priceMonthlyUSD - b.priceMonthlyUSD);
       setPlans(sortedPlans);
       setAllFeatures(storedFeatures);
       setIsLoading(false);
     };
     fetchPlansAndFeatures();
-  }, []);
+  }, [isSuperAdmin]);
 
   const getFeatureName = (featureId: string) => {
     const feature = allFeatures.find(f => f.id === featureId);

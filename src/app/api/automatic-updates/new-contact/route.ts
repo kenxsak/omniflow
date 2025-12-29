@@ -102,8 +102,19 @@ export async function POST(request: NextRequest) {
 
     console.log('[Webhook] Raw payload received:', JSON.stringify(payload));
 
+    // Handle Voice Chat AI nested format: { contact: { name, email, phone }, ... }
+    let contactData = payload;
+    if (payload.contact && typeof payload.contact === 'object') {
+      contactData = {
+        ...payload,
+        name: payload.contact.name || payload.name,
+        email: payload.contact.email || payload.email,
+        phone: payload.contact.phone || payload.phone,
+      };
+    }
+
     // If no email and minimal data, treat as test request from Voice Chat AI testing
-    if (!payload.email) {
+    if (!contactData.email) {
       console.log('[Webhook] Test request accepted (no email field) - returning success');
       const response = NextResponse.json(
         { 
@@ -120,10 +131,10 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('[Webhook] Received contact from Voice Chat AI:', {
-      name: payload.name,
-      email: payload.email,
-      phone: payload.phone,
-      source: payload.source || 'voice-chat-ai',
+      name: contactData.name,
+      email: contactData.email,
+      phone: contactData.phone,
+      source: contactData.source || 'voice-chat-ai',
     });
 
     // Check if contact already exists
@@ -140,11 +151,11 @@ export async function POST(request: NextRequest) {
     }
 
     const leadsRef = collection(serverDb, 'leads');
-    const q = query(leadsRef, where('email', '==', payload.email), where('companyId', '==', accountId));
+    const q = query(leadsRef, where('email', '==', contactData.email), where('companyId', '==', accountId));
     const existingDocs = await getDocs(q);
 
     if (existingDocs.size > 0) {
-      console.log('[Webhook] Contact already exists:', payload.email);
+      console.log('[Webhook] Contact already exists:', contactData.email);
       const response = NextResponse.json(
         { 
           success: true,
@@ -160,17 +171,26 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
+    // Build notes from conversation summary if available
+    let notes = '';
+    if (contactData.conversationSummary) {
+      notes = `Conversation Summary: ${contactData.conversationSummary}`;
+    }
+    if (contactData.conversationId) {
+      notes += notes ? `\nConversation ID: ${contactData.conversationId}` : `Conversation ID: ${contactData.conversationId}`;
+    }
+
     // Add new contact to Firestore
     const newContact = {
-      name: payload.name || 'Unknown',
-      email: payload.email,
-      phone: payload.phone || '',
+      name: contactData.name || 'Unknown',
+      email: contactData.email,
+      phone: contactData.phone || '',
       status: 'New',
-      source: payload.source || 'voice-chat-ai',
+      source: contactData.source || 'voice-chat-ai',
       companyId: accountId,
       createdAt: serverTimestamp(),
       lastContacted: serverTimestamp(),
-      notes: payload.conversationId ? `Conversation ID: ${payload.conversationId}` : '',
+      notes: notes,
       brevoSyncStatus: 'pending',
       hubspotSyncStatus: 'pending',
     };
@@ -179,8 +199,8 @@ export async function POST(request: NextRequest) {
 
     console.log('[Webhook] New contact created successfully:', {
       contactId: docRef.id,
-      email: payload.email,
-      name: payload.name,
+      email: contactData.email,
+      name: contactData.name,
     });
 
     const response = NextResponse.json(

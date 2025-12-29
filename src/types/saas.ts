@@ -257,6 +257,9 @@ export interface Plan {
     // Landing Pages & Social Media Limits (Free plan restrictions)
     maxLandingPages?: number | null;   // Maximum landing pages (null = unlimited, 1 for Free)
     maxSavedPosts?: number | null;     // Maximum saved social media posts (null = unlimited, 5 for Free)
+    
+    // Visibility Control (Super Admin)
+    isHidden?: boolean;                // If true, plan is hidden from regular users (only Super Admin can see)
 }
 
 /**

@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlusCircle, Edit, Trash2, Loader2, Flag, Timer, Sparkles, Users, CreditCard, Database, Image, Key, Layers } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Loader2, Flag, Timer, Sparkles, Users, CreditCard, Database, Image, Key, Layers, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { Plan, Feature, TrialSettings } from '@/types/saas';
 import { getStoredPlans, addStoredPlan, updateStoredPlan, deleteStoredPlan, getStoredFeatures, addStoredFeature, deleteStoredFeature, getTrialSettings, saveTrialSettings, saveStoredFeatures, initialFeatures, syncPlansFromCode } from '@/lib/saas-data';
@@ -529,6 +529,16 @@ export default function PlanManager() {
     loadData();
   };
 
+  const handleToggleVisibility = async (plan: Plan) => {
+    const updatedPlan = { ...plan, isHidden: !plan.isHidden };
+    await updateStoredPlan(updatedPlan);
+    toast({ 
+      title: updatedPlan.isHidden ? "Plan Hidden" : "Plan Visible", 
+      description: `"${plan.name}" is now ${updatedPlan.isHidden ? 'hidden from' : 'visible to'} regular users.` 
+    });
+    loadData();
+  };
+
   const handleAddNewFeature = async () => {
     if (!newFeatureName.trim()) {
       toast({ title: "Feature name is required", variant: "destructive" });
@@ -690,6 +700,14 @@ export default function PlanManager() {
                           )}
                         </TableCell>
                         <TableCell className="text-right">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => handleToggleVisibility(plan)}
+                            title={plan.isHidden ? "Show to users" : "Hide from users"}
+                          >
+                            {plan.isHidden ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-green-500" />}
+                          </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleEdit(plan)}><Edit className="h-4 w-4" /></Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
