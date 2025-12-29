@@ -9,7 +9,6 @@ import { createStripeCheckoutSession } from '@/app/actions/stripe-payment-action
 import { createRazorpayOrder, verifyRazorpayPayment } from '@/app/actions/razorpay-payment-actions';
 import type { BillingCycle } from '@/types/payment';
 import type { Plan } from '@/types/saas';
-import { getPreferredPaymentGateway } from '@/lib/payment-config';
 import { getPriceForPlanWithBillingCycle, getCurrencySymbol, type SupportedCurrency } from '@/lib/geo-detection';
 
 interface PaymentButtonProps {
@@ -41,9 +40,12 @@ export function PaymentButton({
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const preferredGateway = getPreferredPaymentGateway(country || company?.country);
+  // Determine active currency - use passed currency or detect from country
+  const activeCurrency: SupportedCurrency = currency || (country?.toLowerCase() === 'india' || country?.toLowerCase() === 'in' ? 'INR' : 'USD');
   
-  const activeCurrency: SupportedCurrency = currency || (preferredGateway === 'razorpay' ? 'INR' : 'USD');
+  // Use Razorpay ONLY for INR currency, Stripe for everything else
+  const preferredGateway = activeCurrency === 'INR' ? 'razorpay' : 'stripe';
+  
   const amount = getPriceForPlanWithBillingCycle(
     plan.id, 
     activeCurrency, 
@@ -213,6 +215,14 @@ export function PaymentButton({
     return null; // Don't show payment button for free plan
   }
 
+  // Get the correct icon based on currency
+  const getCurrencyIcon = () => {
+    if (activeCurrency === 'INR') {
+      return <IndianRupee className="mr-2 h-4 w-4" />;
+    }
+    return <DollarSign className="mr-2 h-4 w-4" />;
+  };
+
   return (
     <Button
       onClick={handlePayment}
@@ -228,11 +238,7 @@ export function PaymentButton({
         </>
       ) : (
         <>
-          {preferredGateway === 'razorpay' ? (
-            <IndianRupee className="mr-2 h-4 w-4" />
-          ) : (
-            <DollarSign className="mr-2 h-4 w-4" />
-          )}
+          {getCurrencyIcon()}
           Pay {displayAmount}
           {billingCycle === 'yearly' && ` (Save ${plan.yearlyDiscountPercentage}%)`}
         </>
