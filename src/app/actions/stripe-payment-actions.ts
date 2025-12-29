@@ -86,10 +86,23 @@ export async function createStripeCheckoutSession(params: {
     const companyData = companyDoc.data();
     let customerId = companyData.stripeCustomerId;
 
-    // Create customer if doesn't exist
+    // Verify customer exists in Stripe, or create new one
+    // This handles the case where customer was created in test mode but we're now in live mode
+    if (customerId) {
+      try {
+        await stripe.customers.retrieve(customerId);
+      } catch (err: any) {
+        // Customer doesn't exist (likely test mode customer in live mode)
+        console.log('Stripe customer not found, creating new one:', customerId);
+        customerId = null;
+      }
+    }
+
+    // Create customer if doesn't exist or was invalid
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: user.email || '',
+        name: companyData.name || user.name || '',
         metadata: {
           companyId: user.companyId,
           userId: userId,
