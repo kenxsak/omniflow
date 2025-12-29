@@ -36,11 +36,11 @@ export default function AppHeader() {
 
   const userInitials = appUser?.name
     ? appUser.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
     : appUser?.email?.charAt(0).toUpperCase() || "U";
 
   return (
@@ -55,8 +55,7 @@ export default function AppHeader() {
 
         {/* Right side - Actions */}
         <div className="flex items-center gap-2">
-          {/* Theme toggle */}
-          <ThemeToggle />
+
 
           {/* User menu - Clerk style */}
           <DropdownMenu>
@@ -110,13 +109,7 @@ export default function AppHeader() {
                   <Icon icon="solar:settings-linear" className="h-4 w-4 text-muted-foreground" />
                   <span>Settings</span>
                 </button>
-                <button
-                  onClick={() => router.push("/digital-card/manage")}
-                  className="w-full flex items-center gap-3 px-3 py-2 text-[13px] text-foreground rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-                >
-                  <Icon icon="solar:smartphone-linear" className="h-4 w-4 text-muted-foreground" />
-                  <span>Digital Card</span>
-                </button>
+
               </div>
 
               {/* Sign Out */}

@@ -8,10 +8,12 @@ import { checkOperationLimit, checkCreditsAvailable } from './operation-limit-en
 import { calculateCreditsConsumed } from './ai-cost-calculator';
 import { serverDb } from './firebase-server';
 import { doc, getDoc } from 'firebase/firestore';
+import { getUserFromServerSession } from './firebase-admin';
 
 /**
  * Wrapper function to execute AI operations with automatic tracking and quota management
  * This ensures all AI calls are tracked and quota limits are enforced
+ * Super admins bypass all quota restrictions
  */
 export async function executeAIOperation<T>(params: {
   companyId: string;
@@ -52,9 +54,14 @@ export async function executeAIOperation<T>(params: {
   } = params;
 
   try {
+    // Check if user is super admin (bypasses all quota restrictions)
+    const authResult = await getUserFromServerSession();
+    const isSuperAdmin = authResult.success && authResult.user?.role === 'superadmin';
+
     // EMERGENCY PAUSE CHECK: Super Admin can pause AI operations for any company
     // This is the FIRST check to ensure paused companies cannot use AI at all
-    if (serverDb) {
+    // Note: Super admins themselves are NOT affected by pause
+    if (serverDb && !isSuperAdmin) {
       const companyRef = doc(serverDb, 'companies', companyId);
       const companyDoc = await getDoc(companyRef);
       
@@ -71,9 +78,10 @@ export async function executeAIOperation<T>(params: {
       }
     }
 
+    // SUPER ADMIN BYPASS: Skip all credit/quota checks for super admins
     // BYOK BYPASS: If using company-owned API key, skip all credit checks (unlimited usage)
     // Company pays Google directly, so platform doesn't enforce limits
-    if (apiKeyType !== 'company_owned') {
+    if (apiKeyType !== 'company_owned' && !isSuperAdmin) {
         const imageCountForCheck = operationType === 'image_generation' ? 1 : 0;
         const operationLimitCheck = await checkOperationLimit(companyId, operationType, imageCountForCheck);
         if (!operationLimitCheck.allowed) {

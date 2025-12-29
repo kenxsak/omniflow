@@ -4,6 +4,39 @@ import { adminDb } from '@/lib/firebase-admin';
 import { CompanyVoiceChatConfig } from '@/lib/voice-chat-types';
 import * as admin from 'firebase-admin';
 
+// Get voice chat config by userId (looks up companyId first)
+export async function getVoiceChatConfigByUserId(
+  userId: string
+): Promise<{ success: boolean; config?: CompanyVoiceChatConfig; message?: string }> {
+  try {
+    if (!adminDb) {
+      return { success: false, message: 'Database not initialized' };
+    }
+
+    // First, get the user to find their companyId
+    const userRef = adminDb.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return { success: false, message: 'User not found' };
+    }
+
+    const companyId = userDoc.data()?.companyId;
+    if (!companyId) {
+      return { success: false, message: 'User has no company' };
+    }
+
+    // Now get the company's voice chat config
+    return getVoiceChatConfig(companyId);
+  } catch (error) {
+    console.error('Error fetching Voice Chat config by userId:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to fetch configuration',
+    };
+  }
+}
+
 export async function saveVoiceChatConfig(
   companyId: string,
   widgetScript: string

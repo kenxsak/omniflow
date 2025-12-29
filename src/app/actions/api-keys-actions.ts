@@ -85,10 +85,8 @@ export async function saveApiKeysAction(
     }
 
     const companyRef = doc(serverDb, 'companies', companyId);
-
-    // We still need to read current data to handle merging if we want to be safe,
-    // though the UI sends the full form state. Let's merge for safety.
     const companyDoc = await getDoc(companyRef);
+    
     if (!companyDoc.exists()) {
       return { success: false, error: 'Company not found' };
     }
@@ -97,40 +95,32 @@ export async function saveApiKeysAction(
     const existingIntegrationKeys = currentApiKeys[integrationId] || {};
 
     // Prepare the new data object for this specific integration
+    // Start with existing encrypted keys to preserve any fields not being updated
     const encryptedData: Record<string, any> = { ...existingIntegrationKeys };
 
-    // Update with new values
+    // Update with new values - only update fields that are provided
     for (const [key, value] of Object.entries(apiKeyData)) {
       if (value && typeof value === 'string' && value.trim().length > 0) {
         try {
           encryptedData[key] = encryptServerSide(value.trim());
+          console.log(`✅ Encrypted ${integrationId}.${key}`);
         } catch (encryptError) {
           console.error(`Failed to encrypt ${key}:`, encryptError);
           return { success: false, error: `Failed to encrypt ${key}` };
         }
-      } else {
-        // If value is empty/null, remove it from the stored object
-        delete encryptedData[key];
       }
+      // Note: We no longer delete keys when value is empty
+      // This preserves existing values if user doesn't provide new ones
     }
 
-    // Determine the update operation
-    // If we have keys left, update the specific integration field
-    // If no keys left, delete the integration field entirely
+    // Only update if we have keys to save
     if (Object.keys(encryptedData).length > 0) {
       await updateDoc(companyRef, {
         [`apiKeys.${integrationId}`]: encryptedData
       });
-    } else {
-      // Use deleteField() to remove the integration key from the map
-      // We must import deleteField from firebase/firestore
-      const { deleteField } = await import('firebase/firestore');
-      await updateDoc(companyRef, {
-        [`apiKeys.${integrationId}`]: deleteField()
-      });
+      console.log(`✅ API keys securely saved for ${integrationId} in company ${companyId}:`, Object.keys(encryptedData));
     }
 
-    console.log(`✅ API keys securely saved for ${integrationId} in company ${companyId}`);
     return { success: true };
   } catch (err) {
     console.error('Failed to save API keys:', err);

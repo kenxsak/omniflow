@@ -11,15 +11,33 @@ const getDb = () => getFirebaseDb();
 
 // --- Default Data (for seeding) ---
 export const initialFeatures: Feature[] = [
+    // Core Modules
     { id: 'feat_core_crm', name: 'Core CRM', description: 'Access to Leads, Contacts, Pipeline, Task Management, Appointments/Calendar, and Team Management features.', active: true },
     { id: 'feat_ai_content_gen', name: 'Content Factory', description: 'Access to the unified Content Factory, including AI generators and the Content Hub for blogs and pages.', active: true },
-    { id: 'feat_digital_cards', name: 'Digital Cards', description: 'Create professional digital business cards with Voice AI chatbot (109 languages), QR codes, and lead capture. Scales per team member.', active: true },
-    { id: 'feat_ai_ads_manager', name: 'AI Ads Manager', description: 'Access to AI tools for planning and generating ad creatives.', active: true },
-    { id: 'feat_email_marketing', name: 'Email Marketing', description: 'Enables Email Marketing features, including Brevo integration.', active: true },
-    { id: 'feat_sms_whatsapp', name: 'SMS & WhatsApp Marketing', description: 'Enables SMS (Twilio) and WhatsApp marketing features.', active: true },
-    { id: 'feat_ai_voice', name: 'AI Voice & Text-to-Speech', description: 'Generate voice content and convert text to speech for marketing and content.', active: true },
+    { id: 'feat_digital_cards', name: 'Digital Cards', description: 'Create professional digital business cards with QR codes, lead capture, and optional Voice Chat AI integration (external service).', active: true },
+    
+    // Marketing Channels
+    { id: 'feat_email_marketing', name: 'Email Marketing', description: 'Enables Email Marketing features, including Brevo integration, automations, and campaign management.', active: true },
+    { id: 'feat_sms_whatsapp', name: 'SMS & WhatsApp Marketing', description: 'Enables SMS (Twilio/MSG91) and WhatsApp marketing features with bulk messaging.', active: true },
+    { id: 'feat_social_media', name: 'Social Media Management', description: 'Content Hub, multi-platform scheduling, AI content generation, and social media analytics.', active: true },
+    
+    // AI Features
+    { id: 'feat_ai_ads_manager', name: 'AI Ads Manager', description: 'Access to AI tools for planning and generating ad creatives across platforms.', active: true },
+    { id: 'feat_ai_chat', name: 'AI Super Agent', description: 'Text-based AI assistant with specialized agents: Content Writer, Ad Strategist, SEO Expert, and more.', active: true },
+    
+    // Content & Pages
+    { id: 'feat_landing_pages', name: 'Landing Pages', description: 'AI-powered landing page builder with templates, lead capture forms, and analytics.', active: true },
+    { id: 'feat_blog', name: 'Blog & Content Publishing', description: 'Create and publish blog posts with AI assistance, SEO optimization, and scheduling.', active: true },
+    
+    // Automation & Workflows
+    { id: 'feat_workflow_builder', name: 'Workflow Builder', description: 'Visual automation builder for creating custom workflows, triggers, and actions.', active: true },
+    { id: 'feat_automations', name: 'Marketing Automations', description: 'Email sequences, drip campaigns, and automated follow-ups based on triggers.', active: true },
+    
+    // Enterprise Features
     { id: 'feat_enterprise_team', name: 'Enterprise Team Collaboration', description: 'Lead Claiming (prevent duplicate work), Full Audit Trail (compliance tracking), Auto Lead Distribution (fair assignment), and Enterprise Settings page.', active: true },
-    { id: 'feat_advanced_analytics', name: 'Advanced Analytics & Business Reports', description: 'Access to advanced business intelligence, conversion tracking, ROI calculations, and predictive analytics. Available on paid plans only.', active: true },
+    { id: 'feat_advanced_analytics', name: 'Advanced Analytics & Business Reports', description: 'Access to advanced business intelligence, conversion tracking, ROI calculations, and predictive analytics.', active: true },
+    { id: 'feat_white_label', name: 'White Label Branding', description: 'Custom branding, logo, colors, and domain for agencies and resellers. Enterprise only.', active: true },
+    { id: 'feat_api_integrations', name: 'API & Integrations', description: 'REST API access, webhooks, Zapier integration, and third-party app connections.', active: true },
 ];
 
 /**
@@ -51,7 +69,7 @@ const initialSaasPlans: Plan[] = [
     description: 'Try OmniFlow with 20 AI generations to experience the power.',
     priceMonthlyUSD: 0,
     yearlyDiscountPercentage: 0,
-    featureIds: ['feat_core_crm', 'feat_ai_content_gen', 'feat_digital_cards'],
+    featureIds: ['feat_core_crm', 'feat_ai_content_gen', 'feat_digital_cards', 'feat_landing_pages', 'feat_ai_chat'],
     maxUsers: 1,  // Free plan: Only 1 user (the owner), cannot invite anyone
     
     // DUAL CREDIT SYSTEM - One-time credits only
@@ -70,6 +88,12 @@ const initialSaasPlans: Plan[] = [
     digitalCardsPerUser: 0,
     maxDigitalCardsCap: 1,
     
+    // Landing Pages - Limited for free plan
+    maxLandingPages: 1,
+    
+    // Social Media Content - Limited for free plan
+    maxSavedPosts: 5,
+    
     // CRM Limitations - Basic tier with import/export enabled
     crmAccessLevel: 'basic',
     maxContacts: 100,
@@ -83,7 +107,11 @@ const initialSaasPlans: Plan[] = [
     description: 'For solopreneurs and small businesses. 2,000 credits/month OR unlimited with BYOK.',
     priceMonthlyUSD: 29,
     yearlyDiscountPercentage: 15,
-    featureIds: ['feat_core_crm', 'feat_email_marketing', 'feat_ai_content_gen', 'feat_digital_cards', 'feat_advanced_analytics'],
+    featureIds: [
+      'feat_core_crm', 'feat_ai_content_gen', 'feat_digital_cards', 'feat_email_marketing',
+      'feat_social_media', 'feat_landing_pages', 'feat_blog', 'feat_ai_chat',
+      'feat_automations', 'feat_advanced_analytics', 'feat_api_integrations'
+    ],
     maxUsers: 3,
     
     // DUAL CREDIT SYSTEM - Monthly renewable
@@ -102,6 +130,12 @@ const initialSaasPlans: Plan[] = [
     digitalCardsPerUser: 1,
     maxDigitalCardsCap: 5,
     
+    // Landing Pages - Unlimited for paid plans
+    maxLandingPages: null,
+    
+    // Social Media Content - Unlimited for paid plans
+    maxSavedPosts: null,
+    
     // CRM Limitations - Full tier for paid plans
     crmAccessLevel: 'full',
     maxContacts: null,
@@ -116,7 +150,12 @@ const initialSaasPlans: Plan[] = [
     priceMonthlyUSD: 99,
     isFeatured: true,
     yearlyDiscountPercentage: 20,
-    featureIds: ['feat_core_crm', 'feat_email_marketing', 'feat_sms_whatsapp', 'feat_ai_content_gen', 'feat_ai_ads_manager', 'feat_digital_cards', 'feat_advanced_analytics'],
+    featureIds: [
+      'feat_core_crm', 'feat_ai_content_gen', 'feat_digital_cards', 'feat_email_marketing',
+      'feat_sms_whatsapp', 'feat_social_media', 'feat_ai_ads_manager',
+      'feat_landing_pages', 'feat_blog', 'feat_ai_chat', 'feat_workflow_builder',
+      'feat_automations', 'feat_advanced_analytics', 'feat_api_integrations'
+    ],
     maxUsers: 10,
     
     // DUAL CREDIT SYSTEM - Monthly renewable
@@ -135,6 +174,12 @@ const initialSaasPlans: Plan[] = [
     digitalCardsPerUser: 2,
     maxDigitalCardsCap: 30,
     
+    // Landing Pages - Unlimited for paid plans
+    maxLandingPages: null,
+    
+    // Social Media Content - Unlimited for paid plans
+    maxSavedPosts: null,
+    
     // CRM Limitations - Full tier for paid plans
     crmAccessLevel: 'full',
     maxContacts: null,
@@ -148,7 +193,13 @@ const initialSaasPlans: Plan[] = [
     description: 'For large teams. 60,000 credits/month OR unlimited with BYOK. White-label available.',
     priceMonthlyUSD: 249,
     yearlyDiscountPercentage: 25,
-    featureIds: ['feat_core_crm', 'feat_email_marketing', 'feat_sms_whatsapp', 'feat_ai_content_gen', 'feat_ai_ads_manager', 'feat_digital_cards', 'feat_enterprise_team', 'feat_advanced_analytics'],
+    featureIds: [
+      'feat_core_crm', 'feat_ai_content_gen', 'feat_digital_cards', 'feat_email_marketing',
+      'feat_sms_whatsapp', 'feat_social_media', 'feat_ai_ads_manager',
+      'feat_landing_pages', 'feat_blog', 'feat_ai_chat', 'feat_workflow_builder',
+      'feat_automations', 'feat_enterprise_team', 'feat_advanced_analytics',
+      'feat_white_label', 'feat_api_integrations'
+    ],
     maxUsers: 50,
     
     // DUAL CREDIT SYSTEM - Monthly renewable
@@ -166,6 +217,12 @@ const initialSaasPlans: Plan[] = [
     // Digital Cards - 3 per user (50 users = 150 cards)
     digitalCardsPerUser: 3,
     maxDigitalCardsCap: 200,
+    
+    // Landing Pages - Unlimited for paid plans
+    maxLandingPages: null,
+    
+    // Social Media Content - Unlimited for paid plans
+    maxSavedPosts: null,
     
     // CRM Limitations - Full tier for paid plans
     crmAccessLevel: 'full',

@@ -6,7 +6,8 @@ import { usePathname } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import {
   Collapsible,
@@ -29,41 +30,97 @@ interface NavGroup {
   items: NavItem[];
 }
 
-const getNavGroups = (): NavGroup[] => [
-  {
-    id: 'account',
-    label: 'Account',
-    icon: 'solar:user-circle-linear',
-    items: [
-      { href: '/settings', label: 'Profile', icon: 'solar:user-linear' },
-      { href: '/settings/security', label: 'Security', icon: 'solar:shield-keyhole-linear' },
-      { href: '/settings/preferences', label: 'Preferences', icon: 'solar:tuning-2-linear' },
-      { href: '/settings/notifications', label: 'Notifications', icon: 'solar:bell-linear' },
-    ],
-  },
-  {
-    id: 'workspace',
-    label: 'Workspace',
-    icon: 'solar:buildings-2-linear',
-    collapsible: true,
-    items: [
-      { href: '/settings/company', label: 'Organization', icon: 'solar:buildings-2-linear' },
-      { href: '/settings/team', label: 'Team Members', icon: 'solar:users-group-two-rounded-linear', adminOnly: true },
-      { href: '/settings/subscription', label: 'Subscription', icon: 'solar:card-linear' },
-      { href: '/settings/enterprise', label: 'Enterprise', icon: 'solar:shield-star-linear', adminOnly: true },
-    ],
-  },
-  {
-    id: 'developer',
-    label: 'Developer',
-    icon: 'solar:code-linear',
-    collapsible: true,
-    items: [
-      { href: '/settings/integrations', label: 'API Keys', icon: 'solar:key-linear', adminOnly: true },
-      { href: '/settings/webhooks', label: 'Webhooks', icon: 'solar:programming-linear', adminOnly: true },
-    ],
-  },
-];
+const getNavGroups = (isSuperAdmin: boolean): NavGroup[] => {
+  // Super admin gets different navigation
+  if (isSuperAdmin) {
+    return [
+      {
+        id: 'platform',
+        label: 'Platform Management',
+        icon: 'solar:shield-star-linear',
+        items: [
+          { href: '/settings', label: 'Profile', icon: 'solar:user-linear' },
+          { href: '/settings/plans', label: 'Plans & Pricing', icon: 'solar:tag-price-linear' },
+          { href: '/settings/features', label: 'Features', icon: 'solar:widget-4-linear' },
+        ],
+      },
+      {
+        id: 'integrations',
+        label: 'Platform Setup',
+        icon: 'solar:settings-linear',
+        collapsible: true,
+        items: [
+          { href: '/settings/payment-gateway', label: 'Payment Gateway', icon: 'solar:card-linear' },
+          { href: '/settings/email-sms-setup', label: 'Email Service', icon: 'solar:letter-linear' },
+          { href: '/settings/whatsapp-setup', label: 'WhatsApp (Notifications)', icon: 'solar:chat-round-dots-linear' },
+          { href: '/settings/social-media-setup', label: 'Social Media', icon: 'solar:share-circle-linear' },
+          { href: '/settings/ai-setup', label: 'AI Services', icon: 'solar:magic-stick-3-linear' },
+          { href: '/settings/cron-jobs', label: 'Cron Jobs', icon: 'solar:clock-circle-linear' },
+        ],
+      },
+      {
+        id: 'monitoring',
+        label: 'Monitoring',
+        icon: 'solar:chart-2-linear',
+        collapsible: true,
+        items: [
+          { href: '/settings/companies', label: 'All Companies', icon: 'solar:buildings-2-linear' },
+          { href: '/settings/users', label: 'All Users', icon: 'solar:users-group-two-rounded-linear' },
+          { href: '/super-admin-ai-costs', label: 'AI Costs', icon: 'solar:wallet-money-linear' },
+          { href: '/transactions', label: 'Transactions', icon: 'solar:card-transfer-linear' },
+        ],
+      },
+      {
+        id: 'system',
+        label: 'System',
+        icon: 'solar:settings-linear',
+        collapsible: true,
+        items: [
+          { href: '/settings/trial', label: 'Trial Settings', icon: 'solar:clock-circle-linear' },
+          { href: '/settings/preferences', label: 'Preferences', icon: 'solar:tuning-2-linear' },
+        ],
+      },
+    ];
+  }
+
+  // Regular user navigation
+  return [
+    {
+      id: 'account',
+      label: 'Account',
+      icon: 'solar:user-circle-linear',
+      items: [
+        { href: '/settings', label: 'Profile', icon: 'solar:user-linear' },
+        { href: '/settings/security', label: 'Security', icon: 'solar:shield-keyhole-linear' },
+        { href: '/settings/preferences', label: 'Preferences', icon: 'solar:tuning-2-linear' },
+        { href: '/settings/notifications', label: 'Notifications', icon: 'solar:bell-linear' },
+      ],
+    },
+    {
+      id: 'connections',
+      label: 'Connections',
+      icon: 'solar:link-circle-linear',
+      collapsible: true,
+      items: [
+        { href: '/settings/connected-accounts', label: 'Social Media', icon: 'solar:share-circle-linear' },
+        { href: '/settings/integrations', label: 'API Keys', icon: 'solar:key-linear', adminOnly: true },
+        { href: '/settings/webhooks', label: 'Webhooks', icon: 'solar:programming-linear', adminOnly: true },
+      ],
+    },
+    {
+      id: 'workspace',
+      label: 'Workspace',
+      icon: 'solar:buildings-2-linear',
+      collapsible: true,
+      items: [
+        { href: '/settings/company', label: 'Organization', icon: 'solar:buildings-2-linear' },
+        { href: '/settings/team', label: 'Team Members', icon: 'solar:users-group-two-rounded-linear', adminOnly: true },
+        { href: '/settings/subscription', label: 'Subscription', icon: 'solar:card-linear' },
+        { href: '/settings/enterprise', label: 'Enterprise', icon: 'solar:shield-star-linear', adminOnly: true },
+      ],
+    },
+  ];
+};
 
 function NavItemLink({ item, isActive, onClick, collapsed }: { item: NavItem; isActive: boolean; onClick?: () => void; collapsed?: boolean }) {
   return (
@@ -88,12 +145,12 @@ function NavItemLink({ item, isActive, onClick, collapsed }: { item: NavItem; is
 function SettingsNavigation({ onItemClick, collapsed }: { onItemClick?: () => void; collapsed?: boolean }) {
   const pathname = usePathname();
   const { isSuperAdmin, isAdmin, isManager } = useAuth();
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ workspace: true, developer: true });
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ workspace: true, connections: true, platform: true, monitoring: true, system: true, integrations: true });
 
   const isActive = (href: string) => (href === '/settings' ? pathname === '/settings' : pathname.startsWith(href));
   const toggleGroup = (groupId: string) => setOpenGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
 
-  const navGroups = getNavGroups();
+  const navGroups = getNavGroups(isSuperAdmin);
   const filteredGroups = navGroups
     .map((group) => ({
       ...group,
@@ -173,9 +230,10 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const pathname = usePathname();
+  const { isSuperAdmin } = useAuth();
 
   const getCurrentPageTitle = () => {
-    const navGroups = getNavGroups();
+    const navGroups = getNavGroups(isSuperAdmin);
     for (const group of navGroups) {
       for (const item of group.items) {
         if (item.href === '/settings' && pathname === '/settings') return item.label;
@@ -240,6 +298,9 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-72 p-0">
+                <VisuallyHidden>
+                  <SheetTitle>Settings Navigation</SheetTitle>
+                </VisuallyHidden>
                 <div className="h-14 flex items-center px-4 border-b border-stone-200 dark:border-stone-800">
                   <div className="flex items-center gap-2">
                     <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">

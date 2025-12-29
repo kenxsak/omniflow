@@ -12,7 +12,7 @@
  * - GenerateImageWithAiFlowOutput - Return type
  */
 
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { z } from 'genkit';
 
 const GenerateImageWithAiFlowInputSchema = z.object({
@@ -112,7 +112,7 @@ async function generateBrandedImage(
 
   // Use multimodal input with the logo image
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash-image",
+    model: "gemini-2.0-flash-exp",
     contents: [
       {
         role: "user",
@@ -148,13 +148,13 @@ async function generateStandardImage(
   // Build prompt with aspect ratio hint
   const enhancedPrompt = buildPromptWithAspectRatio(input.prompt, aspectRatio);
 
-  console.log(`Generating standard image with Gemini 2.5 Flash Image...`);
+  console.log(`Generating standard image with Gemini 2.0 Flash...`);
   console.log(`Prompt: "${enhancedPrompt}"`);
   console.log(`Aspect ratio: ${aspectRatio}`);
 
-  // Generate image using Gemini 2.5 Flash Image model
+  // Generate image using Gemini 2.0 Flash Experimental (supports image generation)
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash-preview-05-20",
+    model: "gemini-2.0-flash-exp",
     contents: enhancedPrompt,
     config: {
       responseModalities: ["image", "text"],

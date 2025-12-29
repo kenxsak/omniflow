@@ -19,6 +19,7 @@ import { updateCompanyProfileAction } from '@/app/actions/profile-actions';
 import type { Company } from '@/types/saas';
 import { cn } from '@/lib/utils';
 import { SettingsCard } from '@/components/settings/settings-ui';
+import { EmbedFormGenerator } from '@/components/settings/embed-form-generator';
 
 const COUNTRIES = [
   { code: 'IN', name: 'India', currency: 'INR', timezone: 'Asia/Kolkata', flag: '🇮🇳' },
@@ -242,7 +243,7 @@ export default function CompanySettingsPage() {
         <SettingsCard
           title="Location & Currency"
           description="Regional settings for your business"
-          icon="solar:globe-linear"
+          icon="solar:map-point-linear"
         >
           <div className="space-y-4">
             <div className="space-y-1.5">
@@ -384,6 +385,13 @@ export default function CompanySettingsPage() {
           </SettingsCard>
         )}
       </div>
+
+      {/* Lead Capture Embed Form */}
+      {isAdmin && (
+        <div className="pt-2">
+          <EmbedFormGenerator />
+        </div>
+      )}
     </div>
   );
 }

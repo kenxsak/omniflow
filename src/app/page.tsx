@@ -113,12 +113,14 @@ export default function HomePage() {
           "Multi-channel marketing automation (Email, SMS, WhatsApp)",
           "AI content generation (blogs, emails, social posts, images)",
           "Digital business cards with AI voice chatbot",
+          "Landing pages with AI content generation and Clone from Reference",
           "Advanced analytics and reporting",
           "Campaign automation and workflow builder",
           "Email marketing with segmentation",
           "WhatsApp Business API integration",
           "SMS marketing campaigns",
           "AI Ads Manager for Meta and Google Ads",
+          "Social media content creation and scheduling",
           "Content Hub and blog management",
           "Appointment scheduling with automated reminders",
           "Task and activity management",
@@ -160,7 +162,7 @@ export default function HomePage() {
             "name": "What tools does OmniFlow replace?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "OmniFlow replaces 10+ tools today: HubSpot CRM, Mailchimp (3 providers: Brevo, Sender.net, or any SMTP server), Twilio/MSG91, WATI/AiSensy, Jasper AI, Canva, HiHello digital cards, Calendly appointment booking, Todoist task management, and enterprise team collaboration tools. Landing pages and forms are coming soon."
+              "text": "OmniFlow replaces 12+ tools today: HubSpot CRM, Mailchimp (3 providers: Brevo, Sender.net, or any SMTP server), Twilio/MSG91, WATI/AiSensy, Jasper AI, Canva, HiHello digital cards, Calendly appointment booking, Todoist task management, Unbounce/Leadpages landing pages, Buffer/Hootsuite social media management, and enterprise team collaboration tools."
             }
           },
           {
@@ -176,7 +178,7 @@ export default function HomePage() {
             "name": "How does the AI content generation work?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "OmniFlow uses Google Gemini 2.0 Flash for text generation and Imagen 3 for images. Simply describe what you need in plain English, and our AI creates blogs, emails, social posts, ad copy, and marketing images in seconds. It's 10x faster than manual creation."
+              "text": "OmniFlow uses Google Gemini 2.0 Flash for text generation and Nana Banana (Gemini's viral image generator) for images. Simply describe what you need in plain English, and our AI creates blogs, emails, social posts, ad copy, and marketing images in seconds. It's 10x faster than manual creation."
             }
           },
           {
@@ -1228,7 +1230,7 @@ export default function HomePage() {
                 {
                   icon: "solar:brain-bold",
                   title: "AI Content Factory",
-                  description: "Generate blogs, social posts, emails, ad copy, and images in seconds. Powered by Gemini 2.0 Flash & Imagen 3. Write 10x faster.",
+                  description: "Generate blogs, social posts, emails, ad copy, and images in seconds. Powered by Gemini 2.0 Flash & Nana Banana. Write 10x faster.",
                   replaces: "Replaces: Jasper ($82/mo), Canva Pro ($12/mo)"
                 },
                 {
@@ -1286,10 +1288,22 @@ export default function HomePage() {
                   replaces: "Replaces: AdEspresso ($49/mo), Canva ($12/mo)"
                 },
                 {
+                  icon: "solar:share-circle-bold",
+                  title: "Social Media Management",
+                  description: "Create AI-powered content for all platforms, schedule posts with content calendar, quick-publish to Facebook, Instagram, LinkedIn, X, and Pinterest.",
+                  replaces: "Replaces: Buffer ($15/mo), Hootsuite ($99/mo)"
+                },
+                {
                   icon: "solar:document-text-bold",
                   title: "Content Hub & Blog Manager",
                   description: "Publish SEO-optimized blogs and landing pages. AI-assisted writing, image generation, and publishing — all in one place.",
                   replaces: "Replaces: WordPress hosting ($30/mo), SEO tools ($99/mo)"
+                },
+                {
+                  icon: "solar:window-frame-bold",
+                  title: "AI Landing Page Builder",
+                  description: "Create high-converting landing pages with AI. Clone any page from a screenshot, AI-generate content per section, add Voice Chat AI for 24/7 lead capture.",
+                  replaces: "Replaces: Unbounce ($99/mo), Leadpages ($49/mo)"
                 },
                 {
                   icon: "solar:calendar-bold",
@@ -1553,10 +1567,11 @@ export default function HomePage() {
                       { feature: "SMS Marketing", omniflow: "✓ Zero markup", ghl: "✓ 300% markup", hubspot: "○ Add-on", ac: "○ Add-on" },
                       { feature: "CRM & Pipeline", omniflow: "✓ Full-featured", ghl: "✓ Full-featured", hubspot: "✓ Advanced", ac: "✓ Full-featured" },
                       { feature: "Digital Business Cards", omniflow: "✓ AI Voice (109 lang)", ghl: "✗ None", hubspot: "✗ None", ac: "✗ None" },
-                      { feature: "AI Image Generation", omniflow: "✓ Imagen 3", ghl: "✗ None", hubspot: "✗ None", ac: "✗ None" },
+                      { feature: "AI Image Generation", omniflow: "✓ Nana Banana", ghl: "✗ None", hubspot: "✗ None", ac: "✗ None" },
                       { feature: "Analytics & Reports", omniflow: "✓ Real-time", ghl: "✓ Advanced", hubspot: "✓ Advanced", ac: "✓ Good" },
                       { feature: "Workflow Automation", omniflow: "✓ Included", ghl: "✓ Visual builder", hubspot: "✓ Visual builder", ac: "✓ Visual builder" },
-                      { feature: "Landing Pages", omniflow: "🔨 Q1 2026", ghl: "✓ Yes", hubspot: "✓ Yes", ac: "○ Limited" },
+                      { feature: "Landing Pages", omniflow: "✓ AI-Powered + Voice Chat", ghl: "✓ Yes", hubspot: "✓ Yes", ac: "○ Limited" },
+                      { feature: "Social Media Management", omniflow: "✓ AI + Calendar", ghl: "○ Basic", hubspot: "○ Add-on", ac: "✗ None" },
                     ].map((row, i) => (
                       <tr key={i} className="border-b hover:bg-muted/30">
                         <td className="p-4 font-medium">{row.feature}</td>
@@ -1640,7 +1655,7 @@ export default function HomePage() {
                       { feature: "Razorpay Integration", omniflow: "✓ Native", zoho: "✓ Via apps", leadsq: "✓ Native", fresh: "○ Limited" },
                       { feature: "DLT/TRAI Compliance", omniflow: "✓ Auto-handled", zoho: "○ Manual", leadsq: "✓ Supported", fresh: "○ Manual" },
                       { feature: "Digital Business Cards", omniflow: "✓ AI Voice (109 lang)", zoho: "✗ None", leadsq: "✗ None", fresh: "✗ None" },
-                      { feature: "AI Image Generation", omniflow: "✓ Imagen 3", zoho: "✗ None", leadsq: "✗ None", fresh: "✗ None" },
+                      { feature: "AI Image Generation", omniflow: "✓ Nana Banana", zoho: "✗ None", leadsq: "✗ None", fresh: "✗ None" },
                       { feature: "Own CPaaS Infrastructure", omniflow: "✓ wmart.in/cpaas", zoho: "✗ Third-party", leadsq: "✗ Third-party", fresh: "✗ Third-party" },
                     ].map((row, i) => (
                       <tr key={i} className="border-b hover:bg-muted/30">
@@ -1915,7 +1930,7 @@ export default function HomePage() {
         </div>
 
         {/* Final CTA Section */}
-        <section className="py-20 px-4 bg-primary text-primary-foreground">
+        <section className="py-20 px-4 bg-stone-900 dark:bg-primary text-white dark:text-primary-foreground">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <h2 className="text-3xl md:text-5xl font-bold">
               Ready to Transform Your Business?
@@ -1929,8 +1944,8 @@ export default function HomePage() {
                   Start Free 14-Day Trial <Icon icon="solar:arrow-right-linear" className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6 border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 bg-transparent">
-                <Link href="/pricing">
+              <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6 border-2 border-white dark:border-stone-800 text-white dark:text-stone-800 hover:bg-white/10 dark:hover:bg-stone-800/10 bg-transparent">
+                <Link href="/#pricing">
                   View Pricing Plans
                 </Link>
               </Button>

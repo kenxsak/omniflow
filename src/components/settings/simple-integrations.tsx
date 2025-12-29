@@ -455,16 +455,11 @@ export default function SimpleIntegrations() {
           toast({ title: 'Error', description: result.message || 'Failed to save Voice Chat configuration', variant: 'destructive' });
         }
       } else {
+        // Only save the current integration's data
         const result = await saveApiKeysAction(appUser.companyId, selected, data);
         if (result.success) {
-          // Reload keys from database to confirm they were saved
-          const reloadResult = await fetchCompanyApiKeysAction(appUser.companyId);
-          if (reloadResult.success && reloadResult.apiKeys) {
-            setFormData(prev => ({
-              ...prev,
-              ...reloadResult.apiKeys
-            }));
-          }
+          // Update only the current integration in local state, don't reload all
+          // This prevents overwriting other integrations' data
           toast({ title: 'Success', description: `${currentIntegration.name} API keys saved securely` });
         } else {
           toast({ title: 'Error', description: result.error || 'Failed to save API keys', variant: 'destructive' });

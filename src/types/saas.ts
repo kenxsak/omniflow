@@ -128,6 +128,52 @@ export interface Company {
         canDeleteAppointments: Role[];      // Roles that can delete/cancel appointments
         canViewOthersAppointments: Role[];  // Roles that can view other users' appointments
     };
+    
+    // White-Label Branding Settings (Enterprise feature)
+    whiteLabelSettings?: WhiteLabelSettings;
+}
+
+/**
+ * White-label branding configuration for enterprise customers
+ * Allows agencies/resellers to customize the platform appearance
+ */
+export interface WhiteLabelSettings {
+    enabled: boolean;                        // Master toggle for white-label mode
+    
+    // Branding
+    brandName: string;                       // Custom brand name (replaces "OmniFlow")
+    logoUrl?: string;                        // Custom logo URL (light mode)
+    logoDarkUrl?: string;                    // Custom logo URL (dark mode)
+    faviconUrl?: string;                     // Custom favicon URL
+    
+    // Colors
+    primaryColor: string;                    // Primary brand color (hex)
+    primaryForeground?: string;              // Text color on primary (hex)
+    accentColor?: string;                    // Accent/secondary color (hex)
+    
+    // Custom Domain (requires DNS setup)
+    customDomain?: string;                   // e.g., "crm.youragency.com"
+    customDomainVerified?: boolean;          // Whether domain is verified
+    customDomainVerifiedAt?: string;         // ISO timestamp
+    
+    // Footer & Legal
+    footerText?: string;                     // Custom footer text
+    privacyPolicyUrl?: string;               // Custom privacy policy URL
+    termsOfServiceUrl?: string;              // Custom terms of service URL
+    supportEmail?: string;                   // Custom support email
+    supportUrl?: string;                     // Custom support/help center URL
+    
+    // Login Page Customization
+    loginWelcomeText?: string;               // Custom welcome text on login page
+    loginBackgroundUrl?: string;             // Custom background image for login
+    
+    // Email Branding
+    emailFromName?: string;                  // Custom "From" name in emails
+    emailFooterHtml?: string;                // Custom email footer HTML
+    
+    // Metadata
+    updatedAt?: string;                      // Last update timestamp
+    updatedBy?: string;                      // User ID who last updated
 }
 
 /**
@@ -207,6 +253,10 @@ export interface Plan {
     allowBulkImport?: boolean;         // Allow bulk CSV import of contacts
     allowBulkExport?: boolean;         // Allow bulk CSV export of contacts
     allowAdvancedFields?: boolean;     // Allow custom/advanced contact fields
+    
+    // Landing Pages & Social Media Limits (Free plan restrictions)
+    maxLandingPages?: number | null;   // Maximum landing pages (null = unlimited, 1 for Free)
+    maxSavedPosts?: number | null;     // Maximum saved social media posts (null = unlimited, 5 for Free)
 }
 
 /**

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Icon } from '@iconify/react';
 import { useToast } from '@/hooks/use-toast';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
   addStoredSocialMediaPostAction,
   getStoredSocialMediaPostsAction,
@@ -39,6 +40,11 @@ import { useAuth } from '@/hooks/use-auth';
 import { languageOptions } from '@/lib/language-options';
 import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 import { showAIContentReadyToast, showAIImageGeneratedToast, showAISuccessToast, showAITaskCompleteToast } from '@/lib/ai-toast-helpers';
+import { QuickPublishButtons } from '@/components/social-media/quick-publish-buttons';
+import { ContentTemplatesSelector, TemplatePreviewCard } from '@/components/social-media/content-templates-selector';
+import { ImageStylePresets, QuickStylePills } from '@/components/social-media/image-style-presets';
+import { SEOScorePanel } from '@/components/social-media/seo-score-panel';
+import type { ContentTemplate, ImageStylePreset } from '@/lib/content-templates';
 
 type SocialPlatform = GenerateSocialMediaContentInput['platform'];
 type SocialTone = GenerateSocialMediaContentInput['tone'];
@@ -140,6 +146,11 @@ export default function SocialMediaPage() {
   });
   const [enhancedPromptResult, setEnhancedPromptResult] = useState<GenerateEnhancedPromptOutput | null>(null);
   
+  // New state for templates and image styles
+  const [selectedTemplate, setSelectedTemplate] = useState<ContentTemplate | null>(null);
+  const [selectedImageStyle, setSelectedImageStyle] = useState<ImageStylePreset | null>(null);
+  const [showSEOPanel, setShowSEOPanel] = useState(false);
+  
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -153,6 +164,28 @@ export default function SocialMediaPage() {
   const handleContentInputChange = (field: keyof GenerateSocialMediaContentInput, value: string | boolean | number | undefined) => {
     setContentInputs(prev => ({ ...prev, [field]: value }));
   };
+  
+  // Handle template selection
+  const handleTemplateSelect = useCallback((template: ContentTemplate) => {
+    setSelectedTemplate(template);
+    // Set the platform if template specifies one
+    if (template.platforms.length > 0) {
+      const platform = template.platforms[0] as SocialPlatform;
+      handleContentInputChange('platform', platform);
+    }
+    // Set the tone
+    if (template.suggestedTone) {
+      handleContentInputChange('tone', template.suggestedTone as SocialTone);
+    }
+    // Set the prompt template
+    handleContentInputChange('topic', template.promptTemplate);
+    // Set CTA if available
+    if (template.suggestedCTA) {
+      handleContentInputChange('callToAction', template.suggestedCTA);
+    }
+    toast({ title: 'Template Applied', description: `Fill in the [PLACEHOLDERS] in the prompt.` });
+  }, [toast]);
+
   const handleTrendInputChange = (field: keyof GetTrendingTopicSuggestionsInput, value: string) => {
     setTrendInputs(prev => ({ ...prev, [field]: value }));
   };
@@ -309,7 +342,27 @@ export default function SocialMediaPage() {
           toast({ title: "Content Updated" });
       } else {
           const result = await addStoredSocialMediaPostAction(appUser.uid, finalPayload);
-           if (!result.success || !result.data) throw new Error(result.error || 'Failed to save post');
+          
+          // Handle limit reached error with upgrade prompt
+          if (!result.success) {
+            if (result.limitReached) {
+              toast({ 
+                title: '📦 Storage Limit Reached', 
+                description: (
+                  <div className="space-y-2">
+                    <p>{result.error}</p>
+                    <Link href="/settings?tab=billing" className="text-primary underline font-medium">
+                      Upgrade your plan →
+                    </Link>
+                  </div>
+                ),
+                variant: 'destructive',
+                duration: 8000,
+              });
+              return;
+            }
+            throw new Error(result.error || 'Failed to save post');
+          }
           
           const isInstantlyLive = contentInputs.platform === 'BlogPost' || contentInputs.platform === 'SalesLandingPage';
           toast({
@@ -424,26 +477,37 @@ export default function SocialMediaPage() {
   const handleImageGenerationSubmit = useCallback(async (e?: FormEvent) => {
     e?.preventDefault();
     if (!imagePrompt || !appUser) {
-      toast({ title: 'Missing Image Prompt', variant: 'destructive' }); return;
+      toast({ title: 'Missing Image Prompt', description: 'Please describe the image you want to create', variant: 'destructive' }); return;
     }
     setIsGeneratingImage(true); setGeneratedImageDataUri(null);
-    let aspectRatio: "1:1" | "16:9" | "9:16" | "4:5" | "3:4" | "4:3" | undefined = undefined;
-
+    
+    // Map user-friendly aspect ratio names to API values
+    let aspectRatio: "1:1" | "16:9" | "9:16" | "4:3" | "3:4" | undefined = undefined;
     if (selectedAspectRatio !== "Default") {
-        const ratioMapping = { "Square (1:1)": "1:1", "Landscape (16:9)": "16:9", "Portrait (9:16)": "9:16", "Portrait (4:5)": "4:5" };
-        const selected = selectedAspectRatio as keyof typeof ratioMapping;
-        if(ratioMapping[selected]) aspectRatio = ratioMapping[selected] as any;
+        const ratioMapping: Record<string, "1:1" | "16:9" | "9:16" | "4:3" | "3:4"> = { 
+          "Square (1:1)": "1:1", 
+          "Landscape (16:9)": "16:9", 
+          "Portrait (9:16)": "9:16", 
+          "Portrait (4:5)": "3:4" // Map 4:5 to closest supported ratio
+        };
+        aspectRatio = ratioMapping[selectedAspectRatio];
     }
 
-    setPromptForGeneratedImage(imagePrompt);
+    // Apply style preset to prompt if selected
+    let finalPrompt = imagePrompt;
+    if (selectedImageStyle) {
+      finalPrompt = imagePrompt + selectedImageStyle.promptSuffix;
+    }
+
+    setPromptForGeneratedImage(finalPrompt);
     try {
-      // Build input with optional brand logo for AI-powered branding
+      // Build input - brand logo is optional
       const imageInput: any = { 
-        prompt: imagePrompt, 
-        aspectRatio: aspectRatio as any 
+        prompt: finalPrompt, 
+        aspectRatio: aspectRatio
       };
       
-      // If brand logo is uploaded, pass it to the AI for branded image generation
+      // Only add brand logo if user has uploaded one AND wants it included
       if (brandLogo && includeLogo) {
         imageInput.brandLogo = brandLogo;
         imageInput.brandName = company?.name || undefined;
@@ -475,7 +539,7 @@ export default function SocialMediaPage() {
     } finally {
       setIsGeneratingImage(false);
     }
-  }, [imagePrompt, selectedAspectRatio, toast, generatedContent, appUser, brandLogo, includeLogo, company]);
+  }, [imagePrompt, selectedAspectRatio, selectedImageStyle, toast, generatedContent, appUser, brandLogo, includeLogo, company]);
 
   const handleTrendFormSubmit = useCallback(async (e: FormEvent) => {
     e.preventDefault();
@@ -715,12 +779,26 @@ export default function SocialMediaPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <header className="flex items-center justify-between">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-foreground">AI Content Factory</h1>
           <p className="text-xs text-muted-foreground">Generate text, images, video ideas, and discover trending topics</p>
         </div>
-        <ContextualHelpButton pageId="social-media" />
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/social-media/planner">
+              <Icon icon="solar:calendar-mark-linear" className="h-4 w-4 mr-1.5" />
+              <span className="hidden sm:inline">Content </span>Planner
+            </Link>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/social-media/content-hub">
+              <Icon icon="solar:folder-with-files-linear" className="h-4 w-4 mr-1.5" />
+              <span className="hidden sm:inline">Content </span>Hub
+            </Link>
+          </Button>
+          <ContextualHelpButton pageId="social-media" />
+        </div>
       </header>
 
       {/* Navigation Tabs - Clerk Style */}
@@ -1037,10 +1115,25 @@ export default function SocialMediaPage() {
             <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
               <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
               <div className="p-4 sm:p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Icon icon="solar:document-text-linear" className="h-4 w-4 text-muted-foreground" />
-                  <h2 className="text-sm font-semibold">Content Generator</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Icon icon="solar:document-text-linear" className="h-4 w-4 text-muted-foreground" />
+                    <h2 className="text-sm font-semibold">Content Generator</h2>
+                  </div>
+                  <ContentTemplatesSelector 
+                    onSelectTemplate={handleTemplateSelect}
+                    currentPlatform={contentInputs.platform}
+                  />
                 </div>
+                
+                {/* Selected Template Preview */}
+                {selectedTemplate && (
+                  <TemplatePreviewCard 
+                    template={selectedTemplate} 
+                    onClear={() => setSelectedTemplate(null)} 
+                  />
+                )}
+                
                 <form onSubmit={handleContentFormSubmit} className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -1106,13 +1199,35 @@ export default function SocialMediaPage() {
             {generatedContent && generatedContent.variations.length > 0 && (
               <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
                 <div className="p-4 sm:p-6 space-y-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
                     <h3 className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Generated Content</h3>
-                    <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleSaveOrUpdatePost(generatedContent.variations[0])}>
-                      <Icon icon="solar:diskette-linear" className="mr-1 h-3 w-3" />
-                      {editingPostId ? 'Update' : 'Save to Hub'}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      {/* SEO Score for Blog Posts */}
+                      {contentInputs.platform === 'BlogPost' && generatedContent.variations[0]?.textContent && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-7 text-xs"
+                          onClick={() => setShowSEOPanel(!showSEOPanel)}
+                        >
+                          <Icon icon="solar:chart-2-bold" className="mr-1 h-3 w-3" />
+                          SEO Score
+                        </Button>
+                      )}
+                      <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleSaveOrUpdatePost(generatedContent.variations[0])}>
+                        <Icon icon="solar:diskette-linear" className="mr-1 h-3 w-3" />
+                        {editingPostId ? 'Update' : 'Save to Hub'}
+                      </Button>
+                    </div>
                   </div>
+                  
+                  {/* SEO Score Panel */}
+                  {showSEOPanel && contentInputs.platform === 'BlogPost' && generatedContent.variations[0]?.textContent && (
+                    <SEOScorePanel 
+                      htmlContent={generatedContent.variations[0].textContent}
+                      onClose={() => setShowSEOPanel(false)}
+                    />
+                  )}
                   
                   {generatedContent.variations.map((variation, index) => {
                     const isWebPage = contentInputs.platform === 'SalesLandingPage' || contentInputs.platform === 'BlogPost';
@@ -1233,6 +1348,17 @@ export default function SocialMediaPage() {
                             </div>
                           </div>
                         )}
+
+                        {/* Quick Publish to Social Media */}
+                        {!isWebPage && !isYouTube && variation.textContent && (
+                          <div className="pt-3 border-t border-stone-200 dark:border-stone-800">
+                            <QuickPublishButtons 
+                              content={variation.textContent}
+                              imageUrl={generatedImageDataUri || undefined}
+                              hashtags={variation.suggestedHashtagsForVariation?.filter((h): h is string => h !== '#error') || []}
+                            />
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -1296,8 +1422,36 @@ export default function SocialMediaPage() {
                         </Button>
                       )}
                     </div>
-                    <Textarea value={imagePrompt} onChange={(e) => setImagePrompt(e.target.value)} placeholder="Describe the image you want in detail... (e.g., A modern SaaS dashboard with dark theme, showing analytics charts)" rows={3} required className="text-sm" />
-                    <p className="text-[10px] text-muted-foreground mt-1">Tip: Be specific about style, colors, composition, and mood for better results</p>
+                    <Textarea value={imagePrompt} onChange={(e) => setImagePrompt(e.target.value)} placeholder="Describe the image you want... (e.g., A happy team celebrating success in a modern office)" rows={3} required className="text-sm" />
+                    
+                    {/* Quick Prompt Ideas for Non-Tech Users */}
+                    {!imagePrompt && (
+                      <div className="mt-2">
+                        <p className="text-[10px] text-muted-foreground mb-1.5">Quick ideas (click to use):</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {[
+                            "Professional team meeting in modern office",
+                            "Happy customers using a mobile app",
+                            "Business growth chart with upward trend",
+                            "Friendly customer service representative",
+                            "Modern workspace with laptop and coffee",
+                            "Celebration with confetti and success",
+                          ].map((idea) => (
+                            <button
+                              key={idea}
+                              type="button"
+                              onClick={() => setImagePrompt(idea)}
+                              className="px-2 py-1 text-[10px] bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 rounded-md text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                              {idea}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {imagePrompt && (
+                      <p className="text-[10px] text-muted-foreground mt-1">Tip: Click "Enhance Prompt" to improve your description</p>
+                    )}
                   </div>
                   <div>
                     <Label className="text-xs">Aspect Ratio</Label>
@@ -1313,57 +1467,80 @@ export default function SocialMediaPage() {
                     </Select>
                   </div>
                   
-                  {/* Brand Logo Section */}
-                  <div className="border border-dashed border-stone-300 dark:border-stone-700 rounded-lg p-3 bg-stone-50/50 dark:bg-stone-900/50">
-                    <div className="flex items-center justify-between mb-2">
-                      <Label className="text-xs flex items-center gap-1.5">
-                        <Icon icon="solar:magic-stick-3-linear" className="h-3.5 w-3.5" />
-                        Brand Logo
-                        <Badge variant="secondary" className="text-[9px] ml-1">AI Branding</Badge>
-                      </Label>
-                      {brandLogo && (
-                        <Button type="button" variant="ghost" size="sm" className="h-6 text-xs text-muted-foreground hover:text-destructive" onClick={removeLogo}>
-                          <Icon icon="solar:trash-bin-minimalistic-linear" className="h-3 w-3 mr-1" />
-                          Remove
-                        </Button>
-                      )}
-                    </div>
-                    
-                    {brandLogo ? (
-                      <div className="flex items-center gap-3">
-                        <div className="relative h-12 w-12 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 p-1 flex items-center justify-center overflow-hidden">
-                          <NextImage src={brandLogo} alt="Brand logo" width={40} height={40} className="object-contain" />
+                  {/* Image Style Presets */}
+                  <ImageStylePresets
+                    selectedStyle={selectedImageStyle}
+                    onSelectStyle={setSelectedImageStyle}
+                  />
+                  
+                  {/* Brand Logo Section - Collapsible, Optional */}
+                  <Collapsible>
+                    <CollapsibleTrigger asChild>
+                      <button type="button" className="w-full flex items-center justify-between p-3 border border-dashed border-stone-300 dark:border-stone-700 rounded-lg bg-stone-50/50 dark:bg-stone-900/50 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors text-left">
+                        <div className="flex items-center gap-2">
+                          <Icon icon="solar:magic-stick-3-linear" className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-xs font-medium">Add Brand Logo</span>
+                          <Badge variant="outline" className="text-[9px]">Optional</Badge>
                         </div>
-                        <div className="flex-1">
-                          <p className="text-xs font-medium text-foreground">Logo ready for AI branding</p>
-                          <p className="text-[10px] text-muted-foreground">AI will analyze colors & style to create branded images</p>
+                        <Icon icon="solar:alt-arrow-down-linear" className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-2">
+                      <div className="border border-stone-200 dark:border-stone-800 rounded-lg p-3 bg-white dark:bg-stone-950">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-[10px] text-muted-foreground">Upload your logo to create branded images</p>
+                          {brandLogo && (
+                            <Button type="button" variant="ghost" size="sm" className="h-6 text-xs text-muted-foreground hover:text-destructive" onClick={removeLogo}>
+                              <Icon icon="solar:trash-bin-minimalistic-linear" className="h-3 w-3 mr-1" />
+                              Remove
+                            </Button>
+                          )}
                         </div>
-                        <label className="cursor-pointer">
-                          <Button type="button" variant="outline" size="sm" className="h-7 text-xs" asChild>
-                            <span>
-                              <Icon icon="solar:refresh-linear" className="h-3 w-3 mr-1" />
-                              Change
-                            </span>
-                          </Button>
-                          <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
-                        </label>
+                        
+                        {brandLogo ? (
+                          <div className="flex items-center gap-3">
+                            <div className="relative h-12 w-12 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 p-1 flex items-center justify-center overflow-hidden">
+                              <NextImage src={brandLogo} alt="Brand logo" width={40} height={40} className="object-contain" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-xs font-medium text-foreground">Logo ready</p>
+                              <p className="text-[10px] text-muted-foreground">AI will incorporate your branding</p>
+                            </div>
+                            <label className="cursor-pointer">
+                              <Button type="button" variant="outline" size="sm" className="h-7 text-xs" asChild>
+                                <span>
+                                  <Icon icon="solar:refresh-linear" className="h-3 w-3 mr-1" />
+                                  Change
+                                </span>
+                              </Button>
+                              <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                            </label>
+                          </div>
+                        ) : (
+                          <label className="cursor-pointer block">
+                            <div className="flex flex-col items-center justify-center gap-1.5 py-3 border border-dashed border-stone-300 dark:border-stone-600 rounded-lg hover:border-stone-400 dark:hover:border-stone-500 hover:bg-stone-50 dark:hover:bg-stone-900 transition-colors">
+                              <Icon icon="solar:upload-linear" className="h-5 w-5 text-muted-foreground" />
+                              <span className="text-xs text-muted-foreground">Click to upload logo</span>
+                            </div>
+                            <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                          </label>
+                        )}
                       </div>
-                    ) : (
-                      <label className="cursor-pointer block">
-                        <div className="flex flex-col items-center justify-center gap-1.5 py-4 border border-dashed border-stone-300 dark:border-stone-600 rounded-lg hover:border-stone-400 dark:hover:border-stone-500 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 transition-colors">
-                          <Icon icon="solar:upload-linear" className="h-5 w-5 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">Upload your brand logo</span>
-                          <span className="text-[10px] text-muted-foreground/70">AI will incorporate your branding into generated images</span>
-                        </div>
-                        <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
-                      </label>
-                    )}
-                  </div>
+                    </CollapsibleContent>
+                  </Collapsible>
 
-                  <Button type="submit" disabled={isGeneratingImage} size="sm" className="h-8">
-                    {isGeneratingImage && <Icon icon="solar:refresh-linear" className="mr-2 h-3.5 w-3.5 animate-spin" />}
-                    <Icon icon="solar:gallery-add-linear" className="mr-2 h-3.5 w-3.5" />
-                    {brandLogo ? 'Generate Branded Image' : 'Generate Image'}
+                  <Button type="submit" disabled={isGeneratingImage} size="sm" className="h-9 w-full">
+                    {isGeneratingImage ? (
+                      <>
+                        <Icon icon="solar:refresh-linear" className="mr-2 h-4 w-4 animate-spin" />
+                        Creating Image...
+                      </>
+                    ) : (
+                      <>
+                        <Icon icon="solar:gallery-add-linear" className="mr-2 h-4 w-4" />
+                        Generate Image
+                      </>
+                    )}
                   </Button>
                 </form>
               </div>

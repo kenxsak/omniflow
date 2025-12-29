@@ -42,9 +42,10 @@ interface IntegrationDef {
   name: string;
   description: string;
   icon: React.ReactNode | string;
-  category: 'AI' | 'Voice & Chatbot' | 'Communication' | 'Email' | 'SMS' | 'WhatsApp' | 'CRM' | 'Other';
+  category: 'AI' | 'Voice & Chatbot' | 'Communication' | 'Email' | 'SMS' | 'WhatsApp' | 'CRM' | 'Social Media' | 'Other';
   docLink: string;
   fields: IntegrationField[];
+  isOAuth?: boolean; // For OAuth-based integrations like Buffer
 }
 
 // --- Icons Helper ---
@@ -317,6 +318,18 @@ const INTEGRATIONS: IntegrationDef[] = [
       { key: 'webhookUrl', label: 'Webhook URL', placeholder: 'https://b24-....bitrix24.com/rest/...', type: 'text' },
       { key: 'userId', label: 'User ID (Optional)', placeholder: '...', type: 'text' }
     ]
+  },
+
+  // Social Media
+  {
+    id: 'buffer',
+    name: 'Buffer',
+    description: 'Publish to Facebook, Instagram, LinkedIn, Twitter & more (Free: 3 channels)',
+    category: 'Social Media',
+    icon: 'simple-icons:buffer',
+    docLink: 'https://buffer.com/signup',
+    fields: [], // OAuth-based, no fields needed
+    isOAuth: true
   }
 ];
 
@@ -325,16 +338,25 @@ const INTEGRATIONS: IntegrationDef[] = [
 function IntegrationCard({
   integration,
   savedValues,
-  onSave
+  onSave,
+  bufferConnected,
+  bufferProfiles,
+  companyId
 }: {
   integration: IntegrationDef;
   savedValues: Record<string, string> | undefined;
   onSave: (id: string, values: Record<string, string>) => Promise<void>;
+  bufferConnected?: boolean;
+  bufferProfiles?: any[];
+  companyId?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
-  const isConfigured = savedValues && Object.keys(savedValues).length > 0 && Object.values(savedValues).some(v => !!v);
+  
+  // For OAuth integrations like Buffer, check if connected
+  const isOAuthConfigured = integration.isOAuth && integration.id === 'buffer' && bufferConnected;
+  const isConfigured = isOAuthConfigured || (savedValues && Object.keys(savedValues).length > 0 && Object.values(savedValues).some(v => !!v));
 
   // Initialize form when dialog opens
   useEffect(() => {
@@ -381,15 +403,15 @@ function IntegrationCard({
         </Card>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-xl p-0 overflow-hidden border-stone-200 dark:border-stone-800 shadow-2xl">
-        <div className="px-6 py-6 border-b border-stone-100 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/30">
-          <div className="flex items-start gap-4">
-            <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-white dark:bg-stone-950 shadow-sm border border-stone-100 dark:border-stone-800 text-stone-900 dark:text-stone-100 p-2.5">
+      <DialogContent className="sm:max-w-xl p-0 overflow-hidden border-stone-200 dark:border-stone-800 shadow-2xl max-h-[90vh] sm:max-h-[85vh]">
+        <div className="px-4 sm:px-6 py-4 sm:py-6 border-b border-stone-100 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/30">
+          <div className="flex items-start gap-3 sm:gap-4">
+            <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white dark:bg-stone-950 shadow-sm border border-stone-100 dark:border-stone-800 text-stone-900 dark:text-stone-100 p-2 sm:p-2.5 shrink-0">
               <IntegrationIcon icon={integration.icon} className="w-full h-full" />
             </div>
-            <div className="flex-1 space-y-1">
-              <DialogTitle className="text-lg font-semibold">{integration.name}</DialogTitle>
-              <DialogDescription className="text-sm">{integration.description}</DialogDescription>
+            <div className="flex-1 min-w-0 space-y-1">
+              <DialogTitle className="text-base sm:text-lg font-semibold truncate">{integration.name}</DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm line-clamp-2">{integration.description}</DialogDescription>
               {integration.docLink && (
                 <a
                   href={integration.docLink}
@@ -405,70 +427,153 @@ function IntegrationCard({
           </div>
         </div>
 
-        <div className="p-6 space-y-6 overflow-y-auto max-h-[60vh]">
-          <div className="space-y-4">
-            {integration.fields.map((field) => (
-              <div key={field.key} className="space-y-2">
-                <label className="text-sm font-medium text-stone-700 dark:text-stone-300">
-                  {field.label}
-                </label>
-                <div className="relative">
-                  {field.label.toLowerCase().includes('script') || field.label.toLowerCase().includes('webhook') ? (
-                    <textarea
-                      value={formValues[field.key] || ''}
-                      onChange={(e) => setFormValues(prev => ({ ...prev, [field.key]: e.target.value }))}
-                      placeholder={field.placeholder}
-                      className="flex min-h-[100px] w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono text-xs leading-relaxed"
-                    />
-                  ) : (
-                    <Input
-                      type={field.type || 'text'}
-                      value={formValues[field.key] || ''}
-                      onChange={(e) => setFormValues(prev => ({ ...prev, [field.key]: e.target.value }))}
-                      placeholder={field.placeholder}
-                      className="h-10 text-sm font-sans"
-                    />
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto flex-1">
+          {/* OAuth Integration (Buffer) */}
+          {integration.isOAuth && integration.id === 'buffer' ? (
+            <div className="space-y-4">
+              {isOAuthConfigured ? (
+                <>
+                  <div className="rounded-lg bg-green-50 dark:bg-green-950/30 p-4 border border-green-200 dark:border-green-900/50">
+                    <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                      <Icon icon="solar:check-circle-bold" className="w-5 h-5" />
+                      <span className="font-medium">Buffer Connected</span>
+                    </div>
+                    <p className="text-sm text-green-600 dark:text-green-500 mt-1">
+                      {bufferProfiles?.length || 0} social channels available
+                    </p>
+                  </div>
+                  
+                  {bufferProfiles && bufferProfiles.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-stone-700 dark:text-stone-300">Connected Channels:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {bufferProfiles.map((profile: any) => (
+                          <div key={profile.id} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-stone-100 dark:bg-stone-800 text-sm">
+                            {profile.avatar && <img src={profile.avatar} alt="" className="w-5 h-5 rounded-full" />}
+                            <span>{profile.formatted_username || profile.username || profile.service}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => window.open('https://publish.buffer.com/channels', '_blank')}
+                  >
+                    <Icon icon="solar:add-circle-linear" className="w-4 h-4 mr-2" />
+                    Add More Channels in Buffer
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-3 text-sm text-stone-600 dark:text-stone-400">
+                    <div className="flex items-start gap-2">
+                      <Icon icon="solar:check-circle-linear" className="w-4 h-4 text-green-500 mt-0.5" />
+                      <span>Publish to Facebook, Instagram, LinkedIn, Twitter, Pinterest & more</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Icon icon="solar:check-circle-linear" className="w-4 h-4 text-green-500 mt-0.5" />
+                      <span>Free plan includes 3 social channels</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Icon icon="solar:check-circle-linear" className="w-4 h-4 text-green-500 mt-0.5" />
+                      <span>Schedule posts for optimal times</span>
+                    </div>
+                  </div>
+
+                  <Button
+                    className="w-full"
+                    onClick={() => {
+                      if (companyId) {
+                        window.location.href = `/api/auth/buffer?companyId=${companyId}`;
+                      }
+                    }}
+                  >
+                    <Icon icon="solar:link-circle-linear" className="w-4 h-4 mr-2" />
+                    Connect Buffer Account
+                  </Button>
+
+                  <p className="text-xs text-center text-stone-500">
+                    Don't have Buffer?{' '}
+                    <a href="https://buffer.com/signup" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                      Create free account →
+                    </a>
+                  </p>
+                </>
+              )}
+            </div>
+          ) : (
+            /* Standard API Key Integration */
+            <div className="space-y-4">
+              {integration.fields.map((field) => (
+                <div key={field.key} className="space-y-2">
+                  <label className="text-sm font-medium text-stone-700 dark:text-stone-300">
+                    {field.label}
+                  </label>
+                  <div className="relative">
+                    {field.label.toLowerCase().includes('script') || field.label.toLowerCase().includes('webhook') ? (
+                      <textarea
+                        value={formValues[field.key] || ''}
+                        onChange={(e) => setFormValues(prev => ({ ...prev, [field.key]: e.target.value }))}
+                        placeholder={field.placeholder}
+                        className="flex min-h-[100px] w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono text-xs leading-relaxed"
+                      />
+                    ) : (
+                      <Input
+                        type={field.type || 'text'}
+                        value={formValues[field.key] || ''}
+                        onChange={(e) => setFormValues(prev => ({ ...prev, [field.key]: e.target.value }))}
+                        placeholder={field.placeholder}
+                        className="h-10 text-sm font-sans"
+                      />
+                    )}
+                  </div>
+                  {field.help && (
+                    <p className="text-[12px] text-stone-500 leading-normal">{field.help}</p>
                   )}
                 </div>
-                {field.help && (
-                  <p className="text-[12px] text-stone-500 leading-normal">{field.help}</p>
-                )}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
-          <div className="rounded-lg bg-indigo-50 dark:bg-indigo-950/30 p-4 flex gap-3 border border-indigo-100 dark:border-indigo-900/50">
-            <Icon icon="solar:shield-check-linear" className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-            <p className="text-xs text-indigo-900 dark:text-indigo-300 leading-relaxed font-medium">
-              Your credentials are encrypted securely. {integration.name} will only be used to power your configured automations.
-            </p>
-          </div>
+          {!integration.isOAuth && (
+            <div className="rounded-lg bg-indigo-50 dark:bg-indigo-950/30 p-3 sm:p-4 flex gap-2 sm:gap-3 border border-indigo-100 dark:border-indigo-900/50">
+              <Icon icon="solar:shield-check-linear" className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+              <p className="text-[11px] sm:text-xs text-indigo-900 dark:text-indigo-300 leading-relaxed font-medium">
+                Your credentials are encrypted securely.
+              </p>
+            </div>
+          )}
         </div>
 
-        <DialogFooter className="p-6 pt-2 border-t border-stone-100 dark:border-stone-800 bg-stone-50/30 dark:bg-stone-900/10">
-          <Button
-            variant="ghost"
-            onClick={() => setIsOpen(false)}
-            disabled={loading}
-            className="h-10 font-sans normal-case text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={loading}
-            className="h-10 font-sans normal-case px-6 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-stone-200"
-          >
-            {loading ? (
-              <>
-                <Icon icon="solar:refresh-bold" className="w-4 h-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              'Connect Integration'
-            )}
-          </Button>
-        </DialogFooter>
+        {!integration.isOAuth && (
+          <DialogFooter className="p-4 sm:p-6 pt-2 border-t border-stone-100 dark:border-stone-800 bg-stone-50/30 dark:bg-stone-900/10 flex-col-reverse sm:flex-row gap-2 sm:gap-3">
+            <Button
+              variant="ghost"
+              onClick={() => setIsOpen(false)}
+              disabled={loading}
+              className="w-full sm:w-auto h-10 font-sans normal-case text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={loading}
+              className="w-full sm:w-auto h-10 font-sans normal-case px-6 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-stone-200"
+            >
+              {loading ? (
+                <>
+                  <Icon icon="solar:refresh-bold" className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Connect'
+              )}
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
@@ -481,19 +586,24 @@ export default function IntegrationsPage() {
   const { toast } = useToast();
   const [apiKeys, setApiKeys] = useState<Record<string, Record<string, string>>>({});
   const [loading, setLoading] = useState(true);
+  const [bufferConnected, setBufferConnected] = useState(false);
+  const [bufferProfiles, setBufferProfiles] = useState<any[]>([]);
 
   // Load keys on mount
   useEffect(() => {
     const load = async () => {
-      if (!appUser?.companyId) return;
+      if (!appUser?.companyId || !appUser?.uid) return;
       try {
         const { fetchCompanyApiKeysAction } = await import('@/app/actions/api-keys-actions');
         // We also need to get voice chat config manually since it's separate
         const { getVoiceChatConfig } = await import('@/app/actions/voice-chat-actions');
+        // Load Buffer connection status
+        const { getBufferConnectionAction } = await import('@/app/actions/buffer-actions');
 
-        const [keysResult, voiceChatResult] = await Promise.all([
+        const [keysResult, voiceChatResult, bufferResult] = await Promise.all([
           fetchCompanyApiKeysAction(appUser.companyId),
-          getVoiceChatConfig(appUser.companyId)
+          getVoiceChatConfig(appUser.companyId),
+          getBufferConnectionAction(appUser.uid, appUser.companyId)
         ]);
 
         let loadedKeys = keysResult.success && keysResult.apiKeys ? keysResult.apiKeys : {};
@@ -509,6 +619,12 @@ export default function IntegrationsPage() {
           };
         }
 
+        // Set Buffer connection status
+        if (bufferResult.success && bufferResult.data) {
+          setBufferConnected(bufferResult.data.connected);
+          setBufferProfiles(bufferResult.data.profiles || []);
+        }
+
         setApiKeys(loadedKeys);
       } catch (e) {
         console.error(e);
@@ -517,7 +633,7 @@ export default function IntegrationsPage() {
       }
     };
     load();
-  }, [appUser?.companyId]);
+  }, [appUser?.companyId, appUser?.uid]);
 
   const handleSaveKeys = async (integrationId: string, values: Record<string, string>) => {
     if (!appUser?.companyId) return;
@@ -555,7 +671,7 @@ export default function IntegrationsPage() {
 
   // Group by category
   // Order categories logically
-  const ORDERED_CATEGORIES = ['AI', 'Voice & Chatbot', 'Communication', 'Email', 'SMS', 'WhatsApp', 'CRM', 'Other'];
+  const ORDERED_CATEGORIES = ['AI', 'Voice & Chatbot', 'Communication', 'Email', 'SMS', 'WhatsApp', 'Social Media', 'CRM', 'Other'];
   const availableCategories = Array.from(new Set(INTEGRATIONS.map(i => i.category)));
   const sortedCategories = ORDERED_CATEGORIES.filter(c => availableCategories.includes(c as any));
 
@@ -596,6 +712,9 @@ export default function IntegrationsPage() {
                 integration={integration}
                 savedValues={apiKeys[integration.id]}
                 onSave={handleSaveKeys}
+                bufferConnected={bufferConnected}
+                bufferProfiles={bufferProfiles}
+                companyId={appUser?.companyId}
               />
             ))}
           </div>

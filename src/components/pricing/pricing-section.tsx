@@ -20,6 +20,7 @@ import {
   getPriceForPlan as getFixedPrice 
 } from '@/lib/geo-detection';
 import { CurrencySelector } from "@/components/ui/currency-selector";
+import { PlanFeaturesModal } from '@/components/pricing/plan-features-modal';
 import gsap from 'gsap';
 
 interface PricingSectionProps {
@@ -245,8 +246,17 @@ export function PricingSection({
                       </li>
                     ))}
                     {plan.featureIds.length > 4 && (
-                      <li className="text-xs sm:text-sm text-muted-foreground pl-6 sm:pl-7">
-                        +{plan.featureIds.length - 4} more features
+                      <li className="text-xs sm:text-sm text-primary pl-6 sm:pl-7">
+                        <PlanFeaturesModal 
+                          plan={plan} 
+                          allPlans={plans}
+                          trigger={
+                            <button className="hover:underline cursor-pointer flex items-center gap-1">
+                              <Icon icon="solar:alt-arrow-right-linear" className="h-3 w-3" />
+                              +{plan.featureIds.length - 4} more features
+                            </button>
+                          }
+                        />
                       </li>
                     )}
                     {plan.allowOverage && (

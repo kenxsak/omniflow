@@ -143,6 +143,12 @@ const allNavItems: NavItem[] = [
         tooltip: "Manage generated content",
       },
       {
+        href: "/social-media/planner",
+        label: "Content Planner",
+        icon: "solar:calendar-mark-linear",
+        tooltip: "Plan & schedule content",
+      },
+      {
         href: "/ai-campaign-manager",
         label: "Ad Manager",
         icon: "solar:target-linear",
@@ -155,6 +161,24 @@ const allNavItems: NavItem[] = [
         tooltip: "View AI usage & credits",
       },
     ],
+  },
+
+  // ─────────────── BUILDERS ───────────────
+  {
+    href: "/workflow-builder",
+    label: "Automations",
+    icon: "solar:branching-paths-up-linear",
+    tooltip: "Visual workflow builder",
+    featureId: "feat_workflow_builder",
+    badge: "NEW",
+  },
+  {
+    href: "/landing-pages",
+    label: "Landing Pages",
+    icon: "solar:window-frame-linear",
+    tooltip: "Build landing pages",
+    featureId: "feat_ai_content_gen",
+    badge: "NEW",
   },
 
   // ─────────────── INSIGHTS ───────────────

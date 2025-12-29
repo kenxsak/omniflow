@@ -14,7 +14,6 @@ import {
   query,
   where,
   getDocs,
-  orderBy,
   limit as firestoreLimit
 } from 'firebase/firestore';
 import type{
@@ -31,10 +30,6 @@ import {
   calculateTTSCost,
   calculateCreditsConsumed,
 } from './ai-cost-calculator';
-import { 
-  checkOperationLimit,
-  checkCreditsAvailable,
-} from './operation-limit-enforcer';
 import { checkAndSendCreditNotifications } from './ai-credit-notifications';
 import { trackOverageUsage } from './ai-overage-tracker';
 
@@ -439,9 +434,13 @@ async function trackOverageIfNeeded(
 
 /**
  * Check if company has exceeded their AI quota
+ * @param companyId - The company ID to check
+ * @param options - Optional settings
+ * @param options.isSuperAdmin - If true, bypasses quota check (super admins have unlimited access)
  */
 export async function checkAIQuota(
-  companyId: string
+  companyId: string,
+  options?: { isSuperAdmin?: boolean }
 ): Promise<{
   allowed: boolean;
   remaining: number;
@@ -449,6 +448,17 @@ export async function checkAIQuota(
   exceeded: boolean;
   message?: string;
 }> {
+  // Super admins bypass all quota restrictions
+  if (options?.isSuperAdmin) {
+    return {
+      allowed: true,
+      remaining: Infinity,
+      limit: Infinity,
+      exceeded: false,
+      message: 'Super admin - unlimited access',
+    };
+  }
+
   if (!serverDb) {
     return {
       allowed: false,

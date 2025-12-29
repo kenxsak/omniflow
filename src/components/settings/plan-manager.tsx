@@ -10,7 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { PlusCircle, Edit, Trash2, Loader2, Flag, Timer } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PlusCircle, Edit, Trash2, Loader2, Flag, Timer, Sparkles, Users, CreditCard, Database, Image, Key, Layers } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { Plan, Feature, TrialSettings } from '@/types/saas';
 import { getStoredPlans, addStoredPlan, updateStoredPlan, deleteStoredPlan, getStoredFeatures, addStoredFeature, deleteStoredFeature, getTrialSettings, saveTrialSettings, saveStoredFeatures, initialFeatures, syncPlansFromCode } from '@/lib/saas-data';
@@ -54,6 +55,10 @@ const PlanEditDialog: React.FC<{
   const [allowBulkImport, setAllowBulkImport] = useState(false);
   const [allowBulkExport, setAllowBulkExport] = useState(false);
   const [allowAdvancedFields, setAllowAdvancedFields] = useState(false);
+  
+  // Landing Pages & Social Media Limits
+  const [maxLandingPages, setMaxLandingPages] = useState<number | null>(null);
+  const [maxSavedPosts, setMaxSavedPosts] = useState<number | null>(null);
 
   const [allFeatures, setAllFeatures] = useState<Feature[]>([]);
   const [selectedFeatureIds, setSelectedFeatureIds] = useState<Set<string>>(new Set());
@@ -92,6 +97,9 @@ const PlanEditDialog: React.FC<{
             setAllowBulkImport(planToEdit.allowBulkImport || false);
             setAllowBulkExport(planToEdit.allowBulkExport || false);
             setAllowAdvancedFields(planToEdit.allowAdvancedFields || false);
+            // Landing Pages & Social Media
+            setMaxLandingPages(planToEdit.maxLandingPages ?? null);
+            setMaxSavedPosts(planToEdit.maxSavedPosts ?? null);
         } else {
             setName('');
             setDescription('');
@@ -120,6 +128,9 @@ const PlanEditDialog: React.FC<{
             setAllowBulkImport(false);
             setAllowBulkExport(false);
             setAllowAdvancedFields(false);
+            // Landing Pages & Social Media
+            setMaxLandingPages(null);
+            setMaxSavedPosts(null);
         }
     };
     
@@ -174,282 +185,275 @@ const PlanEditDialog: React.FC<{
       allowBulkImport,
       allowBulkExport,
       allowAdvancedFields,
+      // Landing Pages & Social Media
+      maxLandingPages,
+      maxSavedPosts,
     };
     onSave(planData);
     onOpenChange(false);
   };
 
+  // Section Card Component for consistent styling
+  const SectionCard: React.FC<{ title: string; description?: string; icon?: React.ReactNode; children: React.ReactNode }> = 
+    ({ title, description, icon, children }) => (
+    <div className="rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/50 p-3 sm:p-4 space-y-3 sm:space-y-4">
+      <div className="flex items-start sm:items-center gap-2">
+        {icon && <span className="text-primary shrink-0">{icon}</span>}
+        <div className="min-w-0">
+          <h4 className="font-semibold text-sm">{title}</h4>
+          {description && <p className="text-xs text-muted-foreground line-clamp-2">{description}</p>}
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>{planToEdit ? 'Edit Plan' : 'Create New Plan'}</DialogTitle>
-          <DialogDescription>Define the details and feature limits of the subscription plan.</DialogDescription>
+      <DialogContent className="w-[95vw] max-w-4xl h-[95vh] sm:h-[90vh] max-h-[95vh] sm:max-h-[90vh] flex flex-col p-0 gap-0">
+        {/* Header - Responsive padding */}
+        <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 border-b bg-background shrink-0">
+          <DialogTitle className="text-lg sm:text-xl">{planToEdit ? 'Edit Plan' : 'Create New Plan'}</DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm">Configure subscription plan details, limits, and features.</DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-3">
-          <div className="space-y-1">
-            <Label htmlFor="plan-name">Plan Name</Label>
-            <Input id="plan-name" value={name} onChange={e => setName(e.target.value)} />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="plan-description">Description</Label>
-            <Input id="plan-description" value={description} onChange={e => setDescription(e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-semibold">Monthly Pricing (USD)</Label>
-            <p className="text-xs text-muted-foreground">Prices automatically convert to user&apos;s local currency based on their country</p>
-            <div className="space-y-1">
-              <Label htmlFor="plan-price-monthly-usd">Price per Month (USD)</Label>
-              <Input id="plan-price-monthly-usd" type="number" value={priceMonthlyUSD} onChange={e => setPriceMonthlyUSD(Number(e.target.value))} />
-            </div>
-          </div>
-           <div className="space-y-2">
-            <Label className="text-sm font-semibold">Plan Limits</Label>
-            <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                    <Label htmlFor="plan-max-users">Max Users</Label>
-                    <Input id="plan-max-users" type="number" value={maxUsers} onChange={e => setMaxUsers(Number(e.target.value))} min="1"/>
-                </div>
-                <div className="space-y-1">
-                    <Label htmlFor="plan-ai-credits">AI Credits / Month</Label>
-                    <Input id="plan-ai-credits" type="number" value={aiCredits} onChange={e => setAiCredits(Number(e.target.value))} min="0"/>
-                </div>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label className="text-sm font-semibold">Operation Limits (Profitability Control)</Label>
-            <p className="text-xs text-muted-foreground">Set specific limits to prevent expensive operations from causing losses</p>
-            <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-1">
-                    <Label htmlFor="plan-max-images">Max Images/Month</Label>
-                    <Input 
-                      id="plan-max-images" 
-                      type="number" 
-                      value={maxImagesPerMonth ?? ''} 
-                      onChange={e => setMaxImagesPerMonth(e.target.value ? Number(e.target.value) : undefined)} 
-                      placeholder="Unlimited"
-                      min="0"
-                    />
-                </div>
-                <div className="space-y-1">
-                    <Label htmlFor="plan-max-text">Max Text Ops/Month</Label>
-                    <Input 
-                      id="plan-max-text" 
-                      type="number" 
-                      value={maxTextPerMonth ?? ''} 
-                      onChange={e => setMaxTextPerMonth(e.target.value ? Number(e.target.value) : undefined)} 
-                      placeholder="Unlimited"
-                      min="0"
-                    />
-                </div>
-                <div className="space-y-1">
-                    <Label htmlFor="plan-max-tts">Max TTS Ops/Month</Label>
-                    <Input 
-                      id="plan-max-tts" 
-                      type="number" 
-                      value={maxTTSPerMonth ?? ''} 
-                      onChange={e => setMaxTTSPerMonth(e.target.value ? Number(e.target.value) : undefined)} 
-                      placeholder="Unlimited"
-                      min="0"
-                    />
-                </div>
-            </div>
+        
+        <Tabs defaultValue="basic" className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          {/* Tabs - Scrollable on mobile */}
+          <div className="shrink-0 px-3 sm:px-6 pt-3 sm:pt-4 overflow-x-auto">
+            <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-5 gap-1">
+              <TabsTrigger value="basic" className="text-xs sm:text-sm px-2 sm:px-3 whitespace-nowrap">
+                <CreditCard className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
+                Basic
+              </TabsTrigger>
+              <TabsTrigger value="ai" className="text-xs sm:text-sm px-2 sm:px-3 whitespace-nowrap">
+                <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
+                <span className="hidden sm:inline">AI Limits</span>
+                <span className="sm:hidden">AI</span>
+              </TabsTrigger>
+              <TabsTrigger value="crm" className="text-xs sm:text-sm px-2 sm:px-3 whitespace-nowrap">
+                <Database className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
+                CRM
+              </TabsTrigger>
+              <TabsTrigger value="content" className="text-xs sm:text-sm px-2 sm:px-3 whitespace-nowrap">
+                <Layers className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
+                <span className="hidden sm:inline">Content</span>
+                <span className="sm:hidden">More</span>
+              </TabsTrigger>
+              <TabsTrigger value="features" className="text-xs sm:text-sm px-2 sm:px-3 whitespace-nowrap">
+                <Flag className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
+                <span className="hidden sm:inline">Features</span>
+                <span className="sm:hidden">Feat</span>
+              </TabsTrigger>
+            </TabsList>
           </div>
           
-          <div className="space-y-2">
-            <Label className="text-sm font-semibold">Overage Settings (Revenue Opportunity)</Label>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="plan-allow-overage" 
-                  checked={allowOverage} 
-                  onCheckedChange={checked => setAllowOverage(!!checked)} 
-                />
-                <Label htmlFor="plan-allow-overage" className="cursor-pointer">Allow users to purchase extra credits beyond limit</Label>
-              </div>
-              {allowOverage && (
-                <div className="space-y-1 ml-6">
-                  <Label htmlFor="plan-overage-price">Price per Extra Credit (USD)</Label>
-                  <Input 
-                    id="plan-overage-price" 
-                    type="number" 
-                    step="0.001"
-                    value={overagePricePerCredit ?? ''} 
-                    onChange={e => setOveragePricePerCredit(e.target.value ? Number(e.target.value) : undefined)} 
-                    placeholder="e.g., 0.005 = $5 per 1,000 credits"
-                  />
-                  <p className="text-xs text-muted-foreground">Suggested: $0.004-0.005 per credit ($4-5 per 1,000 credits)</p>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label className="text-sm font-semibold">BYOK Settings (Bring Your Own API Key)</Label>
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="plan-allow-byok" 
-                checked={allowBYOK} 
-                onCheckedChange={checked => setAllowBYOK(!!checked)} 
-              />
-              <Label htmlFor="plan-allow-byok" className="cursor-pointer">Allow users to use their own Gemini API key for unlimited AI</Label>
-            </div>
-            <p className="text-xs text-muted-foreground">When enabled, users can bypass AI credit limits by providing their own API key</p>
-          </div>
-          
-          <div className="space-y-2">
-            <Label className="text-sm font-semibold">Digital Card Limits</Label>
-            <p className="text-xs text-muted-foreground">Control how many digital business cards users can create</p>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-1">
-                <Label htmlFor="plan-digital-cards-per-user">Cards per User</Label>
-                <Input 
-                  id="plan-digital-cards-per-user" 
-                  type="number" 
-                  value={digitalCardsPerUser ?? ''} 
-                  onChange={e => setDigitalCardsPerUser(e.target.value ? Number(e.target.value) : undefined)} 
-                  placeholder="0 = fixed"
-                  min="0"
-                />
-                <p className="text-xs text-muted-foreground">0 for free plan (uses fixed limit)</p>
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="plan-digital-cards-cap">Maximum Cap</Label>
-                <Input 
-                  id="plan-digital-cards-cap" 
-                  type="number" 
-                  value={maxDigitalCardsCap ?? ''} 
-                  onChange={e => setMaxDigitalCardsCap(e.target.value ? Number(e.target.value) : undefined)} 
-                  placeholder="Unlimited"
-                  min="0"
-                />
-                <p className="text-xs text-muted-foreground">Upper limit to prevent abuse</p>
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="plan-max-digital-cards">Fixed Limit (Free Plan)</Label>
-                <Input 
-                  id="plan-max-digital-cards" 
-                  type="number" 
-                  value={maxDigitalCards ?? ''} 
-                  onChange={e => setMaxDigitalCards(e.target.value ? Number(e.target.value) : undefined)} 
-                  placeholder="1"
-                  min="0"
-                />
-                <p className="text-xs text-muted-foreground">For plans with 0 cards per user</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label className="text-sm font-semibold">CRM Limitations</Label>
-            <p className="text-xs text-muted-foreground">Control CRM access level and contact limits for this plan</p>
-            
-            <div className="space-y-1">
-              <Label htmlFor="plan-crm-access-level">CRM Access Level</Label>
-              <Select value={crmAccessLevel} onValueChange={(value: 'basic' | 'full') => setCrmAccessLevel(value)}>
-                <SelectTrigger id="plan-crm-access-level">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="basic">Basic CRM (Limited features)</SelectItem>
-                  <SelectItem value="full">Full CRM (All features)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-1">
-              <Label htmlFor="plan-max-contacts">Maximum Contacts</Label>
-              <Input 
-                id="plan-max-contacts" 
-                type="number" 
-                value={maxContacts ?? ''} 
-                onChange={e => setMaxContacts(e.target.value ? Number(e.target.value) : null)} 
-                placeholder="Leave empty for unlimited"
-                min="0"
-              />
-              <p className="text-xs text-muted-foreground">Empty = unlimited contacts (paid plans). Set to 100 for Free plan.</p>
-            </div>
-            
-            <div className="space-y-3 pt-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="plan-allow-bulk-import" 
-                  checked={allowBulkImport} 
-                  onCheckedChange={checked => setAllowBulkImport(!!checked)} 
-                />
-                <Label htmlFor="plan-allow-bulk-import" className="cursor-pointer">Allow bulk CSV import of contacts</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="plan-allow-bulk-export" 
-                  checked={allowBulkExport} 
-                  onCheckedChange={checked => setAllowBulkExport(!!checked)} 
-                />
-                <Label htmlFor="plan-allow-bulk-export" className="cursor-pointer">Allow bulk CSV export of contacts</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="plan-allow-advanced-fields" 
-                  checked={allowAdvancedFields} 
-                  onCheckedChange={checked => setAllowAdvancedFields(!!checked)} 
-                />
-                <Label htmlFor="plan-allow-advanced-fields" className="cursor-pointer">Allow custom/advanced contact fields</Label>
-              </div>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-             <div className="space-y-1">
-                <Label htmlFor="plan-discount-yearly">Yearly Discount (%)</Label>
-                <Input id="plan-discount-yearly" type="number" value={yearlyDiscountPercentage} onChange={e => setYearlyDiscountPercentage(Number(e.target.value))} min="0" max="100" />
-                 <p className="text-xs text-muted-foreground mt-1">Applied to the calculated annual price (Monthly x 12).</p>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-semibold">Payment Links (Optional)</Label>
-            <div className="grid grid-cols-1 gap-4">
-              <div className="space-y-1">
-                <Label htmlFor="plan-link-monthly-usd">Monthly Payment Link</Label>
-                <Input id="plan-link-monthly-usd" type="url" placeholder="https://buy.stripe.com/..." value={paymentLinkMonthlyUSD} onChange={e => setPaymentLinkMonthlyUSD(e.target.value)} />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="plan-link-yearly-usd">Yearly Payment Link</Label>
-                <Input id="plan-link-yearly-usd" type="url" placeholder="https://buy.stripe.com/..." value={paymentLinkYearlyUSD} onChange={e => setPaymentLinkYearlyUSD(e.target.value)} />
-              </div>
-            </div>
-          </div>
-          <div className="space-y-1">
-            <Label>Features</Label>
-            <div className="max-h-48 overflow-y-auto rounded-md border p-4 space-y-2">
-              {allFeatures.map(feature => (
-                <div key={feature.id} className="flex items-start space-x-3">
-                  <Checkbox
-                    id={`feature-${feature.id}`}
-                    checked={selectedFeatureIds.has(feature.id)}
-                    onCheckedChange={(checked) => handleFeatureToggle(feature.id, !!checked)}
-                    className="mt-1"
-                  />
-                  <div className="grid gap-1.5 leading-none">
-                    <Label htmlFor={`feature-${feature.id}`} className="font-medium cursor-pointer">{feature.name}</Label>
-                    <p className="text-xs text-muted-foreground">{feature.description || 'No description'}</p>
-                    <p className="text-xs text-muted-foreground font-mono">ID: {feature.id}</p>
+          {/* Content Area - Scrollable */}
+          <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-3 sm:py-4">
+            {/* Basic Info Tab */}
+            <TabsContent value="basic" className="mt-0 space-y-3 sm:space-y-4 data-[state=inactive]:hidden">
+              <SectionCard title="Plan Information" icon={<CreditCard className="h-4 w-4" />}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="plan-name" className="text-xs sm:text-sm">Plan Name *</Label>
+                    <Input id="plan-name" value={name} onChange={e => setName(e.target.value)} placeholder="e.g., Starter, Pro" className="h-9 sm:h-10 text-sm" />
+                  </div>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="plan-max-users" className="text-xs sm:text-sm">Max Users</Label>
+                    <Input id="plan-max-users" type="number" value={maxUsers} onChange={e => setMaxUsers(Number(e.target.value))} min="1" className="h-9 sm:h-10 text-sm" />
                   </div>
                 </div>
-              ))}
-            </div>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="plan-description" className="text-xs sm:text-sm">Description *</Label>
+                  <Input id="plan-description" value={description} onChange={e => setDescription(e.target.value)} placeholder="Brief description" className="h-9 sm:h-10 text-sm" />
+                </div>
+                <div className="flex items-start sm:items-center space-x-2 pt-1">
+                  <Checkbox id="plan-featured" checked={isFeatured} onCheckedChange={checked => setIsFeatured(!!checked)} className="mt-0.5 sm:mt-0" />
+                  <Label htmlFor="plan-featured" className="cursor-pointer text-xs sm:text-sm leading-tight">Mark as Featured Plan</Label>
+                </div>
+              </SectionCard>
+
+              <SectionCard title="Pricing" description="USD - auto-converts to local currency" icon={<CreditCard className="h-4 w-4" />}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="plan-price-monthly-usd" className="text-xs sm:text-sm">Monthly Price (USD)</Label>
+                    <Input id="plan-price-monthly-usd" type="number" value={priceMonthlyUSD} onChange={e => setPriceMonthlyUSD(Number(e.target.value))} placeholder="0 for free" className="h-9 sm:h-10 text-sm" />
+                  </div>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="plan-discount-yearly" className="text-xs sm:text-sm">Yearly Discount (%)</Label>
+                    <Input id="plan-discount-yearly" type="number" value={yearlyDiscountPercentage} onChange={e => setYearlyDiscountPercentage(Number(e.target.value))} min="0" max="100" placeholder="e.g., 20" className="h-9 sm:h-10 text-sm" />
+                  </div>
+                </div>
+              </SectionCard>
+
+              <SectionCard title="Payment Links" description="Optional Stripe/Razorpay links" icon={<CreditCard className="h-4 w-4" />}>
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="plan-link-monthly-usd" className="text-xs sm:text-sm">Monthly Payment Link</Label>
+                    <Input id="plan-link-monthly-usd" type="url" placeholder="https://buy.stripe.com/..." value={paymentLinkMonthlyUSD} onChange={e => setPaymentLinkMonthlyUSD(e.target.value)} className="h-9 sm:h-10 text-sm" />
+                  </div>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="plan-link-yearly-usd" className="text-xs sm:text-sm">Yearly Payment Link</Label>
+                    <Input id="plan-link-yearly-usd" type="url" placeholder="https://buy.stripe.com/..." value={paymentLinkYearlyUSD} onChange={e => setPaymentLinkYearlyUSD(e.target.value)} className="h-9 sm:h-10 text-sm" />
+                  </div>
+                </div>
+              </SectionCard>
+            </TabsContent>
+
+            {/* AI Limits Tab */}
+            <TabsContent value="ai" className="mt-0 space-y-3 sm:space-y-4 data-[state=inactive]:hidden">
+              <SectionCard title="AI Credits" description="Monthly credit allocation" icon={<Sparkles className="h-4 w-4" />}>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="plan-ai-credits" className="text-xs sm:text-sm">AI Credits per Month</Label>
+                  <Input id="plan-ai-credits" type="number" value={aiCredits} onChange={e => setAiCredits(Number(e.target.value))} min="0" placeholder="e.g., 2000" className="h-9 sm:h-10 text-sm" />
+                  <p className="text-xs text-muted-foreground">Free: 20 lifetime. Paid: monthly renewable.</p>
+                </div>
+              </SectionCard>
+
+              <SectionCard title="Operation Limits" description="Prevent expensive operations" icon={<Image className="h-4 w-4" />}>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="plan-max-images" className="text-xs sm:text-sm">Max Images/Month</Label>
+                    <Input id="plan-max-images" type="number" value={maxImagesPerMonth ?? ''} onChange={e => setMaxImagesPerMonth(e.target.value ? Number(e.target.value) : undefined)} placeholder="Unlimited" min="0" className="h-9 sm:h-10 text-sm" />
+                  </div>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="plan-max-text" className="text-xs sm:text-sm">Max Text Ops/Month</Label>
+                    <Input id="plan-max-text" type="number" value={maxTextPerMonth ?? ''} onChange={e => setMaxTextPerMonth(e.target.value ? Number(e.target.value) : undefined)} placeholder="Unlimited" min="0" className="h-9 sm:h-10 text-sm" />
+                  </div>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="plan-max-tts" className="text-xs sm:text-sm">Max TTS Ops/Month</Label>
+                    <Input id="plan-max-tts" type="number" value={maxTTSPerMonth ?? ''} onChange={e => setMaxTTSPerMonth(e.target.value ? Number(e.target.value) : undefined)} placeholder="Unlimited" min="0" className="h-9 sm:h-10 text-sm" />
+                  </div>
+                </div>
+              </SectionCard>
+
+              <SectionCard title="Overage Settings" description="Extra credits purchase" icon={<CreditCard className="h-4 w-4" />}>
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="flex items-start sm:items-center space-x-2">
+                    <Checkbox id="plan-allow-overage" checked={allowOverage} onCheckedChange={checked => setAllowOverage(!!checked)} className="mt-0.5 sm:mt-0" />
+                    <Label htmlFor="plan-allow-overage" className="cursor-pointer text-xs sm:text-sm leading-tight">Allow extra credit purchases</Label>
+                  </div>
+                  {allowOverage && (
+                    <div className="space-y-1.5 sm:space-y-2 pl-4 sm:pl-6 border-l-2 border-primary/20">
+                      <Label htmlFor="plan-overage-price" className="text-xs sm:text-sm">Price per Credit (USD)</Label>
+                      <Input id="plan-overage-price" type="number" step="0.001" value={overagePricePerCredit ?? ''} onChange={e => setOveragePricePerCredit(e.target.value ? Number(e.target.value) : undefined)} placeholder="e.g., 0.005" className="h-9 sm:h-10 text-sm" />
+                      <p className="text-xs text-muted-foreground">$0.004-0.005 suggested</p>
+                    </div>
+                  )}
+                </div>
+              </SectionCard>
+
+              <SectionCard title="BYOK" description="Bring Your Own API Key" icon={<Key className="h-4 w-4" />}>
+                <div className="flex items-start sm:items-center space-x-2">
+                  <Checkbox id="plan-allow-byok" checked={allowBYOK} onCheckedChange={checked => setAllowBYOK(!!checked)} className="mt-0.5 sm:mt-0" />
+                  <Label htmlFor="plan-allow-byok" className="cursor-pointer text-xs sm:text-sm leading-tight">Allow own Gemini API key for unlimited AI</Label>
+                </div>
+              </SectionCard>
+            </TabsContent>
+
+            {/* CRM Tab */}
+            <TabsContent value="crm" className="mt-0 space-y-3 sm:space-y-4 data-[state=inactive]:hidden">
+              <SectionCard title="CRM Access Level" description="Feature access control" icon={<Database className="h-4 w-4" />}>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="plan-crm-access-level" className="text-xs sm:text-sm">Access Level</Label>
+                  <Select value={crmAccessLevel} onValueChange={(value: 'basic' | 'full') => setCrmAccessLevel(value)}>
+                    <SelectTrigger id="plan-crm-access-level" className="h-9 sm:h-10 text-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="basic">Basic CRM (Limited)</SelectItem>
+                      <SelectItem value="full">Full CRM (All features)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </SectionCard>
+
+              <SectionCard title="Contact Limits" description="Maximum contacts" icon={<Users className="h-4 w-4" />}>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="plan-max-contacts" className="text-xs sm:text-sm">Maximum Contacts</Label>
+                  <Input id="plan-max-contacts" type="number" value={maxContacts ?? ''} onChange={e => setMaxContacts(e.target.value ? Number(e.target.value) : null)} placeholder="Empty = unlimited" min="0" className="h-9 sm:h-10 text-sm" />
+                  <p className="text-xs text-muted-foreground">100 for Free, empty for paid plans</p>
+                </div>
+              </SectionCard>
+
+              <SectionCard title="Import/Export" description="Bulk operations" icon={<Database className="h-4 w-4" />}>
+                <div className="space-y-2.5 sm:space-y-3">
+                  <div className="flex items-start sm:items-center space-x-2">
+                    <Checkbox id="plan-allow-bulk-import" checked={allowBulkImport} onCheckedChange={checked => setAllowBulkImport(!!checked)} className="mt-0.5 sm:mt-0" />
+                    <Label htmlFor="plan-allow-bulk-import" className="cursor-pointer text-xs sm:text-sm leading-tight">Allow CSV import</Label>
+                  </div>
+                  <div className="flex items-start sm:items-center space-x-2">
+                    <Checkbox id="plan-allow-bulk-export" checked={allowBulkExport} onCheckedChange={checked => setAllowBulkExport(!!checked)} className="mt-0.5 sm:mt-0" />
+                    <Label htmlFor="plan-allow-bulk-export" className="cursor-pointer text-xs sm:text-sm leading-tight">Allow CSV export</Label>
+                  </div>
+                  <div className="flex items-start sm:items-center space-x-2">
+                    <Checkbox id="plan-allow-advanced-fields" checked={allowAdvancedFields} onCheckedChange={checked => setAllowAdvancedFields(!!checked)} className="mt-0.5 sm:mt-0" />
+                    <Label htmlFor="plan-allow-advanced-fields" className="cursor-pointer text-xs sm:text-sm leading-tight">Allow custom fields</Label>
+                  </div>
+                </div>
+              </SectionCard>
+            </TabsContent>
+
+            {/* Content Tab */}
+            <TabsContent value="content" className="mt-0 space-y-3 sm:space-y-4 data-[state=inactive]:hidden">
+              <SectionCard title="Landing Pages" description="Page creation limits" icon={<Layers className="h-4 w-4" />}>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="plan-max-landing-pages" className="text-xs sm:text-sm">Maximum Landing Pages</Label>
+                  <Input id="plan-max-landing-pages" type="number" value={maxLandingPages ?? ''} onChange={e => setMaxLandingPages(e.target.value ? Number(e.target.value) : null)} placeholder="Empty = unlimited" min="0" className="h-9 sm:h-10 text-sm" />
+                  <p className="text-xs text-muted-foreground">1 for Free, empty for paid</p>
+                </div>
+              </SectionCard>
+
+              <SectionCard title="Social Media" description="Saved posts limits" icon={<Layers className="h-4 w-4" />}>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="plan-max-saved-posts" className="text-xs sm:text-sm">Maximum Saved Posts</Label>
+                  <Input id="plan-max-saved-posts" type="number" value={maxSavedPosts ?? ''} onChange={e => setMaxSavedPosts(e.target.value ? Number(e.target.value) : null)} placeholder="Empty = unlimited" min="0" className="h-9 sm:h-10 text-sm" />
+                  <p className="text-xs text-muted-foreground">5 for Free, empty for paid</p>
+                </div>
+              </SectionCard>
+
+              <SectionCard title="Digital Cards" description="Business card limits" icon={<CreditCard className="h-4 w-4" />}>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="plan-digital-cards-per-user" className="text-xs sm:text-sm">Cards/User</Label>
+                    <Input id="plan-digital-cards-per-user" type="number" value={digitalCardsPerUser ?? ''} onChange={e => setDigitalCardsPerUser(e.target.value ? Number(e.target.value) : undefined)} placeholder="0 = fixed" min="0" className="h-9 sm:h-10 text-sm" />
+                  </div>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="plan-digital-cards-cap" className="text-xs sm:text-sm">Max Cap</Label>
+                    <Input id="plan-digital-cards-cap" type="number" value={maxDigitalCardsCap ?? ''} onChange={e => setMaxDigitalCardsCap(e.target.value ? Number(e.target.value) : undefined)} placeholder="Unlimited" min="0" className="h-9 sm:h-10 text-sm" />
+                  </div>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="plan-max-digital-cards" className="text-xs sm:text-sm">Fixed Limit</Label>
+                    <Input id="plan-max-digital-cards" type="number" value={maxDigitalCards ?? ''} onChange={e => setMaxDigitalCards(e.target.value ? Number(e.target.value) : undefined)} placeholder="1" min="0" className="h-9 sm:h-10 text-sm" />
+                  </div>
+                </div>
+              </SectionCard>
+            </TabsContent>
+
+            {/* Features Tab */}
+            <TabsContent value="features" className="mt-0 space-y-3 sm:space-y-4 data-[state=inactive]:hidden">
+              <SectionCard title="Plan Features" description="Select included features" icon={<Flag className="h-4 w-4" />}>
+                <div className="grid grid-cols-1 gap-2 sm:gap-3 max-h-[50vh] sm:max-h-[400px] overflow-y-auto pr-1 sm:pr-2">
+                  {allFeatures.map(feature => (
+                    <div key={feature.id} className="flex items-start space-x-2 sm:space-x-3 p-2.5 sm:p-3 rounded-lg border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+                      <Checkbox id={`feature-${feature.id}`} checked={selectedFeatureIds.has(feature.id)} onCheckedChange={(checked) => handleFeatureToggle(feature.id, !!checked)} className="mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <Label htmlFor={`feature-${feature.id}`} className="font-medium cursor-pointer text-xs sm:text-sm">{feature.name}</Label>
+                        <p className="text-xs text-muted-foreground line-clamp-1">{feature.description || 'No description'}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {allFeatures.length === 0 && (
+                  <p className="text-xs sm:text-sm text-muted-foreground text-center py-6 sm:py-8">No active features. Create features in Feature Management.</p>
+                )}
+              </SectionCard>
+            </TabsContent>
           </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox id="plan-featured" checked={isFeatured} onCheckedChange={checked => setIsFeatured(!!checked)} />
-            <Label htmlFor="plan-featured" className="cursor-pointer">Mark as Featured Plan</Label>
-          </div>
+        </Tabs>
+        
+        {/* Footer - Responsive */}
+        <div className="shrink-0 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t bg-background">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto h-9 sm:h-10 text-sm">Cancel</Button>
+          <Button onClick={handleSave} className="w-full sm:w-auto h-9 sm:h-10 text-sm">Save Plan</Button>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={handleSave}>Save Plan</Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

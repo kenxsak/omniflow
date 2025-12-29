@@ -260,7 +260,7 @@ export async function waiveOverageCharge(
  */
 export async function getPlatformOverageRevenue(
   month?: string
-): Promise<{ success: boolean; totalRevenue?: number; pendingRevenue?: number; error?: string }> {
+): Promise<{ success: boolean; totalRevenue?: number; pendingRevenue?: number; paidRevenue?: number; companiesWithOverage?: number; error?: string }> {
   if (!serverDb) {
     return { success: false, error: 'Database not initialized' };
   }
@@ -268,14 +268,41 @@ export async function getPlatformOverageRevenue(
   try {
     const targetMonth = month || new Date().toISOString().slice(0, 7);
     
-    // In a production system, this would query all overage records for the month
-    // For now, returning placeholder values
-    // TODO: Implement aggregation query across all companies
+    // Query all overage records for the month
+    const { collection, query, where, getDocs } = await import('firebase/firestore');
+    
+    const overageQuery = query(
+      collection(serverDb, 'aiOverageCharges'),
+      where('month', '==', targetMonth)
+    );
+    
+    const overageSnapshot = await getDocs(overageQuery);
+    
+    let totalRevenue = 0;
+    let pendingRevenue = 0;
+    let paidRevenue = 0;
+    const companiesWithOverage = overageSnapshot.size;
+    
+    overageSnapshot.forEach((doc) => {
+      const data = doc.data() as AIOverageCharge;
+      const charge = data.overageChargeUSD || 0;
+      
+      totalRevenue += charge;
+      
+      if (data.billingStatus === 'paid') {
+        paidRevenue += charge;
+      } else if (data.billingStatus === 'pending' || data.billingStatus === 'invoiced') {
+        pendingRevenue += charge;
+      }
+      // 'waived' charges are not counted in pending or paid
+    });
     
     return {
       success: true,
-      totalRevenue: 0,
-      pendingRevenue: 0,
+      totalRevenue,
+      pendingRevenue,
+      paidRevenue,
+      companiesWithOverage,
     };
   } catch (error: any) {
     console.error('Error getting platform overage revenue:', error);

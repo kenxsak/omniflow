@@ -20,7 +20,6 @@ export default function ProfileSettingsPage() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
 
-  // Initialize form values when appUser loads
   useEffect(() => {
     if (appUser) {
       setName(appUser.name || '');
@@ -30,11 +29,11 @@ export default function ProfileSettingsPage() {
 
   const userInitials = appUser?.name
     ? appUser.name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
     : appUser?.email?.charAt(0).toUpperCase() || 'U';
 
   const handleSave = async () => {
@@ -83,7 +82,7 @@ export default function ProfileSettingsPage() {
     });
   };
 
-  const getRoleBadge = (role?: string) => {
+  const getRoleBadge = () => {
     return 'bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300';
   };
 
@@ -97,28 +96,33 @@ export default function ProfileSettingsPage() {
         >
           <div className="space-y-4">
             {/* Avatar Section */}
-            <div className="flex items-center gap-4 pb-3 border-b border-stone-200 dark:border-stone-800">
-              <Avatar className="h-16 w-16 border border-stone-200 dark:border-stone-700">
-                <AvatarImage
-                  src={(appUser as { photoURL?: string })?.photoURL || undefined}
-                  alt={appUser?.name || 'User'}
-                />
-                <AvatarFallback className="bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 text-lg font-medium">
-                  {userInitials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
+            <div className="flex items-start gap-4 pb-3 border-b border-stone-200 dark:border-stone-800">
+              <div className="flex flex-col items-center gap-2">
+                <Avatar className="h-16 w-16 border border-stone-200 dark:border-stone-700">
+                  <AvatarImage
+                    src={(appUser as { photoURL?: string })?.photoURL || undefined}
+                    alt={appUser?.name || 'User'}
+                  />
+                  <AvatarFallback className="bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 text-lg font-medium">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+                <Button variant="ghost" size="sm" className="text-[10px] text-muted-foreground px-2 py-1 h-auto">
+                  Change
+                </Button>
+              </div>
+              <div className="flex-1 min-w-0 pt-1">
+                <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-base font-medium">{appUser?.name || 'Unnamed User'}</p>
-                    <p className="text-sm text-muted-foreground">{appUser?.email}</p>
+                    <p className="text-base font-medium truncate">{appUser?.name || 'Unnamed User'}</p>
+                    <p className="text-sm text-muted-foreground truncate">{appUser?.email}</p>
                   </div>
                   {!isEditing && (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setIsEditing(true)}
-                      className="h-8 text-xs text-muted-foreground"
+                      className="h-8 text-xs text-muted-foreground shrink-0"
                     >
                       <Icon icon="solar:pen-linear" className="h-3.5 w-3.5 mr-1.5" />
                       Edit
@@ -126,7 +130,7 @@ export default function ProfileSettingsPage() {
                   )}
                 </div>
                 <div className="flex items-center gap-2 mt-2">
-                  <span className={cn('px-2 py-0.5 text-[10px] font-medium uppercase rounded-md', getRoleBadge(appUser?.role))}>
+                  <span className={cn('px-2 py-0.5 text-[10px] font-medium uppercase rounded-md', getRoleBadge())}>
                     {appUser?.role || 'User'}
                   </span>
                   <span className="px-2 py-0.5 text-[10px] font-medium uppercase rounded-md bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400">
@@ -134,10 +138,6 @@ export default function ProfileSettingsPage() {
                   </span>
                 </div>
               </div>
-              <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground">
-                <Icon icon="solar:camera-linear" className="h-3.5 w-3.5 mr-1.5" />
-                Change
-              </Button>
             </div>
 
             {/* Form Fields */}
@@ -202,7 +202,6 @@ export default function ProfileSettingsPage() {
           </div>
         </SettingsCard>
 
-        {/* Account Details Card - Keeping it as it shows slighty different info presentation or could be removed in future */}
         <SettingsCard
           title="Account Details"
           description="Your account information"
@@ -222,7 +221,7 @@ export default function ProfileSettingsPage() {
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Role</Label>
               <div className="flex items-center gap-2 py-2">
-                <span className={cn('px-2 py-0.5 text-[10px] font-medium uppercase rounded-md', getRoleBadge(appUser?.role))}>
+                <span className={cn('px-2 py-0.5 text-[10px] font-medium uppercase rounded-md', getRoleBadge())}>
                   {appUser?.role || 'User'}
                 </span>
                 <span className="px-2 py-0.5 text-[10px] font-medium uppercase rounded-md bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400">

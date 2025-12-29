@@ -1345,7 +1345,7 @@ input[type="color"]::-moz-color-swatch {
   }
   
   /* Reduce motion for mobile performance */
-  .reduce-motion-mobile {
+  .reduce-motion {
     animation-duration: 0.1ms !important;
     transition-duration: 0.1ms !important;
   }

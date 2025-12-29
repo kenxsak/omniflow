@@ -54,6 +54,7 @@ import { sendSms as sendTwilioSMS } from '@/services/twilio';
 import { sendBulkAuthkeyWhatsApp } from './authkey-client';
 import { sendBulkWhatsAppAiSensy } from './aisensy-client';
 import { sendBulkWhatsAppGupshup } from './gupshup-client';
+import { trackSMSSend, trackWhatsAppSend } from './cost-tracking/cost-tracker';
 
 /**
  * Main function to process all pending campaign jobs
@@ -1029,6 +1030,16 @@ async function processSMSCampaign(job: CampaignJob, company: any): Promise<Proce
     currentBatch: job.progress.currentBatch + 1,
   });
 
+  // Track SMS cost/credits for successfully sent messages
+  if (sent > 0) {
+    const SMS_COST_PER_MESSAGE = 0.005; // $0.005 per SMS (configurable)
+    await trackSMSSend(job.companyId, sent, SMS_COST_PER_MESSAGE).catch(err => {
+      console.error(`[JOB ${job.id}] Failed to track SMS cost:`, err);
+      // Don't fail the job if cost tracking fails
+    });
+    console.log(`[JOB ${job.id}] 💰 Tracked ${sent} SMS sends for cost/credits`);
+  }
+
   // Store failed recipients (keep status as 'processing')
   if (failedRecipients.length > 0) {
     const existingFailed = job.failedRecipients || [];
@@ -1204,6 +1215,16 @@ async function processWhatsAppCampaign(job: CampaignJob, company: any): Promise<
     failed: job.progress.failed + failed,
     currentBatch: job.progress.currentBatch + 1,
   });
+
+  // Track WhatsApp cost/credits for successfully sent messages
+  if (sent > 0) {
+    const WHATSAPP_COST_PER_MESSAGE = 0.01; // $0.01 per WhatsApp message (configurable)
+    await trackWhatsAppSend(job.companyId, sent, WHATSAPP_COST_PER_MESSAGE).catch(err => {
+      console.error(`[JOB ${job.id}] Failed to track WhatsApp cost:`, err);
+      // Don't fail the job if cost tracking fails
+    });
+    console.log(`[JOB ${job.id}] 💰 Tracked ${sent} WhatsApp sends for cost/credits`);
+  }
 
   console.log(`WhatsApp batch processed via ${whatsappProvider}: ${sent} sent, ${failed} failed`);
 

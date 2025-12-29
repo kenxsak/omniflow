@@ -41,6 +41,18 @@ export async function createLeadAction(
 
   const result = await addServerLead(companyId, leadData);
   
+  // Trigger workflows for new contact
+  try {
+    const { triggerContactCreated } = await import('@/lib/workflow-triggers');
+    await triggerContactCreated(companyId, result.id, {
+      ...leadData,
+      id: result.id,
+    });
+  } catch (error) {
+    console.error('[Lead Action] Failed to trigger workflows:', error);
+    // Don't fail the lead creation if workflow trigger fails
+  }
+  
   revalidatePath('/crm');
   revalidatePath('/crm/leads');
   revalidatePath('/crm/pipeline');
