@@ -46,12 +46,18 @@ export function PaymentButton({
   // Use Razorpay ONLY for INR currency, Stripe for everything else
   const preferredGateway = activeCurrency === 'INR' ? 'razorpay' : 'stripe';
   
-  const amount = getPriceForPlanWithBillingCycle(
-    plan.id, 
-    activeCurrency, 
-    billingCycle, 
-    plan.yearlyDiscountPercentage || 0
-  );
+  // For plans with custom prices (not in the fixed pricing map), use the plan's USD price
+  // For standard plans, use the geo-localized fixed pricing
+  const isCustomPricedPlan = !['plan_free', 'plan_starter', 'plan_pro', 'plan_enterprise', 'plan_demo'].includes(plan.id);
+  
+  const amount = isCustomPricedPlan 
+    ? plan.priceMonthlyUSD // Use the plan's USD price directly for custom plans
+    : getPriceForPlanWithBillingCycle(
+        plan.id, 
+        activeCurrency, 
+        billingCycle, 
+        plan.yearlyDiscountPercentage || 0
+      );
   
   const displayAmount = `${getCurrencySymbol(activeCurrency)}${amount.toLocaleString()}`;
 

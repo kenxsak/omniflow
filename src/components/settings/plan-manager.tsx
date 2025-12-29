@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -18,6 +18,21 @@ import { getStoredPlans, addStoredPlan, updateStoredPlan, deleteStoredPlan, getS
 import { useCurrency } from '@/contexts/currency-context';
 import { Switch } from '../ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+
+// Section Card Component for consistent styling - MUST be outside dialog to prevent re-renders
+const SectionCard: React.FC<{ title: string; description?: string; icon?: React.ReactNode; children: React.ReactNode }> = 
+  ({ title, description, icon, children }) => (
+  <div className="rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/50 p-3 sm:p-4 space-y-3 sm:space-y-4">
+    <div className="flex items-start sm:items-center gap-2">
+      {icon && <span className="text-primary shrink-0">{icon}</span>}
+      <div className="min-w-0">
+        <h4 className="font-semibold text-sm">{title}</h4>
+        {description && <p className="text-xs text-muted-foreground line-clamp-2">{description}</p>}
+      </div>
+    </div>
+    {children}
+  </div>
+);
 
 // --- DIALOG COMPONENT ---
 const PlanEditDialog: React.FC<{
@@ -192,21 +207,6 @@ const PlanEditDialog: React.FC<{
     onSave(planData);
     onOpenChange(false);
   };
-
-  // Section Card Component for consistent styling
-  const SectionCard: React.FC<{ title: string; description?: string; icon?: React.ReactNode; children: React.ReactNode }> = 
-    ({ title, description, icon, children }) => (
-    <div className="rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/50 p-3 sm:p-4 space-y-3 sm:space-y-4">
-      <div className="flex items-start sm:items-center gap-2">
-        {icon && <span className="text-primary shrink-0">{icon}</span>}
-        <div className="min-w-0">
-          <h4 className="font-semibold text-sm">{title}</h4>
-          {description && <p className="text-xs text-muted-foreground line-clamp-2">{description}</p>}
-        </div>
-      </div>
-      {children}
-    </div>
-  );
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>

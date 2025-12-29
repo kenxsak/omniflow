@@ -58,45 +58,46 @@ export const CURRENCY_DATA: Record<SupportedCurrency, { symbol: string; name: st
 };
 
 
-// Localized pricing for each currency
-export const FIXED_PRICING: Record<SupportedCurrency, { starter: number; pro: number; enterprise: number }> = {
-  // Americas
-  USD: { starter: 29, pro: 99, enterprise: 249 },
-  CAD: { starter: 39, pro: 135, enterprise: 339 },
-  BRL: { starter: 149, pro: 499, enterprise: 1249 },
-  MXN: { starter: 499, pro: 1699, enterprise: 4249 },
-  // Europe
-  EUR: { starter: 27, pro: 92, enterprise: 230 },
-  GBP: { starter: 23, pro: 78, enterprise: 197 },
-  CHF: { starter: 26, pro: 89, enterprise: 225 },
-  SEK: { starter: 299, pro: 999, enterprise: 2499 },
-  NOK: { starter: 299, pro: 999, enterprise: 2499 },
-  DKK: { starter: 199, pro: 679, enterprise: 1699 },
-  PLN: { starter: 119, pro: 399, enterprise: 999 },
-  CZK: { starter: 649, pro: 2199, enterprise: 5499 },
-  HUF: { starter: 9999, pro: 34999, enterprise: 87499 },
-  TRY: { starter: 899, pro: 2999, enterprise: 7499 },
-  // Asia Pacific  
-  INR: { starter: 1999, pro: 7999, enterprise: 20999 },
-  JPY: { starter: 4290, pro: 14590, enterprise: 36790 },
-  CNY: { starter: 199, pro: 699, enterprise: 1749 },
-  SGD: { starter: 39, pro: 135, enterprise: 339 },
-  AUD: { starter: 45, pro: 155, enterprise: 389 },
-  NZD: { starter: 49, pro: 165, enterprise: 415 },
-  KRW: { starter: 38900, pro: 132900, enterprise: 334900 },
-  THB: { starter: 999, pro: 3499, enterprise: 8749 },
-  MYR: { starter: 129, pro: 449, enterprise: 1129 },
-  PHP: { starter: 1599, pro: 5499, enterprise: 13749 },
-  IDR: { starter: 449000, pro: 1549000, enterprise: 3879000 },
-  VND: { starter: 699000, pro: 2399000, enterprise: 5999000 },
+// Localized pricing for each currency (includes demo plan for testing)
+// Demo prices set to minimum allowed by payment gateways (Stripe min: $0.50)
+export const FIXED_PRICING: Record<SupportedCurrency, { demo?: number; starter: number; pro: number; enterprise: number }> = {
+  // Americas - Stripe minimum $0.50
+  USD: { demo: 0.50, starter: 29, pro: 99, enterprise: 249 },
+  CAD: { demo: 0.50, starter: 39, pro: 135, enterprise: 339 },
+  BRL: { demo: 2, starter: 149, pro: 499, enterprise: 1249 },
+  MXN: { demo: 10, starter: 499, pro: 1699, enterprise: 4249 },
+  // Europe - Stripe minimum €0.50
+  EUR: { demo: 0.50, starter: 27, pro: 92, enterprise: 230 },
+  GBP: { demo: 0.30, starter: 23, pro: 78, enterprise: 197 },
+  CHF: { demo: 0.50, starter: 26, pro: 89, enterprise: 225 },
+  SEK: { demo: 3, starter: 299, pro: 999, enterprise: 2499 },
+  NOK: { demo: 3, starter: 299, pro: 999, enterprise: 2499 },
+  DKK: { demo: 2.50, starter: 199, pro: 679, enterprise: 1699 },
+  PLN: { demo: 2, starter: 119, pro: 399, enterprise: 999 },
+  CZK: { demo: 15, starter: 649, pro: 2199, enterprise: 5499 },
+  HUF: { demo: 200, starter: 9999, pro: 34999, enterprise: 87499 },
+  TRY: { demo: 15, starter: 899, pro: 2999, enterprise: 7499 },
+  // Asia Pacific - INR uses Razorpay (₹1 minimum)
+  INR: { demo: 1, starter: 1999, pro: 7999, enterprise: 20999 },
+  JPY: { demo: 50, starter: 4290, pro: 14590, enterprise: 36790 },
+  CNY: { demo: 4, starter: 199, pro: 699, enterprise: 1749 },
+  SGD: { demo: 0.50, starter: 39, pro: 135, enterprise: 339 },
+  AUD: { demo: 0.50, starter: 45, pro: 155, enterprise: 389 },
+  NZD: { demo: 0.50, starter: 49, pro: 165, enterprise: 415 },
+  KRW: { demo: 500, starter: 38900, pro: 132900, enterprise: 334900 },
+  THB: { demo: 20, starter: 999, pro: 3499, enterprise: 8749 },
+  MYR: { demo: 2, starter: 129, pro: 449, enterprise: 1129 },
+  PHP: { demo: 25, starter: 1599, pro: 5499, enterprise: 13749 },
+  IDR: { demo: 8000, starter: 449000, pro: 1549000, enterprise: 3879000 },
+  VND: { demo: 12000, starter: 699000, pro: 2399000, enterprise: 5999000 },
   // Middle East
-  AED: { starter: 109, pro: 369, enterprise: 919 },
-  SAR: { starter: 109, pro: 369, enterprise: 929 },
-  QAR: { starter: 109, pro: 369, enterprise: 909 },
-  KWD: { starter: 9, pro: 30, enterprise: 76 },
-  BHD: { starter: 11, pro: 37, enterprise: 94 },
+  AED: { demo: 2, starter: 109, pro: 369, enterprise: 919 },
+  SAR: { demo: 2, starter: 109, pro: 369, enterprise: 929 },
+  QAR: { demo: 2, starter: 109, pro: 369, enterprise: 909 },
+  KWD: { demo: 0.15, starter: 9, pro: 30, enterprise: 76 },
+  BHD: { demo: 0.20, starter: 11, pro: 37, enterprise: 94 },
   // Africa
-  ZAR: { starter: 549, pro: 1849, enterprise: 4649 },
+  ZAR: { demo: 10, starter: 549, pro: 1849, enterprise: 4649 },
 };
 
 // Comprehensive country to currency mapping (100+ countries)
@@ -206,19 +207,27 @@ export function getPriceForPlan(planId: string, currency: SupportedCurrency): nu
   const pricing = FIXED_PRICING[currency] || FIXED_PRICING.USD;
   
   // Map plan IDs to pricing tiers
-  const planMap: Record<string, keyof typeof pricing> = {
+  const planMap: Record<string, 'demo' | 'starter' | 'pro' | 'enterprise'> = {
     'plan_free': 'starter',
+    'plan_demo': 'demo',
     'plan_starter': 'starter',
     'plan_pro': 'pro',
     'plan_enterprise': 'enterprise',
     // Fallback mappings
     'free': 'starter',
+    'demo': 'demo',
     'starter': 'starter',
     'pro': 'pro',
     'enterprise': 'enterprise',
   };
   
   const tier = planMap[planId.toLowerCase()] || 'starter';
+  
+  // Handle demo tier - return demo price or fallback to 1
+  if (tier === 'demo') {
+    return pricing.demo || 1;
+  }
+  
   return pricing[tier];
 }
 

@@ -32,7 +32,7 @@ const formatCurrency = (amount: number, currency: string) => {
 const getStatusBadge = (status: PaymentStatus) => {
   switch (status) {
     case 'succeeded':
-      return <Badge className="bg-green-100 text-green-800 hover:bg-green-100"><CheckCircle2 className="w-3 h-3 mr-1" /> Success</Badge>;
+      return <Badge className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30"><CheckCircle2 className="w-3 h-3 mr-1" /> Success</Badge>;
     case 'failed':
       return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" /> Failed</Badge>;
     case 'pending':

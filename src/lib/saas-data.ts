@@ -230,6 +230,33 @@ const initialSaasPlans: Plan[] = [
     allowBulkImport: true,
     allowBulkExport: true,
     allowAdvancedFields: true,
+  },
+  {
+    id: 'plan_demo',
+    name: 'Demo Test',
+    description: 'Payment gateway test plan - ₹1 INR / $0.50 USD minimum',
+    priceMonthlyUSD: 1, // Will be converted to ₹1 for INR, $0.50 for USD via geo-detection
+    yearlyDiscountPercentage: 0,
+    featureIds: ['feat_core_crm'],
+    maxUsers: 1,
+    aiCreditsPerMonth: 10,
+    aiLifetimeCredits: 0,
+    aiMonthlyCredits: 10,
+    allowBYOK: false,
+    maxImagesPerMonth: 1,
+    maxTextPerMonth: 10,
+    maxTTSPerMonth: 0,
+    allowOverage: false,
+    maxDigitalCards: 1,
+    digitalCardsPerUser: 0,
+    maxDigitalCardsCap: 1,
+    maxLandingPages: 1,
+    maxSavedPosts: 5,
+    crmAccessLevel: 'basic',
+    maxContacts: 10,
+    allowBulkImport: false,
+    allowBulkExport: false,
+    allowAdvancedFields: false,
   }
 ];
 
@@ -267,25 +294,8 @@ export async function getStoredPlans(): Promise<Plan[]> {
   
   const existingPlans = snapshot.docs.map(doc => ({...doc.data(), id: doc.id} as Plan));
   
-  // AUTO-MIGRATION: Check if plans need updating by comparing AI credits
-  // If Free plan has wrong credits (500 instead of 150), auto-update all plans
-  const freePlan = existingPlans.find(p => p.id === 'plan_free');
-  const needsUpdate = freePlan && freePlan.aiCreditsPerMonth !== 150;
-  
-  if (needsUpdate) {
-    console.log('🔄 Auto-migrating plans to new pricing structure...');
-    const batch = writeBatch(getDb()!);
-    initialSaasPlans.forEach(plan => {
-        const docRef = doc(getDb()!, "plans", plan.id);
-        const sanitizedPlan = Object.fromEntries(
-            Object.entries(plan).map(([key, value]) => [key, value === undefined ? null : value])
-        );
-        batch.set(docRef, sanitizedPlan); // Overwrite with new values
-    });
-    await batch.commit();
-    console.log('✅ Plans migrated successfully!');
-    return initialSaasPlans;
-  }
+  // Note: Auto-migration removed. Use "Sync Plans from Code" button in Super Admin to update plans.
+  // This prevents accidental overwrites of custom plan configurations.
   
   return existingPlans;
 }

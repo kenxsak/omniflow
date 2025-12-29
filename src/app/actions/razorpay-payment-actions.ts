@@ -16,6 +16,7 @@ import type { BillingCycle, RazorpayOrder } from '@/types/payment';
 import { addMonths, addYears } from 'date-fns';
 
 const FIXED_INR_PRICING: Record<string, number> = {
+  plan_demo: 1,        // ₹1 for testing
   plan_starter: 1999,
   plan_pro: 7999,
   plan_enterprise: 20999,

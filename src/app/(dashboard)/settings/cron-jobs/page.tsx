@@ -42,14 +42,17 @@ export default function CronJobsSettingsPage() {
     setTesting(true);
     setTestResult(null);
     try {
+      // Use the actual CRON_SECRET from environment for testing
       const response = await fetch('/api/cron/run-all', {
         method: 'GET',
-        headers: { 'Authorization': 'Bearer test-from-admin' },
+        headers: { 
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_CRON_SECRET || 'a1b2c3d4-super-secret-key-5e6f7g8h-9i0j'}` 
+        },
       });
       const data = await response.json();
-      setTestResult({ success: response.ok, data });
-    } catch (error) {
-      setTestResult({ success: false, error: 'Failed to connect' });
+      setTestResult({ success: response.ok, status: response.status, data });
+    } catch (error: any) {
+      setTestResult({ success: false, error: error.message || 'Failed to connect' });
     } finally {
       setTesting(false);
     }
@@ -152,8 +155,8 @@ export default function CronJobsSettingsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Label className="w-24 text-xs">Value:</Label>
-                      <code className="flex-1 px-2 py-1 bg-stone-100 dark:bg-stone-800 rounded text-xs">omniflow_cron_secret_2024_xyz</code>
-                      <Button variant="ghost" size="sm" onClick={() => copyToClipboard('omniflow_cron_secret_2024_xyz', 'Secret value')}>
+                      <code className="flex-1 px-2 py-1 bg-stone-100 dark:bg-stone-800 rounded text-xs">a1b2c3d4-super-secret-key-5e6f7g8h-9i0j</code>
+                      <Button variant="ghost" size="sm" onClick={() => copyToClipboard('a1b2c3d4-super-secret-key-5e6f7g8h-9i0j', 'Secret value')}>
                         <Icon icon="solar:copy-linear" className="h-3 w-3" />
                       </Button>
                     </div>
@@ -215,7 +218,7 @@ export default function CronJobsSettingsPage() {
                         <tr>
                           <td className="px-3 py-2 bg-stone-50 dark:bg-stone-900 font-medium">Header Value</td>
                           <td className="px-3 py-2">
-                            <code className="text-xs">Bearer omniflow_cron_secret_2024_xyz</code>
+                            <code className="text-xs">Bearer a1b2c3d4-super-secret-key-5e6f7g8h-9i0j</code>
                           </td>
                         </tr>
                       </tbody>

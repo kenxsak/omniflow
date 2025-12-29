@@ -127,8 +127,14 @@ export async function createStripeCheckoutSession(params: {
     }
 
     // Create checkout session
-    const successUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/settings?tab=billing&payment=success`;
-    const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/settings?tab=billing&payment=canceled`;
+    // Get the app URL - NEXT_PUBLIC_APP_URL must be set in production
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+    if (!appUrl) {
+      return { success: false, error: 'App URL not configured. Please set NEXT_PUBLIC_APP_URL environment variable.' };
+    }
+    
+    const successUrl = `${appUrl}/settings?tab=billing&payment=success`;
+    const cancelUrl = `${appUrl}/settings?tab=billing&payment=canceled`;
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -340,7 +346,11 @@ export async function getStripePortalUrl(params: {
       return { success: false, error: 'No Stripe customer found' };
     }
 
-    const returnUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/settings?tab=billing`;
+    const returnUrl = `${process.env.NEXT_PUBLIC_APP_URL}/settings?tab=billing`;
+    
+    if (!process.env.NEXT_PUBLIC_APP_URL) {
+      return { success: false, error: 'App URL not configured' };
+    }
 
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
