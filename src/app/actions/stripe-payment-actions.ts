@@ -13,6 +13,7 @@ import { verifyAuthToken } from '@/lib/firebase-admin';
 import type { Plan } from '@/types/saas';
 import type { BillingCycle, StripeCheckoutSession } from '@/types/payment';
 import { calculatePrice } from '@/lib/payment-config';
+import { getPriceForPlanWithBillingCycle, type SupportedCurrency } from '@/lib/geo-detection';
 import { addMonths, addYears } from 'date-fns';
 
 // Initialize Stripe
@@ -33,6 +34,7 @@ export async function createStripeCheckoutSession(params: {
   idToken: string;
   planId: string;
   billingCycle: BillingCycle;
+  currency?: SupportedCurrency;
 }): Promise<{ success: boolean; session?: StripeCheckoutSession; error?: string }> {
   try {
     // Verify authentication
@@ -68,8 +70,16 @@ export async function createStripeCheckoutSession(params: {
 
     const plan = planDoc.data() as Plan;
     
-    // Calculate price
-    const amount = calculatePrice(plan, params.billingCycle);
+    // Determine currency - default to USD for Stripe
+    const currency = params.currency || 'USD';
+    
+    // Calculate price based on currency
+    const amount = getPriceForPlanWithBillingCycle(
+      params.planId,
+      currency,
+      params.billingCycle,
+      plan.yearlyDiscountPercentage || 0
+    );
     
     if (amount === 0) {
       return { success: false, error: 'Free plan does not require payment' };
@@ -126,12 +136,12 @@ export async function createStripeCheckoutSession(params: {
       line_items: [
         {
           price_data: {
-            currency: 'usd',
+            currency: currency.toLowerCase(),
             product_data: {
               name: `${plan.name} Plan - ${params.billingCycle === 'yearly' ? 'Annual' : 'Monthly'}`,
               description: plan.description,
             },
-            unit_amount: Math.round(amount * 100), // Convert to cents
+            unit_amount: Math.round(amount * 100), // Convert to cents/smallest unit
             ...(params.billingCycle === 'monthly' && {
               recurring: {
                 interval: 'month',
@@ -147,6 +157,7 @@ export async function createStripeCheckoutSession(params: {
         companyId: user.companyId,
         planId: params.planId,
         billingCycle: params.billingCycle,
+        currency: currency,
       },
     });
 

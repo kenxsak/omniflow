@@ -72,6 +72,7 @@ export function PaymentButton({
         idToken: appUser.idToken,
         planId: plan.id,
         billingCycle,
+        currency: activeCurrency,
       });
 
       if (result.success && result.session?.url) {
