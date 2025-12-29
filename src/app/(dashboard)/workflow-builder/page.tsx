@@ -37,7 +37,7 @@ const actionTemplates = [
   { type: 'action' as const, name: 'Send SMS', icon: 'solar:chat-square-linear', action: 'send_sms' as ActionType },
   { type: 'action' as const, name: 'Send WhatsApp', icon: 'solar:chat-round-dots-linear', action: 'send_whatsapp' as ActionType },
   { type: 'action' as const, name: 'Add Tag', icon: 'solar:tag-linear', action: 'add_tag' as ActionType },
-  { type: 'action' as const, name: 'Remove Tag', icon: 'solar:tag-cross-linear', action: 'remove_tag' as ActionType },
+  { type: 'action' as const, name: 'Remove Tag', icon: 'solar:tag-horizontal-linear', action: 'remove_tag' as ActionType },
   { type: 'action' as const, name: 'Create Task', icon: 'solar:checklist-linear', action: 'create_task' as ActionType },
   { type: 'action' as const, name: 'Notify Team', icon: 'solar:bell-linear', action: 'notify_team' as ActionType },
   { type: 'action' as const, name: 'Webhook', icon: 'solar:programming-linear', action: 'webhook' as ActionType },
@@ -45,7 +45,7 @@ const actionTemplates = [
 
 const conditionTemplates = [
   { type: 'condition' as const, name: 'Has Tag', icon: 'solar:tag-linear', condition: 'has_tag' },
-  { type: 'condition' as const, name: 'Missing Tag', icon: 'solar:tag-cross-linear', condition: 'missing_tag' },
+  { type: 'condition' as const, name: 'Missing Tag', icon: 'solar:tag-horizontal-linear', condition: 'missing_tag' },
   { type: 'condition' as const, name: 'Field Equals', icon: 'solar:text-field-linear', condition: 'field_equals' },
   { type: 'condition' as const, name: 'Contact Source', icon: 'solar:user-id-linear', condition: 'contact_source_is' },
 ];
@@ -74,6 +74,8 @@ export default function WorkflowBuilderPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [workflowStats, setWorkflowStats] = useState<Record<string, any>>({});
+  // Mobile view state: 'nodes' shows node palette, 'canvas' shows workflow canvas
+  const [mobileView, setMobileView] = useState<'nodes' | 'canvas'>('canvas');
 
   // Load workflows on mount
   useEffect(() => {
@@ -203,6 +205,8 @@ export default function WorkflowBuilderPage() {
     setWorkflows(prev => prev.map(w => w.id === updatedWorkflow.id ? updatedWorkflow : w));
     setSelectedNode(newNode);
     setIsNodePanelOpen(true);
+    // On mobile, switch to canvas view after adding a node
+    setMobileView('canvas');
   }, [activeWorkflow]);
 
   const deleteNode = (nodeId: string) => {
@@ -370,13 +374,32 @@ export default function WorkflowBuilderPage() {
 
   // Render node palette
   const renderNodePalette = () => (
-    <div className="lg:w-64 border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-950 p-4 overflow-y-auto">
+    <div className={cn(
+      "border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-950 p-4 overflow-y-auto",
+      // Desktop: fixed width sidebar
+      "lg:w-64 lg:block",
+      // Mobile: full width, conditionally shown
+      "w-full",
+      mobileView !== 'nodes' && "hidden lg:block"
+    )}>
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold">Nodes</h3>
-        <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => setActiveWorkflow(null)}>
-          <Icon icon="solar:arrow-left-linear" className="h-3.5 w-3.5 mr-1" />
-          Back
-        </Button>
+        <div className="flex gap-2">
+          {/* Mobile: Show Canvas button */}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-7 text-xs lg:hidden" 
+            onClick={() => setMobileView('canvas')}
+          >
+            <Icon icon="solar:widget-5-linear" className="h-3.5 w-3.5 mr-1" />
+            Canvas
+          </Button>
+          <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => setActiveWorkflow(null)}>
+            <Icon icon="solar:arrow-left-linear" className="h-3.5 w-3.5 mr-1" />
+            Back
+          </Button>
+        </div>
       </div>
       
       {/* Triggers */}
@@ -461,9 +484,14 @@ export default function WorkflowBuilderPage() {
 
   // Render workflow canvas
   const renderWorkflowCanvas = () => (
-    <div className="flex-1 border border-stone-200 dark:border-stone-800 rounded-2xl bg-stone-50 dark:bg-stone-900/50 relative overflow-hidden">
-      {/* Toolbar */}
-      <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
+    <div className={cn(
+      "flex-1 border border-stone-200 dark:border-stone-800 rounded-2xl bg-stone-50 dark:bg-stone-900/50 relative overflow-hidden flex flex-col",
+      // Mobile: conditionally shown
+      mobileView !== 'canvas' && "hidden lg:flex"
+    )}>
+      {/* Toolbar - Fixed at top */}
+      <div className="p-3 border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950 space-y-2">
+        {/* Row 1: Workflow name */}
         <Input
           value={activeWorkflow?.name || ''}
           onChange={(e) => {
@@ -473,28 +501,36 @@ export default function WorkflowBuilderPage() {
               setWorkflows(prev => prev.map(w => w.id === updated.id ? updated : w));
             }
           }}
-          className="w-48 h-8 text-sm bg-white dark:bg-stone-950"
+          className="w-full h-9 text-sm font-medium"
+          placeholder="Workflow name"
         />
-        <div className="flex gap-2">
+        {/* Row 2: Action buttons */}
+        <div className="flex items-center gap-2">
           <Button
             variant={activeWorkflow?.isActive ? "default" : "outline"}
             size="sm"
-            className="h-8 text-xs"
+            className="h-8 text-xs flex-1"
             onClick={toggleWorkflowActive}
             disabled={isSaving}
           >
-            {isSaving && <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />}
-            <Icon icon={activeWorkflow?.isActive ? "solar:pause-linear" : "solar:play-linear"} className="h-3.5 w-3.5 mr-1" />
+            {isSaving ? (
+              <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+            ) : (
+              <Icon icon={activeWorkflow?.isActive ? "solar:pause-linear" : "solar:play-linear"} className="h-3.5 w-3.5 mr-1.5" />
+            )}
             {activeWorkflow?.isActive ? 'Pause' : 'Activate'}
           </Button>
-          <Button size="sm" className="h-8 text-xs" onClick={saveWorkflow} disabled={isSaving}>
-            {isSaving && <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />}
-            <Icon icon="solar:diskette-linear" className="h-3.5 w-3.5 mr-1" />
+          <Button size="sm" className="h-8 text-xs flex-1" onClick={saveWorkflow} disabled={isSaving}>
+            {isSaving ? (
+              <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+            ) : (
+              <Icon icon="solar:diskette-linear" className="h-3.5 w-3.5 mr-1.5" />
+            )}
             Save
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 text-xs text-destructive">
+              <Button variant="outline" size="sm" className="h-8 w-8 p-0 text-destructive shrink-0">
                 <Icon icon="solar:trash-bin-trash-linear" className="h-3.5 w-3.5" />
               </Button>
             </AlertDialogTrigger>
@@ -519,38 +555,42 @@ export default function WorkflowBuilderPage() {
         </div>
       </div>
 
-      {/* Nodes */}
-      <div className="absolute inset-0 pt-14 p-4 overflow-auto">
+      {/* Nodes - Scrollable area */}
+      <div className="flex-1 overflow-auto p-4">
         {activeWorkflow?.nodes.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-center">
+          <div className="h-full flex flex-col items-center justify-center text-center px-4">
             <Icon icon="solar:add-circle-linear" className="h-12 w-12 text-muted-foreground/30 mb-3" />
-            <p className="text-sm text-muted-foreground">Click a node from the left panel to add it</p>
+            <p className="text-sm text-muted-foreground">
+              <span className="hidden lg:inline">Click a node from the left panel to add it</span>
+              <span className="lg:hidden">Tap "Add Nodes" tab to add nodes</span>
+            </p>
             <p className="text-xs text-muted-foreground mt-1">Start with a Trigger node</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {activeWorkflow?.nodes.map((node, index) => (
-              <div key={node.id} className="flex items-center gap-3">
+              <div key={node.id} className="flex flex-col items-center">
                 {index > 0 && (
-                  <div className="w-8 flex justify-center">
+                  <div className="py-1">
                     <Icon icon="solar:arrow-down-linear" className="h-4 w-4 text-muted-foreground" />
                   </div>
                 )}
                 <button
                   onClick={() => { setSelectedNode(node); setIsNodePanelOpen(true); }}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-xl border-2 bg-white dark:bg-stone-950 transition-all hover:shadow-md min-w-[200px]",
+                    "flex items-center gap-3 p-3 rounded-xl border-2 bg-white dark:bg-stone-950 transition-all hover:shadow-md w-full",
                     nodeColors[node.type],
                     selectedNode?.id === node.id && "ring-2 ring-primary"
                   )}
                 >
-                  <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center", nodeColors[node.type])}>
+                  <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0", nodeColors[node.type])}>
                     <Icon icon={getNodeIcon(node)} className="h-4 w-4" />
                   </div>
-                  <div className="text-left">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{node.type}</p>
-                    <p className="text-sm font-medium">{node.name}</p>
+                  <div className="text-left min-w-0 flex-1">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{node.type}</p>
+                    <p className="text-sm font-medium truncate">{node.name}</p>
                   </div>
+                  <Icon icon="solar:pen-linear" className="h-4 w-4 text-muted-foreground shrink-0" />
                 </button>
               </div>
             ))}
@@ -857,7 +897,28 @@ export default function WorkflowBuilderPage() {
       {!activeWorkflow ? (
         renderWorkflowList()
       ) : (
-        <div className="flex-1 flex flex-col lg:flex-row gap-4">
+        <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
+          {/* Mobile view toggle tabs */}
+          <div className="lg:hidden flex gap-2 mb-2">
+            <Button 
+              variant={mobileView === 'canvas' ? 'default' : 'outline'} 
+              size="sm" 
+              className="flex-1 h-9"
+              onClick={() => setMobileView('canvas')}
+            >
+              <Icon icon="solar:widget-5-linear" className="h-4 w-4 mr-2" />
+              Workflow
+            </Button>
+            <Button 
+              variant={mobileView === 'nodes' ? 'default' : 'outline'} 
+              size="sm" 
+              className="flex-1 h-9"
+              onClick={() => setMobileView('nodes')}
+            >
+              <Icon icon="solar:add-square-linear" className="h-4 w-4 mr-2" />
+              Add Nodes
+            </Button>
+          </div>
           {renderNodePalette()}
           {renderWorkflowCanvas()}
         </div>
