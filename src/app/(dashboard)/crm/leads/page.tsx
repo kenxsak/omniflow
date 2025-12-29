@@ -11,6 +11,8 @@ const INITIAL_PAGE_SIZE = 50;
 export default async function LeadsTablePage() {
   const userResult = await getUserFromServerSession();
   
+  console.log('[LeadsTablePage] User session result:', JSON.stringify(userResult, null, 2));
+  
   if (!userResult.success || !userResult.user.companyId) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -20,6 +22,8 @@ export default async function LeadsTablePage() {
   }
   
   const { uid, role, companyId } = userResult.user;
+  
+  console.log(`[LeadsTablePage] Fetching leads for companyId: ${companyId}, uid: ${uid}, role: ${role}`);
   
   const [paginatedResult, planMetadata] = await Promise.all([
     getPaginatedLeadsForCompany(companyId, {

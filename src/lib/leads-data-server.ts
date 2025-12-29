@@ -60,6 +60,8 @@ export async function getServerLeads(
     return [];
   }
 
+  console.log(`[getServerLeads] Fetching leads for companyId: ${companyId}`);
+
   try {
     let queryRef: any = adminDb
       .collection('leads')
@@ -75,6 +77,8 @@ export async function getServerLeads(
     }
     
     const snapshot = await queryRef.get();
+    
+    console.log(`[getServerLeads] Found ${snapshot.size} leads for companyId: ${companyId}`);
     
     const leads: Lead[] = [];
     snapshot.forEach((doc: admin.firestore.QueryDocumentSnapshot) => {
@@ -142,6 +146,8 @@ export async function getServerLeadsPaginated(
     return { leads: [], total: 0 };
   }
 
+  console.log(`[getServerLeadsPaginated] Fetching leads for companyId: ${companyId}, limit: ${options.limit}, offset: ${options.offset}`);
+
   try {
     let baseQuery: any = adminDb
       .collection('leads')
@@ -154,6 +160,8 @@ export async function getServerLeadsPaginated(
     // Get total count first
     const countSnapshot = await baseQuery.count().get();
     const total = countSnapshot.data().count;
+    
+    console.log(`[getServerLeadsPaginated] Total count for companyId ${companyId}: ${total}`);
     
     // For offset pagination, we need to skip documents
     // This is not ideal for large datasets but works for MVP
