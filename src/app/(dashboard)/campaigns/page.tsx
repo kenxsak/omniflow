@@ -62,14 +62,14 @@ export default function CampaignsPage() {
     switch (status.toLowerCase()) {
       case 'sent':
       case 'completed':
-        return <Badge variant="secondary" className="text-[10px]">Sent</Badge>;
+        return <Badge className="text-[10px] bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0">Sent</Badge>;
       case 'sending':
       case 'processing':
-        return <Badge variant="secondary" className="text-[10px]">Sending</Badge>;
+        return <Badge className="text-[10px] bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-0">Sending</Badge>;
       case 'failed':
-        return <Badge variant="secondary" className="text-[10px]">Failed</Badge>;
+        return <Badge className="text-[10px] bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border-0">Failed</Badge>;
       case 'draft':
-        return <Badge variant="secondary" className="text-[10px]">Draft</Badge>;
+        return <Badge className="text-[10px] bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-0">Draft</Badge>;
       default:
         return <Badge variant="secondary" className="text-[10px]">{status}</Badge>;
     }
@@ -115,7 +115,7 @@ export default function CampaignsPage() {
                 Compose
               </Link>
             </Button>
-            <Button asChild size="sm" className="h-8 shadow-sm">
+            <Button asChild size="sm" className="h-8 shadow-sm text-white" style={{ background: 'linear-gradient(to right, #8b5cf6, #a855f7)' }}>
               <Link href="/campaigns/ai-email">
                 <Icon icon="solar:magic-stick-3-linear" className="mr-1.5 h-4 w-4" />
                 AI Studio
@@ -130,18 +130,19 @@ export default function CampaignsPage() {
       {/* Quick Actions */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { href: '/campaigns/compose-email', icon: 'solar:pen-new-square-linear', title: 'Write Email', desc: 'No AI credits' },
-          { href: '/campaigns/ai-email', icon: 'solar:magic-stick-3-linear', title: 'AI Studio', desc: 'Generate with AI' },
-          { href: '/campaigns/templates', icon: 'solar:document-text-linear', title: 'Templates', desc: 'Ready designs' },
-          { href: '/campaigns/ai-email/saved-templates', icon: 'solar:letter-linear', title: 'Saved', desc: 'Your templates' },
+          { href: '/campaigns/compose-email', icon: 'solar:pen-new-square-linear', title: 'Write Email', desc: 'No AI credits', color: '#3b82f6' },
+          { href: '/campaigns/ai-email', icon: 'solar:magic-stick-3-linear', title: 'AI Studio', desc: 'Generate with AI', color: '#8b5cf6' },
+          { href: '/campaigns/templates', icon: 'solar:document-text-linear', title: 'Templates', desc: 'Ready designs', color: '#14b8a6' },
+          { href: '/campaigns/ai-email/saved-templates', icon: 'solar:letter-linear', title: 'Saved', desc: 'Your templates', color: '#10b981' },
         ].map((item) => (
           <Link 
             key={item.href}
             href={item.href}
             className="group relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden hover:border-stone-300 dark:hover:border-stone-700 transition-all"
           >
-            <div className="flex flex-col items-center gap-1.5 p-4">
-              <Icon icon={item.icon} className="h-5 w-5 text-muted-foreground" />
+            <div className="absolute inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: item.color }} />
+            <div className="flex flex-col items-center gap-1.5 p-4 pt-5">
+              <Icon icon={item.icon} className="h-5 w-5" style={{ color: item.color }} />
               <span className="text-sm font-medium text-center">{item.title}</span>
               <span className="text-[10px] text-muted-foreground text-center">{item.desc}</span>
             </div>
@@ -152,37 +153,37 @@ export default function CampaignsPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full" style={{ background: '#3b82f6' }} />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Total</span>
-              <Icon icon="solar:paper-plane-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:paper-plane-linear" className="h-4 w-4" style={{ color: '#3b82f6' }} />
             </div>
-            <p className="text-2xl font-semibold tabular-nums">
+            <p className="text-2xl font-semibold tabular-nums" style={{ color: '#3b82f6' }}>
               {isLoading ? <Icon icon="solar:refresh-linear" className="h-5 w-5 animate-spin" /> : allCampaigns.length}
             </p>
           </div>
         </div>
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full" style={{ background: '#14b8a6' }} />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Email</span>
-              <Icon icon="solar:letter-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:letter-linear" className="h-4 w-4" style={{ color: '#14b8a6' }} />
             </div>
-            <p className="text-2xl font-semibold tabular-nums">
+            <p className="text-2xl font-semibold tabular-nums" style={{ color: '#14b8a6' }}>
               {isLoading ? <Icon icon="solar:refresh-linear" className="h-5 w-5 animate-spin" /> : emailCampaigns.length}
             </p>
           </div>
         </div>
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full" style={{ background: '#10b981' }} />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">SMS/WA</span>
-              <Icon icon="solar:chat-square-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:chat-square-linear" className="h-4 w-4" style={{ color: '#10b981' }} />
             </div>
-            <p className="text-2xl font-semibold tabular-nums">
+            <p className="text-2xl font-semibold tabular-nums" style={{ color: '#10b981' }}>
               {isLoading ? <Icon icon="solar:refresh-linear" className="h-5 w-5 animate-spin" /> : smsCampaigns.length + whatsappCampaigns.length}
             </p>
           </div>
@@ -191,10 +192,13 @@ export default function CampaignsPage() {
 
       {/* Campaign List */}
       <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-        <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
-        <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+        <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #8b5cf6, #a855f7)' }} />
+        <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between" style={{ background: 'linear-gradient(to right, rgba(139, 92, 246, 0.05), rgba(168, 85, 247, 0.05))' }}>
           <div>
-            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Your Campaigns</span>
+            <div className="flex items-center gap-2">
+              <Icon icon="solar:paper-plane-linear" className="h-4 w-4" style={{ color: '#8b5cf6' }} />
+              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Your Campaigns</span>
+            </div>
             <p className="text-xs text-muted-foreground mt-0.5">View and manage all campaigns</p>
           </div>
           <Button asChild variant="outline" size="sm" className="h-7 text-xs shadow-sm">
@@ -208,10 +212,10 @@ export default function CampaignsPage() {
         {/* Tabs */}
         <div className="flex items-stretch gap-6 px-4 border-b border-stone-200 dark:border-stone-800">
           {[
-            { key: 'all', label: 'All', count: allCampaigns.length },
-            { key: 'email', label: 'Email', count: emailCampaigns.length },
-            { key: 'sms', label: 'SMS', count: smsCampaigns.length },
-            { key: 'whatsapp', label: 'WhatsApp', count: whatsappCampaigns.length },
+            { key: 'all', label: 'All', count: allCampaigns.length, color: '#3b82f6' },
+            { key: 'email', label: 'Email', count: emailCampaigns.length, color: '#14b8a6' },
+            { key: 'sms', label: 'SMS', count: smsCampaigns.length, color: '#f59e0b' },
+            { key: 'whatsapp', label: 'WhatsApp', count: whatsappCampaigns.length, color: '#10b981' },
           ].map((tab) => (
             <button
               key={tab.key}
@@ -223,9 +227,9 @@ export default function CampaignsPage() {
               }`}
             >
               {activeTab === tab.key && (
-                <span className="absolute left-0 top-full h-px w-full bg-foreground" />
+                <span className="absolute left-0 top-full h-0.5 w-full rounded-t-full" style={{ background: tab.color }} />
               )}
-              {tab.label} ({tab.count})
+              {tab.label} <span style={{ color: activeTab === tab.key ? tab.color : undefined }}>({tab.count})</span>
             </button>
           ))}
         </div>
@@ -272,7 +276,14 @@ export default function CampaignsPage() {
                         <tr key={`${campaign.type}-${campaign.id || index}`} className="border-t border-stone-200 dark:border-stone-800 hover:bg-muted/30 transition-colors group">
                           <td className="py-3 px-3">
                             <div className="flex items-center gap-2">
-                              <Icon icon={campaign.icon} className="h-4 w-4 text-muted-foreground" />
+                              <Icon 
+                                icon={campaign.icon} 
+                                className="h-4 w-4" 
+                                style={{ 
+                                  color: campaign.type === 'email' ? '#14b8a6' : 
+                                         campaign.type === 'sms' ? '#f59e0b' : '#10b981' 
+                                }} 
+                              />
                               <span className="capitalize text-xs">{campaign.type}</span>
                             </div>
                           </td>

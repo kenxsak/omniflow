@@ -174,11 +174,14 @@ export default function LeadDossierPage() {
                 <div className="lg:col-span-2 space-y-4 sm:space-y-6">
                     {/* Lead Information Card */}
                     <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-                        <div className="absolute inset-x-8 sm:inset-x-12 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
-                        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800">
-                            <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                                Lead Information
-                            </span>
+                        <div className="absolute inset-x-8 sm:inset-x-12 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #3b82f6, #6366f1)' }} />
+                        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800" style={{ background: 'linear-gradient(to right, rgba(59, 130, 246, 0.05), rgba(99, 102, 241, 0.05))' }}>
+                            <div className="flex items-center gap-2">
+                                <Icon icon="solar:user-id-linear" className="h-4 w-4" style={{ color: '#3b82f6' }} />
+                                <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                    Lead Information
+                                </span>
+                            </div>
                         </div>
                         <div className="p-4 sm:p-5">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
@@ -237,28 +240,28 @@ export default function LeadDossierPage() {
                             <TabsList className="w-full h-auto p-0 bg-transparent border-b border-stone-200 dark:border-stone-800 rounded-none grid grid-cols-4">
                                 <TabsTrigger 
                                     value="activity" 
-                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-xs sm:text-sm"
+                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-500 data-[state=active]:bg-transparent text-xs sm:text-sm data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400"
                                 >
                                     <Icon icon="solar:chart-2-linear" className="h-4 w-4" />
                                     <span className="hidden sm:inline">Activity</span>
                                 </TabsTrigger>
                                 <TabsTrigger 
                                     value="deals" 
-                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-xs sm:text-sm"
+                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:bg-transparent text-xs sm:text-sm data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400"
                                 >
                                     <Icon icon="solar:dollar-linear" className="h-4 w-4" />
                                     <span className="hidden sm:inline">Deals</span>
                                 </TabsTrigger>
                                 <TabsTrigger 
                                     value="tasks" 
-                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-xs sm:text-sm"
+                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-amber-500 data-[state=active]:bg-transparent text-xs sm:text-sm data-[state=active]:text-amber-600 dark:data-[state=active]:text-amber-400"
                                 >
                                     <Icon icon="solar:checklist-linear" className="h-4 w-4" />
                                     <span className="hidden sm:inline">Tasks</span>
                                 </TabsTrigger>
                                 <TabsTrigger 
                                     value="appointments" 
-                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent text-xs sm:text-sm"
+                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent text-xs sm:text-sm data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400"
                                 >
                                     <Icon icon="solar:calendar-linear" className="h-4 w-4" />
                                     <span className="hidden sm:inline">Appointments</span>
@@ -406,11 +409,14 @@ export default function LeadDossierPage() {
 
                     {/* Sync Status Card */}
                     <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-                        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
-                        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800">
-                            <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                                Sync Status
-                            </span>
+                        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #14b8a6, #10b981)' }} />
+                        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800" style={{ background: 'linear-gradient(to right, rgba(20, 184, 166, 0.05), rgba(16, 185, 129, 0.05))' }}>
+                            <div className="flex items-center gap-2">
+                                <Icon icon="solar:refresh-circle-linear" className="h-4 w-4" style={{ color: '#14b8a6' }} />
+                                <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                    Sync Status
+                                </span>
+                            </div>
                         </div>
                         <div className="p-4 sm:p-5 space-y-3">
                             <div className={`flex items-center gap-3 p-3 rounded-lg border ${
@@ -446,11 +452,14 @@ export default function LeadDossierPage() {
 
                     {/* Notes Card */}
                     <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-                        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
-                        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800">
-                            <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                                Notes
-                            </span>
+                        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #f59e0b, #f97316)' }} />
+                        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800" style={{ background: 'linear-gradient(to right, rgba(245, 158, 11, 0.05), rgba(249, 115, 22, 0.05))' }}>
+                            <div className="flex items-center gap-2">
+                                <Icon icon="solar:notes-linear" className="h-4 w-4" style={{ color: '#f59e0b' }} />
+                                <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                    Notes
+                                </span>
+                            </div>
                         </div>
                         <div className="p-4 sm:p-5">
                             <div className="p-3 bg-muted/50 rounded-lg border border-stone-200 dark:border-stone-700 max-h-40 overflow-y-auto">

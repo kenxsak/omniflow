@@ -21,6 +21,9 @@ export function DashboardMetrics({ dealStats, leadCount }: DashboardMetricsProps
       prefix: '$',
       icon: 'solar:wallet-linear',
       subtitle: `${dealStats?.openDeals || 0} open deals`,
+      accentColor: 'bg-[oklch(0.55_0.15_250)] dark:bg-[oklch(0.65_0.16_250)]', // Blue
+      iconColor: 'text-[oklch(0.55_0.15_250)] dark:text-[oklch(0.65_0.16_250)]',
+      valueColor: '#3b82f6', // Blue
     },
     {
       title: 'WON REVENUE',
@@ -28,6 +31,9 @@ export function DashboardMetrics({ dealStats, leadCount }: DashboardMetricsProps
       prefix: '$',
       icon: 'solar:cup-star-linear',
       subtitle: `${dealStats?.wonDeals || 0} deals closed`,
+      accentColor: 'bg-[oklch(0.60_0.16_145)] dark:bg-[oklch(0.68_0.17_145)]', // Green
+      iconColor: 'text-[oklch(0.60_0.16_145)] dark:text-[oklch(0.68_0.17_145)]',
+      valueColor: '#10b981', // Emerald
     },
     {
       title: 'CONVERSION RATE',
@@ -36,12 +42,18 @@ export function DashboardMetrics({ dealStats, leadCount }: DashboardMetricsProps
       decimals: 1,
       icon: 'solar:chart-linear',
       subtitle: 'Deals won vs closed',
+      accentColor: 'bg-[oklch(0.70_0.14_70)] dark:bg-[oklch(0.75_0.15_70)]', // Amber
+      iconColor: 'text-[oklch(0.70_0.14_70)] dark:text-[oklch(0.75_0.15_70)]',
+      valueColor: '#f59e0b', // Amber
     },
     {
       title: 'TOTAL CONTACTS',
       value: leadCount,
       icon: 'solar:users-group-two-rounded-linear',
       subtitle: leadCount > 0 ? 'In your CRM' : 'Add contacts to start',
+      accentColor: 'bg-[oklch(0.55_0.15_300)] dark:bg-[oklch(0.65_0.16_300)]', // Purple
+      iconColor: 'text-[oklch(0.55_0.15_300)] dark:text-[oklch(0.65_0.16_300)]',
+      valueColor: '#8b5cf6', // Purple
     },
   ];
 
@@ -50,17 +62,17 @@ export function DashboardMetrics({ dealStats, leadCount }: DashboardMetricsProps
       {metrics.map((metric) => (
         <StaggerItem key={metric.title}>
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-            {/* Accent bar at top - Clerk style */}
-            <div className="absolute inset-x-8 sm:inset-x-12 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            {/* Colored accent bar at top */}
+            <div className={`absolute inset-x-8 sm:inset-x-12 top-0 h-0.5 rounded-b-full ${metric.accentColor}`} />
             
             <div className="p-3 sm:p-4 pt-4 sm:pt-5">
               <div className="flex items-center justify-between mb-2 sm:mb-3">
                 <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground">
                   {metric.title}
                 </span>
-                <Icon icon={metric.icon} className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground/60" />
+                <Icon icon={metric.icon} className={`h-4 w-4 sm:h-5 sm:w-5 ${metric.iconColor}`} />
               </div>
-              <div className="text-lg sm:text-2xl font-semibold tracking-tight tabular-nums text-foreground">
+              <div className="text-lg sm:text-2xl font-semibold tracking-tight tabular-nums" style={{ color: metric.valueColor }}>
                 <AnimatedCounter 
                   value={metric.value} 
                   prefix={metric.prefix}

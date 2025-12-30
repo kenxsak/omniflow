@@ -20,11 +20,11 @@ interface PerformanceChartProps {
 const chartConfig = {
   leads: {
     label: "New Leads",
-    color: "hsl(var(--chart-1))",
+    color: "var(--chart-1)",
   },
   emails: {
     label: "Emails Sent",
-    color: "hsl(var(--chart-2))",
+    color: "var(--chart-2)",
   },
 } satisfies ChartConfig
 
@@ -68,13 +68,13 @@ export default function PerformanceChart({ data }: PerformanceChartProps) {
             dataKey="leads"
             fill="var(--color-leads)"
             radius={4}
-            activeBar={<Rectangle fill="hsl(var(--chart-1))" opacity={0.75} />}
+            activeBar={<Rectangle fill="var(--chart-1)" opacity={0.75} />}
           />
           <Bar
             dataKey="emails"
             fill="var(--color-emails)"
             radius={4}
-            activeBar={<Rectangle fill="hsl(var(--chart-2))" opacity={0.75} />}
+            activeBar={<Rectangle fill="var(--chart-2)" opacity={0.75} />}
           />
         </BarChart>
       </ChartContainer>

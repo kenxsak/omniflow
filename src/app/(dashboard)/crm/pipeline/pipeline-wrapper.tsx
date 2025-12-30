@@ -150,23 +150,39 @@ export function PipelineWrapper() {
       
       {/* Summary Stats - Clerk style cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
-        {statuses.map(status => (
+        {statuses.map(status => {
+          // Colorful accent bars for each status
+          const statusAccentColors: Record<Lead['status'], string> = {
+            New: 'bg-blue-500 dark:bg-blue-400',
+            Contacted: 'bg-amber-500 dark:bg-amber-400',
+            Qualified: 'bg-emerald-500 dark:bg-emerald-400',
+            Won: 'bg-violet-500 dark:bg-violet-400',
+            Lost: 'bg-rose-500 dark:bg-rose-400',
+          };
+          const statusIconColors: Record<Lead['status'], string> = {
+            New: 'text-blue-500 dark:text-blue-400',
+            Contacted: 'text-amber-500 dark:text-amber-400',
+            Qualified: 'text-emerald-500 dark:text-emerald-400',
+            Won: 'text-violet-500 dark:text-violet-400',
+            Lost: 'text-rose-500 dark:text-rose-400',
+          };
+          return (
           <div 
             key={status} 
             className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden"
           >
             {/* Accent bar */}
-            <div className="absolute inset-x-6 sm:inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className={cn("absolute inset-x-6 sm:inset-x-8 top-0 h-0.5 rounded-b-full", statusAccentColors[status])} />
             
             <div className="p-3 sm:p-4 pt-4 sm:pt-5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                   {status.toUpperCase()}
                 </span>
-                <Icon icon={statusIcons[status]} className="h-4 w-4 text-muted-foreground/60" />
+                <Icon icon={statusIcons[status]} className={cn("h-4 w-4", statusIconColors[status])} />
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">
+                <span className={cn("text-xl sm:text-2xl font-semibold tabular-nums", statusIconColors[status])}>
                   {leadsByStatus[status].length}
                 </span>
                 {/* Status dot indicator */}
@@ -179,7 +195,7 @@ export function PipelineWrapper() {
               </div>
             </div>
           </div>
-        ))}
+        )})}
       </div>
 
       {/* Mobile: Tabs View */}
@@ -223,10 +239,18 @@ export function PipelineWrapper() {
 
       {/* Desktop: Grid View */}
       <div className="hidden lg:grid lg:grid-cols-5 gap-3">
-        {statuses.map(status => (
+        {statuses.map(status => {
+          const columnHeaderBg: Record<Lead['status'], string> = {
+            New: 'bg-gradient-to-r from-blue-50 to-blue-50/50 dark:from-blue-950/30 dark:to-blue-950/10',
+            Contacted: 'bg-gradient-to-r from-amber-50 to-amber-50/50 dark:from-amber-950/30 dark:to-amber-950/10',
+            Qualified: 'bg-gradient-to-r from-emerald-50 to-emerald-50/50 dark:from-emerald-950/30 dark:to-emerald-950/10',
+            Won: 'bg-gradient-to-r from-violet-50 to-violet-50/50 dark:from-violet-950/30 dark:to-violet-950/10',
+            Lost: 'bg-gradient-to-r from-rose-50 to-rose-50/50 dark:from-rose-950/30 dark:to-rose-950/10',
+          };
+          return (
           <div key={status} className="space-y-3">
-            {/* Column header - Clerk style */}
-            <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
+            {/* Column header - with subtle color */}
+            <div className={cn("flex items-center gap-2 px-3 py-2.5 rounded-xl border border-stone-200 dark:border-stone-800", columnHeaderBg[status])}>
               <span className={cn(
                 "size-2 border-[1.5px] rounded-full",
                 statusDotColors[status]
@@ -248,7 +272,7 @@ export function PipelineWrapper() {
               )}
             </div>
           </div>
-        ))}
+        )})}
       </div>
 
       <AppointmentDialog

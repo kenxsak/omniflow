@@ -114,20 +114,36 @@ export function PipelineClient({ leadsByStatus, statuses }: PipelineClientProps)
       
       {/* Summary Stats - Clerk style cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
-        {statuses.map(status => (
+        {statuses.map(status => {
+          // Colorful accent bars for each status
+          const statusAccentColors: Record<Lead['status'], string> = {
+            New: 'bg-blue-500 dark:bg-blue-400',
+            Contacted: 'bg-amber-500 dark:bg-amber-400',
+            Qualified: 'bg-emerald-500 dark:bg-emerald-400',
+            Won: 'bg-violet-500 dark:bg-violet-400',
+            Lost: 'bg-rose-500 dark:bg-rose-400',
+          };
+          const statusIconColors: Record<Lead['status'], string> = {
+            New: 'text-blue-500 dark:text-blue-400',
+            Contacted: 'text-amber-500 dark:text-amber-400',
+            Qualified: 'text-emerald-500 dark:text-emerald-400',
+            Won: 'text-violet-500 dark:text-violet-400',
+            Lost: 'text-rose-500 dark:text-rose-400',
+          };
+          return (
           <div 
             key={status} 
             className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden"
           >
             {/* Accent bar */}
-            <div className="absolute inset-x-6 sm:inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className={cn("absolute inset-x-6 sm:inset-x-8 top-0 h-0.5 rounded-b-full", statusAccentColors[status])} />
             
             <div className="p-3 sm:p-4 pt-4 sm:pt-5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                   {status.toUpperCase()}
                 </span>
-                <Icon icon={statusIcons[status]} className="h-4 w-4 text-muted-foreground/60" />
+                <Icon icon={statusIcons[status]} className={cn("h-4 w-4", statusIconColors[status])} />
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">
@@ -143,7 +159,7 @@ export function PipelineClient({ leadsByStatus, statuses }: PipelineClientProps)
               </div>
             </div>
           </div>
-        ))}
+        )})}
       </div>
 
       {/* Mobile: Tabs View */}

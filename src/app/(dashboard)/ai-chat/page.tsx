@@ -44,10 +44,6 @@ export default function AIChatPage() {
     <div className="min-h-screen pb-20">
       {/* Hero Header */}
       <div ref={headerRef} className="text-center py-8 px-4">
-        <div className="flex justify-end mb-4 max-w-5xl mx-auto">
-          <ContextualHelpButton pageId="ai-chat" />
-        </div>
-        
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-stone-100 dark:bg-stone-800 text-xs font-medium text-muted-foreground mb-4">
           <Icon icon="solar:magic-stick-3-linear" className="h-3.5 w-3.5" />
           AI-Powered Assistant
@@ -216,6 +212,9 @@ export default function AIChatPage() {
           </div>
         </div>
       </div>
+
+      {/* Help Button - Fixed Bottom Right */}
+      <ContextualHelpButton pageId="ai-chat" />
     </div>
   );
 }

@@ -38,6 +38,7 @@ import {
 } from '@/app/actions/appointment-actions';
 import type { Appointment, AppointmentFilter, AppointmentStats, CreateAppointmentInput, UpdateAppointmentInput } from '@/types/appointments';
 import { AnimatedCounter } from '@/components/ui/animated';
+import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 
 export default function AppointmentsPage() {
   const { appUser } = useAuth();
@@ -343,6 +344,7 @@ export default function AppointmentsPage() {
               size="sm"
               onClick={() => setShowCreateDialog(true)}
               className="h-8 text-xs"
+              style={{ background: 'linear-gradient(to right, #3b82f6, #6366f1)' }}
             >
               <Icon icon="solar:add-circle-linear" className="h-3.5 w-3.5 mr-1.5" />
               New Appointment
@@ -372,6 +374,7 @@ export default function AppointmentsPage() {
             size="sm"
             onClick={() => setShowCreateDialog(true)}
             className="h-8 text-xs shrink-0"
+            style={{ background: 'linear-gradient(to right, #3b82f6, #6366f1)' }}
           >
             <Icon icon="solar:add-circle-linear" className="h-3.5 w-3.5 mr-1" />
             New
@@ -384,16 +387,16 @@ export default function AppointmentsPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
           {/* Total */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: '#3b82f6' }} />
             <div className="p-3 sm:p-4 pt-4 sm:pt-5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                   TOTAL
                 </span>
-                <Icon icon="solar:calendar-linear" className="h-4 w-4 text-muted-foreground/60" />
+                <Icon icon="solar:calendar-linear" className="h-4 w-4" style={{ color: '#3b82f6' }} />
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">
+                <span className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: '#3b82f6' }}>
                   <AnimatedCounter value={stats.total} />
                 </span>
                 <span className={`size-1.5 sm:size-2 border-[1.5px] rounded-full ${statDotColors.total}`} />
@@ -404,16 +407,16 @@ export default function AppointmentsPage() {
           
           {/* Scheduled */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: '#f59e0b' }} />
             <div className="p-3 sm:p-4 pt-4 sm:pt-5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                   SCHEDULED
                 </span>
-                <Icon icon="solar:calendar-mark-linear" className="h-4 w-4 text-muted-foreground/60" />
+                <Icon icon="solar:calendar-mark-linear" className="h-4 w-4" style={{ color: '#f59e0b' }} />
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">
+                <span className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: '#f59e0b' }}>
                   <AnimatedCounter value={stats.scheduled} />
                 </span>
                 <span className={`size-1.5 sm:size-2 border-[1.5px] rounded-full ${statDotColors.scheduled}`} />
@@ -424,16 +427,16 @@ export default function AppointmentsPage() {
           
           {/* Completed */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: '#10b981' }} />
             <div className="p-3 sm:p-4 pt-4 sm:pt-5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                   COMPLETED
                 </span>
-                <Icon icon="solar:check-circle-linear" className="h-4 w-4 text-muted-foreground/60" />
+                <Icon icon="solar:check-circle-linear" className="h-4 w-4" style={{ color: '#10b981' }} />
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">
+                <span className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: '#10b981' }}>
                   <AnimatedCounter value={stats.completed} />
                 </span>
                 <span className={`size-1.5 sm:size-2 border-[1.5px] rounded-full ${statDotColors.completed}`} />
@@ -444,16 +447,16 @@ export default function AppointmentsPage() {
           
           {/* This Week */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: '#8b5cf6' }} />
             <div className="p-3 sm:p-4 pt-4 sm:pt-5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                   THIS WEEK
                 </span>
-                <Icon icon="solar:calendar-date-linear" className="h-4 w-4 text-muted-foreground/60" />
+                <Icon icon="solar:calendar-date-linear" className="h-4 w-4" style={{ color: '#8b5cf6' }} />
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">
+                <span className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: '#8b5cf6' }}>
                   <AnimatedCounter value={stats.upcomingThisWeek} />
                 </span>
                 <span className={`size-1.5 sm:size-2 border-[1.5px] rounded-full ${statDotColors.thisWeek}`} />
@@ -466,10 +469,10 @@ export default function AppointmentsPage() {
 
       {/* Appointments List Card - Clerk style */}
       <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-        <div className="absolute inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
-        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800">
+        <div className="absolute inset-x-14 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #6366f1, #8b5cf6)' }} />
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800" style={{ background: 'linear-gradient(to right, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05))' }}>
           <div className="flex items-center gap-2">
-            <Icon icon="solar:calendar-linear" className="h-4 w-4 text-muted-foreground/60" />
+            <Icon icon="solar:calendar-linear" className="h-4 w-4" style={{ color: '#6366f1' }} />
             <span className="text-sm font-medium text-foreground">All Appointments</span>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
@@ -569,6 +572,9 @@ export default function AppointmentsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Help Button - Fixed Bottom Right */}
+      <ContextualHelpButton pageId="appointments" />
     </div>
   );
 }

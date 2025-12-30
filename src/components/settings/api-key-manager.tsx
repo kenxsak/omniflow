@@ -224,7 +224,7 @@ const initialServices: ApiServiceIntegration[] = [
       { id: 'apiKey', label: 'Gupshup API Key', value: '', isProtected: true, placeholder: 'Enter your Gupshup API key', helperText: 'Get this from your Gupshup dashboard (Settings → API Keys)' },
       { id: 'appName', label: 'App ID (or App Name)', value: '', isProtected: false, placeholder: 'b6eb9204-70fd-45c5-89d3-250adcfe3ac9', helperText: 'For 2024 API: Enter the long "App ID" from Gupshup dashboard (UUID format like b6eb9204-70fd...). For legacy API: Use the short App Name instead.' },
       { id: 'srcName', label: 'App Name (for sending)', value: '', isProtected: false, placeholder: 'PosiblePos', helperText: 'REQUIRED for message delivery: Enter your App Name exactly as shown in Gupshup dashboard (e.g., "PosiblePos"). This is different from the App ID above.' },
-      { id: 'phoneNumber', label: 'Business WhatsApp Number', value: '', isProtected: false, placeholder: '+918169123261', helperText: 'Your WhatsApp Business phone number with country code (e.g., +918169123261)' },
+      { id: 'phoneNumber', label: 'Business WhatsApp Number', value: '', isProtected: false, placeholder: '918169123261', helperText: 'Your WhatsApp Business phone number with country code (e.g., 918169123261)' },
     ],
     documentationLink: 'https://docs.gupshup.io/docs/whatsapp-api-documentation',
     affiliateLink: 'https://www.gupshup.io',

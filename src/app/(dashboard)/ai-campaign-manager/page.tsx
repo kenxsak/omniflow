@@ -303,10 +303,10 @@ export default function AiAdsManagerPage() {
         {activeTab === 'keywords' && (
           <div className="space-y-4">
             <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-blue-500 dark:bg-blue-400" />
               <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-2 mb-1">
-                  <Icon icon="solar:magnifer-linear" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:magnifer-linear" className="h-4 w-4 text-blue-500 dark:text-blue-400" />
                   <h2 className="text-sm font-semibold">Google Ads Keyword Planner</h2>
                 </div>
                 <p className="text-xs text-muted-foreground mb-4">Generate keyword ideas with AI-estimated competition and CPC ranges.</p>
@@ -340,10 +340,10 @@ export default function AiAdsManagerPage() {
         {activeTab === 'google' && (
           <div className="space-y-4">
             <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-emerald-500 dark:bg-emerald-400" />
               <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-2 mb-1">
-                  <Icon icon="solar:text-bold-linear" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:text-bold-linear" className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
                   <h2 className="text-sm font-semibold">Google Search Ad Copy</h2>
                 </div>
                 <p className="text-xs text-muted-foreground mb-4">Generate headlines and descriptions for Google Search campaigns.</p>
@@ -366,10 +366,10 @@ export default function AiAdsManagerPage() {
         {activeTab === 'facebook' && (
           <div className="space-y-4">
             <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-indigo-500 dark:bg-indigo-400" />
               <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-2 mb-1">
-                  <Icon icon="solar:gallery-linear" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:gallery-linear" className="h-4 w-4 text-indigo-500 dark:text-indigo-400" />
                   <h2 className="text-sm font-semibold">Facebook & Instagram Ads</h2>
                 </div>
                 <p className="text-xs text-muted-foreground mb-4">Create engaging ad content for Meta platforms.</p>
@@ -394,10 +394,10 @@ export default function AiAdsManagerPage() {
         {activeTab === 'linkedin' && (
           <div className="space-y-4">
             <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-sky-500 dark:bg-sky-400" />
               <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-2 mb-1">
-                  <Icon icon="solar:case-linear" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:case-linear" className="h-4 w-4 text-sky-500 dark:text-sky-400" />
                   <h2 className="text-sm font-semibold">LinkedIn Ads</h2>
                 </div>
                 <p className="text-xs text-muted-foreground mb-4">Generate professional B2B ad content for LinkedIn.</p>
@@ -422,10 +422,10 @@ export default function AiAdsManagerPage() {
         {activeTab === 'youtube' && (
           <div className="space-y-4">
             <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-rose-500 dark:bg-rose-400" />
               <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-2 mb-1">
-                  <Icon icon="solar:play-circle-linear" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:play-circle-linear" className="h-4 w-4 text-rose-500 dark:text-rose-400" />
                   <h2 className="text-sm font-semibold">YouTube Ads</h2>
                 </div>
                 <p className="text-xs text-muted-foreground mb-4">Create video ad scripts and campaign strategies for YouTube.</p>
@@ -449,10 +449,10 @@ export default function AiAdsManagerPage() {
         {activeTab === 'tiktok' && (
           <div className="space-y-4">
             <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-fuchsia-500 dark:bg-fuchsia-400" />
               <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-2 mb-1">
-                  <Icon icon="solar:music-note-linear" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:music-note-linear" className="h-4 w-4 text-fuchsia-500 dark:text-fuchsia-400" />
                   <h2 className="text-sm font-semibold">TikTok & Reels Ads</h2>
                 </div>
                 <p className="text-xs text-muted-foreground mb-4">Generate trendy short-form video ad concepts.</p>

@@ -204,31 +204,31 @@ export default function AICampaignDraftsPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-3 gap-3">
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-blue-500 dark:bg-blue-400" />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Total Drafts</span>
-              <Icon icon="solar:document-text-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:document-text-linear" className="h-4 w-4 text-blue-500 dark:text-blue-400" />
             </div>
             <p className="text-2xl font-semibold tabular-nums">{drafts.length}</p>
           </div>
         </div>
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-emerald-500 dark:bg-emerald-400" />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Published</span>
-              <Icon icon="solar:check-circle-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:check-circle-linear" className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
             </div>
             <p className="text-2xl font-semibold tabular-nums">{drafts.filter(d => d.status === 'published').length}</p>
           </div>
         </div>
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-amber-500 dark:bg-amber-400" />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">In Progress</span>
-              <Icon icon="solar:pen-new-square-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:pen-new-square-linear" className="h-4 w-4 text-amber-500 dark:text-amber-400" />
             </div>
             <p className="text-2xl font-semibold tabular-nums">{drafts.filter(d => d.status === 'draft').length}</p>
           </div>
@@ -237,7 +237,7 @@ export default function AICampaignDraftsPage() {
 
       {/* Drafts List */}
       <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-        <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+        <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-purple-500 dark:bg-purple-400" />
         <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
           <div>
             <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Saved Drafts</span>

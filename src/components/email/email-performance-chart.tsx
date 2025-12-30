@@ -26,15 +26,15 @@ interface EmailPerformanceChartProps {
 const chartConfig = {
   sent: {
     label: "Sent",
-    color: "hsl(var(--chart-1))",
+    color: "var(--chart-1)",
   },
   opened: {
     label: "Opened",
-    color: "hsl(var(--chart-2))",
+    color: "var(--chart-2)",
   },
   clicked: {
     label: "Clicked",
-    color: "hsl(var(--chart-3))",
+    color: "var(--chart-3)",
   },
 } satisfies ChartConfig
 

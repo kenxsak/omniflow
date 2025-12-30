@@ -18,6 +18,7 @@ import { AiChatbotIcon } from '@/components/icons/ai-chatbot-icon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { ColorExtractor } from '@/components/digital-card/color-extractor';
+import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 
 export default function CreateDigitalCardPage() {
   const router = useRouter();
@@ -1021,6 +1022,9 @@ export default function CreateDigitalCardPage() {
           </Button>
         </div>
       </div>
+
+      {/* Help Button - Fixed Bottom Right */}
+      <ContextualHelpButton pageId="digital-card-create" />
     </div>
   );
 }

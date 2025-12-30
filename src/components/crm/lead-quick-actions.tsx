@@ -162,9 +162,9 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
   return (
     <>
       <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
-        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800 flex items-center gap-2">
-          <Icon icon="solar:chat-round-dots-linear" className="h-4 w-4 text-muted-foreground" />
+        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #6366f1, #8b5cf6)' }} />
+        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800 flex items-center gap-2" style={{ background: 'linear-gradient(to right, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05))' }}>
+          <Icon icon="solar:chat-round-dots-linear" className="h-4 w-4" style={{ color: '#6366f1' }} />
           <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
             Quick Actions
           </span>
@@ -203,7 +203,7 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
                 className="w-full justify-start gap-2 h-10 border-stone-200 dark:border-stone-700 hover:bg-muted/50" 
                 disabled={!lead.email}
               >
-                <Icon icon="solar:letter-linear" className="h-4 w-4 text-muted-foreground" />
+                <Icon icon="solar:letter-linear" className="h-4 w-4" style={{ color: '#3b82f6' }} />
                 <span className="flex-1 text-left text-sm">Email</span>
                 <Icon icon="solar:alt-arrow-down-linear" className="h-3 w-3 text-muted-foreground" />
               </Button>
@@ -227,7 +227,7 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
             onClick={handleCall}
             disabled={!lead.phone}
           >
-            <Icon icon="solar:phone-linear" className="h-4 w-4 text-muted-foreground" />
+            <Icon icon="solar:phone-linear" className="h-4 w-4" style={{ color: '#10b981' }} />
             <span className="flex-1 text-left text-sm truncate">
               Call {lead.phone ? lead.phone : '(No phone)'}
             </span>

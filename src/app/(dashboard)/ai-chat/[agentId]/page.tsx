@@ -81,7 +81,7 @@ export default function AgentChatPage() {
       {/* Chat Container - matching card style */}
       <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
         {/* Top accent line like dashboard cards */}
-        <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+        <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-purple-500 dark:bg-purple-400" />
         
         <div className="h-[calc(100vh-200px)] flex">
           {/* Desktop Sidebar */}

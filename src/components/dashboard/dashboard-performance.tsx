@@ -34,7 +34,7 @@ export function DashboardPerformance({
         <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
           {/* Week over Week - Clerk style */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-[oklch(0.55_0.15_250)] dark:bg-[oklch(0.65_0.16_250)]" />
             <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
               <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                 WEEK OVER WEEK
@@ -121,7 +121,7 @@ export function DashboardPerformance({
 
           {/* Top Performers / Your Performance - Clerk style */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-[oklch(0.70_0.14_70)] dark:bg-[oklch(0.75_0.15_70)]" />
             <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-stone-200 dark:border-stone-800">
               <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                 {topPerformers.length > 1 ? 'TOP PERFORMERS' : 'YOUR PERFORMANCE'}

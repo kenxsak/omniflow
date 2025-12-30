@@ -22,6 +22,7 @@ import { getCompany, getStoredPlans } from '@/lib/saas-data';
 import type { Plan } from '@/types/saas';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Link from 'next/link';
+import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 
 // Landing page templates with better previews
 const pageTemplates = [
@@ -701,18 +702,18 @@ export default function LandingPagesPage() {
               {/* Stats Summary */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
-                  { label: 'Total Pages', value: pages.length, icon: 'solar:document-bold', color: 'text-blue-500' },
-                  { label: 'Published', value: pages.filter(p => p.isPublished).length, icon: 'solar:check-circle-bold', color: 'text-green-500' },
-                  { label: 'Drafts', value: pages.filter(p => !p.isPublished).length, icon: 'solar:pen-bold', color: 'text-amber-500' },
-                  { label: 'Total Leads', value: pages.reduce((acc, p) => acc + (p.stats?.submissions || 0), 0), icon: 'solar:users-group-rounded-bold', color: 'text-purple-500' },
+                  { label: 'Total Pages', value: pages.length, icon: 'solar:document-bold', color: 'text-blue-500 dark:text-blue-400', bg: 'bg-blue-500/10' },
+                  { label: 'Published', value: pages.filter(p => p.isPublished).length, icon: 'solar:check-circle-bold', color: 'text-emerald-500 dark:text-emerald-400', bg: 'bg-emerald-500/10' },
+                  { label: 'Drafts', value: pages.filter(p => !p.isPublished).length, icon: 'solar:pen-bold', color: 'text-amber-500 dark:text-amber-400', bg: 'bg-amber-500/10' },
+                  { label: 'Total Leads', value: pages.reduce((acc, p) => acc + (p.stats?.submissions || 0), 0), icon: 'solar:users-group-rounded-bold', color: 'text-purple-500 dark:text-purple-400', bg: 'bg-purple-500/10' },
                 ].map((stat, i) => (
                   <div key={i} className="p-4 rounded-xl bg-white dark:bg-stone-950 border border-stone-200 dark:border-stone-800">
                     <div className="flex items-center gap-3">
-                      <div className={cn("w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center", stat.color)}>
+                      <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", stat.bg, stat.color)}>
                         <Icon icon={stat.icon} className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold">{stat.value}</p>
+                        <p className={cn("text-2xl font-bold", stat.color)}>{stat.value}</p>
                         <p className="text-xs text-muted-foreground">{stat.label}</p>
                       </div>
                     </div>
@@ -843,6 +844,9 @@ export default function LandingPagesPage() {
           copyPageLink={copyPageLink}
         />
       )}
+
+      {/* Help Button - Fixed Bottom Right */}
+      <ContextualHelpButton pageId="landing-pages" />
     </div>
   );
 }

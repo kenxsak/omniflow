@@ -27,12 +27,12 @@ interface AttributionBreakdownProps {
 
 // Visible colors for pie chart (works in both light and dark mode)
 const PIE_COLORS = [
-  '#fafaf9', // stone-50 (white)
-  '#a8a29e', // stone-400
-  '#78716c', // stone-500
-  '#57534e', // stone-600
-  '#44403c', // stone-700
-  '#292524', // stone-800
+  '#3b82f6', // blue-500
+  '#14b8a6', // teal-500
+  '#10b981', // emerald-500
+  '#f59e0b', // amber-500
+  '#8b5cf6', // violet-500
+  '#ec4899', // pink-500
 ];
 
 // Capitalize first letter of each word
@@ -55,7 +55,7 @@ export default function AttributionBreakdown({ attribution }: AttributionBreakdo
   
   return (
     <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-violet-500 dark:bg-violet-400" />
       
       {/* Header */}
       <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
@@ -87,9 +87,9 @@ export default function AttributionBreakdown({ attribution }: AttributionBreakdo
       
       <div className="p-4 space-y-5">
         {/* Top Channel */}
-        <div className="p-3 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+        <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
           <div className="flex items-start gap-2">
-            <Icon icon="solar:cup-star-linear" className="h-4 w-4 text-muted-foreground mt-0.5" />
+            <Icon icon="solar:cup-star-linear" className="h-4 w-4 text-amber-500 dark:text-amber-400 mt-0.5" />
             <div>
               <p className="text-sm font-medium text-foreground">
                 {capitalizeWords(topChannel.channel)} is Your Top Channel
@@ -263,15 +263,15 @@ export default function AttributionBreakdown({ attribution }: AttributionBreakdo
         {/* Summary */}
         <div className="grid grid-cols-3 gap-4 pt-4 border-t border-stone-200 dark:border-stone-800">
           <div className="text-center">
-            <div className="text-lg font-semibold tabular-nums text-foreground">{formatCurrency(totalRevenue)}</div>
+            <div className="text-lg font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">{formatCurrency(totalRevenue)}</div>
             <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Total Revenue</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-semibold tabular-nums text-foreground">{formatCurrency(attribution.totalMarketingSpend)}</div>
+            <div className="text-lg font-semibold tabular-nums text-blue-600 dark:text-blue-400">{formatCurrency(attribution.totalMarketingSpend)}</div>
             <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Marketing Spend</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-semibold tabular-nums text-foreground">{formatPercentage(overallROI, 0)}</div>
+            <div className="text-lg font-semibold tabular-nums text-amber-600 dark:text-amber-400">{formatPercentage(overallROI, 0)}</div>
             <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Overall ROI</div>
           </div>
         </div>

@@ -151,13 +151,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             // Update appUser with fresh token
             setAppUser(prev => prev ? { ...prev, idToken: freshIdToken } : null);
             
-            await fetch('/api/auth/session', {
+            // Try to update session cookie, don't block on failure
+            fetch('/api/auth/session', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idToken: freshIdToken }),
-            });
+            }).catch(err => console.warn('[Auth] Session refresh failed:', err.message));
         } catch (error) {
-            console.error('Error refreshing session cookie:', error);
+            console.error('[Auth] Error refreshing token:', error);
         }
         await fetchFullContext(firebaseUser);
         setLoading(false);
@@ -176,14 +177,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Update appUser with fresh token
         setAppUser(prev => prev ? { ...prev, idToken: freshIdToken } : null);
         
-        await fetch('/api/auth/session', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ idToken: freshIdToken }),
-        });
-        console.log('[Auth] Token refreshed successfully');
+        // Try to update session cookie, but don't fail if network is unavailable
+        try {
+          await fetch('/api/auth/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken: freshIdToken }),
+          });
+          console.log('[Auth] Token refreshed successfully');
+        } catch (fetchError) {
+          // Network error - session cookie update failed but token is still valid locally
+          console.warn('[Auth] Could not update session cookie (network issue), token still valid locally');
+        }
       } catch (error) {
-        console.error('Error auto-refreshing token:', error);
+        // Only log if it's not a network error (user might be offline)
+        if (error instanceof Error && !error.message.includes('Failed to fetch')) {
+          console.error('[Auth] Error auto-refreshing token:', error);
+        } else {
+          console.warn('[Auth] Token refresh skipped - network unavailable');
+        }
       }
     };
     
@@ -205,21 +217,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (user) {
             try {
                 const idToken = await user.getIdToken();
-                await fetch('/api/auth/session', {
+                // Try to set session cookie, but don't block on failure
+                fetch('/api/auth/session', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ idToken }),
-                });
+                }).catch(err => console.warn('[Auth] Session cookie update failed:', err.message));
             } catch (error) {
-                console.error('Error setting session cookie:', error);
+                console.error('[Auth] Error getting ID token:', error);
             }
             await fetchFullContext(user);
         } else {
-            try {
-                await fetch('/api/auth/session', { method: 'DELETE' });
-            } catch (error) {
-                console.error('Error deleting session cookie:', error);
-            }
+            // Try to delete session cookie, but don't block on failure
+            fetch('/api/auth/session', { method: 'DELETE' })
+                .catch(err => console.warn('[Auth] Session cookie delete failed:', err.message));
             setAppUser(null);
             setCompany(null);
             setImpersonatingUser(null);

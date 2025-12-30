@@ -562,7 +562,7 @@ export default function AICampaignStudioPage() {
       {/* Stage 1: Describe */}
       {stage === 1 && (
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-blue-500 dark:bg-blue-400" />
           <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
             <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Stage 1: Describe Your Email Campaign</span>
             <p className="text-xs text-muted-foreground mt-0.5">Tell us about your campaign in plain language</p>
@@ -623,7 +623,7 @@ export default function AICampaignStudioPage() {
       {stage === 2 && parsedBrief && emailContent && (
         <div className="space-y-4">
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-teal-500 dark:bg-teal-400" />
             <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
               <div>
                 <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Stage 2: Review & Customize Content</span>
@@ -733,7 +733,7 @@ export default function AICampaignStudioPage() {
       {/* Stage 3: Publish */}
       {stage === 3 && (
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-emerald-500 dark:bg-emerald-400" />
           <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
             <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Stage 3: Select Audience & Send</span>
             <p className="text-xs text-muted-foreground mt-0.5">Choose your contacts and delivery provider</p>

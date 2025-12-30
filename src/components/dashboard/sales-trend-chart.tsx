@@ -36,10 +36,10 @@ export function SalesTrendChart({ data, loading, chartType = 'area' }: SalesTren
   if (loading) {
     return (
       <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-[oklch(0.60_0.16_145)] dark:bg-[oklch(0.68_0.17_145)]" />
         <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-stone-200 dark:border-stone-800">
           <div className="flex items-center gap-2">
-            <Icon icon="solar:chart-linear" className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground/60" />
+            <Icon icon="solar:chart-linear" className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[oklch(0.60_0.16_145)] dark:text-[oklch(0.68_0.17_145)]" />
             <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
               SALES TREND
             </span>
@@ -57,10 +57,10 @@ export function SalesTrendChart({ data, loading, chartType = 'area' }: SalesTren
   if (!hasData) {
     return (
       <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-[oklch(0.60_0.16_145)] dark:bg-[oklch(0.68_0.17_145)]" />
         <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-stone-200 dark:border-stone-800">
           <div className="flex items-center gap-2">
-            <Icon icon="solar:chart-linear" className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground/60" />
+            <Icon icon="solar:chart-linear" className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[oklch(0.60_0.16_145)] dark:text-[oklch(0.68_0.17_145)]" />
             <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
               SALES TREND
             </span>
@@ -88,12 +88,12 @@ export function SalesTrendChart({ data, loading, chartType = 'area' }: SalesTren
 
   return (
     <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-      <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+      <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-[oklch(0.60_0.16_145)] dark:bg-[oklch(0.68_0.17_145)]" />
       <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-stone-200 dark:border-stone-800">
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <Icon icon="solar:chart-linear" className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground/60 shrink-0" />
+              <Icon icon="solar:chart-linear" className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[oklch(0.60_0.16_145)] dark:text-[oklch(0.68_0.17_145)] shrink-0" />
               <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                 SALES TREND
               </span>
@@ -127,8 +127,8 @@ export function SalesTrendChart({ data, loading, chartType = 'area' }: SalesTren
               <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--foreground))" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="hsl(var(--foreground))" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="oklch(0.60 0.16 145)" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="oklch(0.60 0.16 145)" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -155,7 +155,7 @@ export function SalesTrendChart({ data, loading, chartType = 'area' }: SalesTren
                 <Area 
                   type="monotone" 
                   dataKey="revenue" 
-                  stroke="hsl(var(--foreground))" 
+                  stroke="oklch(0.60 0.16 145)" 
                   strokeWidth={2}
                   fillOpacity={1} 
                   fill="url(#colorRevenue)" 
@@ -195,9 +195,9 @@ export function SalesTrendChart({ data, loading, chartType = 'area' }: SalesTren
                   }}
                 />
                 <Legend />
-                <Bar yAxisId="left" dataKey="revenue" fill="hsl(var(--foreground))" name="Revenue" radius={[4, 4, 0, 0]} />
-                <Bar yAxisId="right" dataKey="wonDeals" fill="hsl(var(--muted-foreground))" name="Won" radius={[4, 4, 0, 0]} />
-                <Bar yAxisId="right" dataKey="lostDeals" fill="hsl(var(--border))" name="Lost" radius={[4, 4, 0, 0]} />
+                <Bar yAxisId="left" dataKey="revenue" fill="oklch(0.60 0.16 145)" name="Revenue" radius={[4, 4, 0, 0]} />
+                <Bar yAxisId="right" dataKey="wonDeals" fill="oklch(0.55 0.15 250)" name="Won" radius={[4, 4, 0, 0]} />
+                <Bar yAxisId="right" dataKey="lostDeals" fill="oklch(0.55 0.16 20)" name="Lost" radius={[4, 4, 0, 0]} />
               </BarChart>
             )}
           </ResponsiveContainer>

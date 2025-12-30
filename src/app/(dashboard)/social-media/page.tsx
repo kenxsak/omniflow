@@ -797,7 +797,6 @@ export default function SocialMediaPage() {
               <span className="hidden sm:inline">Content </span>Hub
             </Link>
           </Button>
-          <ContextualHelpButton pageId="social-media" />
         </div>
       </header>
 
@@ -831,10 +830,10 @@ export default function SocialMediaPage() {
         {activeTab === 'trends' && (
           <div className="space-y-4">
             <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-amber-500 dark:bg-amber-400" />
               <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Icon icon="solar:lightbulb-linear" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:lightbulb-linear" className="h-4 w-4 text-amber-500 dark:text-amber-400" />
                   <h2 className="text-sm font-semibold">Trending Topic Suggester</h2>
                 </div>
                 <form onSubmit={handleTrendFormSubmit} className="space-y-4">
@@ -916,10 +915,10 @@ export default function SocialMediaPage() {
         {activeTab === 'enhancer' && (
           <div className="space-y-4">
             <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-purple-500 dark:bg-purple-400" />
               <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Icon icon="solar:magic-stick-3-linear" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:magic-stick-3-linear" className="h-4 w-4 text-purple-500 dark:text-purple-400" />
                   <h2 className="text-sm font-semibold">Prompt Enhancer</h2>
                 </div>
                 <p className="text-xs text-muted-foreground mb-4">Turn simple ideas into powerful, detailed prompts for AI image generation and content creation.</p>
@@ -1113,11 +1112,11 @@ export default function SocialMediaPage() {
         {activeTab === 'content' && (
           <div className="space-y-4">
             <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-blue-500 dark:bg-blue-400" />
               <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <Icon icon="solar:document-text-linear" className="h-4 w-4 text-muted-foreground" />
+                    <Icon icon="solar:document-text-linear" className="h-4 w-4 text-blue-500 dark:text-blue-400" />
                     <h2 className="text-sm font-semibold">Content Generator</h2>
                   </div>
                   <ContentTemplatesSelector 
@@ -1372,10 +1371,10 @@ export default function SocialMediaPage() {
         {activeTab === 'image' && (
           <div className="space-y-4">
             <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-teal-500 dark:bg-teal-400" />
               <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Icon icon="solar:gallery-linear" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:gallery-linear" className="h-4 w-4 text-teal-500 dark:text-teal-400" />
                   <h2 className="text-sm font-semibold">AI Image Generator</h2>
                   <Badge variant="secondary" className="text-[10px]">Premium</Badge>
                 </div>
@@ -1648,10 +1647,10 @@ export default function SocialMediaPage() {
         {activeTab === 'hashtags' && (
           <div className="space-y-4">
             <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-emerald-500 dark:bg-emerald-400" />
               <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Icon icon="solar:hashtag-linear" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:hashtag-linear" className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
                   <h2 className="text-sm font-semibold">Hashtag Suggester</h2>
                 </div>
                 <form onSubmit={handleHashtagFormSubmit} className="space-y-4">
@@ -1711,10 +1710,10 @@ export default function SocialMediaPage() {
         {activeTab === 'reviews' && (
           <div className="space-y-4">
             <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-rose-500 dark:bg-rose-400" />
               <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Icon icon="solar:chat-round-dots-linear" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:chat-round-dots-linear" className="h-4 w-4 text-rose-500 dark:text-rose-400" />
                   <h2 className="text-sm font-semibold">Review Responder</h2>
                 </div>
                 <p className="text-xs text-muted-foreground mb-4">Generate professional responses to customer reviews.</p>
@@ -1775,6 +1774,9 @@ export default function SocialMediaPage() {
           </div>
         </div>
       </div>
+
+      {/* Help Button - Fixed Bottom Right */}
+      <ContextualHelpButton pageId="social-media" />
     </div>
   );
 }

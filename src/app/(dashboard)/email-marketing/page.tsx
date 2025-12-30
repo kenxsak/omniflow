@@ -14,24 +14,24 @@ import EmailPerformanceChart, { type EmailChartData } from '@/components/email/e
 import { useAuth } from '@/hooks/use-auth';
 import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 
-// Helper for campaign status styling - using stone colors
+// Helper for campaign status styling - using semantic colors
 const getCampaignStatusClass = (status: EmailCampaign['status']) => {
   switch (status) {
     case 'Sent via Brevo':
     case 'Sent via Sender.net':
     case 'Sent':
-      return 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200/60 dark:border-stone-700/60';
+      return 'bg-success-muted text-success-muted-foreground border border-success-border';
     case 'Draft':
       return 'bg-stone-50 dark:bg-stone-900 text-stone-500 dark:text-stone-400 border border-stone-200/60 dark:border-stone-700/60';
     case 'Scheduled':
-      return 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200/60 dark:border-stone-700/60';
+      return 'bg-info-muted text-info-muted-foreground border border-info-border';
     case 'Sending via Brevo':
     case 'Sending via Sender.net':
-      return 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200/60 dark:border-stone-700/60 animate-pulse';
+      return 'bg-warning-muted text-warning-muted-foreground border border-warning-border animate-pulse';
     case 'Failed via Brevo':
     case 'Failed via Sender.net':
     case 'Failed':
-      return 'bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 border border-stone-300/60 dark:border-stone-600/60';
+      return 'bg-destructive-muted text-destructive-muted-foreground border border-destructive-border';
     default:
       return 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 border border-stone-200/60 dark:border-stone-700/60';
   }
@@ -143,7 +143,7 @@ export default function EmailMarketingPage() {
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex gap-2 flex-wrap">
-            <Button asChild>
+            <Button asChild className="text-white" style={{ background: 'linear-gradient(to right, #8b5cf6, #a855f7)' }}>
               <Link href="/campaigns/ai-email">
                 <Icon icon="solar:stars-linear" className="mr-2 h-4 w-4" /> Create with AI
               </Link>
@@ -161,7 +161,7 @@ export default function EmailMarketingPage() {
 
         {/* Mobile Actions */}
         <div className="flex lg:hidden gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-          <Button asChild size="sm" className="flex-shrink-0">
+          <Button asChild size="sm" className="flex-shrink-0 text-white" style={{ background: 'linear-gradient(to right, #8b5cf6, #a855f7)' }}>
             <Link href="/campaigns/ai-email">
               <Icon icon="solar:stars-linear" className="mr-1.5 h-4 w-4" /> AI Create
             </Link>
@@ -179,57 +179,57 @@ export default function EmailMarketingPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl">
+        <Card className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl hover:border-blue-500/50 transition-colors">
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs sm:text-sm text-muted-foreground">Campaigns</span>
-              <div className="w-8 h-8 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                <Icon icon="solar:letter-linear" className="w-4 h-4 text-muted-foreground" />
+              <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                <Icon icon="solar:letter-linear" className="w-4 h-4 text-blue-500 dark:text-blue-400" />
               </div>
             </div>
-            <div className="text-xl sm:text-2xl font-semibold text-foreground">
+            <div className="text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-400">
               {localCampaigns.length}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl">
+        <Card className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl hover:border-emerald-500/50 transition-colors">
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs sm:text-sm text-muted-foreground">Open Rate</span>
-              <div className="w-8 h-8 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                <Icon icon="solar:eye-linear" className="w-4 h-4 text-muted-foreground" />
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                <Icon icon="solar:eye-linear" className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
               </div>
             </div>
-            <div className="text-xl sm:text-2xl font-semibold text-foreground">
+            <div className="text-xl sm:text-2xl font-semibold text-emerald-600 dark:text-emerald-400">
               {avgOpenRate.toFixed(1)}%
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl">
+        <Card className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl hover:border-amber-500/50 transition-colors">
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs sm:text-sm text-muted-foreground">Click Rate</span>
-              <div className="w-8 h-8 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                <Icon icon="solar:cursor-linear" className="w-4 h-4 text-muted-foreground" />
+              <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                <Icon icon="solar:cursor-linear" className="w-4 h-4 text-amber-500 dark:text-amber-400" />
               </div>
             </div>
-            <div className="text-xl sm:text-2xl font-semibold text-foreground">
+            <div className="text-xl sm:text-2xl font-semibold text-amber-600 dark:text-amber-400">
               {avgClickRate.toFixed(1)}%
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl">
+        <Card className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl hover:border-purple-500/50 transition-colors">
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs sm:text-sm text-muted-foreground">Sent</span>
-              <div className="w-8 h-8 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                <Icon icon="solar:graph-up-linear" className="w-4 h-4 text-muted-foreground" />
+              <div className="w-8 h-8 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                <Icon icon="solar:graph-up-linear" className="w-4 h-4 text-purple-500 dark:text-purple-400" />
               </div>
             </div>
-            <div className="text-xl sm:text-2xl font-semibold text-foreground">
+            <div className="text-xl sm:text-2xl font-semibold text-purple-600 dark:text-purple-400">
               {sentLocalCampaigns.length}
             </div>
           </CardContent>
@@ -240,9 +240,13 @@ export default function EmailMarketingPage() {
       <BrevoCampaignList />
 
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2 border border-stone-200/60 dark:border-stone-800/60 rounded-2xl">
-          <CardHeader className="p-4 sm:p-6">
-            <CardTitle className="text-base sm:text-lg font-semibold">Recent Local Campaigns</CardTitle>
+        <Card className="lg:col-span-2 border border-stone-200/60 dark:border-stone-800/60 rounded-2xl overflow-hidden">
+          <CardHeader className="p-4 sm:p-6 relative" style={{ background: 'linear-gradient(to right, rgba(59, 130, 246, 0.05), rgba(99, 102, 241, 0.05))' }}>
+            <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #3b82f6, #6366f1)' }} />
+            <div className="flex items-center gap-2">
+              <Icon icon="solar:letter-linear" className="h-4 w-4" style={{ color: '#3b82f6' }} />
+              <CardTitle className="text-base sm:text-lg font-semibold">Recent Local Campaigns</CardTitle>
+            </div>
             <CardDescription className="text-xs sm:text-sm">Overview of your latest email campaigns stored locally.</CardDescription>
           </CardHeader>
           <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
@@ -294,26 +298,30 @@ export default function EmailMarketingPage() {
         </Card>
 
         <div className="space-y-4 sm:space-y-6">
-          <Card className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl">
-            <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="text-base sm:text-lg font-semibold">Quick Links</CardTitle>
+          <Card className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl overflow-hidden">
+            <CardHeader className="p-4 sm:p-6 relative" style={{ background: 'linear-gradient(to right, rgba(20, 184, 166, 0.05), rgba(16, 185, 129, 0.05))' }}>
+              <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #14b8a6, #10b981)' }} />
+              <div className="flex items-center gap-2">
+                <Icon icon="solar:link-linear" className="h-4 w-4" style={{ color: '#14b8a6' }} />
+                <CardTitle className="text-base sm:text-lg font-semibold">Quick Links</CardTitle>
+              </div>
             </CardHeader>
             <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-2">
               <Button variant="outline" className="w-full justify-start h-10 sm:h-11 text-sm rounded-xl" asChild>
                 <Link href="/email-marketing/subscribers">
-                  <Icon icon="solar:checklist-linear" className="mr-2 h-4 w-4" /> Contact Lists
+                  <Icon icon="solar:checklist-linear" className="mr-2 h-4 w-4" style={{ color: '#3b82f6' }} /> Contact Lists
                 </Link>
               </Button>
               {canShowAutomations && (
                 <Button variant="outline" className="w-full justify-start h-10 sm:h-11 text-sm rounded-xl" asChild>
                   <Link href="/email-marketing/automations">
-                    <Icon icon="solar:bolt-linear" className="mr-2 h-4 w-4" /> Auto-Send Emails
+                    <Icon icon="solar:bolt-linear" className="mr-2 h-4 w-4" style={{ color: '#f59e0b' }} /> Auto-Send Emails
                   </Link>
                 </Button>
               )}
               <Button variant="outline" className="w-full justify-start h-10 sm:h-11 text-sm rounded-xl" asChild>
                 <Link href="/settings?tab=integrations">
-                  <Icon icon="solar:settings-linear" className="mr-2 h-4 w-4" /> Email Settings
+                  <Icon icon="solar:settings-linear" className="mr-2 h-4 w-4" style={{ color: '#8b5cf6' }} /> Email Settings
                 </Link>
               </Button>
             </CardContent>
@@ -321,9 +329,13 @@ export default function EmailMarketingPage() {
         </div>
       </div>
 
-      <Card className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl">
-        <CardHeader className="p-4 sm:p-6">
-          <CardTitle className="text-base sm:text-lg font-semibold">Email Performance Analytics</CardTitle>
+      <Card className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl overflow-hidden">
+        <CardHeader className="p-4 sm:p-6 relative" style={{ background: 'linear-gradient(to right, rgba(139, 92, 246, 0.05), rgba(168, 85, 247, 0.05))' }}>
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #8b5cf6, #a855f7)' }} />
+          <div className="flex items-center gap-2">
+            <Icon icon="solar:chart-2-linear" className="h-4 w-4" style={{ color: '#8b5cf6' }} />
+            <CardTitle className="text-base sm:text-lg font-semibold">Email Performance Analytics</CardTitle>
+          </div>
           <CardDescription className="text-xs sm:text-sm">Performance of your last 5 sent campaigns from local data.</CardDescription>
         </CardHeader>
         <CardContent className="h-[280px] sm:h-[350px] p-2 sm:p-4">

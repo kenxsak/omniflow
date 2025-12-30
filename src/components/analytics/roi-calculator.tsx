@@ -44,15 +44,15 @@ export default function ROICalculator() {
   };
 
   const metrics = [
-    { label: 'ROI', value: roi === Infinity ? '∞' : formatPercentage(roi, 0), icon: 'solar:graph-up-linear' },
-    { label: 'ROAS', value: `${roas.toFixed(2)}x`, icon: 'solar:wallet-linear' },
-    { label: 'CPL', value: formatCurrency(cpl), icon: 'solar:users-group-rounded-linear' },
-    { label: 'CAC', value: formatCurrency(cac), icon: 'solar:target-linear' },
+    { label: 'ROI', value: roi === Infinity ? '∞' : formatPercentage(roi, 0), icon: 'solar:graph-up-linear', color: '#10b981', bgColor: 'rgba(16, 185, 129, 0.1)' },
+    { label: 'ROAS', value: `${roas.toFixed(2)}x`, icon: 'solar:wallet-linear', color: '#3b82f6', bgColor: 'rgba(59, 130, 246, 0.1)' },
+    { label: 'CPL', value: formatCurrency(cpl), icon: 'solar:users-group-rounded-linear', color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.1)' },
+    { label: 'CAC', value: formatCurrency(cac), icon: 'solar:target-linear', color: '#8b5cf6', bgColor: 'rgba(139, 92, 246, 0.1)' },
   ];
   
   return (
     <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-500" />
+      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-emerald-500 dark:bg-emerald-400" />
       
       {/* Header */}
       <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
@@ -126,12 +126,16 @@ export default function ROICalculator() {
         {/* Results Grid */}
         <div className="grid grid-cols-4 gap-2">
           {metrics.map((metric) => (
-            <div key={metric.label} className="text-center p-3 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-100 dark:border-stone-800">
+            <div 
+              key={metric.label} 
+              className="text-center p-3 rounded-lg border border-stone-100 dark:border-stone-800"
+              style={{ backgroundColor: metric.bgColor }}
+            >
               <div className="flex items-center justify-center gap-1 mb-1">
-                <Icon icon={metric.icon} className="h-3 w-3 text-muted-foreground" />
+                <Icon icon={metric.icon} className="h-3 w-3" style={{ color: metric.color }} />
                 <span className="text-[9px] font-semibold tracking-wider text-muted-foreground uppercase">{metric.label}</span>
               </div>
-              <div className="text-base font-semibold tabular-nums text-foreground">
+              <div className="text-base font-semibold tabular-nums" style={{ color: metric.color }}>
                 {metric.value}
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { LucideIcon, PlusCircle, FileUp, Users, Mail, Send, MessageSquare, CreditCard, Lightbulb, BarChart } from 'lucide-react';
+import { LucideIcon, PlusCircle, FileUp, Mail, Send, CreditCard } from 'lucide-react';
 
 export type PageId =
   | 'dashboard'
@@ -27,7 +27,13 @@ export type PageId =
   | 'onboarding'
   | 'my-team'
   | 'settings'
-  | 'business-reports';
+  | 'business-reports'
+  | 'landing-pages'
+  | 'workflow-builder'
+  | 'appointments'
+  | 'team-management'
+  | 'advanced-analytics'
+  | 'transactions';
 
 interface QuickAction {
   label: string;
@@ -55,12 +61,12 @@ interface HelpContent {
 export const helpContent: Record<PageId, HelpContent> = {
   dashboard: {
     pageTitle: 'Dashboard',
-    overview: 'This is your home base - a quick snapshot of how your business is doing. See your contact count, message stats, and what\'s working best, all in one place.',
+    overview: 'Your command center - see everything happening in your business at a glance. OmniFlow replaces 10+ tools, and this is where you see it all working together.',
     capabilities: [
-      'See a quick overview of your business performance',
-      'Check how many contacts you have and recent activity',
-      'View your latest email and text message results',
-      'Track your smart tools usage this month'
+      'See your total contacts and recent activity',
+      'Track emails, texts, and WhatsApp messages sent',
+      'Monitor your AI credits usage',
+      'View quick stats on what\'s working'
     ],
     quickActions: [
       {
@@ -75,22 +81,22 @@ export const helpContent: Record<PageId, HelpContent> = {
       }
     ],
     tips: [
-      'Check your dashboard daily to stay on top of your business',
-      'The numbers update automatically as you work',
-      'Click on any card to see more detailed information'
+      'Check your dashboard daily to stay on top of things',
+      'Numbers update automatically as you work',
+      'Click any card to see more details'
     ],
     faqs: [
       {
-        question: 'What do the numbers on each card mean?',
-        answer: 'Each card shows a different metric: Total Contacts is everyone in your list, Smart Tools Usage shows how many AI credits you\'ve used this month, Email Campaigns shows your sent campaigns, and Engagement tracks how people interact with your messages.'
+        question: 'What do the numbers mean?',
+        answer: 'Total Contacts = everyone in your list. AI Credits = how much AI you\'ve used this month. Campaigns = emails and messages you\'ve sent. Engagement = how people respond to your messages.'
       },
       {
-        question: 'How often does the dashboard update?',
-        answer: 'Your dashboard updates automatically whenever you send messages, add contacts, or use any feature. Just refresh the page to see the latest numbers.'
+        question: 'How often does it update?',
+        answer: 'Automatically! Every time you send a message, add a contact, or use any feature, the numbers update. Refresh the page to see the latest.'
       },
       {
-        question: 'What if I\'m running low on Smart Tools credits?',
-        answer: 'You\'ll see a warning when you\'ve used 80% of your monthly quota. You can upgrade your plan in Settings to get more credits and keep using AI features.'
+        question: 'What if I run out of AI credits?',
+        answer: 'You\'ll see a warning at 80% usage. Go to Settings → Billing to upgrade your plan for more credits, or wait until next month when they reset.'
       }
     ]
   },
@@ -122,13 +128,13 @@ export const helpContent: Record<PageId, HelpContent> = {
 
   crm: {
     pageTitle: 'My Contacts',
-    overview: 'Your contact list - everyone who might become a customer. Add people manually, import from a file, or organize them into groups. This is where you keep track of all the people interested in your business.',
+    overview: 'Everyone who might buy from you - all in one place. Add people manually, import from Excel, or organize them into groups. This is your customer database that connects to everything else in OmniFlow.',
     capabilities: [
-      'Add people who might buy from you',
-      'Import contacts from a spreadsheet (Excel or CSV)',
-      'Organize people by how interested they are',
-      'Sync contacts to Brevo/HubSpot to keep external tools updated',
-      'Add selected contacts to WhatsApp/SMS lists for bulk messaging'
+      'Add and manage all your contacts',
+      'Import contacts from Excel or CSV files',
+      'Organize contacts with tags and status',
+      'Sync to external tools like Brevo or HubSpot',
+      'Add contacts to WhatsApp/SMS lists for campaigns'
     ],
     quickActions: [
       {
@@ -149,27 +155,27 @@ export const helpContent: Record<PageId, HelpContent> = {
       }
     ],
     tips: [
-      'Import contacts from Excel - just make sure you have Name and Email columns',
+      'Import from Excel - just have Name and Email columns',
       'Add notes to remember important details about each person',
-      'Use tags to organize contacts (like "VIP Customer" or "Interested in Product A")',
-      'Only contacts with valid phone numbers can receive text messages or WhatsApp'
+      'Use tags like "VIP" or "Interested in Product A" to organize',
+      'Phone numbers need country codes (+91 for India, +1 for US) for messaging'
     ],
     faqs: [
       {
-        question: 'How do I import contacts from Excel or CSV?',
-        answer: 'Click "Import from File" button, select your Excel or CSV file, then map the columns (Name, Email, Phone, etc.). The file should have column headers in the first row.'
+        question: 'How do I import contacts from Excel?',
+        answer: 'Click "Import from File", select your Excel or CSV file, then match the columns (Name, Email, Phone). Your file should have column headers in the first row.'
       },
       {
-        question: 'What\'s the difference between "Sync to Brevo" and "Add to WhatsApp List"?',
-        answer: 'Syncing pushes contacts FROM OmniFlow TO external tools like Brevo/HubSpot to keep them updated. "Add to WhatsApp/SMS List" prepares contacts for bulk messaging campaigns within OmniFlow.'
+        question: 'What\'s the difference between Sync and Add to List?',
+        answer: 'Sync pushes contacts to external tools (Brevo/HubSpot). "Add to WhatsApp/SMS List" prepares contacts for bulk messaging campaigns within OmniFlow.'
       },
       {
-        question: 'Can I send messages to contacts who don\'t have phone numbers?',
-        answer: 'You can send them emails, but not text messages or WhatsApp. Make sure phone numbers include the country code (+1 for US, +91 for India, etc.).'
+        question: 'Can I message contacts without phone numbers?',
+        answer: 'You can email them, but not text or WhatsApp. Make sure phone numbers include country codes (+91 for India, +1 for US).'
       },
       {
-        question: 'How do I organize my contacts by interest level?',
-        answer: 'Use the "Status" field - mark them as New, Contacted, Qualified, or Won. You can also add custom tags to group them however you like.'
+        question: 'How do I track where contacts are in my sales process?',
+        answer: 'Use the Status field - mark them as New, Contacted, Qualified, or Won. You can also add custom tags to group them your way.'
       }
     ]
   },
@@ -277,12 +283,12 @@ export const helpContent: Record<PageId, HelpContent> = {
 
   'email-campaigns': {
     pageTitle: 'Email Campaigns',
-    overview: 'Send emails to your contact list and see how well they perform. Track who opened your emails, who clicked links, and what\'s working best.',
+    overview: 'Send emails to your contacts and see how they perform. Track opens, clicks, and what\'s working best.',
     capabilities: [
-      'Send professional emails to your contact list',
+      'Send professional emails to your contacts',
       'See how many people opened your emails',
       'Track which emails got the most clicks',
-      'View email history and performance over time'
+      'View email history and performance'
     ],
     quickActions: [
       {
@@ -292,22 +298,22 @@ export const helpContent: Record<PageId, HelpContent> = {
       }
     ],
     tips: [
-      'Higher open rates mean your subject lines are working well',
-      'Track which emails get the most clicks to learn what your audience likes',
+      'Higher open rates mean your subject lines are working',
+      'Track clicks to learn what your audience likes',
       'Send test emails to yourself before sending to everyone'
     ],
     faqs: [
       {
-        question: 'What is a contact group and do I need one?',
-        answer: 'A contact group is a list of people who will receive your email. For example, "All Customers" or "Newsletter Subscribers". You create groups in the Email Subscribers section.'
+        question: 'What is a contact group?',
+        answer: 'A list of people who will receive your email. For example, "All Customers" or "Newsletter Subscribers". Create groups in Email Subscribers section.'
       },
       {
         question: 'How do I know if my email was delivered?',
-        answer: 'After sending, check the campaign details. You\'ll see Sent, Delivered, Opened, and Clicked counts. If Delivered is lower than Sent, some emails bounced (invalid addresses).'
+        answer: 'Check the campaign details. You\'ll see Sent, Delivered, Opened, and Clicked counts. If Delivered is lower than Sent, some emails bounced.'
       },
       {
         question: 'Why is my open rate low?',
-        answer: 'Try improving your subject line - make it short, clear, and interesting. Also send at better times (Tuesday-Thursday, 9-11 AM works well for most businesses).'
+        answer: 'Try improving your subject line - make it short and interesting. Send at better times (Tuesday-Thursday, 9-11 AM works well).'
       }
     ]
   },
@@ -344,31 +350,31 @@ export const helpContent: Record<PageId, HelpContent> = {
   },
 
   'email-automations': {
-    pageTitle: 'Auto-Send Emails',
-    overview: 'Set up emails that send automatically when something happens - like when someone signs up or abandons their cart. Save time and never miss a follow-up.',
+    pageTitle: 'Email Automation',
+    overview: 'Set up emails that send automatically - welcome new contacts, follow up on abandoned carts, or nurture leads. Save time and never miss a follow-up.',
     capabilities: [
       'Set up emails that send automatically',
-      'Welcome new contacts with an automatic email',
-      'Send follow-up emails without having to remember',
+      'Welcome new contacts instantly',
+      'Send follow-ups without remembering',
       'Create multi-step email sequences'
     ],
     tips: [
       'Set up a welcome email first - it\'s the easiest one',
-      'Automated emails save you time and never forget to follow up',
-      'Test your automation by adding yourself as a contact first'
+      'Automated emails save time and never forget to follow up',
+      'Test by adding yourself as a contact first'
     ],
     faqs: [
       {
-        question: 'What are auto-messages and how do they work?',
-        answer: 'Auto-messages are emails that send themselves when a trigger happens. For example, when someone joins your list, they automatically get a welcome email without you doing anything.'
+        question: 'What are automated emails?',
+        answer: 'Emails that send themselves when something happens. For example, when someone joins your list, they automatically get a welcome email without you doing anything.'
       },
       {
-        question: 'Can I edit the automated emails after setting them up?',
-        answer: 'Yes! Click Configure on any automation to edit the emails, change timing, or turn it on/off. Your changes take effect immediately.'
+        question: 'Can I edit automated emails later?',
+        answer: 'Yes! Click Configure on any automation to edit emails, change timing, or turn it on/off. Changes take effect immediately.'
       },
       {
-        question: 'How do I know if my automations are working?',
-        answer: 'Check the Status - it should say "Active". You can also add yourself as a test contact to see if you receive the automated emails.'
+        question: 'How do I know if automations are working?',
+        answer: 'Check the Status - it should say "Active". Add yourself as a test contact to see if you receive the automated emails.'
       }
     ]
   },
@@ -434,13 +440,13 @@ export const helpContent: Record<PageId, HelpContent> = {
   },
 
   'whatsapp-bulk-campaigns': {
-    pageTitle: 'WhatsApp Bulk Campaigns',
-    overview: 'Send WhatsApp messages to hundreds or thousands of people at once. Perfect for announcements, promotions, or updates to your customer base.',
+    pageTitle: 'WhatsApp Campaigns',
+    overview: 'Send WhatsApp messages to hundreds or thousands of people at once. Perfect for announcements, promotions, or updates.',
     capabilities: [
-      'Send WhatsApp messages to hundreds or thousands of contacts at once',
+      'Send WhatsApp to many contacts at once',
       'Use approved templates for business messaging',
-      'Track delivery and read status for each message',
-      'Send personalized messages to contact lists'
+      'Track delivery and read status',
+      'Send personalized messages'
     ],
     quickActions: [
       {
@@ -450,39 +456,39 @@ export const helpContent: Record<PageId, HelpContent> = {
       }
     ],
     tips: [
-      'First, connect WATI, AiSensy, or Meta WhatsApp in Settings → Integrations',
-      'Add contacts to WhatsApp lists from your CRM using "Add to WhatsApp List" button',
-      'Use approved templates - WhatsApp requires Meta approval for bulk messages',
-      'Track delivery and read receipts in the "My Campaigns" tab'
+      'First, connect WATI or AiSensy in Settings → Integrations',
+      'Add contacts to WhatsApp lists from your CRM',
+      'Use approved templates - WhatsApp requires Meta approval',
+      'Track delivery and read receipts in "My Campaigns"'
     ],
     faqs: [
       {
         question: 'How do I send WhatsApp campaigns?',
-        answer: 'Step 1: Connect a WhatsApp service (WATI/AiSensy) in Settings. Step 2: Add contacts to a WhatsApp list from CRM. Step 3: Create campaign, select template and contact list, then send.'
+        answer: 'Step 1: Connect WATI/AiSensy in Settings. Step 2: Add contacts to a WhatsApp list from CRM. Step 3: Create campaign, select template and list, then send.'
       },
       {
-        question: 'What are approved templates and where do I get them?',
-        answer: 'WhatsApp requires all business messages to use pre-approved templates. You create and submit templates in your WATI or AiSensy dashboard. Once Meta approves them (usually 24-48 hours), they appear here.'
+        question: 'What are approved templates?',
+        answer: 'WhatsApp requires all business messages to use pre-approved templates. Create them in your WATI or AiSensy dashboard. Meta approves them in 24-48 hours.'
       },
       {
-        question: 'Why do my contacts need country codes?',
-        answer: 'WhatsApp requires full international phone numbers. Use +91 for India, +1 for US, +44 for UK, etc. Without the country code, messages won\'t send.'
+        question: 'Why do contacts need country codes?',
+        answer: 'WhatsApp requires full international numbers. Use +91 for India, +1 for US, +44 for UK. Without the code, messages won\'t send.'
       },
       {
-        question: 'How much does it cost to send WhatsApp messages?',
-        answer: 'Costs depend on your WhatsApp provider (WATI/AiSensy) and recipient country. Check their pricing - usually a few cents per message. You\'ll see estimated costs before sending.'
+        question: 'How much does it cost?',
+        answer: 'Costs depend on your WhatsApp provider and recipient country. Usually a few cents per message. You\'ll see estimated costs before sending.'
       }
     ]
   },
 
   'sms-bulk-campaigns': {
-    pageTitle: 'SMS Bulk Campaigns',
+    pageTitle: 'SMS Campaigns',
     overview: 'Send text messages to hundreds or thousands of people at once. Perfect for time-sensitive updates, promotions, or reminders.',
     capabilities: [
-      'Send text messages to hundreds or thousands of contacts at once',
-      'Track delivery status and costs for each campaign',
-      'Send both promotional and transactional messages',
-      'View estimated costs before sending'
+      'Send SMS to many contacts at once',
+      'Track delivery status and costs',
+      'Send promotional and transactional messages',
+      'See cost estimates before sending'
     ],
     quickActions: [
       {
@@ -493,38 +499,39 @@ export const helpContent: Record<PageId, HelpContent> = {
     ],
     tips: [
       'First, connect MSG91 or Fast2SMS in Settings → Integrations',
-      'Add contacts to SMS lists from your CRM using "Add to WhatsApp/SMS List"',
-      'Keep messages under 160 characters to save money (longer = multiple SMS charges)',
-      'View cost estimates before sending - typically ₹0.20-0.50 per message in India'
+      'Add contacts to SMS lists from your CRM',
+      'Keep messages under 160 characters to save money',
+      'View cost estimates before sending'
     ],
     faqs: [
       {
         question: 'How do bulk SMS campaigns work?',
-        answer: 'Step 1: Connect MSG91 or Fast2SMS in Settings. Step 2: Add contacts to SMS list from CRM. Step 3: Write your message (under 160 characters), select your contact list, and send.'
+        answer: 'Step 1: Connect MSG91 or Fast2SMS in Settings. Step 2: Add contacts to SMS list from CRM. Step 3: Write your message (under 160 characters), select your list, and send.'
       },
       {
         question: 'What is DLT and do I need it?',
-        answer: 'DLT (Distributed Ledger Technology) is required by India\'s telecom rules for promotional SMS. Register your templates at MSG91\'s DLT portal. Transactional messages (like OTPs) don\'t need DLT.'
+        answer: 'DLT is required by India\'s telecom rules for promotional SMS. Register your templates at MSG91\'s DLT portal. Transactional messages (like OTPs) don\'t need DLT.'
       },
       {
         question: 'How much do SMS messages cost?',
-        answer: 'In India: ₹0.20-0.50 per message depending on provider. Each 160 characters = 1 SMS. A 320-character message costs double. You\'ll see the exact cost estimate before sending.'
+        answer: 'In India: ₹0.20-0.50 per message. Each 160 characters = 1 SMS. A 320-character message costs double. You\'ll see the exact cost before sending.'
       },
       {
         question: 'Can I send to international numbers?',
-        answer: 'Yes, but costs are higher (₹2-5 per SMS depending on country). Make sure phone numbers include the country code (+1 for US, +91 for India, etc.).'
+        answer: 'Yes, but costs are higher (₹2-5 per SMS). Make sure phone numbers include country codes (+1 for US, +91 for India).'
       }
     ]
   },
 
   'digital-cards': {
     pageTitle: 'Digital Business Cards',
-    overview: 'Create a beautiful, shareable web page for your business or personal brand. Like a digital business card that you can send to anyone with a link or QR code.',
+    overview: 'Your online business card - share it with anyone via link or QR code. No website needed! OmniFlow is the only platform with AI Voice Chatbot on digital cards.',
     capabilities: [
-      'Create professional digital business cards',
-      'Share your card with anyone via link or QR code',
-      'Track who views your card and clicks your links',
-      'Capture leads through built-in contact forms'
+      'Create beautiful digital business cards',
+      'Share via link or QR code',
+      'Capture leads with built-in contact forms',
+      'Add AI Voice Chatbot (only OmniFlow has this!)',
+      'Track who views your card'
     ],
     quickActions: [
       {
@@ -534,27 +541,27 @@ export const helpContent: Record<PageId, HelpContent> = {
       }
     ],
     tips: [
-      'Share your digital card link in email signatures and social media bios',
-      'Print the QR code on business cards, flyers, or store windows',
+      'Share your card link in email signatures and social media',
+      'Print the QR code on business cards or flyers',
       'Enable the contact form to capture leads automatically',
-      'Check the analytics to see who\'s viewing your card'
+      'Add the AI Voice Chatbot to answer questions 24/7'
     ],
     faqs: [
       {
-        question: 'What are digital cards and why use them?',
-        answer: 'A digital card is a mobile-friendly web page with your contact info, links, and business details. Share it via link or QR code instead of paper business cards. People can save your contact, visit your website, or message you instantly.'
+        question: 'What is a digital card?',
+        answer: 'A mobile-friendly web page with your contact info, links, and business details. Share it via link or QR code instead of paper business cards. People can save your contact, visit your website, or message you instantly.'
       },
       {
-        question: 'How do I share my digital card?',
-        answer: 'Click Copy Link to share via email/text, or download the QR code to print on physical materials. Anyone who scans the QR or clicks the link sees your card.'
+        question: 'How do I share my card?',
+        answer: 'Click Copy Link to share via email or text. Download the QR code to print on business cards, flyers, or store windows. Anyone who scans or clicks sees your card.'
       },
       {
-        question: 'Can I have multiple digital cards?',
-        answer: 'Yes! Your plan determines how many cards you can create. Use different cards for different purposes - one for your business, one personal, etc.'
+        question: 'What makes OmniFlow\'s digital cards special?',
+        answer: 'We\'re the only platform with AI Voice Chatbot! Your card can answer questions, capture leads, and book appointments 24/7 - no other digital card service offers this.'
       },
       {
-        question: 'How do I track who views my card?',
-        answer: 'Each card shows view count, link clicks, and leads captured. Click on a card to see detailed analytics.'
+        question: 'Can I have multiple cards?',
+        answer: 'Yes! Create different cards for different purposes - one for your business, one personal, one for a specific product or event.'
       }
     ]
   },
@@ -605,37 +612,37 @@ export const helpContent: Record<PageId, HelpContent> = {
   },
 
   'ai-chat': {
-    pageTitle: 'AI Content Factory',
-    overview: 'Let AI write content for you - social posts, emails, ads, blog articles, and more. Just describe what you want, and the AI creates it instantly.',
+    pageTitle: 'AI Assistants',
+    overview: 'Chat with specialized AI assistants that help you with different tasks. Each assistant is an expert in their area - content writing, email marketing, SEO, ads, and more.',
     capabilities: [
-      'Generate social media posts for any platform',
-      'Write professional email campaigns',
-      'Create ad copy for Google, Facebook, LinkedIn',
-      'Draft blog articles and web content',
-      'Get trending topic suggestions'
+      'Chat with AI experts for different marketing tasks',
+      'Get help writing emails, social posts, and blog articles',
+      'Create ad copy for Google and Facebook',
+      'Get SEO tips and trending topic ideas',
+      'Generate images for your marketing'
     ],
     tips: [
-      'Choose a specialized agent for best results (Content Writer for posts, Email Expert for campaigns)',
-      'Be specific in your prompts - "Write a Facebook post about our new coffee blend" works better than "Write a post"',
-      'You can edit the AI\'s output to match your brand voice',
-      'Save good prompts to reuse later'
+      'Pick the right assistant for your task - Content Writer for posts, Email Expert for campaigns',
+      'Be specific - "Write a Facebook post about our weekend shoe sale" works better than "Write a post"',
+      'You can always edit what the AI creates to match your style',
+      'Ask follow-up questions to refine the content'
     ],
     faqs: [
       {
-        question: 'How do I generate content with AI?',
-        answer: 'Click on an AI agent (like Content Writer or Email Expert), then describe what you want. For example: "Write a friendly Instagram post announcing our weekend sale on shoes." The AI will draft it in seconds.'
+        question: 'Which AI assistant should I use?',
+        answer: 'Content Writer: social posts and blogs. Email Expert: email campaigns. SEO Expert: keywords and trending topics. Ad Copy Expert: Google/Facebook ads. Image Creator: marketing visuals.'
       },
       {
-        question: 'What should I write in prompts for best results?',
-        answer: 'Be specific! Include: (1) What you\'re promoting, (2) Your target audience, (3) Desired tone (friendly/professional), (4) Call to action. Example: "Write a professional LinkedIn post for small business owners about time management, friendly tone, CTA to download our guide."'
+        question: 'How do I get the best results from AI?',
+        answer: 'Be specific! Tell the AI: (1) What you\'re promoting, (2) Who it\'s for, (3) The tone you want (friendly/professional), (4) What action you want people to take.'
       },
       {
-        question: 'Can I edit what the AI creates?',
-        answer: 'Absolutely! The AI creates a draft - you should always review and edit it to match your brand voice and add personal touches.'
+        question: 'Can I use the content the AI creates?',
+        answer: 'Yes! The AI creates drafts for you to use. Review and edit them to match your brand voice, then use them in your campaigns, posts, or website.'
       },
       {
-        question: 'What are trending topics and how do I use them?',
-        answer: 'Click the SEO Expert agent and ask for trending topics in your industry. The AI will suggest popular topics people are searching for, perfect for blog posts or social content.'
+        question: 'How many times can I use the AI?',
+        answer: 'Your plan includes a monthly AI credit quota. Check your dashboard to see how many credits you have left. Upgrade your plan for more credits.'
       }
     ]
   },
@@ -662,11 +669,14 @@ export const helpContent: Record<PageId, HelpContent> = {
   },
 
   'social-media': {
-    pageTitle: 'Content Writer',
+    pageTitle: 'AI Content Factory',
+    overview: 'Your AI-powered content creation hub. Generate social media posts, images, and marketing content in seconds. Schedule posts across all your social platforms from one place.',
     capabilities: [
-      'Let the computer write social media posts for you',
-      'Create email messages automatically',
-      'Generate blog articles and web page content'
+      'Create social media posts with AI - just describe what you want',
+      'Generate eye-catching images for your posts',
+      'Schedule posts to Facebook, Instagram, LinkedIn, and Twitter',
+      'Save content to your library for later use',
+      'Get SEO suggestions to improve your reach'
     ],
     quickActions: [
       {
@@ -679,37 +689,60 @@ export const helpContent: Record<PageId, HelpContent> = {
       }
     ],
     tips: [
-      'Just describe what you want to say, and the computer will write it for you',
-      'You can edit the content after it\'s generated to make it perfect',
-      'Save your favorite posts to reuse them later'
+      'Tell the AI what you want to say - "Write a post about our weekend sale" works great',
+      'Use the image generator to create visuals that match your post',
+      'Schedule posts for the best times - Tuesday-Thursday mornings work well',
+      'Connect your social accounts in Settings to post directly'
+    ],
+    faqs: [
+      {
+        question: 'How do I create a post with AI?',
+        answer: 'Click "Create Post", describe what you want (like "Write a fun Instagram post about our new coffee blend"), and the AI will write it for you. You can edit it before posting.'
+      },
+      {
+        question: 'Can I post to multiple platforms at once?',
+        answer: 'Yes! Connect your social accounts in Settings → Social Media Setup. Then when you create a post, you can select which platforms to publish to.'
+      },
+      {
+        question: 'How do I schedule posts for later?',
+        answer: 'After creating your post, click "Schedule" instead of "Post Now". Pick the date and time, and it will be published automatically.'
+      },
+      {
+        question: 'What is the Content Hub?',
+        answer: 'The Content Hub stores all your created content - posts, images, and drafts. You can reuse, edit, or schedule any saved content later.'
+      }
     ]
   },
 
   onboarding: {
-    pageTitle: 'Getting Started Checklist',
-    overview: 'Track your progress as you get started with OmniFlow. Complete these simple steps to unlock the full power of your marketing platform.',
+    pageTitle: 'Getting Started',
+    overview: 'Welcome to OmniFlow! Follow these simple steps to set up your all-in-one marketing platform. Everything you need is built-in - no external tools required.',
     capabilities: [
-      'Add your first contacts using the built-in CRM',
-      'Send your first email campaign (no external service needed)',
-      'Create a Digital Business Card for lead capture',
+      'Add your first contacts',
+      'Send your first email campaign',
+      'Create a Digital Business Card',
       'Try AI content generation',
-      'Set up email automation',
+      'Set up automated follow-ups',
       'Launch multi-channel campaigns'
     ],
     tips: [
-      'You can complete all these steps using OmniFlow\'s built-in features - no external tools required!',
+      'Everything works out of the box - no external tools needed!',
       'Start with "Add Contacts" - it\'s the easiest first step',
-      'Each completed step unlocks new marketing capabilities',
-      'Skip any step and come back later - there\'s no pressure'
+      'Each step unlocks more marketing power',
+      'Skip any step and come back later - no pressure'
     ],
     faqs: [
       {
-        question: 'Do I need to set up external tools first?',
-        answer: 'No! All checklist items use OmniFlow\'s built-in features. You can add contacts, send emails, create digital cards, and use AI without connecting any external services.'
+        question: 'Do I need to connect external tools first?',
+        answer: 'No! OmniFlow has everything built-in. You can add contacts, send emails, create digital cards, and use AI without connecting anything else.'
       },
       {
-        question: 'What happens when I complete all checklist items?',
-        answer: 'You\'ll have a fully functional marketing system! You\'ll have sent campaigns, captured leads, used AI, and set up automation - all the basics for successful marketing.'
+        question: 'What happens when I complete all steps?',
+        answer: 'You\'ll have a fully working marketing system! Contacts in your CRM, campaigns sent, leads captured, AI content created, and automation running.'
+      },
+      {
+        question: 'How is OmniFlow different from other tools?',
+        answer: 'OmniFlow replaces 10+ tools (CRM, email, SMS, WhatsApp, AI content, digital cards, and more) at 1/3rd the cost. Everything works together in one place.'
       }
     ]
   },
@@ -729,36 +762,234 @@ export const helpContent: Record<PageId, HelpContent> = {
 
   settings: {
     pageTitle: 'Settings',
-    overview: 'Connect your business tools, manage your subscription, and configure how OmniFlow works for you. This is your control center.',
+    overview: 'Your control center - connect your tools, manage your subscription, and customize how OmniFlow works for you.',
     capabilities: [
-      'Connect email services (Brevo, SMTP)',
-      'Connect messaging platforms (WhatsApp, SMS)',
+      'Connect email services (Brevo, Gmail, SMTP)',
+      'Connect messaging (WhatsApp, SMS providers)',
       'Manage your subscription and billing',
-      'Add team members and manage permissions',
-      'Update your business information'
+      'Add team members',
+      'Update your business info'
     ],
     tips: [
-      'Start with the Integrations tab to connect email and messaging services',
-      'You\'ll need API keys or credentials from each service you connect',
-      'Add team members in the Users tab to collaborate',
-      'Keep your business info updated - it appears on invoices and emails'
+      'Start with Integrations to connect email and messaging',
+      'You\'ll need API keys from each service you connect',
+      'Add team members in the Users tab',
+      'Keep your business info updated - it shows on invoices and emails'
     ],
     faqs: [
       {
         question: 'How do I connect my email service?',
-        answer: 'Go to Settings → Integrations tab. For Brevo: paste your API key. For Gmail/SMTP: enter your email, password, and server details. Most providers show these in their Settings → API or SMTP section.'
+        answer: 'Go to Integrations tab. For Brevo: paste your API key. For Gmail/SMTP: enter your email, password, and server details. Find these in your email provider\'s Settings.'
       },
       {
-        question: 'Where do I find API keys for different services?',
-        answer: 'Brevo: Account → SMTP & API → API Keys. HubSpot: Settings → Integrations → Private Apps. WATI: Dashboard → API Docs. MSG91: Dashboard → Settings → API Keys. Each service is slightly different.'
+        question: 'Where do I find API keys?',
+        answer: 'Brevo: Account → SMTP & API → API Keys. HubSpot: Settings → Integrations → Private Apps. WATI: Dashboard → API Docs. MSG91: Dashboard → Settings → API Keys.'
       },
       {
         question: 'How do I add team members?',
-        answer: 'Go to Settings → Users tab, click Invite User, enter their email. They\'ll receive an invitation to join your OmniFlow account.'
+        answer: 'Go to Users tab, click Invite User, enter their email. They\'ll get an invitation to join your OmniFlow account.'
       },
       {
-        question: 'Can I change my subscription plan?',
-        answer: 'Yes! Go to Settings → Billing tab to upgrade or downgrade your plan. Changes take effect immediately, and billing adjusts automatically.'
+        question: 'Can I change my plan?',
+        answer: 'Yes! Go to Billing tab to upgrade or downgrade. Changes take effect immediately and billing adjusts automatically.'
+      }
+    ]
+  },
+
+  'landing-pages': {
+    pageTitle: 'Landing Pages',
+    overview: 'Create beautiful web pages without coding. Perfect for capturing leads, launching products, or promoting events. AI can even clone any website design you like!',
+    capabilities: [
+      'Create landing pages from templates',
+      'Clone any website design with AI',
+      'Add lead capture forms (syncs to your CRM)',
+      'Customize colors and branding',
+      'Publish instantly with a shareable link'
+    ],
+    tips: [
+      'Start with a template - it\'s faster than building from scratch',
+      'Use "Clone from Reference" to copy any page design you like',
+      'Add a lead form to capture visitor info automatically',
+      'Preview on mobile before publishing'
+    ],
+    faqs: [
+      {
+        question: 'How do I create a landing page?',
+        answer: 'Click "Create New Page", pick a template (Lead Capture, Product Launch, etc.), then customize the content. Click any section to edit text, images, and colors.'
+      },
+      {
+        question: 'What is Clone from Reference?',
+        answer: 'Paste any website URL and AI will analyze its design and create a similar page for you. Great for recreating competitor pages or designs you admire.'
+      },
+      {
+        question: 'Where do leads from my page go?',
+        answer: 'When someone fills out a form, their info automatically appears in your Contacts. You can then follow up via email, WhatsApp, or SMS.'
+      },
+      {
+        question: 'Can I use my own domain?',
+        answer: 'Pages are published at omniflow.app/p/your-page-name. Custom domains are available on higher plans.'
+      }
+    ]
+  },
+
+  'workflow-builder': {
+    pageTitle: 'Workflow Builder',
+    overview: 'Automate your follow-ups and never miss a lead. When something happens (new contact, form filled), automatically send emails, SMS, or WhatsApp messages.',
+    capabilities: [
+      'Create automated workflows with drag & drop',
+      'Trigger actions when contacts are added or forms submitted',
+      'Send automated emails, SMS, and WhatsApp',
+      'Add delays between messages',
+      'Create different paths based on conditions'
+    ],
+    tips: [
+      'Start simple - create a "Welcome Email" workflow first',
+      'Every workflow needs a Trigger (what starts it) and an Action (what happens)',
+      'Use delays to space out messages - don\'t overwhelm contacts',
+      'Test by adding yourself as a contact'
+    ],
+    faqs: [
+      {
+        question: 'How do I create my first workflow?',
+        answer: 'Click "New Workflow", add a Trigger (like "New Contact Added"), then add an Action (like "Send Email"). Configure each step, then click Activate.'
+      },
+      {
+        question: 'What triggers are available?',
+        answer: 'New Contact Added, Form Submitted, Tag Added, Deal Stage Changed, Deal Won, Appointment Scheduled, and Manual Trigger.'
+      },
+      {
+        question: 'Can I send WhatsApp automatically?',
+        answer: 'Yes! Add a "Send WhatsApp" action. You\'ll need to connect WATI or AiSensy in Settings first, and use approved message templates.'
+      },
+      {
+        question: 'How do I test my workflow?',
+        answer: 'Add yourself as a test contact with your email/phone. The workflow will run and you\'ll receive the messages.'
+      }
+    ]
+  },
+
+  'appointments': {
+    pageTitle: 'Appointments',
+    overview: 'All your bookings in one place. Sync with Cal.com for automatic scheduling, or create appointments manually.',
+    capabilities: [
+      'View all appointments in one place',
+      'Create appointments manually',
+      'Sync bookings from Cal.com automatically',
+      'Mark appointments as completed or cancelled',
+      'Set up reminders'
+    ],
+    tips: [
+      'Connect Cal.com in Settings to auto-sync bookings',
+      'Appointments sync automatically when you open this page',
+      'Use filters to see upcoming or completed appointments',
+      'Click any appointment to view details or reschedule'
+    ],
+    faqs: [
+      {
+        question: 'How do I connect Cal.com?',
+        answer: 'Go to Settings → Integrations, find Cal.com, and enter your API key. Once connected, bookings sync automatically.'
+      },
+      {
+        question: 'Can I create appointments without Cal.com?',
+        answer: 'Yes! Click "New Appointment" to create one manually. Enter client details, date, time, and notes.'
+      },
+      {
+        question: 'How do reminders work?',
+        answer: 'When creating an appointment, enable email or SMS reminders. They\'ll be sent automatically before the appointment.'
+      }
+    ]
+  },
+
+  'team-management': {
+    pageTitle: 'Team Management',
+    overview: 'Track your team\'s work status. Team members can clock in/out, and managers can see who\'s working.',
+    capabilities: [
+      'Clock in and out to track work hours',
+      'See who\'s currently working',
+      'View attendance history',
+      'Managers can see all team members\' status'
+    ],
+    tips: [
+      'Clock in when you start, clock out when you\'re done',
+      'Your status updates in real-time for your team',
+      'Managers and admins see the full team view'
+    ],
+    faqs: [
+      {
+        question: 'How do I clock in?',
+        answer: 'Click the "Clock In" button. Your status changes to "Clocked In" and your team can see you\'re working.'
+      },
+      {
+        question: 'Can I see my team\'s attendance?',
+        answer: 'If you\'re a manager or admin, you\'ll see a table showing all team members, their status, and when they last clocked in/out.'
+      },
+      {
+        question: 'Is attendance tracked automatically?',
+        answer: 'No, you need to manually clock in and out. This gives you control over when your work time is recorded.'
+      }
+    ]
+  },
+
+  'advanced-analytics': {
+    pageTitle: 'Advanced Analytics',
+    overview: 'See what\'s working in your business. Track your sales funnel, calculate campaign ROI, and get AI predictions for growth.',
+    capabilities: [
+      'View your sales funnel (lead to customer)',
+      'Calculate ROI for email and SMS campaigns',
+      'See which channels bring the most revenue',
+      'Get AI predictions for future performance',
+      'Export reports to Excel'
+    ],
+    tips: [
+      'Connect Brevo and Twilio in Settings to see campaign costs and ROI',
+      'Use the period filter to compare different time ranges',
+      'Check Predictions for AI-powered growth forecasts',
+      'Export reports to share with your team'
+    ],
+    faqs: [
+      {
+        question: 'Why is my ROI showing as 0?',
+        answer: 'ROI needs campaign cost data. Connect Brevo (for email costs) and Twilio (for SMS costs) in Settings → Integrations.'
+      },
+      {
+        question: 'How are predictions calculated?',
+        answer: 'AI analyzes your historical data (leads, revenue, campaigns) to predict future trends. You need at least 3 months of data for accurate predictions.'
+      },
+      {
+        question: 'What does the conversion funnel show?',
+        answer: 'How contacts move through your sales process: New Lead → Contacted → Qualified → Won. Percentages show how many make it to each stage.'
+      }
+    ]
+  },
+
+  'transactions': {
+    pageTitle: 'Transactions',
+    overview: 'View all payments across your platform. Track successful payments, handle failed ones, and monitor your revenue.',
+    capabilities: [
+      'View all Stripe and Razorpay transactions',
+      'Filter by status (succeeded, failed, pending)',
+      'See revenue totals in USD and INR',
+      'Update transaction status manually',
+      'Search by company, email, or transaction ID'
+    ],
+    tips: [
+      'Use filters to find specific transactions quickly',
+      'Check failed transactions to follow up with customers',
+      'Export data for accounting',
+      'Review pending transactions that may need attention'
+    ],
+    faqs: [
+      {
+        question: 'Why are some transactions pending?',
+        answer: 'Pending transactions are waiting for payment confirmation from Stripe/Razorpay. They usually resolve in a few minutes. If stuck, you can manually update the status.'
+      },
+      {
+        question: 'Can I refund from here?',
+        answer: 'Refunds must be processed through your Stripe or Razorpay dashboard directly. This page shows history but doesn\'t process refunds.'
+      },
+      {
+        question: 'What\'s the difference between Stripe and Razorpay?',
+        answer: 'Stripe handles international payments (USD), Razorpay handles Indian payments (INR). Customers are automatically routed based on their location.'
       }
     ]
   }

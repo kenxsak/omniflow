@@ -79,15 +79,15 @@ export function DashboardClient({
       <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         {/* Pipeline Value */}
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full" style={{ background: '#3b82f6' }} />
           <div className="p-3 sm:p-4 pt-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                 Pipeline Value
               </span>
-              <Icon icon="solar:wallet-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:wallet-linear" className="h-4 w-4" style={{ color: '#3b82f6' }} />
             </div>
-            <div className="text-lg sm:text-2xl font-semibold tabular-nums text-foreground">
+            <div className="text-lg sm:text-2xl font-semibold tabular-nums" style={{ color: '#3b82f6' }}>
               {formatCurrency(pipelineValue)}
             </div>
             <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
@@ -98,19 +98,19 @@ export function DashboardClient({
 
         {/* Won Revenue */}
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full" style={{ background: '#10b981' }} />
           <div className="p-3 sm:p-4 pt-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                 Won Revenue
               </span>
-              <Icon icon="solar:cup-star-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:cup-star-linear" className="h-4 w-4" style={{ color: '#10b981' }} />
             </div>
-            <div className="text-lg sm:text-2xl font-semibold tabular-nums text-foreground">
+            <div className="text-lg sm:text-2xl font-semibold tabular-nums" style={{ color: '#10b981' }}>
               {formatCurrency(wonValue)}
             </div>
             <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 flex items-center gap-1">
-              <Icon icon="solar:arrow-up-linear" className="h-3 w-3" />
+              <Icon icon="solar:arrow-up-linear" className="h-3 w-3" style={{ color: '#10b981' }} />
               {dealStats?.wonDeals || 0} deals closed
             </p>
           </div>
@@ -118,15 +118,15 @@ export function DashboardClient({
 
         {/* Conversion Rate */}
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full" style={{ background: '#f59e0b' }} />
           <div className="p-3 sm:p-4 pt-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                 Conversion Rate
               </span>
-              <Icon icon="solar:chart-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:chart-linear" className="h-4 w-4" style={{ color: '#f59e0b' }} />
             </div>
-            <div className="text-lg sm:text-2xl font-semibold tabular-nums text-foreground">
+            <div className="text-lg sm:text-2xl font-semibold tabular-nums" style={{ color: '#f59e0b' }}>
               {conversionRate.toFixed(1)}%
             </div>
             <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
@@ -137,15 +137,15 @@ export function DashboardClient({
 
         {/* Total Contacts */}
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full" style={{ background: '#8b5cf6' }} />
           <div className="p-3 sm:p-4 pt-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                 Total Contacts
               </span>
-              <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4" style={{ color: '#8b5cf6' }} />
             </div>
-            <div className="text-lg sm:text-2xl font-semibold tabular-nums text-foreground">
+            <div className="text-lg sm:text-2xl font-semibold tabular-nums" style={{ color: '#8b5cf6' }}>
               {stats.total}
             </div>
             <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
@@ -159,10 +159,10 @@ export function DashboardClient({
       <div className="grid gap-4 md:grid-cols-2">
         {/* Recent Activity */}
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-primary" />
-          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #6366f1, #8b5cf6)' }} />
+          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800" style={{ background: 'linear-gradient(to right, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05))' }}>
             <div className="flex items-center gap-2">
-              <Icon icon="solar:chart-2-linear" className="h-4 w-4 text-muted-foreground" />
+              <Icon icon="solar:chart-2-linear" className="h-4 w-4" style={{ color: '#6366f1' }} />
               <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                 Recent Activity
               </span>
@@ -197,23 +197,35 @@ export function DashboardClient({
 
         {/* Status Distribution */}
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
-          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
-            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-              Contact Status Distribution
-            </span>
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #14b8a6, #10b981)' }} />
+          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800" style={{ background: 'linear-gradient(to right, rgba(20, 184, 166, 0.05), rgba(16, 185, 129, 0.05))' }}>
+            <div className="flex items-center gap-2">
+              <Icon icon="solar:pie-chart-2-linear" className="h-4 w-4" style={{ color: '#14b8a6' }} />
+              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                Contact Status Distribution
+              </span>
+            </div>
             <p className="text-xs text-muted-foreground mt-0.5">Breakdown of contacts by pipeline stage</p>
           </div>
           <div className="p-4">
             <div className="space-y-3">
-              {statusDistribution.map(({ status, count, percentage }) => (
+              {statusDistribution.map(({ status, count, percentage }) => {
+                const statusBarColors: Record<string, string> = {
+                  'New': '#3b82f6',
+                  'Contacted': '#f59e0b',
+                  'Qualified': '#14b8a6',
+                  'Won': '#10b981',
+                  'Lost': '#f43f5e',
+                };
+                const barColor = statusBarColors[status] || '#14b8a6';
+                return (
                 <div key={status} className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium text-foreground">{status}</span>
+                  <span className="text-sm font-medium text-foreground w-20">{status}</span>
                   <div className="flex items-center gap-2 flex-1 max-w-[200px]">
                     <div className="flex-1 bg-stone-100 dark:bg-stone-800 rounded-full h-1.5">
                       <div 
-                        className="bg-foreground h-1.5 rounded-full transition-all" 
-                        style={{ width: `${percentage}%` }}
+                        className="h-1.5 rounded-full transition-all" 
+                        style={{ width: `${percentage}%`, background: barColor }}
                       />
                     </div>
                     <span className="text-xs text-muted-foreground tabular-nums w-16 text-right">
@@ -221,7 +233,7 @@ export function DashboardClient({
                     </span>
                   </div>
                 </div>
-              ))}
+              )})}
             </div>
           </div>
         </div>
@@ -230,26 +242,30 @@ export function DashboardClient({
       {/* Secondary Stats */}
       <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden p-4">
+          <div className="absolute inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: '#3b82f6' }} />
           <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">New Contacts</span>
-          <div className="text-xl font-semibold tabular-nums mt-1">{stats.new}</div>
+          <div className="text-xl font-semibold tabular-nums mt-1" style={{ color: '#3b82f6' }}>{stats.new}</div>
           <p className="text-[10px] text-muted-foreground">Awaiting first contact</p>
         </div>
 
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden p-4">
+          <div className="absolute inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: '#14b8a6' }} />
           <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Synced</span>
-          <div className="text-xl font-semibold tabular-nums mt-1">{stats.synced}</div>
+          <div className="text-xl font-semibold tabular-nums mt-1" style={{ color: '#14b8a6' }}>{stats.synced}</div>
           <p className="text-[10px] text-muted-foreground">Synced to platforms</p>
         </div>
 
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden p-4">
+          <div className="absolute inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: '#10b981' }} />
           <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Avg Deal Size</span>
-          <div className="text-xl font-semibold tabular-nums mt-1">{formatCurrency(dealStats?.avgDealSize || 0)}</div>
+          <div className="text-xl font-semibold tabular-nums mt-1" style={{ color: '#10b981' }}>{formatCurrency(dealStats?.avgDealSize || 0)}</div>
           <p className="text-[10px] text-muted-foreground">Per opportunity</p>
         </div>
 
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden p-4">
+          <div className="absolute inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: '#f59e0b' }} />
           <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Open Deals</span>
-          <div className="text-xl font-semibold tabular-nums mt-1">{dealStats?.openDeals || 0}</div>
+          <div className="text-xl font-semibold tabular-nums mt-1" style={{ color: '#f59e0b' }}>{dealStats?.openDeals || 0}</div>
           <p className="text-[10px] text-muted-foreground">In active pipeline</p>
         </div>
       </div>
@@ -258,8 +274,8 @@ export function DashboardClient({
       {isManagerOrAdmin && hasTeamMembers && (
         <div className="mt-8">
           <div className="flex items-center gap-3 mb-6">
-            <div className="h-8 w-8 rounded-lg bg-muted/50 flex items-center justify-center">
-              <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4 text-muted-foreground" />
+            <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #eff6ff, #f5f3ff)' }}>
+              <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4" style={{ color: '#6366f1' }} />
             </div>
             <div>
               <h2 className="text-lg font-semibold">Team Performance</h2>

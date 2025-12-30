@@ -75,44 +75,44 @@ export function TeamPerformanceDashboard({ leads, teamMembers }: TeamPerformance
       {/* Stats Grid */}
       <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-[oklch(0.55_0.15_250)] dark:bg-[oklch(0.65_0.16_250)]" />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Team Members</span>
-              <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:users-group-two-rounded-linear" className="h-4 w-4 text-[oklch(0.55_0.15_250)] dark:text-[oklch(0.65_0.16_250)]" />
             </div>
             <p className="text-2xl font-semibold tabular-nums">{teamMembers.length}</p>
           </div>
         </div>
         
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-[oklch(0.55_0.14_160)] dark:bg-[oklch(0.65_0.15_160)]" />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Avg Leads/Rep</span>
-              <Icon icon="solar:target-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:target-linear" className="h-4 w-4 text-[oklch(0.55_0.14_160)] dark:text-[oklch(0.65_0.15_160)]" />
             </div>
             <p className="text-2xl font-semibold tabular-nums">{avgLeadsPerRep}</p>
           </div>
         </div>
         
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-[oklch(0.60_0.16_145)] dark:bg-[oklch(0.68_0.17_145)]" />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Total Won</span>
-              <Icon icon="solar:cup-star-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:cup-star-linear" className="h-4 w-4 text-[oklch(0.60_0.16_145)] dark:text-[oklch(0.68_0.17_145)]" />
             </div>
             <p className="text-2xl font-semibold tabular-nums">{leads.filter(l => l.status === 'Won').length}</p>
           </div>
         </div>
         
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-[oklch(0.70_0.14_70)] dark:bg-[oklch(0.75_0.15_70)]" />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Unassigned</span>
-              <Icon icon="solar:user-cross-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:user-cross-linear" className="h-4 w-4 text-[oklch(0.70_0.14_70)] dark:text-[oklch(0.75_0.15_70)]" />
             </div>
             <p className="text-2xl font-semibold tabular-nums">{unassignedLeads}</p>
           </div>
@@ -123,7 +123,7 @@ export function TeamPerformanceDashboard({ leads, teamMembers }: TeamPerformance
       <div className="grid gap-4 md:grid-cols-2">
         {/* Lead Distribution Chart */}
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-[oklch(0.55_0.15_250)] dark:bg-[oklch(0.65_0.16_250)]" />
           <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
             <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               Lead Distribution
@@ -148,7 +148,7 @@ export function TeamPerformanceDashboard({ leads, teamMembers }: TeamPerformance
                     labelStyle={{ color: '#a8a29e' }}
                     cursor={{ fill: 'rgba(255,255,255,0.05)' }}
                   />
-                  <Bar dataKey="leads" name="Total Leads" radius={[4, 4, 0, 0]} fill="#a8a29e" />
+                  <Bar dataKey="leads" name="Total Leads" radius={[4, 4, 0, 0]} fill="oklch(0.55 0.15 250)" />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -164,7 +164,7 @@ export function TeamPerformanceDashboard({ leads, teamMembers }: TeamPerformance
 
         {/* Team Leaderboard */}
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-[oklch(0.60_0.16_145)] dark:bg-[oklch(0.68_0.17_145)]" />
           <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
             <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               Team Leaderboard
@@ -213,7 +213,7 @@ export function TeamPerformanceDashboard({ leads, teamMembers }: TeamPerformance
 
       {/* Performance Details Table */}
       <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-        <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+        <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-[oklch(0.55_0.15_300)] dark:bg-[oklch(0.65_0.16_300)]" />
         <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
           <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
             Team Performance Details
@@ -270,7 +270,7 @@ export function TeamPerformanceDashboard({ leads, teamMembers }: TeamPerformance
                         <div className="flex items-center gap-2 justify-center">
                           <div className="h-1.5 w-12 bg-stone-200 dark:bg-stone-800 rounded-full overflow-hidden">
                             <div 
-                              className="h-full bg-foreground rounded-full transition-all" 
+                              className="h-full bg-[oklch(0.60_0.16_145)] dark:bg-[oklch(0.68_0.17_145)] rounded-full transition-all" 
                               style={{ width: `${rep.conversionRate}%` }}
                             />
                           </div>

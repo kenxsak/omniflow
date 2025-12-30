@@ -233,17 +233,18 @@ function LeadsTableInner({
 
   const handleDownloadTemplate = async () => {
     try {
-      const XLSX = await import('xlsx');
-      const templateData = [
-        { 'Name': 'John Doe', 'Email': 'john@example.com', 'Phone': '+1234567890', 'Company': 'Example Corp', 'Status': 'New' },
-        { 'Name': 'Jane Smith', 'Email': 'jane@example.com', 'Phone': '+1987654321', 'Company': 'Sample Inc', 'Status': 'Qualified' }
-      ];
+      const csvContent = `Name,Email,Phone,Company,Status
+John Doe,john@example.com,"919876543210",Example Corp,New
+Jane Smith,jane@example.com,"918765432109",Sample Inc,Qualified`;
       
-      const worksheet = XLSX.utils.json_to_sheet(templateData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Contacts Template");
-      XLSX.writeFile(workbook, "OmniFlow_CRM_Contacts_Template.xlsx");
-      toast({ title: "Template Downloaded" });
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'OmniFlow_CRM_Contacts_Template.csv';
+      link.click();
+      URL.revokeObjectURL(link.href);
+      
+      toast({ title: "Template Downloaded", description: "Phone may show as 9.19E+11 in Excel - that's OK, imports correctly!" });
     } catch (error) {
       toast({ title: "Download Failed", variant: "destructive" });
     }
@@ -365,19 +366,19 @@ function LeadsTableInner({
         </div>
       </header>
 
-      {/* Tabs - Clerk Style */}
+      {/* Tabs - Clerk Style with semantic colors */}
       {userRole && userRole !== 'user' && (
         <div className="flex items-stretch gap-6 overflow-x-auto pb-px border-b border-stone-200 dark:border-stone-800">
           <button
             onClick={() => setActiveTab('all')}
             className={`relative flex items-center gap-1.5 whitespace-nowrap py-2 text-sm transition-colors ${
               activeTab === 'all' 
-                ? 'text-foreground' 
+                ? 'text-foreground font-medium' 
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {activeTab === 'all' && (
-              <span className="absolute left-0 top-full h-px w-full bg-foreground" />
+              <span className="absolute left-0 top-full h-0.5 w-full rounded-full" style={{ background: '#3b82f6' }} />
             )}
             All
           </button>
@@ -385,12 +386,12 @@ function LeadsTableInner({
             onClick={() => setActiveTab('my')}
             className={`relative flex items-center gap-1.5 whitespace-nowrap py-2 text-sm transition-colors ${
               activeTab === 'my' 
-                ? 'text-foreground' 
+                ? 'text-foreground font-medium' 
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {activeTab === 'my' && (
-              <span className="absolute left-0 top-full h-px w-full bg-foreground" />
+              <span className="absolute left-0 top-full h-0.5 w-full rounded-full" style={{ background: '#14b8a6' }} />
             )}
             My Contacts
           </button>
@@ -398,12 +399,12 @@ function LeadsTableInner({
             onClick={() => setActiveTab('unassigned')}
             className={`relative flex items-center gap-1.5 whitespace-nowrap py-2 text-sm transition-colors ${
               activeTab === 'unassigned' 
-                ? 'text-foreground' 
+                ? 'text-foreground font-medium' 
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {activeTab === 'unassigned' && (
-              <span className="absolute left-0 top-full h-px w-full bg-foreground" />
+              <span className="absolute left-0 top-full h-0.5 w-full rounded-full" style={{ background: '#f59e0b' }} />
             )}
             Unassigned
           </button>
@@ -477,11 +478,12 @@ function LeadsTableInner({
             </div>
           </div>
 
-          {/* Create Button - Clerk Style Primary */}
+          {/* Create Button - Blue gradient */}
           <div className="flex-0 sm:ml-auto">
             <Button 
               onClick={openAddLeadDialog}
-              className="h-8 px-3 text-sm shadow-sm bg-primary hover:bg-primary/90"
+              className="h-8 px-3 text-sm shadow-sm"
+              style={{ background: 'linear-gradient(to right, #3b82f6, #6366f1)' }}
             >
               <Icon icon="solar:add-circle-linear" className="h-4 w-4 mr-1.5" />
               Create contact
@@ -491,8 +493,8 @@ function LeadsTableInner({
 
         {/* Bulk Actions Bar */}
         {selectedLeadIds.size > 0 && (
-          <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
-            <span className="text-sm font-medium">{selectedLeadIds.size} selected</span>
+          <div className="flex items-center gap-2 mb-4 p-3 rounded-lg border" style={{ background: 'rgba(59, 130, 246, 0.05)', borderColor: 'rgba(59, 130, 246, 0.2)' }}>
+            <span className="text-sm font-medium" style={{ color: '#3b82f6' }}>{selectedLeadIds.size} selected</span>
             <div className="flex items-center gap-2 ml-auto">
               <Button variant="outline" size="sm" onClick={handleAddToList} disabled={isDeleting} className="h-7 text-xs">
                 <Icon icon="solar:users-group-two-rounded-linear" className="h-3.5 w-3.5 mr-1.5" />

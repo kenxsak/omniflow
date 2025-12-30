@@ -29,6 +29,7 @@ import {
 } from '@/app/actions/advanced-analytics-actions';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency, formatPercentage } from '@/lib/analytics-service';
+import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 
 // Dynamic imports for heavy components
 const ConversionFunnelChart = dynamic(
@@ -278,6 +279,7 @@ export default function AdvancedAnalyticsPage() {
                     value={metrics.kpis.totalLeads}
                     icon="solar:target-linear"
                     growth={metrics.periodComparison.leadsGrowth}
+                    color="#3b82f6"
                   />
                   <MetricCard
                     label="Total Revenue"
@@ -285,6 +287,7 @@ export default function AdvancedAnalyticsPage() {
                     icon="solar:wallet-linear"
                     growth={metrics.periodComparison.revenueGrowth}
                     isFormatted
+                    color="#10b981"
                   />
                   <MetricCard
                     label="Overall ROI"
@@ -292,6 +295,7 @@ export default function AdvancedAnalyticsPage() {
                     icon="solar:chart-linear"
                     badge={metrics.kpis.overallROI >= 200 ? 'Excellent' : 'Good'}
                     isFormatted
+                    color="#f59e0b"
                   />
                   <MetricCard
                     label="Marketing Spend"
@@ -299,6 +303,7 @@ export default function AdvancedAnalyticsPage() {
                     icon="solar:tag-price-linear"
                     subtitle={`CPL: ${formatCurrency(metrics.costs.costPerLead)}`}
                     isFormatted
+                    color="#8b5cf6"
                   />
                 </div>
               )}
@@ -343,6 +348,9 @@ export default function AdvancedAnalyticsPage() {
           )}
         </div>
       )}
+
+      {/* Help Button - Fixed Bottom Right */}
+      <ContextualHelpButton pageId="advanced-analytics" />
     </div>
   );
 }
@@ -355,7 +363,8 @@ function MetricCard({
   growth, 
   badge, 
   subtitle,
-  isFormatted 
+  isFormatted,
+  color = '#3b82f6'
 }: { 
   label: string; 
   value: number | string; 
@@ -364,22 +373,32 @@ function MetricCard({
   badge?: string;
   subtitle?: string;
   isFormatted?: boolean;
+  color?: string;
 }) {
   return (
     <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-      <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+      <div 
+        className="absolute inset-x-8 top-0 h-0.5 rounded-b-full" 
+        style={{ backgroundColor: color }}
+      />
       <div className="p-3 sm:p-4 pt-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
             {label}
           </span>
-          <Icon icon={icon} className="h-4 w-4 text-muted-foreground/60" />
+          <Icon icon={icon} className="h-4 w-4" style={{ color }} />
         </div>
-        <div className="text-lg sm:text-xl font-semibold tabular-nums text-foreground truncate">
+        <div 
+          className="text-lg sm:text-xl font-semibold tabular-nums truncate"
+          style={{ color }}
+        >
           {isFormatted ? value : <AnimatedCounter value={value as number} />}
         </div>
         {growth !== undefined && growth !== 0 && (
-          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+          <div 
+            className="flex items-center gap-1 text-xs mt-1"
+            style={{ color: growth > 0 ? '#10b981' : '#f43f5e' }}
+          >
             <Icon icon={growth > 0 ? "solar:arrow-up-linear" : "solar:arrow-down-linear"} className="h-3 w-3" />
             <span>{growth > 0 ? '+' : ''}{growth.toFixed(1)}%</span>
           </div>

@@ -247,13 +247,18 @@ export default function WhatsAppMarketingPage() {
   };
 
   const handleDownloadTemplate = async () => {
-    const XLSX = await import('xlsx');
-    const templateData = [{ Name: "John Doe", PhoneNumber: "+919876543210" }];
-    const worksheet = XLSX.utils.json_to_sheet(templateData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Contacts Template");
-    XLSX.writeFile(workbook, "WhatsApp_Contacts_Template.xlsx");
-    toast({ title: "Template Downloaded" });
+    const csvContent = `Name,PhoneNumber
+John Doe,"919876543210"
+Jane Smith,"919123456789"`;
+    
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'WhatsApp_Contacts_Template.csv';
+    link.click();
+    URL.revokeObjectURL(link.href);
+    
+    toast({ title: "Template Downloaded", description: "Phone may show as 9.19E+11 in Excel - that's OK, imports correctly!" });
   };
 
   const getValidDate = (timestamp: any): Date | null => {
@@ -586,7 +591,7 @@ export default function WhatsAppMarketingPage() {
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-muted-foreground">Optional</span>
                 </div>
                 <div className="flex gap-2">
-                  <Input type="tel" value={singleSendPhoneNumber} onChange={(e) => setSingleSendPhoneNumber(e.target.value)} placeholder="+919876543210" className="h-9 flex-1" />
+                  <Input type="tel" value={singleSendPhoneNumber} onChange={(e) => setSingleSendPhoneNumber(e.target.value)} placeholder="919876543210" className="h-9 flex-1" />
                   <Button onClick={() => initiateSingleWaMeSend(singleSendPhoneNumber, campaignMessage, "Test")} disabled={!singleSendPhoneNumber || !campaignMessage} size="sm" className="h-9">
                     <Icon icon="solar:plain-linear" className="mr-1.5 h-3.5 w-3.5" />
                     Test
@@ -784,7 +789,7 @@ export default function WhatsAppMarketingPage() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="contact-phone" className="text-xs text-muted-foreground">Phone *</Label>
-                <Input id="contact-phone" type="tel" value={newContactPhoneNumber} onChange={(e) => setNewContactPhoneNumber(e.target.value)} placeholder="+919876543210" required className="h-9" />
+                <Input id="contact-phone" type="tel" value={newContactPhoneNumber} onChange={(e) => setNewContactPhoneNumber(e.target.value)} placeholder="919876543210" required className="h-9" />
               </div>
             </DialogBody>
             <DialogFooter>

@@ -19,6 +19,7 @@ import {
 } from '@/app/actions/onboarding-client-actions';
 import type { OnboardingProgress, ChecklistItem } from '@/app/actions/onboarding-actions';
 import { addStoredLead } from '@/lib/mock-data';
+import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 
 export default function OnboardingPage() {
   const { appUser, company } = useAuth();
@@ -242,6 +243,9 @@ export default function OnboardingPage() {
           <p>Need help? Contact our support team anytime</p>
         </div>
       </div>
+
+      {/* Help Button - Fixed Bottom Right */}
+      <ContextualHelpButton pageId="onboarding" />
     </div>
   );
 }

@@ -50,7 +50,7 @@ export default function PredictiveChart({ analytics, historicalLeads }: Predicti
   
   return (
     <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-amber-500 dark:bg-amber-400" />
       
       <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
         <div className="flex items-start justify-between">
@@ -103,8 +103,8 @@ export default function PredictiveChart({ analytics, historicalLeads }: Predicti
               <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="leadsGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#a8a29e" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#a8a29e" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#57534e" strokeOpacity={0.3} vertical={false} />
@@ -138,21 +138,21 @@ export default function PredictiveChart({ analytics, historicalLeads }: Predicti
                 <Area 
                   type="monotone" 
                   dataKey="leads" 
-                  stroke="#fafaf9" 
+                  stroke="#3b82f6" 
                   strokeWidth={2}
                   fill="url(#leadsGradient)"
                   name="Actual Leads"
-                  dot={{ fill: '#fafaf9', strokeWidth: 0, r: 4 }}
+                  dot={{ fill: '#3b82f6', strokeWidth: 0, r: 4 }}
                   connectNulls={false}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="predicted" 
-                  stroke="#78716c" 
+                  stroke="#f59e0b" 
                   strokeWidth={2}
                   strokeDasharray="6 4"
                   name="Predicted"
-                  dot={{ fill: '#78716c', strokeWidth: 0, r: 4 }}
+                  dot={{ fill: '#f59e0b', strokeWidth: 0, r: 4 }}
                   connectNulls
                 />
               </ComposedChart>
@@ -161,35 +161,35 @@ export default function PredictiveChart({ analytics, historicalLeads }: Predicti
         </div>
         
         <div className="grid md:grid-cols-2 gap-3">
-          <div className="p-4 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+          <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
             <div className="flex items-center gap-2 mb-3">
-              <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4 text-muted-foreground" />
+              <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4 text-blue-500 dark:text-blue-400" />
               <h4 className="text-sm font-medium">Lead Forecast</h4>
             </div>
             <div className="space-y-1.5">
               <p className="text-xs text-muted-foreground">
-                Next Month: <span className="font-semibold text-foreground">{formatNumber(leadForecast.nextMonth.predicted)}</span>
+                Next Month: <span className="font-semibold text-blue-600 dark:text-blue-400">{formatNumber(leadForecast.nextMonth.predicted)}</span>
                 <span className="text-[10px] ml-1.5">({leadForecast.nextMonth.range.min}-{leadForecast.nextMonth.range.max})</span>
               </p>
               <p className="text-xs text-muted-foreground">
-                Next 3 Months: <span className="font-semibold text-foreground">{formatNumber(leadForecast.next3Months.predicted)}</span>
+                Next 3 Months: <span className="font-semibold text-blue-600 dark:text-blue-400">{formatNumber(leadForecast.next3Months.predicted)}</span>
               </p>
               <Badge variant="outline" className="mt-2 text-[10px]">{leadForecast.nextMonth.confidence} confidence</Badge>
             </div>
           </div>
           
-          <div className="p-4 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+          <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
             <div className="flex items-center gap-2 mb-3">
-              <Icon icon="solar:wallet-linear" className="h-4 w-4 text-muted-foreground" />
+              <Icon icon="solar:wallet-linear" className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
               <h4 className="text-sm font-medium">Revenue Forecast</h4>
             </div>
             <div className="space-y-1.5">
               <p className="text-xs text-muted-foreground">
-                Next Month: <span className="font-semibold text-foreground">${formatNumber(revenueForecast.nextMonth.predicted)}</span>
+                Next Month: <span className="font-semibold text-emerald-600 dark:text-emerald-400">${formatNumber(revenueForecast.nextMonth.predicted)}</span>
                 <span className="text-[10px] ml-1.5">(${revenueForecast.nextMonth.range.min}-${revenueForecast.nextMonth.range.max})</span>
               </p>
               <p className="text-xs text-muted-foreground">
-                Next 3 Months: <span className="font-semibold text-foreground">${formatNumber(revenueForecast.next3Months.predicted)}</span>
+                Next 3 Months: <span className="font-semibold text-emerald-600 dark:text-emerald-400">${formatNumber(revenueForecast.next3Months.predicted)}</span>
               </p>
               <Badge variant="outline" className="mt-2 text-[10px]">{revenueForecast.nextMonth.confidence} confidence</Badge>
             </div>

@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { updateUserProfileAction } from '@/app/actions/profile-actions';
 import { cn } from '@/lib/utils';
 import { SettingsCard } from '@/components/settings/settings-ui';
+import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 
 export default function ProfileSettingsPage() {
   const { appUser, refreshAuthContext } = useAuth();
@@ -257,6 +258,9 @@ export default function ProfileSettingsPage() {
           </div>
         </SettingsCard>
       </div>
+
+      {/* Help Button - Fixed Bottom Right */}
+      <ContextualHelpButton pageId="settings" />
     </div>
   );
 }

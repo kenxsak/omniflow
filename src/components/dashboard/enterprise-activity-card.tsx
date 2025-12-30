@@ -82,7 +82,7 @@ export function EnterpriseActivityCard() {
   if (isLoading) {
     return (
       <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-violet-500 dark:bg-violet-400" />
         <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-stone-200 dark:border-stone-800 flex items-center gap-1.5 sm:gap-2">
           <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
             TEAM
@@ -104,7 +104,7 @@ export function EnterpriseActivityCard() {
   if (!stats) {
     return (
       <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+        <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-violet-500 dark:bg-violet-400" />
         <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-stone-200 dark:border-stone-800 flex items-center gap-1.5 sm:gap-2">
           <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
             TEAM
@@ -148,7 +148,7 @@ export function EnterpriseActivityCard() {
 
   return (
     <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-      <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+      <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-violet-500 dark:bg-violet-400" />
       <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
         <div className="flex items-center gap-1.5 sm:gap-2">
           <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
@@ -173,15 +173,15 @@ export function EnterpriseActivityCard() {
       <div className="p-3 sm:p-4">
         <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-3 sm:mb-4">
           <div className="text-center p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-800">
-            <div className="text-sm sm:text-lg font-semibold tabular-nums text-foreground">{stats.totalMembers}</div>
+            <div className="text-sm sm:text-lg font-semibold tabular-nums" style={{ color: '#8b5cf6' }}>{stats.totalMembers}</div>
             <div className="text-[8px] sm:text-[10px] text-muted-foreground font-mono">MEMBERS</div>
           </div>
           <div className="text-center p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-800">
-            <div className="text-sm sm:text-lg font-semibold tabular-nums text-foreground">{stats.activeToday}</div>
+            <div className="text-sm sm:text-lg font-semibold tabular-nums" style={{ color: '#10b981' }}>{stats.activeToday}</div>
             <div className="text-[8px] sm:text-[10px] text-muted-foreground font-mono">ACTIVE</div>
           </div>
           <div className="text-center p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-800">
-            <div className="text-sm sm:text-lg font-semibold tabular-nums text-foreground">{stats.claimedLeads}</div>
+            <div className="text-sm sm:text-lg font-semibold tabular-nums" style={{ color: '#f59e0b' }}>{stats.claimedLeads}</div>
             <div className="text-[8px] sm:text-[10px] text-muted-foreground font-mono">CLAIMED</div>
           </div>
         </div>

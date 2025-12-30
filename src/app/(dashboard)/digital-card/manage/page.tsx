@@ -184,24 +184,24 @@ export default function ManageDigitalCardsPage() {
           </p>
         </div>
         <div>
-          <Button onClick={() => router.push('/digital-card/create')} size="lg">
+          <Button onClick={() => router.push('/digital-card/create')} size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
             <Plus className="h-4 w-4 -ml-1" />
             New Card
           </Button>
         </div>
       </div>
 
-      {/* Card Limit Indicator - Autosend style */}
+      {/* Card Limit Indicator - Colorful style */}
       {plan && userCount > 0 && (
         <div className="border border-stone-200 dark:border-stone-800 rounded-2xl overflow-hidden">
-          <div className="bg-stone-100 dark:bg-stone-900 px-6 py-4 border-b border-stone-200 dark:border-stone-800">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 px-6 py-4 border-b border-stone-200 dark:border-stone-800">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-stone-800 dark:text-stone-200 font-medium text-base">Card Usage</p>
                 <p className="text-stone-500 dark:text-stone-400 font-normal text-sm">{limitDescription}</p>
               </div>
               {limitStatus === 'limit_reached' && (
-                <Button size="sm" onClick={() => router.push('/settings/subscription')}>
+                <Button size="sm" className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700" onClick={() => router.push('/settings/subscription')}>
                   Upgrade Plan
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" className="-mr-1">
                     <path d="M5 12H19.5833M19.5833 12L12.5833 5M19.5833 12L12.5833 19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
@@ -214,21 +214,30 @@ export default function ManageDigitalCardsPage() {
             <div className="flex items-center gap-8">
               <div className="flex flex-col gap-1">
                 <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Used</p>
-                <p className="text-stone-800 dark:text-stone-200 font-semibold text-2xl font-mono">{currentCards}</p>
+                <p className="text-blue-600 dark:text-blue-400 font-semibold text-2xl font-mono">{currentCards}</p>
               </div>
               <div className="flex flex-col gap-1">
                 <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Limit</p>
                 <p className="text-stone-800 dark:text-stone-200 font-semibold text-2xl font-mono">{maxCards}</p>
               </div>
               <div className="flex-1">
-                <Progress value={usagePercentage} className="h-2" />
+                <div className="w-full h-2 bg-stone-200 dark:bg-stone-700 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full rounded-full transition-all ${
+                      limitStatus === 'limit_reached' ? 'bg-rose-500' :
+                      limitStatus === 'warning' ? 'bg-amber-500' :
+                      'bg-gradient-to-r from-blue-500 to-indigo-500'
+                    }`}
+                    style={{ width: `${Math.min(usagePercentage, 100)}%` }}
+                  />
+                </div>
               </div>
               <div className="flex flex-col gap-1">
                 <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Usage</p>
                 <p className={`font-semibold text-lg font-mono ${
-                  limitStatus === 'limit_reached' ? 'text-rose-600' :
-                  limitStatus === 'warning' ? 'text-amber-600' :
-                  'text-stone-800 dark:text-stone-200'
+                  limitStatus === 'limit_reached' ? 'text-rose-600 dark:text-rose-400' :
+                  limitStatus === 'warning' ? 'text-amber-600 dark:text-amber-400' :
+                  'text-blue-600 dark:text-blue-400'
                 }`}>{Math.round(usagePercentage)}%</p>
               </div>
             </div>
@@ -243,14 +252,16 @@ export default function ManageDigitalCardsPage() {
       )}
 
       {cards.length === 0 ? (
-        <div className="border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-950">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-2xl bg-gradient-to-br from-white to-blue-50/50 dark:from-stone-950 dark:to-blue-950/20">
           <div className="py-12 px-6 text-center space-y-4">
-            <div className="text-5xl mb-4">📇</div>
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-3xl shadow-lg">
+              📇
+            </div>
             <p className="text-stone-800 dark:text-stone-200 font-semibold text-lg">No digital cards yet</p>
             <p className="text-stone-500 dark:text-stone-400 font-normal text-sm max-w-md mx-auto">
               Create your first digital card to share your business information with customers
             </p>
-            <Button onClick={() => router.push('/digital-card/create')}>
+            <Button onClick={() => router.push('/digital-card/create')} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
               <Plus className="h-4 w-4 -ml-1" />
               Create Your First Card
             </Button>
@@ -280,25 +291,25 @@ export default function ManageDigitalCardsPage() {
                   </span>
                 </div>
 
-                {/* Stats row */}
+                {/* Stats row - Colorful */}
                 <div className="flex items-center flex-wrap gap-x-8 gap-y-4">
                   <div className="flex flex-col gap-1">
                     <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Views</p>
-                    <p className="text-stone-800 dark:text-stone-200 font-normal text-xs font-mono">{card.analytics?.views || 0}</p>
+                    <p className="text-blue-600 dark:text-blue-400 font-semibold text-xs font-mono">{card.analytics?.views || 0}</p>
                   </div>
                   <div className="flex flex-col gap-1">
                     <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Clicks</p>
-                    <p className="text-stone-800 dark:text-stone-200 font-normal text-xs font-mono">
+                    <p className="text-teal-600 dark:text-teal-400 font-semibold text-xs font-mono">
                       {Object.values(card.analytics?.linkClicks || {}).reduce((a, b) => a + b, 0)}
                     </p>
                   </div>
                   <div className="flex flex-col gap-1">
                     <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Leads</p>
-                    <p className="text-stone-800 dark:text-stone-200 font-normal text-xs font-mono">{card.analytics?.leadsGenerated || 0}</p>
+                    <p className="text-emerald-600 dark:text-emerald-400 font-semibold text-xs font-mono">{card.analytics?.leadsGenerated || 0}</p>
                   </div>
                   <div className="flex flex-col gap-1">
                     <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Created</p>
-                    <p className="text-stone-800 dark:text-stone-200 font-normal text-xs font-mono">
+                    <p className="text-stone-600 dark:text-stone-300 font-normal text-xs font-mono">
                       {card.createdAt ? new Date(card.createdAt).toLocaleDateString() : '-'}
                     </p>
                   </div>

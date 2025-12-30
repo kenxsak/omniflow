@@ -21,6 +21,7 @@ import StatCard from '@/components/dashboard/stat-card';
 import type { PaymentStatus } from '@/types/payment';
 import { Animated, AnimatedCounter } from '@/components/ui/animated';
 import gsap from 'gsap';
+import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 
 const formatCurrency = (amount: number, currency: string) => {
   if (currency === 'INR') {
@@ -46,9 +47,9 @@ const getStatusBadge = (status: PaymentStatus) => {
 
 const getGatewayBadge = (gateway: 'stripe' | 'razorpay') => {
   if (gateway === 'stripe') {
-    return <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30"><CreditCard className="w-3 h-3 mr-1" /> Stripe</Badge>;
+    return <Badge variant="outline" className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/30"><CreditCard className="w-3 h-3 mr-1" /> Stripe</Badge>;
   }
-  return <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30"><CreditCard className="w-3 h-3 mr-1" /> Razorpay</Badge>;
+  return <Badge variant="outline" className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30"><CreditCard className="w-3 h-3 mr-1" /> Razorpay</Badge>;
 };
 
 export default function TransactionsPage() {
@@ -194,15 +195,15 @@ export default function TransactionsPage() {
 
       {stats && (
         <div ref={statsRef} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-primary/50">
+          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-blue-500/50">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm text-muted-foreground">Total</span>
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <CreditCard className="w-4 h-4 text-primary" />
+                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                  <CreditCard className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                 </div>
               </div>
-              <div className="text-xl sm:text-2xl font-bold">
+              <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
                 <AnimatedCounter value={stats.total} />
               </div>
             </CardContent>
@@ -236,29 +237,29 @@ export default function TransactionsPage() {
             </CardContent>
           </Card>
           
-          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-primary/50">
+          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-indigo-500/50">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm text-muted-foreground">USD</span>
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <DollarSign className="w-4 h-4 text-primary" />
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+                  <DollarSign className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
                 </div>
               </div>
-              <div className="text-lg sm:text-xl font-bold text-primary truncate">
+              <div className="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 truncate">
                 {formatCurrency(stats.totalRevenue.USD, 'USD')}
               </div>
             </CardContent>
           </Card>
           
-          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-primary/50 col-span-2 sm:col-span-1">
+          <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-teal-500/50 col-span-2 sm:col-span-1">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm text-muted-foreground">INR</span>
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <IndianRupee className="w-4 h-4 text-primary" />
+                <div className="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center">
+                  <IndianRupee className="w-4 h-4 text-teal-500 dark:text-teal-400" />
                 </div>
               </div>
-              <div className="text-lg sm:text-xl font-bold text-primary truncate">
+              <div className="text-lg sm:text-xl font-bold text-teal-600 dark:text-teal-400 truncate">
                 {formatCurrency(stats.totalRevenue.INR, 'INR')}
               </div>
             </CardContent>
@@ -513,6 +514,9 @@ export default function TransactionsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Help Button - Fixed Bottom Right */}
+      <ContextualHelpButton pageId="transactions" />
     </div>
   );
 }

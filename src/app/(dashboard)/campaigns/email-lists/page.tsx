@@ -195,13 +195,18 @@ export default function EmailListsPage() {
   };
 
   const handleDownloadTemplate = async () => {
-    const XLSX = await import('xlsx');
-    const templateData = [{ Name: "John Doe", Email: "john@example.com", Phone: "+919876543210", Company: "Acme Inc" }];
-    const worksheet = XLSX.utils.json_to_sheet(templateData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Email Contacts Template");
-    XLSX.writeFile(workbook, "OmniFlow_Email_Contacts_Template.xlsx");
-    toast({ title: "Template Downloaded" });
+    const csvContent = `Name,Email,Phone,Company
+John Doe,john@example.com,"919876543210",Acme Inc
+Jane Smith,jane@example.com,"919123456789",Sample Corp`;
+    
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'OmniFlow_Email_Contacts_Template.csv';
+    link.click();
+    URL.revokeObjectURL(link.href);
+    
+    toast({ title: "Template Downloaded", description: "Phone may show as 9.19E+11 in Excel - that's OK, imports correctly!" });
   };
 
   const openSyncDialog = (list: EmailList) => {
@@ -347,43 +352,43 @@ export default function EmailListsPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full" style={{ background: '#3b82f6' }} />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Total Lists</span>
-              <Icon icon="solar:folder-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:folder-linear" className="h-4 w-4" style={{ color: '#3b82f6' }} />
             </div>
-            <p className="text-2xl font-semibold tabular-nums">{emailLists.length}</p>
+            <p className="text-2xl font-semibold tabular-nums" style={{ color: '#3b82f6' }}>{emailLists.length}</p>
           </div>
         </div>
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full" style={{ background: '#14b8a6' }} />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Total Contacts</span>
-              <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4" style={{ color: '#14b8a6' }} />
             </div>
-            <p className="text-2xl font-semibold tabular-nums">{emailLists.reduce((sum, l) => sum + (l.contactCount || 0), 0)}</p>
+            <p className="text-2xl font-semibold tabular-nums" style={{ color: '#14b8a6' }}>{emailLists.reduce((sum, l) => sum + (l.contactCount || 0), 0)}</p>
           </div>
         </div>
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full" style={{ background: '#10b981' }} />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Selected</span>
-              <Icon icon="solar:checklist-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:checklist-linear" className="h-4 w-4" style={{ color: '#10b981' }} />
             </div>
-            <p className="text-2xl font-semibold tabular-nums">{selectedList?.contactCount || 0}</p>
+            <p className="text-2xl font-semibold tabular-nums" style={{ color: '#10b981' }}>{selectedList?.contactCount || 0}</p>
           </div>
         </div>
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full" style={{ background: '#f59e0b' }} />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Filtered</span>
-              <Icon icon="solar:filter-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:filter-linear" className="h-4 w-4" style={{ color: '#f59e0b' }} />
             </div>
-            <p className="text-2xl font-semibold tabular-nums">{filteredContacts.length}</p>
+            <p className="text-2xl font-semibold tabular-nums" style={{ color: '#f59e0b' }}>{filteredContacts.length}</p>
           </div>
         </div>
       </div>
@@ -391,15 +396,18 @@ export default function EmailListsPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Your Email Lists */}
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
-          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #3b82f6, #6366f1)' }} />
+          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between" style={{ background: 'linear-gradient(to right, rgba(59, 130, 246, 0.05), rgba(99, 102, 241, 0.05))' }}>
             <div>
-              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Your Email Lists</span>
+              <div className="flex items-center gap-2">
+                <Icon icon="solar:folder-linear" className="h-4 w-4" style={{ color: '#3b82f6' }} />
+                <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Your Email Lists</span>
+              </div>
               <p className="text-xs text-muted-foreground mt-0.5">Create lists for different customer segments</p>
             </div>
             <Dialog open={isCreateListDialogOpen} onOpenChange={setIsCreateListDialogOpen}>
               <DialogTrigger asChild>
-                <Button size="sm" className="h-8 text-xs shadow-sm">
+                <Button size="sm" className="h-8 text-xs shadow-sm" style={{ background: 'linear-gradient(to right, #3b82f6, #6366f1)' }}>
                   <Icon icon="solar:add-circle-linear" className="mr-1.5 h-4 w-4" />
                   Create New List
                 </Button>
@@ -496,11 +504,14 @@ export default function EmailListsPage() {
 
         {/* Contacts Panel */}
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
-          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #14b8a6, #10b981)' }} />
+          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800" style={{ background: 'linear-gradient(to right, rgba(20, 184, 166, 0.05), rgba(16, 185, 129, 0.05))' }}>
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div>
-                <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">{selectedList ? `Contacts in "${selectedList.name}"` : 'Select a List'}</span>
+                <div className="flex items-center gap-2">
+                  <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4" style={{ color: '#14b8a6' }} />
+                  <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">{selectedList ? `Contacts in "${selectedList.name}"` : 'Select a List'}</span>
+                </div>
                 <p className="text-xs text-muted-foreground mt-0.5">{selectedList ? `${contactsInSelectedList.length} contacts in this list` : 'Click on a list to view contacts'}</p>
               </div>
               {selectedList && (
@@ -522,7 +533,7 @@ export default function EmailListsPage() {
                         <div className="space-y-3 py-3">
                           <div><Label htmlFor="contact-name">Name *</Label><Input id="contact-name" value={newContactName} onChange={(e) => setNewContactName(e.target.value)} required /></div>
                           <div><Label htmlFor="contact-email">Email *</Label><Input id="contact-email" type="email" value={newContactEmail} onChange={(e) => setNewContactEmail(e.target.value)} placeholder="email@example.com" required /></div>
-                          <div><Label htmlFor="contact-phone">Phone (Optional)</Label><Input id="contact-phone" type="tel" value={newContactPhone} onChange={(e) => setNewContactPhone(e.target.value)} placeholder="+919876543210" /></div>
+                          <div><Label htmlFor="contact-phone">Phone (Optional)</Label><Input id="contact-phone" type="tel" value={newContactPhone} onChange={(e) => setNewContactPhone(e.target.value)} placeholder="919876543210" /></div>
                           <div><Label htmlFor="contact-company">Company (Optional)</Label><Input id="contact-company" value={newContactCompany} onChange={(e) => setNewContactCompany(e.target.value)} placeholder="Company name" /></div>
                         </div>
                         <DialogFooter>

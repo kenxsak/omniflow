@@ -20,7 +20,7 @@ interface CampaignsTableProps {
 export default function CampaignsTable({ campaigns }: CampaignsTableProps) {
   return (
     <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-500" />
+      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-purple-500 dark:bg-purple-400" />
       <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
         <div className="flex items-center gap-2">
           <Icon icon="solar:target-linear" className="h-4 w-4 text-muted-foreground" />
@@ -54,19 +54,30 @@ export default function CampaignsTable({ campaigns }: CampaignsTableProps) {
                 </TableCell>
                 <TableCell className="text-right text-sm tabular-nums">{campaign.leadsGenerated}</TableCell>
                 <TableCell className="text-right text-sm tabular-nums">{campaign.customersAcquired}</TableCell>
-                <TableCell className="text-right text-sm font-medium tabular-nums">
+                <TableCell className="text-right text-sm font-medium tabular-nums text-emerald-600 dark:text-emerald-400">
                   {formatCurrency(campaign.revenue)}
                 </TableCell>
-                <TableCell className="text-right text-sm tabular-nums">
+                <TableCell className="text-right text-sm tabular-nums text-amber-600 dark:text-amber-400">
                   {formatCurrency(campaign.marketingSpend + campaign.aiCostsUsed)}
                 </TableCell>
                 <TableCell className="text-right">
-                  <Badge variant="secondary" className="text-[10px]">
+                  <Badge 
+                    variant="secondary" 
+                    className={`text-[10px] ${campaign.roi >= 100 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : campaign.roi >= 0 ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'}`}
+                  >
                     {formatPercentage(campaign.roi, 0)}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Badge variant="outline" className="text-[10px] capitalize">
+                  <Badge 
+                    variant="outline" 
+                    className={`text-[10px] capitalize ${
+                      campaign.performanceRating === 'excellent' ? 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400' :
+                      campaign.performanceRating === 'good' ? 'border-blue-500/30 text-blue-600 dark:text-blue-400' :
+                      campaign.performanceRating === 'average' ? 'border-amber-500/30 text-amber-600 dark:text-amber-400' :
+                      'border-rose-500/30 text-rose-600 dark:text-rose-400'
+                    }`}
+                  >
                     {campaign.performanceRating}
                   </Badge>
                 </TableCell>

@@ -216,7 +216,7 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
       <DialogContent className="w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-4xl lg:max-w-5xl max-h-[95vh] sm:max-h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
         {/* Header with accent bar */}
         <div className="relative px-6 pt-6 pb-4 border-b border-stone-200 dark:border-stone-800">
-          <div className="absolute inset-x-12 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-12 top-0 h-0.5 rounded-b-full bg-blue-500 dark:bg-blue-400" />
           <DialogHeader className="space-y-1">
             <DialogTitle className="text-lg font-semibold pr-8">{config.name}</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">{config.description}</DialogDescription>
@@ -227,10 +227,10 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
           {/* Link to Email List Section */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-teal-500 dark:bg-teal-400" />
             <div className="p-4 pt-5">
               <div className="flex items-center gap-2 mb-3">
-                <Icon icon="solar:link-linear" className="h-4 w-4 text-muted-foreground" />
+                <Icon icon="solar:link-linear" className="h-4 w-4 text-teal-500 dark:text-teal-400" />
                 <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Link to Email List</span>
               </div>
             <Select value={selectedListId} onValueChange={setSelectedListId}>
@@ -259,10 +259,10 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
 
           {/* Delivery Provider Section */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-purple-500 dark:bg-purple-400" />
             <div className="p-4 pt-5">
               <div className="flex items-center gap-2 mb-1">
-                <Icon icon="solar:server-linear" className="h-4 w-4 text-muted-foreground" />
+                <Icon icon="solar:server-linear" className="h-4 w-4 text-purple-500 dark:text-purple-400" />
                 <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Delivery Provider</span>
               </div>
               <p className="text-xs text-muted-foreground mb-4">
@@ -343,11 +343,11 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
 
           {/* Email Sequence Steps Section */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-emerald-500 dark:bg-emerald-400" />
             <div className="p-4 pt-5">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Icon icon="solar:list-check-linear" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:list-check-linear" className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
                   <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Email Sequence Steps</span>
                 </div>
                 <span className="text-xs text-muted-foreground">{config.steps.length} steps</span>
@@ -746,31 +746,31 @@ export default function EmailAutomationsPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-3 gap-3">
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-blue-500 dark:bg-blue-400" />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Total Automations</span>
-              <Icon icon="solar:robot-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:robot-linear" className="h-4 w-4 text-blue-500 dark:text-blue-400" />
             </div>
             <p className="text-2xl font-semibold tabular-nums">{automations.length}</p>
           </div>
         </div>
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-emerald-500 dark:bg-emerald-400" />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Active</span>
-              <Icon icon="solar:play-circle-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:play-circle-linear" className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
             </div>
             <p className="text-2xl font-semibold tabular-nums">{activeCount}</p>
           </div>
         </div>
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+          <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-amber-500 dark:bg-amber-400" />
           <div className="p-4 pt-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Total Emails</span>
-              <Icon icon="solar:letter-linear" className="h-4 w-4 text-muted-foreground/60" />
+              <Icon icon="solar:letter-linear" className="h-4 w-4 text-amber-500 dark:text-amber-400" />
             </div>
             <p className="text-2xl font-semibold tabular-nums">{totalEmails}</p>
           </div>
@@ -785,7 +785,7 @@ export default function EmailAutomationsPage() {
           
           return (
             <div key={automation.id} className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden flex flex-col">
-              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+              <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-purple-500 dark:bg-purple-400" />
               
               {/* Header */}
               <div className="p-4 pt-5 flex-1">

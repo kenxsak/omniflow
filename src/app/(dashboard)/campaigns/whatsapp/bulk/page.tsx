@@ -353,33 +353,41 @@ export default function WhatsAppBulkCampaignsPage() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3 hover:border-blue-500/50 transition-colors">
           <div className="flex items-center gap-2 mb-1">
-            <Icon icon="solar:plain-linear" className="h-4 w-4 text-muted-foreground" />
+            <div className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center">
+              <Icon icon="solar:plain-linear" className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
+            </div>
             <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Campaigns</span>
           </div>
-          <p className="text-xl font-semibold tabular-nums">{campaigns.length}</p>
+          <p className="text-xl font-semibold tabular-nums text-blue-600 dark:text-blue-400">{campaigns.length}</p>
         </div>
-        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3 hover:border-purple-500/50 transition-colors">
           <div className="flex items-center gap-2 mb-1">
-            <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4 text-muted-foreground" />
+            <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
+              <Icon icon="solar:users-group-rounded-linear" className="h-3.5 w-3.5 text-purple-500 dark:text-purple-400" />
+            </div>
             <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Lists</span>
           </div>
-          <p className="text-xl font-semibold tabular-nums">{whatsappLists.length}</p>
+          <p className="text-xl font-semibold tabular-nums text-purple-600 dark:text-purple-400">{whatsappLists.length}</p>
         </div>
-        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3 hover:border-emerald-500/50 transition-colors">
           <div className="flex items-center gap-2 mb-1">
-            <Icon icon="solar:check-circle-linear" className="h-4 w-4 text-muted-foreground" />
+            <div className="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+              <Icon icon="solar:check-circle-linear" className="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400" />
+            </div>
             <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Sent</span>
           </div>
-          <p className="text-xl font-semibold tabular-nums">{campaigns.reduce((acc, c) => acc + c.stats.sent, 0)}</p>
+          <p className="text-xl font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">{campaigns.reduce((acc, c) => acc + c.stats.sent, 0)}</p>
         </div>
-        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3 hover:border-teal-500/50 transition-colors">
           <div className="flex items-center gap-2 mb-1">
-            <Icon icon="solar:link-linear" className="h-4 w-4 text-muted-foreground" />
+            <div className="w-6 h-6 rounded-lg bg-teal-500/10 flex items-center justify-center">
+              <Icon icon="solar:link-linear" className="h-3.5 w-3.5 text-teal-500 dark:text-teal-400" />
+            </div>
             <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Platform</span>
           </div>
-          <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">API Active</p>
+          <p className="text-sm font-medium text-teal-600 dark:text-teal-400">API Active</p>
         </div>
       </div>
 

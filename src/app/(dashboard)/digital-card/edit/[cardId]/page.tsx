@@ -265,20 +265,20 @@ export default function EditDigitalCardPage() {
 
   return (
     <div className="flex flex-col gap-6 w-full h-full">
-      {/* Header - Autosend style */}
+      {/* Header - Colorful style */}
       <div className="flex flex-col gap-4">
         <p className="text-stone-800 dark:text-stone-200 font-semibold text-lg">Edit Digital Card</p>
         
-        {/* Tabs - AutoSend style */}
+        {/* Tabs - Colorful style */}
         <Tabs defaultValue="basic" className="w-full">
-          <TabsList>
-            <TabsTrigger value="basic">Basic</TabsTrigger>
-            <TabsTrigger value="contact">Contact</TabsTrigger>
-            <TabsTrigger value="links">Links</TabsTrigger>
-            <TabsTrigger value="social">Social</TabsTrigger>
-            <TabsTrigger value="lead-capture">Leads</TabsTrigger>
-            <TabsTrigger value="branding">Brand</TabsTrigger>
-            <TabsTrigger value="embed">Embed</TabsTrigger>
+          <TabsList className="bg-stone-100 dark:bg-stone-900">
+            <TabsTrigger value="basic" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">Basic</TabsTrigger>
+            <TabsTrigger value="contact" className="data-[state=active]:bg-teal-500 data-[state=active]:text-white">Contact</TabsTrigger>
+            <TabsTrigger value="links" className="data-[state=active]:bg-indigo-500 data-[state=active]:text-white">Links</TabsTrigger>
+            <TabsTrigger value="social" className="data-[state=active]:bg-pink-500 data-[state=active]:text-white">Social</TabsTrigger>
+            <TabsTrigger value="lead-capture" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">Leads</TabsTrigger>
+            <TabsTrigger value="branding" className="data-[state=active]:bg-violet-500 data-[state=active]:text-white">Brand</TabsTrigger>
+            <TabsTrigger value="embed" className="data-[state=active]:bg-amber-500 data-[state=active]:text-white">Embed</TabsTrigger>
           </TabsList>
           
           <p className="text-stone-500 dark:text-stone-400 font-normal text-sm mt-4">
@@ -299,9 +299,11 @@ export default function EditDigitalCardPage() {
       )}
 
         <TabsContent value="basic">
-          <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+          <section className="rounded-2xl bg-gradient-to-br from-blue-50/50 to-indigo-50/30 dark:from-blue-950/20 dark:to-indigo-950/10 p-1">
             <header className="flex items-center gap-2 px-5 py-3">
-              <Icon icon="solar:user-circle-linear" className="h-5 w-5 text-muted-foreground" />
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                <Icon icon="solar:user-circle-linear" className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
               <div>
                 <h2 className="text-sm font-semibold text-foreground">Basic Information</h2>
                 <p className="text-xs text-muted-foreground">Tell people about yourself or your business</p>
@@ -443,9 +445,11 @@ export default function EditDigitalCardPage() {
         </TabsContent>
 
         <TabsContent value="contact">
-          <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+          <section className="rounded-2xl bg-gradient-to-br from-teal-50/50 to-cyan-50/30 dark:from-teal-950/20 dark:to-cyan-950/10 p-1">
             <header className="flex items-center gap-2 px-5 py-3">
-              <Icon icon="solar:phone-linear" className="h-5 w-5 text-muted-foreground" />
+              <div className="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center">
+                <Icon icon="solar:phone-linear" className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+              </div>
               <div>
                 <h2 className="text-sm font-semibold text-foreground">Contact Information</h2>
                 <p className="text-xs text-muted-foreground">How can people reach you?</p>
@@ -517,9 +521,11 @@ export default function EditDigitalCardPage() {
         </TabsContent>
 
         <TabsContent value="links">
-          <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+          <section className="rounded-2xl bg-gradient-to-br from-indigo-50/50 to-purple-50/30 dark:from-indigo-950/20 dark:to-purple-950/10 p-1">
             <header className="flex items-center gap-2 px-5 py-3">
-              <Icon icon="solar:link-linear" className="h-5 w-5 text-muted-foreground" />
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+                <Icon icon="solar:link-linear" className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              </div>
               <div>
                 <h2 className="text-sm font-semibold text-foreground">Action Links</h2>
                 <p className="text-xs text-muted-foreground">Add buttons that link to your services, products, or booking pages</p>
@@ -649,9 +655,11 @@ export default function EditDigitalCardPage() {
         </TabsContent>
 
         <TabsContent value="social">
-          <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+          <section className="rounded-2xl bg-gradient-to-br from-pink-50/50 to-rose-50/30 dark:from-pink-950/20 dark:to-rose-950/10 p-1">
             <header className="flex items-center gap-2 px-5 py-3">
-              <Icon icon="solar:share-linear" className="h-5 w-5 text-muted-foreground" />
+              <div className="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center">
+                <Icon icon="solar:share-linear" className="h-5 w-5 text-pink-600 dark:text-pink-400" />
+              </div>
               <div>
                 <h2 className="text-sm font-semibold text-foreground">Social Media</h2>
                 <p className="text-xs text-muted-foreground">Add your social media profiles</p>
@@ -787,10 +795,12 @@ export default function EditDigitalCardPage() {
 
         <TabsContent value="lead-capture">
           <div className="space-y-6">
-            {/* Contact Form Card - Clerk Style */}
-            <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+            {/* Contact Form Card - Colorful Style */}
+            <section className="rounded-2xl bg-gradient-to-br from-emerald-50/50 to-teal-50/30 dark:from-emerald-950/20 dark:to-teal-950/10 p-1">
               <header className="flex items-center gap-2 px-5 py-3">
-                <Icon icon="solar:chat-square-linear" className="h-5 w-5 text-muted-foreground" />
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                  <Icon icon="solar:chat-square-linear" className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
                 <h2 className="text-sm font-semibold text-foreground">Contact Form</h2>
               </header>
               <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
@@ -871,10 +881,12 @@ export default function EditDigitalCardPage() {
               </div>
             </section>
 
-            {/* Calendar Booking Card - Clerk Style */}
-            <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+            {/* Calendar Booking Card - Colorful Style */}
+            <section className="rounded-2xl bg-gradient-to-br from-blue-50/50 to-indigo-50/30 dark:from-blue-950/20 dark:to-indigo-950/10 p-1">
               <header className="flex items-center gap-2 px-5 py-3">
-                <Icon icon="solar:calendar-mark-linear" className="h-5 w-5 text-muted-foreground" />
+                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                  <Icon icon="solar:calendar-mark-linear" className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
                 <h2 className="text-sm font-semibold text-foreground">Calendar Booking</h2>
               </header>
               <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
@@ -1068,9 +1080,11 @@ export default function EditDigitalCardPage() {
         </TabsContent>
 
         <TabsContent value="branding">
-          <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
+          <section className="rounded-2xl bg-gradient-to-br from-violet-50/50 to-purple-50/30 dark:from-violet-950/20 dark:to-purple-950/10 p-1">
             <header className="flex items-center gap-2 px-5 py-3">
-              <Icon icon="solar:palette-linear" className="h-5 w-5 text-muted-foreground" />
+              <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                <Icon icon="solar:palette-linear" className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+              </div>
               <div>
                 <h2 className="text-sm font-semibold text-foreground">Branding & Theme</h2>
                 <p className="text-xs text-muted-foreground">Customize the look and feel of your digital card</p>
@@ -1231,6 +1245,8 @@ export default function EditDigitalCardPage() {
         <Button
           onClick={() => handleSubmit(true)}
           disabled={saving}
+          variant="outline"
+          className="border-blue-200 text-blue-600 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-950"
         >
           {saving ? (
             <>
@@ -1244,7 +1260,7 @@ export default function EditDigitalCardPage() {
         <Button
           onClick={() => handleSubmit(false)}
           disabled={saving}
-          variant="default"
+          className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
         >
           {saving ? (
             <>

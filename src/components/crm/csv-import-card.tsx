@@ -6,6 +6,7 @@ import { Icon } from '@iconify/react';
 import { useToast } from '@/hooks/use-toast';
 import { createLeadAction, validateBulkImportAction } from '@/app/actions/lead-actions';
 import { useRouter } from 'next/navigation';
+import { normalizePhone } from '@/lib/phone-utils';
 
 interface CsvImportCardProps {
   companyId: string;
@@ -17,20 +18,23 @@ export function CsvImportCard({ companyId }: CsvImportCardProps) {
   const router = useRouter();
 
   const handleDownloadTemplate = async () => {
-    const XLSX = await import('xlsx');
-    const templateData = [
-      { 'Name': 'John Doe', 'Email': 'john@example.com', 'Phone': '+1234567890', 'Company': 'Example Corp', 'Status': 'New' },
-      { 'Name': 'Jane Smith', 'Email': 'jane@example.com', 'Phone': '+1987654321', 'Company': 'Sample Inc', 'Status': 'Qualified' }
-    ];
+    // Use CSV format with text indicator for phone numbers
+    // Adding = and quotes forces Excel to treat as text formula
+    const csvContent = `Name,Email,Phone,Company,Status
+John Doe,john@example.com,"919876543210",Example Corp,New
+Jane Smith,jane@example.com,"918765432109",Sample Inc,Qualified`;
     
-    const worksheet = XLSX.utils.json_to_sheet(templateData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Contacts Template");
-    XLSX.writeFile(workbook, "OmniFlow_CRM_Contacts_Template.xlsx");
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' }); // BOM for Excel
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'OmniFlow_CRM_Contacts_Template.csv';
+    link.click();
+    URL.revokeObjectURL(link.href);
+    
     toast({ 
       title: "Template Downloaded", 
-      description: "Fill in the template with your contacts and upload it back",
-      duration: 3000
+      description: "Phone numbers may show as scientific notation in Excel - that's OK! Data imports correctly.",
+      duration: 5000
     });
   };
 
@@ -49,10 +53,10 @@ export function CsvImportCard({ companyId }: CsvImportCardProps) {
       
       if (data) {
         try {
-          const workbook = XLSX.read(data, { type: 'binary' });
+          const workbook = XLSX.read(data, { type: 'binary', cellText: true, raw: false });
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json<any>(worksheet);
+          const jsonData = XLSX.utils.sheet_to_json<any>(worksheet, { raw: false });
           
           const validContacts = jsonData.filter(row => {
             const name = row['Name'] || row['name'] || row['Full Name'];
@@ -78,7 +82,8 @@ export function CsvImportCard({ companyId }: CsvImportCardProps) {
           for (const row of jsonData) {
             const name = row['Name'] || row['name'] || row['Full Name'];
             const email = row['Email'] || row['email'];
-            const phone = row['Phone'] || row['phone'] || row['Mobile'];
+            const rawPhone = row['Phone'] || row['phone'] || row['Mobile'] || row['PhoneNumber'];
+            const phone = normalizePhone(rawPhone);
             const company = row['Company'] || row['company'];
             const status = row['Status'] || row['status'] || 'New';
             
@@ -87,7 +92,7 @@ export function CsvImportCard({ companyId }: CsvImportCardProps) {
                 await createLeadAction(companyId, {
                   name: String(name).trim(),
                   email: String(email).toLowerCase().trim(),
-                  phone: phone ? String(phone).trim() : undefined,
+                  phone: phone,
                   status: status as any,
                   source: 'CSV Import',
                   notes: company ? `Company: ${company}` : undefined,
@@ -204,7 +209,7 @@ export function CsvImportCard({ companyId }: CsvImportCardProps) {
         </div>
 
         <p className="text-[10px] text-muted-foreground pt-3 border-t border-stone-200 dark:border-stone-700">
-          Supported: CSV, Excel (.xlsx, .xls) • Required: Name, Email • Optional: Phone, Company, Status
+          Supported: CSV, Excel (.xlsx, .xls) • Required: Name, Email • Phone: enter with country code (e.g., 919876543210)
         </p>
       </div>
     </div>

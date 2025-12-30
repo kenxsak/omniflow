@@ -13,6 +13,7 @@ import { getDashboardAnalytics } from '@/app/actions/analytics-dashboard-actions
 import { skipOnboardingAction, completeOnboardingAction } from '@/app/actions/onboarding-client-actions';
 import type { DealStats } from '@/types/crm';
 import type { WeekOverWeekStats, PipelineStageConversion, SalesTrendData, TeamPerformer } from '@/app/actions/analytics-dashboard-actions';
+import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 
 // Import dashboard sub-components
 import { DashboardMetrics } from '@/components/dashboard/dashboard-metrics';
@@ -141,6 +142,9 @@ export default function DashboardPage() {
           />
         </>
       )}
+
+      {/* Help Button */}
+      <ContextualHelpButton pageId="dashboard" />
     </div>
   );
 }

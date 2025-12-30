@@ -30,13 +30,13 @@ interface LeadStatusChartProps {
 const chartConfig = {
   count: {
     label: "Leads",
-    color: "hsl(var(--chart-1))", // Use primary chart color
+    color: "var(--chart-1)", // Use primary chart color
   },
-  New: { color: "hsl(var(--chart-1))" },
-  Contacted: { color: "hsl(var(--chart-2))" },
-  Qualified: { color: "hsl(var(--chart-3))" },
-  Won: { color: "hsl(var(--chart-4))" },
-  Lost: { color: "hsl(var(--chart-5))" },
+  New: { color: "var(--chart-1)" },
+  Contacted: { color: "var(--chart-2)" },
+  Qualified: { color: "var(--chart-3)" },
+  Won: { color: "var(--chart-4)" },
+  Lost: { color: "var(--chart-5)" },
 } satisfies ChartConfig
 
 export default function LeadStatusChart({ data }: LeadStatusChartProps) {

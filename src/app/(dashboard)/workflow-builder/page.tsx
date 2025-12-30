@@ -19,6 +19,7 @@ import {
 import type { Workflow, WorkflowNode, WorkflowConnection, TriggerEvent, ActionType } from '@/types/workflows';
 import { Loader2 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 
 
 // Node templates with proper types
@@ -925,6 +926,9 @@ export default function WorkflowBuilderPage() {
       )}
 
       {renderNodeConfigPanel()}
+
+      {/* Help Button - Fixed Bottom Right */}
+      <ContextualHelpButton pageId="workflow-builder" />
     </div>
   );
 }

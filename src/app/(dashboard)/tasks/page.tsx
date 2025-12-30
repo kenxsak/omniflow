@@ -21,6 +21,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { getAppointmentsAction } from '@/app/actions/appointment-actions';
 import { getLeadsForTaskDropdown } from '@/app/actions/task-actions';
 import { cn } from '@/lib/utils';
+import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 
 const AddTaskDialog = dynamic(() => import('@/components/tasks/add-task-dialog'), { ssr: false });
 const TaskCalendarView = dynamic(() => import('@/components/tasks/task-calendar-view'), { ssr: false });
@@ -130,7 +131,7 @@ export default function TasksPage() {
               Manage all your to-dos in one place
             </p>
           </div>
-          <Button onClick={handleCreateNew} size="sm" className="h-8 text-xs w-full sm:w-auto">
+          <Button onClick={handleCreateNew} size="sm" className="h-8 text-xs w-full sm:w-auto" style={{ background: 'linear-gradient(to right, #3b82f6, #6366f1)' }}>
             <Icon icon="solar:add-circle-linear" className="mr-1.5 h-3.5 w-3.5" /> New Task
           </Button>
         </div>
@@ -139,39 +140,39 @@ export default function TasksPage() {
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
           {/* To Do */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: '#3b82f6' }} />
             <div className="p-3 sm:p-4 pt-4 sm:pt-5">
               <div className="flex items-center justify-between mb-2">
-                <Icon icon="solar:clock-circle-linear" className="h-4 w-4 text-muted-foreground/60" />
+                <Icon icon="solar:clock-circle-linear" className="h-4 w-4" style={{ color: '#3b82f6' }} />
                 <span className={cn("size-1.5 sm:size-2 border-[1.5px] rounded-full", statusDotColors['To Do'])} />
               </div>
-              <div className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">{todoCount}</div>
+              <div className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: '#3b82f6' }}>{todoCount}</div>
               <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">To Do</p>
             </div>
           </div>
 
           {/* In Progress */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: '#f59e0b' }} />
             <div className="p-3 sm:p-4 pt-4 sm:pt-5">
               <div className="flex items-center justify-between mb-2">
-                <Icon icon="solar:hourglass-linear" className="h-4 w-4 text-muted-foreground/60" />
+                <Icon icon="solar:hourglass-linear" className="h-4 w-4" style={{ color: '#f59e0b' }} />
                 <span className={cn("size-1.5 sm:size-2 border-[1.5px] rounded-full", statusDotColors['In Progress'])} />
               </div>
-              <div className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">{inProgressCount}</div>
+              <div className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: '#f59e0b' }}>{inProgressCount}</div>
               <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">In Progress</p>
             </div>
           </div>
 
           {/* Done */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="absolute inset-x-6 sm:inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: '#10b981' }} />
             <div className="p-3 sm:p-4 pt-4 sm:pt-5">
               <div className="flex items-center justify-between mb-2">
-                <Icon icon="solar:check-circle-linear" className="h-4 w-4 text-muted-foreground/60" />
+                <Icon icon="solar:check-circle-linear" className="h-4 w-4" style={{ color: '#10b981' }} />
                 <span className={cn("size-1.5 sm:size-2 border-[1.5px] rounded-full", statusDotColors['Done'])} />
               </div>
-              <div className="text-xl sm:text-2xl font-semibold tabular-nums text-foreground">{doneCount}</div>
+              <div className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: '#10b981' }}>{doneCount}</div>
               <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Done</p>
             </div>
           </div>
@@ -180,10 +181,10 @@ export default function TasksPage() {
         {/* Tasks List - Clerk style card */}
         <div className="border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
           {/* Card Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4 sm:p-5 border-b border-stone-200 dark:border-stone-800">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4 sm:p-5 border-b border-stone-200 dark:border-stone-800" style={{ background: 'linear-gradient(to right, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05))' }}>
             <div className="flex items-center gap-3">
-              <div className="size-9 rounded-lg bg-stone-100 dark:bg-stone-900 flex items-center justify-center">
-                <Icon icon="solar:checklist-minimalistic-linear" className="h-4.5 w-4.5 text-muted-foreground/70" />
+              <div className="size-9 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #eff6ff, #f5f3ff)' }}>
+                <Icon icon="solar:checklist-minimalistic-linear" className="h-4.5 w-4.5" style={{ color: '#6366f1' }} />
               </div>
               <div>
                 <h2 className="text-sm sm:text-base font-semibold text-foreground">All Tasks</h2>
@@ -369,6 +370,9 @@ export default function TasksPage() {
           loadData();
         }}
       />
+
+      {/* Help Button */}
+      <ContextualHelpButton pageId="tasks" />
     </>
   );
 }

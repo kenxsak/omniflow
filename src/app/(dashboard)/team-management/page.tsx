@@ -10,6 +10,7 @@ import type { AppUser, AttendanceRecord } from '@/types/saas';
 import { getCompanyUsers, logAttendance, getLastAttendanceRecord } from '@/lib/saas-data';
 import { useAuth } from '@/hooks/use-auth';
 import { format, formatDistanceToNow } from 'date-fns';
+import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 
 export default function TeamManagementPage() {
   const { appUser, isAdmin, isManager } = useAuth();
@@ -71,7 +72,7 @@ export default function TeamManagementPage() {
 
   const renderUserView = () => (
     <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden max-w-md mx-auto">
-      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-500" />
+      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-[oklch(0.55_0.15_250)] dark:bg-[oklch(0.65_0.16_250)]" />
       
       <div className="p-6 text-center border-b border-stone-200 dark:border-stone-800">
         <div className="w-12 h-12 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto mb-3">
@@ -123,7 +124,7 @@ export default function TeamManagementPage() {
 
   const renderAdminView = () => (
     <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-500" />
+      <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-[oklch(0.60_0.16_145)] dark:bg-[oklch(0.68_0.17_145)]" />
       
       <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
         <div className="flex items-center gap-2">
@@ -239,6 +240,9 @@ export default function TeamManagementPage() {
       ) : (
         renderUserView()
       )}
+
+      {/* Help Button - Fixed Bottom Right */}
+      <ContextualHelpButton pageId="team-management" />
     </div>
   );
 }

@@ -238,7 +238,7 @@ export default function OnboardingChecklist() {
   return (
     <>
       <div className="relative border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-        <div className="absolute inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+        <div className="absolute inset-x-14 top-0 h-0.5 rounded-b-full bg-emerald-500 dark:bg-emerald-400" />
         
         {/* Header */}
         <div className="px-4 sm:px-6 py-3 border-b border-stone-200 dark:border-stone-800">
@@ -359,7 +359,7 @@ export default function OnboardingChecklist() {
 
                 {/* Action button - right aligned */}
                 {!showAsComplete && (
-                  <Button asChild size="sm" variant="outline" className="h-7 text-[10px] px-3 shrink-0">
+                  <Button asChild size="sm" className="h-7 text-[10px] px-3 shrink-0 text-white" style={{ background: 'linear-gradient(to right, #10b981, #14b8a6)' }}>
                     <Link href={item.actionLink} className="inline-flex items-center gap-1">
                       {item.actionLabel}
                       <Icon icon="solar:arrow-right-linear" className="h-3 w-3" />

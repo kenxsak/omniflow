@@ -149,7 +149,7 @@ export function DashboardActivity() {
       <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Appointments Card - Clerk style */}
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+          <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-blue-500 dark:bg-blue-400" />
           <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
             <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
               UPCOMING
@@ -223,7 +223,7 @@ export function DashboardActivity() {
 
         {/* Tasks Card - Clerk style */}
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />
+          <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-amber-500 dark:bg-amber-400" />
           <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">

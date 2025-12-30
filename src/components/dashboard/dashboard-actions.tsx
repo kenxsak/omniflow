@@ -84,7 +84,7 @@ export function DashboardActions({
       {aiCreditsLimit > 0 && (
         <Animated animation="fadeUp">
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-14 top-0 h-0.5 rounded-b-full bg-stone-400 dark:bg-stone-600" />
+            <div className="absolute inset-x-14 top-0 h-0.5 rounded-b-full bg-[oklch(0.55_0.15_300)] dark:bg-[oklch(0.65_0.16_300)]" />
             <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
               <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                 AI CREDITS
