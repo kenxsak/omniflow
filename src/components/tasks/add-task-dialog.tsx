@@ -151,7 +151,7 @@ export default function AddTaskDialog({ isOpen, onOpenChange, onTaskSaved, taskT
         </DialogHeader>
         
         <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogBody className="space-y-5">
+          <DialogBody className="space-y-5 max-h-[60vh] overflow-y-auto">
             <input type="hidden" {...control.register("companyId")} />
             
             {/* Title */}
