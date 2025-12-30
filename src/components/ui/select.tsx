@@ -70,7 +70,7 @@ const SelectContent = React.forwardRef<
       ref={ref}
       className={cn(
         // Autosend style dropdown content - clean, no arrows
-        "relative z-50 max-h-[60vh] sm:max-h-96 min-w-[8rem]",
+        "relative z-[100] max-h-[60vh] sm:max-h-96 min-w-[8rem]",
         "rounded-xl border border-stone-200 dark:border-stone-700",
         "bg-white dark:bg-stone-900",
         "text-stone-800 dark:text-stone-200",

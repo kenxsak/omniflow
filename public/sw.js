@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v5';
 const CACHE_NAME = `omniflow-${CACHE_VERSION}`;
 const STATIC_CACHE = `omniflow-static-${CACHE_VERSION}`;
 const API_CACHE = `omniflow-api-${CACHE_VERSION}`;
@@ -9,11 +9,12 @@ const IS_LOCALHOST = self.location.hostname === 'localhost' || self.location.hos
 const APP_SHELL = [
   '/',
   '/offline',
-  '/favicon.ico',
   '/manifest.json',
-  '/favicon_io/apple-touch-icon.png',
-  '/favicon_io/android-chrome-192x192.png',
-  '/favicon_io/android-chrome-512x512.png'
+  '/icons/apple-touch-icon.png',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+  '/icons/maskable-icon-192x192.png',
+  '/icons/maskable-icon-512x512.png'
 ];
 
 const STATIC_ASSET_PATTERNS = [

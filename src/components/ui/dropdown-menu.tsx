@@ -50,7 +50,7 @@ const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      "z-50 min-w-[8rem] overflow-hidden rounded-xl border border-border/50 dark:border-border/10 bg-popover p-1 text-popover-foreground shadow-xl dark:shadow-none",
+      "z-[100] min-w-[8rem] overflow-hidden rounded-xl border border-border/50 dark:border-border/10 bg-popover p-1 text-popover-foreground shadow-xl dark:shadow-none",
       "data-[state=open]:animate-in data-[state=closed]:animate-out",
       "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -74,7 +74,7 @@ const DropdownMenuContent = React.forwardRef<
       sideOffset={sideOffset}
       className={cn(
         // Autosend style dropdown
-        "z-50 min-w-[8rem] overflow-hidden rounded-xl p-1.5",
+        "z-[100] min-w-[8rem] overflow-hidden rounded-xl p-1.5",
         "border border-stone-200 dark:border-stone-700",
         "bg-white dark:bg-stone-900",
         "text-stone-800 dark:text-stone-200",
