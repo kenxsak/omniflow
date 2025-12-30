@@ -560,19 +560,19 @@ export default function LandingPagesPage() {
           </p>
         </div>
         {viewMode === 'list' && (
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button 
               variant="outline" 
               onClick={() => hasReachedLimit ? null : setShowCloneModal(true)} 
               disabled={hasReachedLimit}
-              className="gap-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-300 dark:border-emerald-700 hover:from-emerald-500/20 hover:to-teal-500/20"
+              className="gap-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-300 dark:border-emerald-700 hover:from-emerald-500/20 hover:to-teal-500/20 text-xs sm:text-sm"
             >
-              <Icon icon="solar:copy-bold" className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-              <span className="text-emerald-700 dark:text-emerald-300">Clone from Reference</span>
+              <Icon icon="solar:copy-bold" className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span className="text-emerald-700 dark:text-emerald-300 truncate">Clone from Reference</span>
             </Button>
-            <Button onClick={() => hasReachedLimit ? null : setShowTemplates(true)} disabled={hasReachedLimit} className="gap-2">
-              <Icon icon="solar:add-circle-bold" className="h-4 w-4" />
-              Create New Page
+            <Button onClick={() => hasReachedLimit ? null : setShowTemplates(true)} disabled={hasReachedLimit} className="gap-2 text-xs sm:text-sm">
+              <Icon icon="solar:add-circle-bold" className="h-4 w-4 shrink-0" />
+              <span className="truncate">Create New Page</span>
             </Button>
           </div>
         )}

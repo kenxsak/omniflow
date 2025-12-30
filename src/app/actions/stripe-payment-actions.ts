@@ -7,12 +7,10 @@
 'use server';
 
 import Stripe from 'stripe';
-import { serverDb } from '@/lib/firebase-server';
-import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { verifyAuthToken } from '@/lib/firebase-admin';
+import { adminDb, verifyAuthToken } from '@/lib/firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 import type { Plan } from '@/types/saas';
 import type { BillingCycle, StripeCheckoutSession } from '@/types/payment';
-import { calculatePrice } from '@/lib/payment-config';
 import { getPriceForPlanWithBillingCycle, type SupportedCurrency } from '@/lib/geo-detection';
 import { addMonths, addYears } from 'date-fns';
 
@@ -43,28 +41,26 @@ export async function createStripeCheckoutSession(params: {
       return { success: false, error: 'Authentication required' };
     }
 
-    if (!serverDb) {
+    if (!adminDb) {
       return { success: false, error: 'Database not initialized' };
     }
 
     const userId = verification.uid;
     
     // Get user data
-    const userRef = doc(serverDb, 'users', userId);
-    const userDoc = await getDoc(userRef);
+    const userDoc = await adminDb.collection('users').doc(userId).get();
     
-    if (!userDoc.exists()) {
+    if (!userDoc.exists) {
       return { success: false, error: 'User not found' };
     }
     
-    const user = userDoc.data();
+    const user = userDoc.data()!;
     const stripe = getStripeInstance();
 
     // Get plan details
-    const planRef = doc(serverDb, 'plans', params.planId);
-    const planDoc = await getDoc(planRef);
+    const planDoc = await adminDb.collection('plans').doc(params.planId).get();
     
-    if (!planDoc.exists()) {
+    if (!planDoc.exists) {
       return { success: false, error: 'Plan not found' };
     }
 
@@ -86,23 +82,20 @@ export async function createStripeCheckoutSession(params: {
     }
 
     // Get or create Stripe customer
-    const companyRef = doc(serverDb, 'companies', user.companyId);
-    const companyDoc = await getDoc(companyRef);
+    const companyDoc = await adminDb.collection('companies').doc(user.companyId).get();
     
-    if (!companyDoc.exists()) {
+    if (!companyDoc.exists) {
       return { success: false, error: 'Company not found' };
     }
 
-    const companyData = companyDoc.data();
+    const companyData = companyDoc.data()!;
     let customerId = companyData.stripeCustomerId;
 
     // Verify customer exists in Stripe, or create new one
-    // This handles the case where customer was created in test mode but we're now in live mode
     if (customerId) {
       try {
         await stripe.customers.retrieve(customerId);
       } catch (err: any) {
-        // Customer doesn't exist (likely test mode customer in live mode)
         console.log('Stripe customer not found, creating new one:', customerId);
         customerId = null;
       }
@@ -121,13 +114,12 @@ export async function createStripeCheckoutSession(params: {
       customerId = customer.id;
       
       // Save customer ID to company
-      await updateDoc(companyRef, {
+      await adminDb.collection('companies').doc(user.companyId).update({
         stripeCustomerId: customerId,
       });
     }
 
     // Create checkout session
-    // Get the app URL - NEXT_PUBLIC_APP_URL must be set in production
     const appUrl = process.env.NEXT_PUBLIC_APP_URL;
     if (!appUrl) {
       return { success: false, error: 'App URL not configured. Please set NEXT_PUBLIC_APP_URL environment variable.' };
@@ -147,7 +139,7 @@ export async function createStripeCheckoutSession(params: {
               name: `${plan.name} Plan - ${params.billingCycle === 'yearly' ? 'Annual' : 'Monthly'}`,
               description: plan.description,
             },
-            unit_amount: Math.round(amount * 100), // Convert to cents/smallest unit
+            unit_amount: Math.round(amount * 100),
             ...(params.billingCycle === 'monthly' && {
               recurring: {
                 interval: 'month',
@@ -191,7 +183,7 @@ export async function handleStripePaymentSuccess(
   sessionId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    if (!serverDb) {
+    if (!adminDb) {
       return { success: false, error: 'Database not initialized' };
     }
 
@@ -205,10 +197,9 @@ export async function handleStripePaymentSuccess(
     const { companyId, planId, billingCycle } = session.metadata;
 
     // Get plan details
-    const planRef = doc(serverDb, 'plans', planId);
-    const planDoc = await getDoc(planRef);
+    const planDoc = await adminDb.collection('plans').doc(planId).get();
     
-    if (!planDoc.exists()) {
+    if (!planDoc.exists) {
       return { success: false, error: 'Plan not found' };
     }
 
@@ -221,19 +212,17 @@ export async function handleStripePaymentSuccess(
       : addMonths(now, 1);
 
     // Update company subscription
-    const companyRef = doc(serverDb, 'companies', companyId);
-    await updateDoc(companyRef, {
+    await adminDb.collection('companies').doc(companyId).update({
       planId: planId,
       billingCycle: billingCycle,
       planExpiresAt: expiryDate.toISOString(),
       status: 'active',
       stripeSubscriptionId: session.subscription || null,
-      updatedAt: serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     });
 
     // Record transaction
-    const transactionRef = doc(serverDb, 'paymentTransactions', `stripe_${sessionId}`);
-    await setDoc(transactionRef, {
+    await adminDb.collection('paymentTransactions').doc(`stripe_${sessionId}`).set({
       companyId: companyId,
       gateway: 'stripe',
       gatewayTransactionId: session.id,
@@ -242,7 +231,7 @@ export async function handleStripePaymentSuccess(
       status: 'succeeded',
       description: `${plan.name} Plan - ${billingCycle}`,
       metadata: session.metadata,
-      createdAt: serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
 
     return { success: true };
@@ -264,29 +253,27 @@ export async function cancelStripeSubscription(params: {
       return { success: false, error: 'Authentication required' };
     }
 
-    if (!serverDb) {
+    if (!adminDb) {
       return { success: false, error: 'Database not initialized' };
     }
     
     const userId = verification.uid;
-    const userRef = doc(serverDb, 'users', userId);
-    const userDoc = await getDoc(userRef);
+    const userDoc = await adminDb.collection('users').doc(userId).get();
     
-    if (!userDoc.exists()) {
+    if (!userDoc.exists) {
       return { success: false, error: 'User not found' };
     }
     
-    const user = userDoc.data();
+    const user = userDoc.data()!;
 
     const stripe = getStripeInstance();
-    const companyRef = doc(serverDb, 'companies', user.companyId);
-    const companyDoc = await getDoc(companyRef);
+    const companyDoc = await adminDb.collection('companies').doc(user.companyId).get();
     
-    if (!companyDoc.exists()) {
+    if (!companyDoc.exists) {
       return { success: false, error: 'Company not found' };
     }
 
-    const companyData = companyDoc.data();
+    const companyData = companyDoc.data()!;
     const subscriptionId = companyData.stripeSubscriptionId;
 
     if (!subscriptionId) {
@@ -317,29 +304,27 @@ export async function getStripePortalUrl(params: {
       return { success: false, error: 'Authentication required' };
     }
 
-    if (!serverDb) {
+    if (!adminDb) {
       return { success: false, error: 'Database not initialized' };
     }
     
     const userId = verification.uid;
-    const userRef = doc(serverDb, 'users', userId);
-    const userDoc = await getDoc(userRef);
+    const userDoc = await adminDb.collection('users').doc(userId).get();
     
-    if (!userDoc.exists()) {
+    if (!userDoc.exists) {
       return { success: false, error: 'User not found' };
     }
     
-    const user = userDoc.data();
+    const user = userDoc.data()!;
 
     const stripe = getStripeInstance();
-    const companyRef = doc(serverDb, 'companies', user.companyId);
-    const companyDoc = await getDoc(companyRef);
+    const companyDoc = await adminDb.collection('companies').doc(user.companyId).get();
     
-    if (!companyDoc.exists()) {
+    if (!companyDoc.exists) {
       return { success: false, error: 'Company not found' };
     }
 
-    const companyData = companyDoc.data();
+    const companyData = companyDoc.data()!;
     const customerId = companyData.stripeCustomerId;
 
     if (!customerId) {

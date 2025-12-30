@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="50%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#a855f7"/>
+    </linearGradient>
+    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.9"/>
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Full background for maskable (no rounded corners - system applies mask) -->
+  <rect width="512" height="512" fill="url(#bgGradient)"/>
+  
+  <!-- OmniFlow Wave Logo - Centered with safe zone padding (80% of icon) -->
+  <g transform="translate(256, 256) scale(1.0)">
+    <!-- Wave 1 - Top -->
+    <path d="M-80,-48 Q-40,-72 0,-48 Q40,-24 80,-48" 
+          fill="none" 
+          stroke="url(#waveGradient)" 
+          stroke-width="24" 
+          stroke-linecap="round"
+          opacity="1"/>
+    
+    <!-- Wave 2 - Middle -->
+    <path d="M-80,0 Q-40,-24 0,0 Q40,24 80,0" 
+          fill="none" 
+          stroke="url(#waveGradient)" 
+          stroke-width="24" 
+          stroke-linecap="round"
+          opacity="0.85"/>
+    
+    <!-- Wave 3 - Bottom -->
+    <path d="M-80,48 Q-40,24 0,48 Q40,72 80,48" 
+          fill="none" 
+          stroke="url(#waveGradient)" 
+          stroke-width="24" 
+          stroke-linecap="round"
+          opacity="0.7"/>
+  </g>
+</svg>

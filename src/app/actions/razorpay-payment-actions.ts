@@ -8,9 +8,8 @@
 
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
-import { serverDb } from '@/lib/firebase-server';
-import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { verifyAuthToken } from '@/lib/firebase-admin';
+import { adminDb, verifyAuthToken } from '@/lib/firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 import type { Plan } from '@/types/saas';
 import type { BillingCycle, RazorpayOrder } from '@/types/payment';
 import { addMonths, addYears } from 'date-fns';
@@ -52,28 +51,26 @@ export async function createRazorpayOrder(params: {
       return { success: false, error: 'Authentication required' };
     }
 
-    if (!serverDb) {
+    if (!adminDb) {
       return { success: false, error: 'Database not initialized' };
     }
 
     const userId = verification.uid;
     
     // Get user data
-    const userRef = doc(serverDb, 'users', userId);
-    const userDoc = await getDoc(userRef);
+    const userDoc = await adminDb.collection('users').doc(userId).get();
     
-    if (!userDoc.exists()) {
+    if (!userDoc.exists) {
       return { success: false, error: 'User not found' };
     }
     
-    const user = userDoc.data();
+    const user = userDoc.data()!;
     const razorpay = getRazorpayInstance();
 
     // Get plan details
-    const planRef = doc(serverDb, 'plans', params.planId);
-    const planDoc = await getDoc(planRef);
+    const planDoc = await adminDb.collection('plans').doc(params.planId).get();
     
-    if (!planDoc.exists()) {
+    if (!planDoc.exists) {
       return { success: false, error: 'Plan not found' };
     }
 
@@ -107,8 +104,7 @@ export async function createRazorpayOrder(params: {
     });
 
     // Store order in Firestore for verification
-    const orderRef = doc(serverDb, 'razorpayOrders', order.id);
-    await setDoc(orderRef, {
+    await adminDb.collection('razorpayOrders').doc(order.id).set({
       orderId: order.id,
       companyId: user.companyId,
       planId: params.planId,
@@ -116,7 +112,7 @@ export async function createRazorpayOrder(params: {
       amount: amountINRPaise,
       currency: 'INR',
       status: 'created',
-      createdAt: serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
 
     return {
@@ -152,7 +148,7 @@ export async function verifyRazorpayPayment(params: {
       return { success: false, error: 'Authentication required' };
     }
 
-    if (!serverDb) {
+    if (!adminDb) {
       return { success: false, error: 'Database not initialized' };
     }
 
@@ -172,20 +168,18 @@ export async function verifyRazorpayPayment(params: {
     }
 
     // Get order details
-    const orderRef = doc(serverDb, 'razorpayOrders', params.orderId);
-    const orderDoc = await getDoc(orderRef);
+    const orderDoc = await adminDb.collection('razorpayOrders').doc(params.orderId).get();
     
-    if (!orderDoc.exists()) {
+    if (!orderDoc.exists) {
       return { success: false, error: 'Order not found' };
     }
 
-    const orderData = orderDoc.data();
+    const orderData = orderDoc.data()!;
     
     // Get plan details
-    const planRef = doc(serverDb, 'plans', orderData.planId);
-    const planDoc = await getDoc(planRef);
+    const planDoc = await adminDb.collection('plans').doc(orderData.planId).get();
     
-    if (!planDoc.exists()) {
+    if (!planDoc.exists) {
       return { success: false, error: 'Plan not found' };
     }
 
@@ -198,26 +192,24 @@ export async function verifyRazorpayPayment(params: {
       : addMonths(now, 1);
 
     // Update company subscription
-    const companyRef = doc(serverDb, 'companies', orderData.companyId);
-    await updateDoc(companyRef, {
+    await adminDb.collection('companies').doc(orderData.companyId).update({
       planId: orderData.planId,
       billingCycle: orderData.billingCycle,
       planExpiresAt: expiryDate.toISOString(),
       status: 'active',
       razorpayCustomerId: null, // Razorpay doesn't require customer ID for one-time payments
-      updatedAt: serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     });
 
     // Update order status
-    await updateDoc(orderRef, {
+    await adminDb.collection('razorpayOrders').doc(params.orderId).update({
       status: 'paid',
       paymentId: params.paymentId,
-      paidAt: serverTimestamp(),
+      paidAt: FieldValue.serverTimestamp(),
     });
 
     // Record transaction
-    const transactionRef = doc(serverDb, 'paymentTransactions', `razorpay_${params.paymentId}`);
-    await setDoc(transactionRef, {
+    await adminDb.collection('paymentTransactions').doc(`razorpay_${params.paymentId}`).set({
       companyId: orderData.companyId,
       gateway: 'razorpay',
       gatewayTransactionId: params.paymentId,
@@ -230,7 +222,7 @@ export async function verifyRazorpayPayment(params: {
         planId: orderData.planId,
         billingCycle: orderData.billingCycle,
       },
-      createdAt: serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
 
     return { success: true };

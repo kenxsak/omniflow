@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -23,6 +23,7 @@ import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
+import { useNotifications } from '@/hooks/use-notifications';
 import { AppointmentList } from '@/components/appointments/appointment-list';
 import { AppointmentForm } from '@/components/appointments/appointment-form';
 import {
@@ -41,11 +42,13 @@ import { AnimatedCounter } from '@/components/ui/animated';
 export default function AppointmentsPage() {
   const { appUser } = useAuth();
   const { toast } = useToast();
+  const { notify, requestPermission, isMobile } = useNotifications();
   
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [stats, setStats] = useState<AppointmentStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
+  const hasAutoSynced = useRef(false);
   
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -56,6 +59,11 @@ export default function AppointmentsPage() {
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
   
   const [filters, setFilters] = useState<AppointmentFilter>({});
+
+  // Request notification permission on mount (for mobile push)
+  useEffect(() => {
+    requestPermission();
+  }, [requestPermission]);
 
   const fetchAppointments = useCallback(async () => {
     if (!appUser?.idToken) return;
@@ -86,11 +94,51 @@ export default function AppointmentsPage() {
     }
   }, [appUser?.idToken, filters, toast]);
 
+  // Auto-sync Cal.com on page load (silent background sync)
+  const autoSyncCalCom = useCallback(async () => {
+    if (!appUser?.idToken || hasAutoSynced.current) return;
+    
+    hasAutoSynced.current = true;
+    
+    try {
+      const result = await syncCalComBookingsAction({ idToken: appUser.idToken });
+      
+      if (result.success && result.synced && result.synced > 0) {
+        const message = `Synced ${result.synced} new booking${result.synced > 1 ? 's' : ''} from Cal.com`;
+        
+        // Show notification (toast on desktop, push on mobile)
+        notify({
+          title: '📅 Cal.com Synced',
+          description: message,
+          pushOnMobile: true,
+        });
+        
+        // Refresh appointments list
+        fetchAppointments();
+      }
+      // If no new bookings or error, stay silent (don't bother user)
+    } catch (error) {
+      // Silent fail for auto-sync - don't show error to user
+      console.error('Auto-sync Cal.com failed:', error);
+    }
+  }, [appUser?.idToken, notify, fetchAppointments]);
+
   useEffect(() => {
     if (appUser?.idToken) {
       fetchAppointments();
     }
   }, [appUser?.idToken, fetchAppointments]);
+
+  // Trigger auto-sync after initial load
+  useEffect(() => {
+    if (appUser?.idToken && !isLoading && !hasAutoSynced.current) {
+      // Small delay to let the page render first
+      const timer = setTimeout(() => {
+        autoSyncCalCom();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [appUser?.idToken, isLoading, autoSyncCalCom]);
 
   const handleCreateAppointment = async (data: CreateAppointmentInput | UpdateAppointmentInput) => {
     if (!appUser?.idToken) return;
@@ -208,10 +256,16 @@ export default function AppointmentsPage() {
       const result = await syncCalComBookingsAction({ idToken: appUser.idToken });
       
       if (result.success) {
-        toast({
-          title: 'Sync Complete',
-          description: `Synced ${result.synced} bookings.`,
+        const message = result.synced && result.synced > 0 
+          ? `Synced ${result.synced} booking${result.synced > 1 ? 's' : ''} from Cal.com`
+          : 'Already up to date with Cal.com';
+        
+        notify({
+          title: '✅ Sync Complete',
+          description: message,
+          pushOnMobile: !!(result.synced && result.synced > 0),
         });
+        
         fetchAppointments();
       } else {
         toast({ title: 'Sync Failed', description: result.error, variant: 'destructive' });
