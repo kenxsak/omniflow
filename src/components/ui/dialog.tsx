@@ -43,10 +43,10 @@ const DialogContent = React.forwardRef<
         // Base styles
         "fixed z-[60] w-full border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950 shadow-2xl duration-200",
         // Mobile
-        "inset-x-0 bottom-0 rounded-t-2xl max-h-[90vh] overflow-y-auto",
+        "inset-x-0 bottom-0 rounded-t-2xl max-h-[90vh] flex flex-col",
         // Desktop
         "sm:inset-auto sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%]",
-        "sm:max-w-lg sm:rounded-2xl sm:max-h-[85vh] sm:overflow-y-auto",
+        "sm:max-w-lg sm:rounded-2xl sm:max-h-[85vh] sm:flex sm:flex-col",
         // Animations
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
@@ -59,7 +59,7 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {/* Mobile drag indicator */}
-      <div className="sm:hidden mx-auto w-10 h-1 rounded-full bg-stone-300 dark:bg-stone-700 mt-3 mb-1" />
+      <div className="sm:hidden mx-auto w-10 h-1 rounded-full bg-stone-300 dark:bg-stone-700 mt-3 mb-1 shrink-0" />
       {children}
     </DialogPrimitive.Content>
   </DialogPortal>
@@ -72,7 +72,7 @@ const DialogHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col gap-2 p-6 border-b border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900",
+      "flex flex-col gap-2 p-6 border-b border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900 shrink-0",
       className
     )}
     {...props}
@@ -86,7 +86,7 @@ const DialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex items-center justify-end gap-3 p-4 border-t border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900",
+      "flex items-center justify-end gap-3 p-4 border-t border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900 shrink-0",
       className
     )}
     {...props}
@@ -100,7 +100,7 @@ const DialogBody = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "p-6 bg-white dark:bg-stone-950",
+      "p-6 bg-white dark:bg-stone-950 flex-1 overflow-y-auto",
       className
     )}
     {...props}
