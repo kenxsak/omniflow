@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle as AlertTitleComponent } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Wand2, Copy, Users as UsersIcon, Youtube, ClipboardCopy, Info } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import type { GenerateYouTubeAdContentInput, GenerateYouTubeAdContentOutput } from '@/ai/flows/generate-youtube-ad-content-flow';
 import { languageOptions } from '@/lib/language-options';
 
@@ -97,7 +98,11 @@ const YouTubeAdSectionComponent: React.FC<YouTubeAdSectionProps> = ({
               </div>
           </CardContent>
           <CardFooter>
-              <Button type="submit" disabled={isLoading}><Wand2 className="mr-2 h-4 w-4" /> {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Generate YouTube Ad Content</Button>
+              <Button type="submit" disabled={isLoading} className="text-white" style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)' }}>
+                <Icon icon="solar:play-circle-linear" className="mr-2 h-4 w-4" /> 
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Generate YouTube Ad Content
+              </Button>
           </CardFooter>
       </form>
       {output && (

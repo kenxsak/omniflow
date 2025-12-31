@@ -10,63 +10,7 @@ import { useCurrency } from '@/contexts/currency-context';
 import { getStripePortalUrl } from '@/app/actions/stripe-payment-actions';
 import type { Plan, Company, Feature } from '@/types/saas';
 import { cn } from '@/lib/utils';
-import { SettingsTabs } from '@/components/settings/settings-tabs';
-
-// Reusable Settings Card
-function SettingsCard({
-    title,
-    description,
-    icon,
-    children,
-    headerAction,
-    status,
-}: {
-    title: string;
-    description: string;
-    icon: string;
-    children: React.ReactNode;
-    headerAction?: React.ReactNode;
-    status?: 'active' | 'warning' | 'inactive';
-}) {
-    return (
-        <div className="border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-950 overflow-hidden shadow-sm">
-            <div className="px-5 py-4 border-b border-stone-100 dark:border-stone-800/60 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div
-                        className={cn(
-                            'h-9 w-9 rounded-xl flex items-center justify-center',
-                            status === 'active'
-                                ? 'bg-emerald-100 dark:bg-emerald-900/30'
-                                : status === 'warning'
-                                    ? 'bg-amber-100 dark:bg-amber-900/30'
-                                    : 'bg-stone-100 dark:bg-stone-800'
-                        )}
-                    >
-                        <Icon
-                            icon={icon}
-                            className={cn(
-                                'h-4.5 w-4.5',
-                                status === 'active'
-                                    ? 'text-emerald-600 dark:text-emerald-400'
-                                    : status === 'warning'
-                                        ? 'text-amber-600 dark:text-amber-400'
-                                        : 'text-stone-500 dark:text-stone-400'
-                            )}
-                        />
-                    </div>
-                    <div>
-                        <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
-                            {title}
-                        </h3>
-                        <p className="text-xs text-stone-500 dark:text-stone-500">{description}</p>
-                    </div>
-                </div>
-                {headerAction}
-            </div>
-            <div className="p-5">{children}</div>
-        </div>
-    );
-}
+import { SettingsCard } from '@/components/settings/settings-ui';
 
 export default function UsagePage() {
     const { appUser } = useAuth();
@@ -229,7 +173,6 @@ export default function UsagePage() {
                 title="Current Plan Overview"
                 description={`${company.name}'s active subscription`}
                 icon="solar:crown-linear"
-                status={isExpired ? 'warning' : 'active'}
             >
                 <div className="space-y-5">
                     <div className="flex items-center justify-between pb-4 border-b border-stone-100 dark:border-stone-800/60">

@@ -25,6 +25,7 @@ import { useToast } from '@/hooks/use-toast';
 import { getAuditLogsAction, exportAuditLogsAction } from '@/app/actions/enterprise-actions';
 import type { AuditLogEntry } from '@/types/enterprise';
 import { format, formatDistanceToNow } from 'date-fns';
+import { SettingsCard } from '@/components/settings/settings-ui';
 
 const actionColors: Record<string, string> = {
   create: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
@@ -46,39 +47,6 @@ const severityColors: Record<string, string> = {
   warning: 'border-l-amber-500',
   critical: 'border-l-red-500',
 };
-
-// Reusable Settings Card matching the theme
-function SettingsCard({
-  title,
-  description,
-  icon,
-  headerAction,
-  children,
-}: {
-  title: string;
-  description: string;
-  icon: string;
-  headerAction?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="border border-stone-200/60 dark:border-stone-800/60 rounded-2xl bg-white dark:bg-stone-950 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <div className="px-5 py-4 border-b border-stone-200/60 dark:border-stone-800/60 bg-stone-50/50 dark:bg-stone-900/30 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-stone-100 dark:bg-stone-800">
-            <Icon icon={icon} className="h-4 w-4 text-stone-600 dark:text-stone-400" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold">{title}</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
-          </div>
-        </div>
-        {headerAction}
-      </div>
-      <div className="p-5">{children}</div>
-    </div>
-  );
-}
 
 export function AuditLogViewer() {
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
@@ -158,7 +126,7 @@ export function AuditLogViewer() {
       title="Audit Trail"
       description="Complete history of all actions performed in your CRM"
       icon="solar:shield-check-linear"
-      headerAction={
+      action={
         <div className="flex gap-2">
           <Button
             variant="outline"

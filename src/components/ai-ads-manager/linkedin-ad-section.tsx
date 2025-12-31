@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Wand2, Copy, Users as UsersIcon, Briefcase, Award, Building, Linkedin, ClipboardCopy, Mail } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import type { GenerateLinkedInAdContentInput, GenerateLinkedInAdContentOutput } from '@/ai/flows/generate-linkedin-ad-content-flow';
 import { languageOptions } from '@/lib/language-options';
 
@@ -53,7 +54,11 @@ const LinkedInAdSectionComponent: React.FC<LinkedInAdSectionProps> = ({
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isLoading}><Wand2 className="mr-2 h-4 w-4" /> {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Generate LinkedIn Ad Content</Button>
+            <Button type="submit" disabled={isLoading} className="text-white" style={{ background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)' }}>
+              <Icon icon="solar:case-linear" className="mr-2 h-4 w-4" /> 
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Generate LinkedIn Ad Content
+            </Button>
           </CardFooter>
         </form>
         {output && (

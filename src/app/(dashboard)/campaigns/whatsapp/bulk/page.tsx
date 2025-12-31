@@ -343,7 +343,7 @@ export default function WhatsAppBulkCampaignsPage() {
           <h1 className="text-xl font-semibold tracking-tight">WhatsApp Bulk Campaigns</h1>
           <p className="text-sm text-muted-foreground mt-1">Send WhatsApp messages to hundreds or thousands of contacts at once</p>
         </div>
-        <Button asChild size="sm" className="h-8 text-xs">
+        <Button asChild size="sm" className="h-8 text-xs text-white" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)' }}>
           <Link href="/campaigns/ai-email">
             <Icon icon="solar:magic-stick-3-linear" className="mr-1.5 h-3.5 w-3.5" />
             Create with AI
@@ -567,7 +567,7 @@ export default function WhatsAppBulkCampaignsPage() {
               {/* Step 1: Select Platform */}
               <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-stone-200 dark:bg-stone-800 text-[10px] font-semibold">1</span>
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-semibold text-white" style={{ backgroundColor: '#3b82f6' }}>1</span>
                   <h3 className="font-semibold text-sm">Select WhatsApp Platform</h3>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -630,7 +630,7 @@ export default function WhatsAppBulkCampaignsPage() {
               {/* Step 2: Campaign Name */}
               <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-stone-200 dark:bg-stone-800 text-[10px] font-semibold">2</span>
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-semibold text-white" style={{ backgroundColor: '#8b5cf6' }}>2</span>
                   <h3 className="font-semibold text-sm">Campaign Name</h3>
                 </div>
                 <div className="space-y-1.5">
@@ -650,7 +650,7 @@ export default function WhatsAppBulkCampaignsPage() {
               {/* Step 3: Select Template */}
               <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4 space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-stone-200 dark:bg-stone-800 text-[10px] font-semibold">3</span>
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-semibold text-white" style={{ backgroundColor: '#14b8a6' }}>3</span>
                   <h3 className="font-semibold text-sm">
                     {selectedPlatform === 'aisensy' ? 'AiSensy API Campaign Name' : 'Message Template'}
                   </h3>
@@ -753,7 +753,7 @@ export default function WhatsAppBulkCampaignsPage() {
                 )}
 
                 <div className="flex items-start gap-3 p-3 border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50">
-                  <Icon icon="solar:info-circle-linear" className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <Icon icon="solar:info-circle-linear" className="h-4 w-4 mt-0.5 flex-shrink-0" style={{ color: '#3b82f6' }} />
                   <div className="text-[10px] text-muted-foreground">
                     <p className="font-medium mb-1">Only WhatsApp-approved designs shown</p>
                     <p>WhatsApp reviews all bulk message designs before you can use them. This usually takes 1-24 hours.</p>
@@ -764,7 +764,7 @@ export default function WhatsAppBulkCampaignsPage() {
               {/* Step 4: Select Recipients */}
               <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4 space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-stone-200 dark:bg-stone-800 text-[10px] font-semibold">4</span>
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-semibold text-white" style={{ backgroundColor: '#10b981' }}>4</span>
                   <h3 className="font-semibold text-sm">Select Recipients</h3>
                 </div>
                 <div className="space-y-1.5">
@@ -790,9 +790,9 @@ export default function WhatsAppBulkCampaignsPage() {
                 </div>
                 {selectedList && (
                   <div className="flex items-center gap-2 p-3 border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50">
-                    <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4 text-muted-foreground" />
+                    <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4" style={{ color: '#10b981' }} />
                     <span className="text-xs">
-                      <strong>{selectedList.contactCount || 0}</strong> contacts will receive this message
+                      <strong style={{ color: '#10b981' }}>{selectedList.contactCount || 0}</strong> contacts will receive this message
                     </span>
                   </div>
                 )}
@@ -802,7 +802,8 @@ export default function WhatsAppBulkCampaignsPage() {
               <Button
                 onClick={handleCreateCampaign}
                 disabled={isSending || !campaignName || !selectedTemplate || !selectedListId}
-                className="w-full h-10"
+                className="w-full h-10 text-white"
+                style={{ background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)' }}
               >
                 {isSending ? (
                   <>

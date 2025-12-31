@@ -8,6 +8,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Trash2, Edit3, Link as LinkIcon, ExternalLink, Rss, FileCode, Loader2, Eye, EyeOff, Trash, Calendar, AlertTriangle } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { format } from 'date-fns';
 import type { SocialMediaPost } from '@/types/social-media';
 import { getStoredSocialMediaPostsAction, deleteStoredSocialMediaPostAction, togglePostStatusAction, bulkDeleteSocialPostsAction, deleteAllDraftsAction, deleteOldPostsAction, checkSavedPostsLimitAction } from '@/app/actions/social-media-actions';
@@ -34,6 +35,10 @@ export default function ContentHubPage() {
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
   const [showCleanupDialog, setShowCleanupDialog] = useState(false);
   const [cleanupDays, setCleanupDays] = useState('30');
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
   
   // Saved posts limit state
   const [limitInfo, setLimitInfo] = useState<{
@@ -65,7 +70,17 @@ export default function ContentHubPage() {
     setLimitInfo(limitResult);
     setIsLoading(false);
     setSelectedPosts(new Set()); // Clear selection on reload
+    setCurrentPage(1); // Reset to first page on reload
   }, [appUser, toast]);
+
+  // Pagination computed values
+  const totalPages = Math.ceil(posts.length / ITEMS_PER_PAGE);
+  const paginatedPosts = posts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+  const endIndex = Math.min(currentPage * ITEMS_PER_PAGE, posts.length);
 
   useEffect(() => {
     if (appUser) {
@@ -75,12 +90,26 @@ export default function ContentHubPage() {
 
   // Selection handlers
   const toggleSelectAll = () => {
-    if (selectedPosts.size === posts.length) {
-      setSelectedPosts(new Set());
+    // Select/deselect only the posts on the current page
+    const currentPagePostIds = paginatedPosts.map(p => p.id);
+    const allCurrentPageSelected = currentPagePostIds.every(id => selectedPosts.has(id));
+    
+    if (allCurrentPageSelected) {
+      // Deselect all on current page
+      const newSelected = new Set(selectedPosts);
+      currentPagePostIds.forEach(id => newSelected.delete(id));
+      setSelectedPosts(newSelected);
     } else {
-      setSelectedPosts(new Set(posts.map(p => p.id)));
+      // Select all on current page
+      const newSelected = new Set(selectedPosts);
+      currentPagePostIds.forEach(id => newSelected.add(id));
+      setSelectedPosts(newSelected);
     }
   };
+  
+  // Check if all posts on current page are selected
+  const allCurrentPageSelected = paginatedPosts.length > 0 && 
+    paginatedPosts.every(p => selectedPosts.has(p.id));
 
   const toggleSelectPost = (postId: string) => {
     const newSelected = new Set(selectedPosts);
@@ -191,11 +220,25 @@ export default function ContentHubPage() {
     }
   };
 
-  const getStatusBadgeVariant = (status: SocialMediaPost['status']) => {
+  const getStatusBadgeVariant = (status: SocialMediaPost['status']): "secondary" | "outline" | "default" | "destructive" => {
     switch(status) {
       case 'Draft': return 'secondary';
-      case 'Posted': return 'outline';
+      case 'Posted': return 'default';
+      case 'Scheduled': return 'outline';
       default: return 'secondary';
+    }
+  }
+  
+  const getStatusBadgeStyle = (status: SocialMediaPost['status']) => {
+    switch(status) {
+      case 'Draft': 
+        return { backgroundColor: 'rgba(107, 114, 128, 0.15)', color: '#6b7280', border: '1px solid rgba(107, 114, 128, 0.3)' };
+      case 'Posted': 
+        return { backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)' };
+      case 'Scheduled': 
+        return { backgroundColor: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)' };
+      default: 
+        return { backgroundColor: 'rgba(107, 114, 128, 0.15)', color: '#6b7280', border: '1px solid rgba(107, 114, 128, 0.3)' };
     }
   }
 
@@ -209,11 +252,21 @@ export default function ContentHubPage() {
   const getIconForPlatform = (platform: SocialMediaPost['platform']) => {
     switch (platform) {
         case 'BlogPost':
-            return <Rss className="h-4 w-4 text-warning-muted-foreground" />;
+            return <Rss className="h-4 w-4" style={{ color: '#f59e0b' }} />;
         case 'SalesLandingPage':
-            return <FileCode className="h-4 w-4 text-success-muted-foreground" />;
+            return <FileCode className="h-4 w-4" style={{ color: '#10b981' }} />;
+        case 'Instagram':
+            return <Icon icon="mdi:instagram" className="h-4 w-4" style={{ color: '#e1306c' }} />;
+        case 'TwitterX':
+            return <Icon icon="ri:twitter-x-fill" className="h-4 w-4" style={{ color: '#1da1f2' }} />;
+        case 'LinkedIn':
+            return <Icon icon="mdi:linkedin" className="h-4 w-4" style={{ color: '#0077b5' }} />;
+        case 'Facebook':
+            return <Icon icon="mdi:facebook" className="h-4 w-4" style={{ color: '#1877f2' }} />;
+        case 'YouTubeVideoScript':
+            return <Icon icon="mdi:youtube" className="h-4 w-4" style={{ color: '#ff0000' }} />;
         default:
-            return <Edit3 className="h-4 w-4 text-primary" />;
+            return <Edit3 className="h-4 w-4" style={{ color: '#8b5cf6' }} />;
     }
   };
 
@@ -258,8 +311,8 @@ export default function ContentHubPage() {
           {/* Bulk Actions Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
-                <Trash className="mr-2 h-4 w-4" /> Cleanup
+              <Button variant="outline" size="sm" className="flex-1 sm:flex-none border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800">
+                <Trash className="mr-2 h-4 w-4" style={{ color: '#6b7280' }} /> Cleanup
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -282,7 +335,7 @@ export default function ContentHubPage() {
             </DropdownMenuContent>
           </DropdownMenu>
           
-          <Button asChild size="sm" className="flex-1 sm:flex-none">
+          <Button asChild size="sm" className="flex-1 sm:flex-none text-white" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
             <Link href="/social-media">
               <Edit3 className="mr-2 h-4 w-4" /> <span className="hidden xs:inline">Go to </span>Content Generator
             </Link>
@@ -380,9 +433,13 @@ export default function ContentHubPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Card>
+      <Card className="relative overflow-hidden">
+        <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-purple-500 dark:bg-purple-400" />
         <CardHeader className="p-3 sm:p-6">
-          <CardTitle className="text-base sm:text-lg">Saved Content</CardTitle>
+          <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+            <Icon icon="solar:folder-with-files-bold" className="h-5 w-5" style={{ color: '#8b5cf6' }} />
+            Saved Content
+          </CardTitle>
           <CardDescription className="text-xs sm:text-sm">
             All your saved content is stored in the database. This hub is where you manage content for social media and your public-facing pages.
           </CardDescription>
@@ -391,15 +448,15 @@ export default function ContentHubPage() {
           {/* Mobile Card View */}
           <div className="sm:hidden space-y-3">
             {/* Mobile Select All */}
-            {posts.length > 0 && !isLoading && (
+            {paginatedPosts.length > 0 && !isLoading && (
               <div className="flex items-center gap-2 pb-2 border-b">
                 <Checkbox
-                  checked={selectedPosts.size === posts.length && posts.length > 0}
+                  checked={allCurrentPageSelected}
                   onCheckedChange={toggleSelectAll}
                   id="select-all-mobile"
                 />
                 <label htmlFor="select-all-mobile" className="text-sm text-muted-foreground cursor-pointer">
-                  Select All ({posts.length})
+                  Select All on Page ({paginatedPosts.length})
                 </label>
               </div>
             )}
@@ -410,7 +467,7 @@ export default function ContentHubPage() {
                 No saved posts yet. Go to the "Content Generator" to create and save some content.
               </div>
             ) : (
-              posts.map((post) => (
+              paginatedPosts.map((post) => (
                 <div key={post.id} className={`p-3 border rounded-md space-y-2 ${selectedPosts.has(post.id) ? 'border-primary bg-primary/5' : ''}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -422,7 +479,7 @@ export default function ContentHubPage() {
                       <span className="text-sm font-medium">{post.platform}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Badge variant={getStatusBadgeVariant(post.status)} className="text-[10px]">{post.status}</Badge>
+                      <Badge variant="outline" className="text-[10px]" style={getStatusBadgeStyle(post.status)}>{post.status}</Badge>
                       {(post.platform === 'BlogPost' || post.platform === 'SalesLandingPage') && (
                         <Button 
                           variant="ghost" 
@@ -447,20 +504,20 @@ export default function ContentHubPage() {
                       )}
                       {(post.platform === 'BlogPost' || post.platform === 'SalesLandingPage') && (
                         <>
-                          <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
-                            <Link href={`/blog/${post.id}`} target="_blank"><ExternalLink className="h-3 w-3" /></Link>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-blue-50 dark:hover:bg-blue-900/20" asChild>
+                            <Link href={`/blog/${post.id}`} target="_blank"><ExternalLink className="h-3 w-3" style={{ color: '#3b82f6' }} /></Link>
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCopyLink(post.id)}>
-                            <LinkIcon className="h-3 w-3" />
+                          <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-teal-50 dark:hover:bg-teal-900/20" onClick={() => handleCopyLink(post.id)}>
+                            <LinkIcon className="h-3 w-3" style={{ color: '#14b8a6' }} />
                           </Button>
                         </>
                       )}
-                      <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
-                        <Link href={`/social-media?editPostId=${post.id}`}><Edit3 className="h-3 w-3" /></Link>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-purple-50 dark:hover:bg-purple-900/20" asChild>
+                        <Link href={`/social-media?editPostId=${post.id}`}><Edit3 className="h-3 w-3" style={{ color: '#8b5cf6' }} /></Link>
                       </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-7 w-7"><Trash2 className="h-3 w-3 text-destructive" /></Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-red-50 dark:hover:bg-red-900/20"><Trash2 className="h-3 w-3" style={{ color: '#ef4444' }} /></Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
@@ -487,9 +544,9 @@ export default function ContentHubPage() {
                 <TableRow>
                   <TableHead className="w-[40px]">
                     <Checkbox
-                      checked={selectedPosts.size === posts.length && posts.length > 0}
+                      checked={allCurrentPageSelected}
                       onCheckedChange={toggleSelectAll}
-                      aria-label="Select all"
+                      aria-label="Select all on page"
                     />
                   </TableHead>
                   <TableHead>Type</TableHead>
@@ -509,7 +566,7 @@ export default function ContentHubPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  posts.map((post) => (
+                  paginatedPosts.map((post) => (
                     <TableRow key={post.id} className={selectedPosts.has(post.id) ? 'bg-primary/5' : ''}>
                       <TableCell>
                         <Checkbox
@@ -527,7 +584,7 @@ export default function ContentHubPage() {
                       <TableCell className="text-muted-foreground text-xs">{post.textContent.substring(0, 120)}...</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Badge variant={getStatusBadgeVariant(post.status)}>{post.status}</Badge>
+                          <Badge variant="outline" style={getStatusBadgeStyle(post.status)}>{post.status}</Badge>
                           {(post.platform === 'BlogPost' || post.platform === 'SalesLandingPage') && (
                             <TooltipProvider>
                               <Tooltip>
@@ -566,9 +623,9 @@ export default function ContentHubPage() {
                                 <>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <Button variant="ghost" size="icon" asChild>
+                                        <Button variant="ghost" size="icon" asChild className="hover:bg-blue-50 dark:hover:bg-blue-900/20">
                                             <Link href={`/blog/${post.id}`} target="_blank">
-                                                <ExternalLink className="h-4 w-4" />
+                                                <ExternalLink className="h-4 w-4" style={{ color: '#3b82f6' }} />
                                             </Link>
                                         </Button>
                                     </TooltipTrigger>
@@ -576,8 +633,8 @@ export default function ContentHubPage() {
                                 </Tooltip>
                                  <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <Button variant="ghost" size="icon" onClick={() => handleCopyLink(post.id)}>
-                                            <LinkIcon className="h-4 w-4" />
+                                        <Button variant="ghost" size="icon" onClick={() => handleCopyLink(post.id)} className="hover:bg-teal-50 dark:hover:bg-teal-900/20">
+                                            <LinkIcon className="h-4 w-4" style={{ color: '#14b8a6' }} />
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent><p>Copy Public Link</p></TooltipContent>
@@ -586,9 +643,9 @@ export default function ContentHubPage() {
                             )}
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" asChild>
+                              <Button variant="ghost" size="icon" asChild className="hover:bg-purple-50 dark:hover:bg-purple-900/20">
                                 <Link href={`/social-media?editPostId=${post.id}`}>
-                                  <Edit3 className="h-4 w-4" />
+                                  <Edit3 className="h-4 w-4" style={{ color: '#8b5cf6' }} />
                                 </Link>
                               </Button>
                             </TooltipTrigger>
@@ -598,8 +655,8 @@ export default function ContentHubPage() {
                         
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4 text-destructive" />
+                            <Button variant="ghost" size="icon" className="hover:bg-red-50 dark:hover:bg-red-900/20">
+                              <Trash2 className="h-4 w-4" style={{ color: '#ef4444' }} />
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
@@ -624,6 +681,81 @@ export default function ContentHubPage() {
               </TableBody>
             </Table>
           </div>
+          
+          {/* Pagination */}
+          {posts.length > ITEMS_PER_PAGE && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t mt-4">
+              <p className="text-xs text-muted-foreground">
+                Showing <span className="font-medium">{startIndex}</span> to <span className="font-medium">{endIndex}</span> of <span className="font-medium">{posts.length}</span> posts
+              </p>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-3"
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                >
+                  <Icon icon="solar:double-alt-arrow-left-linear" className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-3"
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <Icon icon="solar:alt-arrow-left-linear" className="h-4 w-4" />
+                </Button>
+                
+                {/* Page numbers */}
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum: number;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? "default" : "outline"}
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={() => setCurrentPage(pageNum)}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-3"
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  <Icon icon="solar:alt-arrow-right-linear" className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-3"
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                >
+                  <Icon icon="solar:double-alt-arrow-right-linear" className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

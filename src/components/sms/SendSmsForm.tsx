@@ -436,7 +436,7 @@ export default function SendSmsForm() {
             {/* Phone Frame */}
             <div className="mx-auto w-[260px] h-[520px] bg-stone-900 rounded-[2.5rem] p-2.5 shadow-xl border-4 border-stone-800">
               {/* Phone Inner Frame */}
-              <div className="w-full h-full bg-stone-950 rounded-[2rem] overflow-hidden flex flex-col">
+              <div className="w-full h-full bg-[#0f172a] rounded-[2rem] overflow-hidden flex flex-col">
                 {/* Phone Notch */}
                 <div className="flex justify-center pt-2 pb-1">
                   <div className="w-16 h-4 bg-stone-900 rounded-full" />
@@ -451,53 +451,58 @@ export default function SendSmsForm() {
                   </div>
                 </div>
                 
-                {/* Messages Header */}
-                <div className="px-3 py-2 border-b border-stone-800">
+                {/* Messages Header - SMS themed with teal accent */}
+                <div className="px-3 py-2 border-b border-stone-800 bg-[#1e293b]">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-stone-700 flex items-center justify-center">
-                      <Icon icon="solar:chat-round-line-linear" className="w-3.5 h-3.5 text-stone-400" />
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ backgroundColor: '#0d9488' }}>
+                      <Icon icon="solar:chat-round-line-linear" className="w-3.5 h-3.5 text-white" />
                     </div>
                     <div>
                       <p className="text-[11px] font-medium text-stone-200">{toPhoneNumber || 'Recipient'}</p>
-                      <p className="text-[9px] text-stone-500">Quick SMS</p>
+                      <p className="text-[9px]" style={{ color: '#5eead4' }}>Quick SMS</p>
                     </div>
                   </div>
                 </div>
                 
                 {/* Messages Area */}
-                <div className="flex-1 p-2.5 overflow-y-auto">
+                <div className="flex-1 p-2.5 overflow-y-auto bg-[#0f172a]">
                   {messageBody ? (
                     <div className="flex justify-start">
-                      <div className="max-w-[90%] bg-stone-800 rounded-xl rounded-tl-sm px-2.5 py-1.5 shadow-sm">
+                      <div className="max-w-[90%] rounded-xl rounded-tl-sm px-2.5 py-1.5 shadow-sm" style={{ backgroundColor: '#1e3a5f' }}>
                         <p className="text-[11px] text-stone-200 whitespace-pre-wrap break-words leading-relaxed">
                           {messageBody}
                         </p>
-                        <p className="text-[8px] text-stone-500 mt-1 text-right">
-                          {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </p>
+                        <div className="flex items-center justify-end gap-1 mt-1">
+                          <p className="text-[8px] text-stone-400">
+                            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                          <svg className="w-2.5 h-2.5" style={{ color: '#38bdf8' }} fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   ) : (
                     <div className="h-full flex items-center justify-center">
                       <div className="text-center">
-                        <Icon icon="solar:chat-round-line-linear" className="w-6 h-6 text-stone-700 mx-auto mb-1.5" />
-                        <p className="text-[10px] text-stone-600">Type a message</p>
+                        <Icon icon="solar:chat-round-line-linear" className="w-6 h-6 mx-auto mb-1.5" style={{ color: '#0d9488' }} />
+                        <p className="text-[10px] text-stone-500">Type a message</p>
                       </div>
                     </div>
                   )}
                 </div>
                 
-                {/* Message Stats */}
-                <div className="px-2.5 py-1.5 border-t border-stone-800 bg-stone-900/50">
-                  <div className="flex items-center justify-between text-[9px] text-stone-500">
-                    <span>{messageBody.length} chars</span>
-                    <span>{smsInfo.segments} segment{smsInfo.segments !== 1 ? 's' : ''}</span>
-                    <span>{smsInfo.encoding}</span>
+                {/* Message Stats - with teal accent */}
+                <div className="px-2.5 py-1.5 border-t border-stone-800 bg-[#1e293b]">
+                  <div className="flex items-center justify-between text-[9px]">
+                    <span style={{ color: '#5eead4' }}>{messageBody.length} chars</span>
+                    <span className="text-stone-400">{smsInfo.segments} segment{smsInfo.segments !== 1 ? 's' : ''}</span>
+                    <span style={{ color: '#38bdf8' }}>{smsInfo.encoding}</span>
                   </div>
                 </div>
                 
                 {/* Home Indicator */}
-                <div className="flex justify-center py-1.5">
+                <div className="flex justify-center py-1.5 bg-[#0f172a]">
                   <div className="w-20 h-1 bg-stone-700 rounded-full" />
                 </div>
               </div>
@@ -506,7 +511,7 @@ export default function SendSmsForm() {
             {/* Preview Info */}
             <div className="mt-3 p-2.5 bg-stone-50 dark:bg-stone-900/50 rounded-lg border border-stone-200 dark:border-stone-800">
               <p className="text-[10px] text-muted-foreground leading-relaxed">
-                Preview shows how your SMS will appear. {smsInfo.segments > 1 && <span className="text-amber-500">Multi-segment messages may cost more.</span>}
+                Preview shows how your SMS will appear. {smsInfo.segments > 1 && <span style={{ color: '#f59e0b' }}>Multi-segment messages may cost more.</span>}
               </p>
             </div>
           </div>

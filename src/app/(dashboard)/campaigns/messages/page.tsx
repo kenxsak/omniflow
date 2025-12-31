@@ -92,11 +92,11 @@ export default function UnifiedSmsPage() {
                 )}
               >
                 <span className="flex items-center gap-1.5">
-                  <Icon icon="solar:magic-stick-3-linear" className="h-4 w-4" />
+                  <Icon icon="solar:magic-stick-3-linear" className="h-4 w-4" style={{ color: activeTab === 'ai' ? '#8b5cf6' : undefined }} />
                   Create with AI
                 </span>
                 {activeTab === 'ai' && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-t-full" />
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t-full" style={{ background: '#8b5cf6' }} />
                 )}
               </button>
               <button
@@ -109,11 +109,11 @@ export default function UnifiedSmsPage() {
                 )}
               >
                 <span className="flex items-center gap-1.5">
-                  <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4" />
+                  <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4" style={{ color: activeTab === 'bulk' ? '#10b981' : undefined }} />
                   Send Campaign
                 </span>
                 {activeTab === 'bulk' && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-t-full" />
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t-full" style={{ background: '#10b981' }} />
                 )}
               </button>
             </nav>

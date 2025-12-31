@@ -785,15 +785,15 @@ export default function SocialMediaPage() {
           <p className="text-xs text-muted-foreground">Generate text, images, video ideas, and discover trending topics</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" asChild>
+          <Button variant="outline" size="sm" asChild className="border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20">
             <Link href="/social-media/planner">
-              <Icon icon="solar:calendar-mark-linear" className="h-4 w-4 mr-1.5" />
+              <Icon icon="solar:calendar-mark-linear" className="h-4 w-4 mr-1.5" style={{ color: '#3b82f6' }} />
               <span className="hidden sm:inline">Content </span>Planner
             </Link>
           </Button>
-          <Button variant="outline" size="sm" asChild>
+          <Button variant="outline" size="sm" asChild className="border-teal-200 dark:border-teal-800 hover:bg-teal-50 dark:hover:bg-teal-900/20">
             <Link href="/social-media/content-hub">
-              <Icon icon="solar:folder-with-files-linear" className="h-4 w-4 mr-1.5" />
+              <Icon icon="solar:folder-with-files-linear" className="h-4 w-4 mr-1.5" style={{ color: '#14b8a6' }} />
               <span className="hidden sm:inline">Content </span>Hub
             </Link>
           </Button>
@@ -870,7 +870,7 @@ export default function SocialMediaPage() {
                       <Input value={trendInputs.targetRegion || ''} onChange={(e) => handleTrendInputChange('targetRegion', e.target.value)} placeholder="e.g., Global, USA" className="mt-1.5 h-9 text-sm" />
                     </div>
                   </div>
-                  <Button type="submit" disabled={isLoadingTrends} size="sm" className="h-8">
+                  <Button type="submit" disabled={isLoadingTrends} size="sm" className="h-8 text-white" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
                     {isLoadingTrends && <Icon icon="solar:refresh-linear" className="mr-2 h-3.5 w-3.5 animate-spin" />}
                     <Icon icon="solar:magnifer-linear" className="mr-2 h-3.5 w-3.5" />
                     Get Trends
@@ -1006,7 +1006,7 @@ export default function SocialMediaPage() {
                       />
                     </div>
                   </div>
-                  <Button type="submit" disabled={isEnhancingPrompt} size="sm" className="h-8">
+                  <Button type="submit" disabled={isEnhancingPrompt} size="sm" className="h-8 text-white" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
                     {isEnhancingPrompt && <Icon icon="solar:refresh-linear" className="mr-2 h-3.5 w-3.5 animate-spin" />}
                     <Icon icon="solar:magic-stick-3-linear" className="mr-2 h-3.5 w-3.5" />
                     Enhance Prompt
@@ -1185,7 +1185,7 @@ export default function SocialMediaPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button type="submit" disabled={isLoadingContent} size="sm" className="h-8">
+                  <Button type="submit" disabled={isLoadingContent} size="sm" className="h-8 text-white" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
                     {isLoadingContent && <Icon icon="solar:refresh-linear" className="mr-2 h-3.5 w-3.5 animate-spin" />}
                     <Icon icon="solar:magic-stick-3-linear" className="mr-2 h-3.5 w-3.5" />
                     {editingPostId ? 'Re-Generate' : 'Generate Content'}
@@ -1528,7 +1528,7 @@ export default function SocialMediaPage() {
                     </CollapsibleContent>
                   </Collapsible>
 
-                  <Button type="submit" disabled={isGeneratingImage} size="sm" className="h-9 w-full">
+                  <Button type="submit" disabled={isGeneratingImage} size="sm" className="h-9 w-full text-white" style={{ background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)' }}>
                     {isGeneratingImage ? (
                       <>
                         <Icon icon="solar:refresh-linear" className="mr-2 h-4 w-4 animate-spin" />
@@ -1677,7 +1677,7 @@ export default function SocialMediaPage() {
                       <Input type="number" min="3" max="20" value={hashtagInputs.numSuggestions} onChange={(e) => handleHashtagInputChange('numSuggestions', parseInt(e.target.value, 10))} className="mt-1.5 h-9 text-sm" />
                     </div>
                   </div>
-                  <Button type="submit" disabled={isGeneratingHashtags} size="sm" className="h-8">
+                  <Button type="submit" disabled={isGeneratingHashtags} size="sm" className="h-8 text-white" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
                     {isGeneratingHashtags && <Icon icon="solar:refresh-linear" className="mr-2 h-3.5 w-3.5 animate-spin" />}
                     <Icon icon="solar:hashtag-linear" className="mr-2 h-3.5 w-3.5" />
                     Suggest Hashtags
@@ -1739,7 +1739,7 @@ export default function SocialMediaPage() {
                       <Input value={reviewInput.businessName} onChange={(e) => handleReviewInputChange('businessName', e.target.value)} placeholder="Your business name" required className="mt-1.5 h-9 text-sm" />
                     </div>
                   </div>
-                  <Button type="submit" disabled={isReviewLoading} size="sm" className="h-8">
+                  <Button type="submit" disabled={isReviewLoading} size="sm" className="h-8 text-white" style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)' }}>
                     {isReviewLoading && <Icon icon="solar:refresh-linear" className="mr-2 h-3.5 w-3.5 animate-spin" />}
                     <Icon icon="solar:magic-stick-3-linear" className="mr-2 h-3.5 w-3.5" />
                     Generate Response

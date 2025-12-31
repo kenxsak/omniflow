@@ -616,7 +616,7 @@ export default function ComposeEmailPage() {
             <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             <span className="hidden xs:inline">Use </span>Template
           </Button>
-          <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
+          <Button size="sm" asChild className="text-xs sm:text-sm text-white" style={{ background: 'linear-gradient(to right, #8b5cf6, #a855f7)' }}>
             <Link href="/campaigns/ai-email">
               <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               AI Studio
@@ -636,10 +636,11 @@ export default function ComposeEmailPage() {
 
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-4 order-2 lg:order-1">
-          <Card>
-            <CardHeader className="pb-3 sm:pb-6">
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-3 sm:pb-6 relative" style={{ background: 'linear-gradient(to right, rgba(59, 130, 246, 0.05), rgba(99, 102, 241, 0.05))' }}>
+              <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #3b82f6, #6366f1)' }} />
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <Mail className="h-4 w-4 sm:h-5 sm:w-5" />
+                <Mail className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: '#3b82f6' }} />
                 Email Content
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
@@ -703,7 +704,7 @@ export default function ComposeEmailPage() {
                 }}
                 disabled={!subject || !htmlContent}
               >
-                <BookmarkPlus className="h-4 w-4 mr-2" />
+                <BookmarkPlus className="h-4 w-4 mr-2" style={{ color: '#8b5cf6' }} />
                 Save as Template
               </Button>
             </CardFooter>
@@ -711,10 +712,11 @@ export default function ComposeEmailPage() {
         </div>
 
         <div className="space-y-4 order-1 lg:order-2">
-          <Card>
-            <CardHeader className="pb-3 sm:pb-6">
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-3 sm:pb-6 relative" style={{ background: 'linear-gradient(to right, rgba(20, 184, 166, 0.05), rgba(16, 185, 129, 0.05))' }}>
+              <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #14b8a6, #10b981)' }} />
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <Users className="h-4 w-4 sm:h-5 sm:w-5" />
+                <Users className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: '#14b8a6' }} />
                 Send To
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
@@ -807,7 +809,8 @@ export default function ComposeEmailPage() {
             </CardContent>
             <CardFooter className="pt-2">
               <Button
-                className="w-full min-h-[44px] text-sm sm:text-base"
+                className="w-full min-h-[44px] text-sm sm:text-base text-white"
+                style={{ background: 'linear-gradient(to right, #10b981, #14b8a6)' }}
                 onClick={handleSendEmail}
                 disabled={isSending || !subject || !htmlContent || !deliveryProvider || 
                   (deliveryProvider === 'brevo' && !selectedBrevoListId) ||
@@ -840,45 +843,60 @@ export default function ComposeEmailPage() {
       <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}>
         <DialogContent className="w-full max-w-[95vw] sm:max-w-4xl max-h-[90vh] sm:max-h-[80vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle className="text-base sm:text-lg">Marketing Email Templates</DialogTitle>
+            <div className="flex items-center gap-2">
+              <FileText className="h-5 w-5" style={{ color: '#8b5cf6' }} />
+              <DialogTitle className="text-base sm:text-lg">Marketing Email Templates</DialogTitle>
+            </div>
             <DialogDescription className="text-xs sm:text-sm">
               Choose a template to start with. Customize the [bracketed] text with your details.
             </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
-            {MARKETING_TEMPLATES.map((template) => (
-              <Card key={template.id} className="hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2 px-3 sm:px-6">
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-sm sm:text-base">{template.name}</CardTitle>
-                    <Badge variant="secondary" className="text-[10px] sm:text-xs shrink-0">{template.category}</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 px-3 sm:px-6">
-                  <div className="text-xs sm:text-sm">
-                    <span className="font-medium">Subject: </span>
-                    <span className="text-muted-foreground">{template.subject}</span>
-                  </div>
-                  <div className="bg-muted p-2 rounded text-xs max-h-20 sm:max-h-24 overflow-y-auto">
-                    <div dangerouslySetInnerHTML={{ __html: template.body.substring(0, 200) + '...' }} />
-                  </div>
-                </CardContent>
-                <CardFooter className="flex gap-2 px-3 sm:px-6 pt-2">
-                  <Button size="sm" onClick={() => handleUseTemplate(template)} className="flex-1 text-xs sm:text-sm">
-                    Use Template
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleCopyTemplate(template)}
-                    className="shrink-0"
-                  >
-                    {copied === template.id ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
+            {MARKETING_TEMPLATES.map((template) => {
+              const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
+                onboarding: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-200 dark:border-blue-800' },
+                marketing: { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-400', border: 'border-purple-200 dark:border-purple-800' },
+                engagement: { bg: 'bg-teal-100 dark:bg-teal-900/30', text: 'text-teal-700 dark:text-teal-400', border: 'border-teal-200 dark:border-teal-800' },
+                sales: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-700 dark:text-emerald-400', border: 'border-emerald-200 dark:border-emerald-800' },
+                events: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-200 dark:border-amber-800' },
+                transactional: { bg: 'bg-rose-100 dark:bg-rose-900/30', text: 'text-rose-700 dark:text-rose-400', border: 'border-rose-200 dark:border-rose-800' },
+              };
+              const colors = categoryColors[template.category] || categoryColors.marketing;
+              
+              return (
+                <Card key={template.id} className="hover:shadow-md transition-shadow overflow-hidden">
+                  <CardHeader className="pb-2 px-3 sm:px-6 relative">
+                    <div className="flex items-start justify-between gap-2">
+                      <CardTitle className="text-sm sm:text-base">{template.name}</CardTitle>
+                      <Badge className={`text-[10px] sm:text-xs shrink-0 border-0 ${colors.bg} ${colors.text}`}>{template.category}</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-2 px-3 sm:px-6">
+                    <div className="text-xs sm:text-sm">
+                      <span className="font-medium">Subject: </span>
+                      <span className="text-muted-foreground">{template.subject}</span>
+                    </div>
+                    <div className="bg-muted p-2 rounded text-xs max-h-20 sm:max-h-24 overflow-y-auto">
+                      <div dangerouslySetInnerHTML={{ __html: template.body.substring(0, 200) + '...' }} />
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex gap-2 px-3 sm:px-6 pt-2">
+                    <Button size="sm" onClick={() => handleUseTemplate(template)} className="flex-1 text-xs sm:text-sm">
+                      Use Template
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleCopyTemplate(template)}
+                      className="shrink-0"
+                    >
+                      {copied === template.id ? <Check className="h-4 w-4" style={{ color: '#10b981' }} /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                  </CardFooter>
+                </Card>
+              );
+            })}
           </div>
         </DialogContent>
       </Dialog>

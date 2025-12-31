@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Wand2, Copy, ClipboardCopy, ListFilter } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import type { GenerateGoogleSearchAdCopyInput, AdCopyVariation as GoogleAdVariation } from '@/ai/flows/generate-google-search-ad-copy-flow';
 import { languageOptions } from '@/lib/language-options';
 
@@ -44,7 +45,11 @@ const GoogleSearchAdCopySectionComponent: React.FC<GoogleSearchAdCopySectionProp
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" disabled={isLoading}><Wand2 className="mr-2 h-4 w-4" /> {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Generate Ad Copy</Button>
+          <Button type="submit" disabled={isLoading} className="text-white" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
+            <Icon icon="solar:text-bold-linear" className="mr-2 h-4 w-4" /> 
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Generate Ad Copy
+          </Button>
         </CardFooter>
       </form>
       {variations && (

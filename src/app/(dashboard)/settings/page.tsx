@@ -84,7 +84,22 @@ export default function ProfileSettingsPage() {
   };
 
   const getRoleBadge = () => {
-    return 'bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300';
+    const role = appUser?.role?.toLowerCase();
+    if (role === 'admin' || role === 'superadmin') {
+      return 'bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300 border border-violet-200 dark:border-violet-800';
+    }
+    if (role === 'manager') {
+      return 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800';
+    }
+    return 'bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300 border border-stone-200 dark:border-stone-700';
+  };
+
+  const getTypeBadge = () => {
+    const type = appUser?.type?.toLowerCase();
+    if (type === 'field') {
+      return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+    }
+    return 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400 border border-stone-200 dark:border-stone-700';
   };
 
   return (
@@ -134,7 +149,7 @@ export default function ProfileSettingsPage() {
                   <span className={cn('px-2 py-0.5 text-[10px] font-medium uppercase rounded-md', getRoleBadge())}>
                     {appUser?.role || 'User'}
                   </span>
-                  <span className="px-2 py-0.5 text-[10px] font-medium uppercase rounded-md bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400">
+                  <span className={cn('px-2 py-0.5 text-[10px] font-medium uppercase rounded-md', getTypeBadge())}>
                     {appUser?.type || 'Office'}
                   </span>
                 </div>
@@ -225,7 +240,7 @@ export default function ProfileSettingsPage() {
                 <span className={cn('px-2 py-0.5 text-[10px] font-medium uppercase rounded-md', getRoleBadge())}>
                   {appUser?.role || 'User'}
                 </span>
-                <span className="px-2 py-0.5 text-[10px] font-medium uppercase rounded-md bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400">
+                <span className={cn('px-2 py-0.5 text-[10px] font-medium uppercase rounded-md', getTypeBadge())}>
                   {appUser?.type || 'Office'}
                 </span>
               </div>

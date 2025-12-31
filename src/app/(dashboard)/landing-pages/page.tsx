@@ -571,7 +571,7 @@ export default function LandingPagesPage() {
               <Icon icon="solar:copy-bold" className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span className="text-emerald-700 dark:text-emerald-300 truncate">Clone from Reference</span>
             </Button>
-            <Button onClick={() => hasReachedLimit ? null : setShowTemplates(true)} disabled={hasReachedLimit} className="gap-2 text-xs sm:text-sm">
+            <Button onClick={() => hasReachedLimit ? null : setShowTemplates(true)} disabled={hasReachedLimit} className="gap-2 text-xs sm:text-sm text-white" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
               <Icon icon="solar:add-circle-bold" className="h-4 w-4 shrink-0" />
               <span className="truncate">Create New Page</span>
             </Button>
@@ -664,7 +664,7 @@ export default function LandingPagesPage() {
                 Build beautiful, high-converting landing pages in minutes. No coding required!
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button onClick={() => setShowTemplates(true)} size="lg" className="gap-2">
+                <Button onClick={() => setShowTemplates(true)} size="lg" className="gap-2 text-white" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
                   <Icon icon="solar:add-circle-bold" className="h-5 w-5" />
                   Start from Template
                 </Button>
@@ -759,12 +759,12 @@ export default function LandingPagesPage() {
                     {page.isPublished && (
                       <div className="flex gap-4 mb-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
-                          <Icon icon="solar:eye-linear" className="h-3.5 w-3.5" />
-                          {page.stats?.views || 0} views
+                          <Icon icon="solar:eye-linear" className="h-3.5 w-3.5" style={{ color: '#3b82f6' }} />
+                          <span style={{ color: '#3b82f6' }}>{page.stats?.views || 0}</span> views
                         </span>
                         <span className="flex items-center gap-1">
-                          <Icon icon="solar:user-plus-linear" className="h-3.5 w-3.5" />
-                          {page.stats?.submissions || 0} leads
+                          <Icon icon="solar:user-plus-linear" className="h-3.5 w-3.5" style={{ color: '#10b981' }} />
+                          <span style={{ color: '#10b981' }}>{page.stats?.submissions || 0}</span> leads
                         </span>
                       </div>
                     )}
@@ -774,8 +774,9 @@ export default function LandingPagesPage() {
                       <Button 
                         variant="default" 
                         size="sm" 
-                        className="flex-1"
+                        className="flex-1 text-white"
                         onClick={() => openPageEditor(page)}
+                        style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}
                       >
                         <Icon icon="solar:pen-linear" className="h-3.5 w-3.5 mr-1" />
                         Edit
@@ -954,10 +955,10 @@ function PageEditor({
               Back
             </Button>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={onSave} disabled={saving}>
+              <Button variant="outline" size="sm" onClick={onSave} disabled={saving} className="text-white" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
                 {saving ? <Icon icon="solar:refresh-linear" className="h-4 w-4 animate-spin" /> : <Icon icon="solar:diskette-bold" className="h-4 w-4" />}
               </Button>
-              <Button size="sm" onClick={onPublish} disabled={publishing}>
+              <Button size="sm" onClick={onPublish} disabled={publishing} className="text-white" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
                 {publishing ? <Icon icon="solar:refresh-linear" className="h-4 w-4 animate-spin" /> : <Icon icon="solar:upload-bold" className="h-4 w-4" />}
               </Button>
             </div>
@@ -1003,7 +1004,7 @@ function PageEditor({
                 Copy Link
               </Button>
             )}
-            <Button variant="outline" size="sm" onClick={onSave} disabled={saving}>
+            <Button variant="outline" size="sm" onClick={onSave} disabled={saving} className="text-white" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
               {saving ? (
                 <Icon icon="solar:refresh-linear" className="h-4 w-4 mr-1 animate-spin" />
               ) : (
@@ -1011,7 +1012,7 @@ function PageEditor({
               )}
               {saving ? 'Saving...' : 'Save'}
             </Button>
-            <Button size="sm" onClick={onPublish} disabled={publishing}>
+            <Button size="sm" onClick={onPublish} disabled={publishing} className="text-white" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
               {publishing ? (
                 <Icon icon="solar:refresh-linear" className="h-4 w-4 mr-1 animate-spin" />
               ) : (
@@ -1090,8 +1091,9 @@ function PageEditor({
           </Button>
           <Button 
             size="icon" 
-            className="h-14 w-14 rounded-full shadow-lg"
+            className="h-14 w-14 rounded-full shadow-lg text-white"
             onClick={() => setShowAddSectionSheet(true)}
+            style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}
           >
             <Icon icon="solar:add-circle-bold" className="h-6 w-6" />
           </Button>
@@ -1527,32 +1529,32 @@ function SectionPreview({
       )}
 
       {section.type === 'pricing' && (
-        <div className="py-4 px-2">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-w-2xl mx-auto">
+        <div className="py-4 px-2 sm:px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full max-w-4xl mx-auto">
             {(section.content.plans || [{ name: 'Basic', price: '$9', features: ['Feature 1', 'Feature 2'] }, { name: 'Pro', price: '$29', popular: true, features: ['Feature 1', 'Feature 2'] }]).slice(0, 3).map((plan: any, i: number) => (
               <div key={i} className={cn(
-                "p-4 rounded-xl border text-center relative",
+                "p-4 sm:p-5 rounded-xl border text-center relative flex flex-col min-h-[180px]",
                 plan.popular 
-                  ? "border-primary bg-primary/10 dark:bg-primary/20 shadow-md" 
+                  ? "border-primary bg-primary/10 dark:bg-primary/20 shadow-md sm:scale-[1.02]" 
                   : "border-stone-300 dark:border-stone-600 bg-stone-50 dark:bg-stone-800"
               )}>
                 {plan.popular && (
-                  <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[9px] px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-md whitespace-nowrap">
+                  <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-md whitespace-nowrap">
                     ⭐ Popular
                   </span>
                 )}
-                <p className="text-sm font-semibold text-stone-900 dark:text-white mt-1">{plan.name || 'Plan'}</p>
-                <p className="text-2xl font-bold text-stone-900 dark:text-white my-1">{plan.price || '$0'}</p>
+                <p className="text-sm sm:text-base font-semibold text-stone-900 dark:text-white mt-1">{plan.name || 'Plan'}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-stone-900 dark:text-white my-1 sm:my-2">{plan.price || '$0'}<span className="text-xs font-normal text-stone-500">/mo</span></p>
                 {plan.features && plan.features.length > 0 && (
-                  <div className="mt-3 space-y-1.5">
-                    {plan.features.slice(0, 3).map((f: string, fi: number) => (
-                      <p key={fi} className="text-xs text-stone-600 dark:text-stone-300 flex items-center justify-center gap-1.5">
-                        <Icon icon="solar:check-circle-bold" className="h-3.5 w-3.5 text-green-500 shrink-0" />
+                  <div className="mt-3 space-y-1.5 flex-1">
+                    {plan.features.slice(0, 4).map((f: string, fi: number) => (
+                      <p key={fi} className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 flex items-center justify-center gap-1.5">
+                        <Icon icon="solar:check-circle-bold" className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500 shrink-0" />
                         <span className="truncate">{f}</span>
                       </p>
                     ))}
-                    {plan.features.length > 3 && (
-                      <p className="text-[10px] text-stone-500 dark:text-stone-400">+{plan.features.length - 3} more</p>
+                    {plan.features.length > 4 && (
+                      <p className="text-[10px] sm:text-xs text-stone-500 dark:text-stone-400">+{plan.features.length - 4} more</p>
                     )}
                   </div>
                 )}

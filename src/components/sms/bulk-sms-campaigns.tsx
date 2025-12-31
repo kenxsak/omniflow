@@ -850,16 +850,17 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
   };
 
   const getStatusBadge = (status: SMSCampaign['status']) => {
-    const statusColors: Record<SMSCampaign['status'], string> = {
-      draft: 'text-stone-500 dark:text-stone-400',
-      scheduled: 'text-amber-600 dark:text-amber-400',
-      sending: 'text-blue-600 dark:text-blue-400',
-      completed: 'text-emerald-600 dark:text-emerald-400',
-      failed: 'text-red-600 dark:text-red-400',
+    const statusColors: Record<SMSCampaign['status'], { text: string; bg: string }> = {
+      draft: { text: 'text-stone-600 dark:text-stone-400', bg: 'bg-stone-100 dark:bg-stone-800' },
+      scheduled: { text: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/30' },
+      sending: { text: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-100 dark:bg-blue-900/30' },
+      completed: { text: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
+      failed: { text: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-100 dark:bg-rose-900/30' },
     };
 
+    const colors = statusColors[status];
     return (
-      <span className={`text-xs font-medium ${statusColors[status]}`}>
+      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${colors.text} ${colors.bg}`}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
@@ -913,11 +914,11 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
             }`}
           >
             <span className="flex items-center gap-1.5">
-              <Users className="h-4 w-4" />
+              <Users className="h-4 w-4" style={{ color: activeTab === 'campaigns' ? '#3b82f6' : undefined }} />
               My Campaigns
             </span>
             {activeTab === 'campaigns' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-t-full" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t-full" style={{ background: '#3b82f6' }} />
             )}
           </button>
           <button
@@ -929,11 +930,11 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
             }`}
           >
             <span className="flex items-center gap-1.5">
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4" style={{ color: activeTab === 'create' ? '#10b981' : undefined }} />
               Create Campaign
             </span>
             {activeTab === 'create' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-t-full" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t-full" style={{ background: '#10b981' }} />
             )}
           </button>
         </nav>
@@ -1628,7 +1629,7 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                 {/* Phone Frame */}
                 <div className="mx-auto w-[280px] h-[560px] bg-stone-900 rounded-[3rem] p-3 shadow-xl border-4 border-stone-800">
                   {/* Phone Inner Frame */}
-                  <div className="w-full h-full bg-stone-950 rounded-[2.25rem] overflow-hidden flex flex-col">
+                  <div className="w-full h-full bg-[#0f172a] rounded-[2.25rem] overflow-hidden flex flex-col">
                     {/* Phone Notch */}
                     <div className="flex justify-center pt-2 pb-1">
                       <div className="w-20 h-5 bg-stone-900 rounded-full" />
@@ -1643,24 +1644,24 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                       </div>
                     </div>
                     
-                    {/* Messages Header */}
-                    <div className="px-4 py-2 border-b border-stone-800">
+                    {/* Messages Header - SMS themed with teal accent */}
+                    <div className="px-4 py-2 border-b border-stone-800 bg-[#1e293b]">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-stone-700 flex items-center justify-center">
-                          <MessageSquare className="w-4 h-4 text-stone-400" />
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#0d9488' }}>
+                          <MessageSquare className="w-4 h-4 text-white" />
                         </div>
-                        <div>
-                          <p className="text-xs font-medium text-stone-200">{campaignName || 'Campaign Name'}</p>
-                          <p className="text-[10px] text-stone-500">{selectedPlatform.toUpperCase()}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-stone-200 truncate">{campaignName || 'Campaign Name'}</p>
+                          <p className="text-[10px]" style={{ color: '#5eead4' }}>{selectedPlatform.toUpperCase()}</p>
                         </div>
                       </div>
                     </div>
                     
                     {/* Messages Area */}
-                    <div className="flex-1 p-3 overflow-y-auto">
+                    <div className="flex-1 p-3 overflow-y-auto bg-[#0f172a]">
                       {message ? (
                         <div className="flex justify-start">
-                          <div className="max-w-[85%] bg-stone-800 rounded-2xl rounded-tl-sm px-3 py-2 shadow-sm">
+                          <div className="max-w-[85%] rounded-2xl rounded-tl-sm px-3 py-2 shadow-sm" style={{ backgroundColor: '#1e3a5f' }}>
                             <p className="text-xs text-stone-200 whitespace-pre-wrap break-words leading-relaxed">
                               {message.replace(/\{#VAR#\}|##[^#]+##|\{(\w+)\}/g, (match, varName) => {
                                 if (varName) {
@@ -1673,32 +1674,37 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                                 return '[value]';
                               })}
                             </p>
-                            <p className="text-[9px] text-stone-500 mt-1 text-right">
-                              {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </p>
+                            <div className="flex items-center justify-end gap-1 mt-1">
+                              <p className="text-[9px] text-stone-400">
+                                {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                              <svg className="w-3 h-3" style={{ color: '#38bdf8' }} fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                              </svg>
+                            </div>
                           </div>
                         </div>
                       ) : (
                         <div className="h-full flex items-center justify-center">
                           <div className="text-center">
-                            <MessageSquare className="w-8 h-8 text-stone-700 mx-auto mb-2" />
-                            <p className="text-xs text-stone-600">Enter your message to see preview</p>
+                            <MessageSquare className="w-8 h-8 mx-auto mb-2" style={{ color: '#0d9488' }} />
+                            <p className="text-xs text-stone-500">Enter your message to see preview</p>
                           </div>
                         </div>
                       )}
                     </div>
                     
-                    {/* Message Stats */}
-                    <div className="px-3 py-2 border-t border-stone-800 bg-stone-900/50">
-                      <div className="flex items-center justify-between text-[10px] text-stone-500">
-                        <span>{message.length} chars</span>
-                        <span>{smsCount} SMS segment{smsCount > 1 ? 's' : ''}</span>
-                        <span>{selectedListId ? (contactLists.find(l => l.id === selectedListId)?.contactCount || 0) : 0} recipients</span>
+                    {/* Message Stats - with teal accent */}
+                    <div className="px-3 py-2 border-t border-stone-800 bg-[#1e293b]">
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span style={{ color: '#5eead4' }}>{message.length} chars</span>
+                        <span className="text-stone-400">{smsCount} SMS segment{smsCount > 1 ? 's' : ''}</span>
+                        <span style={{ color: '#38bdf8' }}>{selectedListId ? (contactLists.find(l => l.id === selectedListId)?.contactCount || 0) : 0} recipients</span>
                       </div>
                     </div>
                     
                     {/* Home Indicator */}
-                    <div className="flex justify-center py-2">
+                    <div className="flex justify-center py-2 bg-[#0f172a]">
                       <div className="w-24 h-1 bg-stone-700 rounded-full" />
                     </div>
                   </div>
@@ -1707,7 +1713,7 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
                 {/* Preview Info */}
                 <div className="mt-4 p-3 bg-stone-50 dark:bg-stone-900/50 rounded-lg border border-stone-200 dark:border-stone-800">
                   <p className="text-xs text-muted-foreground">
-                    This preview shows how your SMS will appear on recipients' devices. Variables like <code className="px-1 py-0.5 bg-stone-200 dark:bg-stone-800 rounded text-[10px]">{'{name}'}</code> will be replaced with actual contact data.
+                    This preview shows how your SMS will appear on recipients' devices. Variables like <code className="px-1 py-0.5 bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 rounded text-[10px]">{'{name}'}</code> will be replaced with actual contact data.
                   </p>
                 </div>
               </div>

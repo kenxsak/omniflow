@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Alert, AlertDescription, AlertTitle as AlertTitleComponent } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Wand2, SendToBack, Copy, ClipboardCopy, Info, AlertTriangle, SearchCode } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import type { GenerateGoogleAdsKeywordsInput, GenerateGoogleAdsKeywordsOutput, KeywordDetail } from '@/ai/flows/generate-google-ads-keywords-flow';
 import { languageOptions } from '@/lib/language-options';
 
@@ -82,14 +83,20 @@ const KeywordPlannerSectionComponent: React.FC<KeywordPlannerSectionProps> = ({
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" disabled={isLoading}><Wand2 className="mr-2 h-4 w-4" /> {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Generate Keyword Suggestions</Button>
+          <Button type="submit" disabled={isLoading} className="text-white" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
+            <Icon icon="solar:magnifer-linear" className="mr-2 h-4 w-4" /> 
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Generate Keyword Suggestions
+          </Button>
         </CardFooter>
       </form>
       {output && (
         <CardContent className="mt-6 border-t pt-6 space-y-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
             <h3 className="text-lg font-semibold">Generated Keyword Ideas:</h3>
-            <Button onClick={onUseKeywordsForAdCopy} size="sm" variant="default"><SendToBack className="mr-2 h-4 w-4" /> Use Keywords for Ad Copy</Button>
+            <Button onClick={onUseKeywordsForAdCopy} size="sm" className="text-white" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
+              <SendToBack className="mr-2 h-4 w-4" /> Use Keywords for Ad Copy
+            </Button>
           </div>
           <Accordion type="multiple" defaultValue={["primaryKeywords", "longTailKeywords"]} className="w-full">
             {(Object.keys(output) as Array<keyof typeof output>).map((key) => {

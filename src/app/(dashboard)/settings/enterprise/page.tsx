@@ -10,36 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { cn } from '@/lib/utils';
-
-// Reusable Settings Card
-function SettingsCard({
-  title,
-  description,
-  icon,
-  children,
-}: {
-  title: string;
-  description: string;
-  icon: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="border border-stone-200/60 dark:border-stone-800/60 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <div className="px-3 sm:px-5 py-3 sm:py-4 border-b border-stone-200/60 dark:border-stone-800/60 bg-stone-50/50 dark:bg-stone-900/30">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-stone-100 dark:bg-stone-800 flex-shrink-0">
-            <Icon icon={icon} className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-stone-600 dark:text-stone-400" />
-          </div>
-          <div className="min-w-0">
-            <h3 className="text-xs sm:text-sm font-semibold truncate">{title}</h3>
-            <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">{description}</p>
-          </div>
-        </div>
-      </div>
-      <div className="p-3 sm:p-5">{children}</div>
-    </div>
-  );
-}
+import { SettingsCard } from '@/components/settings/settings-ui';
 
 export default function EnterpriseSettingsPage() {
   const { isAdmin } = useAuth();

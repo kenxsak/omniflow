@@ -71,7 +71,9 @@ export function PricingSection({
         getStoredPlans(),
         getStoredFeatures()
       ]);
-      const sortedPlans = storedPlans.sort((a, b) => a.priceMonthlyUSD - b.priceMonthlyUSD);
+      // Filter out hidden plans (disabled by super admin) and sort by price
+      const visiblePlans = storedPlans.filter(plan => !plan.isHidden);
+      const sortedPlans = visiblePlans.sort((a, b) => a.priceMonthlyUSD - b.priceMonthlyUSD);
       setPlans(sortedPlans);
       setAllFeatures(storedFeatures);
       setIsLoading(false);

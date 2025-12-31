@@ -585,11 +585,28 @@ export default function IntegrationsPage() {
         </div>
       </div>
 
-      {sortedCategories.map(cat => (
+      {sortedCategories.map(cat => {
+        // Category color mapping
+        const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
+          'AI': { bg: 'bg-violet-100 dark:bg-violet-900/40', text: 'text-violet-600 dark:text-violet-400', border: 'border-violet-200 dark:border-violet-800' },
+          'Voice & Chatbot': { bg: 'bg-cyan-100 dark:bg-cyan-900/40', text: 'text-cyan-600 dark:text-cyan-400', border: 'border-cyan-200 dark:border-cyan-800' },
+          'Communication': { bg: 'bg-blue-100 dark:bg-blue-900/40', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-200 dark:border-blue-800' },
+          'Email': { bg: 'bg-blue-100 dark:bg-blue-900/40', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-200 dark:border-blue-800' },
+          'SMS': { bg: 'bg-emerald-100 dark:bg-emerald-900/40', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-200 dark:border-emerald-800' },
+          'WhatsApp': { bg: 'bg-green-100 dark:bg-green-900/40', text: 'text-green-600 dark:text-green-400', border: 'border-green-200 dark:border-green-800' },
+          'CRM': { bg: 'bg-orange-100 dark:bg-orange-900/40', text: 'text-orange-600 dark:text-orange-400', border: 'border-orange-200 dark:border-orange-800' },
+          'Other': { bg: 'bg-stone-100 dark:bg-stone-800', text: 'text-stone-600 dark:text-stone-400', border: 'border-stone-200 dark:border-stone-700' },
+        };
+        const colors = categoryColors[cat] || categoryColors['Other'];
+        
+        return (
         <div key={cat} className="space-y-4">
-          <div className="flex items-center gap-2 border-b border-stone-200 dark:border-stone-800 pb-2">
-            <h3 className="text-sm font-medium text-stone-900 dark:text-stone-100 uppercase tracking-wider">{cat}</h3>
-            <span className="text-xs text-stone-400 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-full">
+          <div className="flex items-center gap-3 border-b border-stone-200 dark:border-stone-800 pb-3">
+            <div className={cn('p-2 rounded-lg', colors.bg)}>
+              <Icon icon={cat === 'AI' ? 'solar:magic-stick-3-linear' : cat === 'Email' ? 'solar:letter-linear' : cat === 'SMS' ? 'solar:chat-line-linear' : cat === 'WhatsApp' ? 'solar:chat-round-dots-linear' : cat === 'CRM' ? 'solar:users-group-rounded-linear' : cat === 'Voice & Chatbot' ? 'solar:microphone-3-linear' : 'solar:widget-4-linear'} className={cn('h-4 w-4', colors.text)} />
+            </div>
+            <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100 uppercase tracking-wider">{cat}</h3>
+            <span className={cn('text-xs px-2 py-0.5 rounded-full', colors.bg, colors.text)}>
               {INTEGRATIONS.filter(i => i.category === cat).length}
             </span>
           </div>
@@ -604,7 +621,7 @@ export default function IntegrationsPage() {
             ))}
           </div>
         </div>
-      ))}
+      )})}
     </div>
   );
 }

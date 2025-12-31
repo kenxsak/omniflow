@@ -90,7 +90,11 @@ export default function TemplatePreview({ template, isOpen, onOpenChange, onAppl
     return parts.map((part, index) => {
       if (part.match(/\{[^}]+\}/)) {
         return (
-          <span key={index} className="bg-warning-muted px-1 rounded font-semibold">
+          <span 
+            key={index} 
+            className="px-1.5 py-0.5 rounded font-semibold"
+            style={{ backgroundColor: '#fef3c7', color: '#92400e' }}
+          >
             {part}
           </span>
         );
@@ -186,7 +190,15 @@ export default function TemplatePreview({ template, isOpen, onOpenChange, onAppl
           </div>
 
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Badge variant="outline" className="border-stone-200 dark:border-stone-800">{template.type.toUpperCase()}</Badge>
+            <span 
+              className="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider uppercase"
+              style={template.type === 'email' 
+                ? { backgroundColor: '#dbeafe', color: '#1d4ed8' }
+                : { backgroundColor: '#ccfbf1', color: '#0f766e' }
+              }
+            >
+              {template.type.toUpperCase()}
+            </span>
             <span>•</span>
             <span>{template.industry.join(', ')}</span>
           </div>

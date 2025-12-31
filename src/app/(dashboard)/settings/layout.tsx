@@ -128,14 +128,14 @@ function NavItemLink({ item, isActive, onClick, collapsed }: { item: NavItem; is
       onClick={onClick}
       title={collapsed ? item.label : undefined}
       className={cn(
-        'group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors',
+        'group flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all',
         isActive
-          ? 'bg-stone-100 dark:bg-stone-800 text-foreground font-medium'
+          ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium'
           : 'text-muted-foreground hover:bg-stone-50 dark:hover:bg-stone-900 hover:text-foreground',
         collapsed && 'justify-center px-2'
       )}
     >
-      <Icon icon={item.icon} className={cn('h-4 w-4 shrink-0', isActive ? 'text-foreground' : 'text-muted-foreground')} />
+      <Icon icon={item.icon} className={cn('h-4 w-4 shrink-0', isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-muted-foreground group-hover:text-foreground')} />
       {!collapsed && <span>{item.label}</span>}
     </Link>
   );
@@ -251,19 +251,19 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
           sidebarCollapsed ? 'w-16' : 'w-64'
         )}>
           {/* Sidebar Header */}
-          <div className="h-14 flex items-center px-4 border-b border-stone-200 dark:border-stone-800 shrink-0">
+          <div className="h-14 flex items-center px-4 border-b border-stone-200 dark:border-stone-800 shrink-0 bg-gradient-to-r from-indigo-50/50 to-violet-50/50 dark:from-indigo-950/20 dark:to-violet-950/20">
             <div className={cn('flex items-center w-full', sidebarCollapsed ? 'justify-center' : 'justify-between')}>
               {!sidebarCollapsed && (
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
-                    <Icon icon="solar:settings-bold" className="h-4.5 w-4.5" />
+                <div className="flex items-center gap-2.5">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-sm shadow-indigo-500/25">
+                    <Icon icon="solar:settings-bold" className="h-4 w-4" />
                   </div>
-                  <span className="font-semibold text-sm">Settings</span>
+                  <span className="font-semibold text-sm text-foreground">Settings</span>
                 </div>
               )}
               <button
                 onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className="p-1.5 rounded-lg text-stone-500 hover:bg-stone-200 dark:hover:bg-stone-800 transition-colors"
+                className="p-1.5 rounded-lg text-stone-500 hover:bg-white/80 dark:hover:bg-stone-800 transition-colors"
                 title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
               >
                 <Icon
@@ -283,12 +283,12 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white dark:bg-stone-950">
           {/* Mobile Header */}
-          <div className="lg:hidden border-b border-stone-200 dark:border-stone-800 px-4 py-3 shrink-0 flex items-center justify-between">
+          <div className="lg:hidden border-b border-stone-200 dark:border-stone-800 px-4 py-3 shrink-0 flex items-center justify-between bg-gradient-to-r from-indigo-50/50 to-violet-50/50 dark:from-indigo-950/20 dark:to-violet-950/20">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
-                <Icon icon="solar:settings-bold" className="h-4.5 w-4.5" />
+              <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-sm shadow-indigo-500/25">
+                <Icon icon="solar:settings-bold" className="h-4 w-4" />
               </div>
-              <span className="font-semibold text-sm">{getCurrentPageTitle()}</span>
+              <span className="font-semibold text-sm text-foreground">{getCurrentPageTitle()}</span>
             </div>
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -300,12 +300,12 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
                 <VisuallyHidden>
                   <SheetTitle>Settings Navigation</SheetTitle>
                 </VisuallyHidden>
-                <div className="h-14 flex items-center px-4 border-b border-stone-200 dark:border-stone-800">
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
-                      <Icon icon="solar:settings-bold" className="h-4.5 w-4.5" />
+                <div className="h-14 flex items-center px-4 border-b border-stone-200 dark:border-stone-800 bg-gradient-to-r from-indigo-50/50 to-violet-50/50 dark:from-indigo-950/20 dark:to-violet-950/20">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-sm shadow-indigo-500/25">
+                      <Icon icon="solar:settings-bold" className="h-4 w-4" />
                     </div>
-                    <span className="font-semibold text-sm">Settings</span>
+                    <span className="font-semibold text-sm text-foreground">Settings</span>
                   </div>
                 </div>
                 <div className="p-4 overflow-y-auto max-h-[calc(100vh-3.5rem)]">

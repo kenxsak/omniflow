@@ -281,33 +281,41 @@ Jane Smith,"919123456789"`;
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3 hover:border-purple-500/50 transition-colors">
           <div className="flex items-center gap-2 mb-1">
-            <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4 text-muted-foreground" />
+            <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
+              <Icon icon="solar:users-group-rounded-linear" className="h-3.5 w-3.5" style={{ color: '#8b5cf6' }} />
+            </div>
             <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Lists</span>
           </div>
-          <p className="text-xl font-semibold tabular-nums">{whatsAppLists.length}</p>
+          <p className="text-xl font-semibold tabular-nums" style={{ color: '#8b5cf6' }}>{whatsAppLists.length}</p>
         </div>
-        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3 hover:border-blue-500/50 transition-colors">
           <div className="flex items-center gap-2 mb-1">
-            <Icon icon="solar:user-linear" className="h-4 w-4 text-muted-foreground" />
+            <div className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center">
+              <Icon icon="solar:user-linear" className="h-3.5 w-3.5" style={{ color: '#3b82f6' }} />
+            </div>
             <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Contacts</span>
           </div>
-          <p className="text-xl font-semibold tabular-nums">{whatsAppLists.reduce((acc, l) => acc + (l.contactCount || 0), 0)}</p>
+          <p className="text-xl font-semibold tabular-nums" style={{ color: '#3b82f6' }}>{whatsAppLists.reduce((acc, l) => acc + (l.contactCount || 0), 0)}</p>
         </div>
-        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3 hover:border-emerald-500/50 transition-colors">
           <div className="flex items-center gap-2 mb-1">
-            <Icon icon="solar:plain-linear" className="h-4 w-4 text-muted-foreground" />
+            <div className="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+              <Icon icon="solar:plain-linear" className="h-3.5 w-3.5" style={{ color: '#10b981' }} />
+            </div>
             <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Sent</span>
           </div>
-          <p className="text-xl font-semibold tabular-nums">{messagesInitiatedCount}</p>
+          <p className="text-xl font-semibold tabular-nums" style={{ color: '#10b981' }}>{messagesInitiatedCount}</p>
         </div>
-        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3 hover:border-green-500/50 transition-colors">
           <div className="flex items-center gap-2 mb-1">
-            <Icon icon="solar:link-linear" className="h-4 w-4 text-muted-foreground" />
+            <div className="w-6 h-6 rounded-lg bg-green-500/10 flex items-center justify-center">
+              <Icon icon="solar:link-linear" className="h-3.5 w-3.5" style={{ color: '#22c55e' }} />
+            </div>
             <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Method</span>
           </div>
-          <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">wa.me Active</p>
+          <p className="text-sm font-medium" style={{ color: '#22c55e' }}>wa.me Active</p>
         </div>
       </div>
 
@@ -518,7 +526,7 @@ Jane Smith,"919123456789"`;
               {/* Step 1: Select List */}
               <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-stone-200 dark:bg-stone-800 text-[10px] font-semibold">1</span>
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-semibold text-white" style={{ backgroundColor: '#3b82f6' }}>1</span>
                   <h3 className="font-semibold text-sm">Select Contact List</h3>
                 </div>
                 <Select value={selectedListIdForCampaign} onValueChange={async (value) => {
@@ -544,13 +552,13 @@ Jane Smith,"919123456789"`;
               {/* Step 2: Draft Message */}
               <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4 space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-stone-200 dark:bg-stone-800 text-[10px] font-semibold">2</span>
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-semibold text-white" style={{ backgroundColor: '#8b5cf6' }}>2</span>
                   <h3 className="font-semibold text-sm">Draft Your Message</h3>
                 </div>
 
                 {/* AI Draft */}
                 <div className="p-3 bg-stone-50 dark:bg-stone-900/50 rounded-lg border border-stone-200 dark:border-stone-800 space-y-3">
-                  <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">AI Assistant</p>
+                  <p className="text-[10px] font-semibold tracking-wider uppercase" style={{ color: '#8b5cf6' }}>AI Assistant</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1.5">
                       <Label htmlFor="wa-ai-context" className="text-xs text-muted-foreground">Context</Label>
@@ -562,23 +570,22 @@ Jane Smith,"919123456789"`;
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button type="button" variant="outline" size="sm" onClick={handleDraftMessageWithAI} disabled={isAiDraftingMessage} className="h-8 text-xs">
-                      {isAiDraftingMessage ? <Icon icon="solar:refresh-linear" className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Icon icon="solar:magic-stick-3-linear" className="mr-1.5 h-3.5 w-3.5" />}
+                    <Button type="button" variant="outline" size="sm" onClick={handleDraftMessageWithAI} disabled={isAiDraftingMessage} className="h-8 text-xs border-purple-200 dark:border-purple-800 hover:bg-purple-50 dark:hover:bg-purple-900/20">
+                      {isAiDraftingMessage ? <Icon icon="solar:refresh-linear" className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Icon icon="solar:magic-stick-3-linear" className="mr-1.5 h-3.5 w-3.5" style={{ color: '#8b5cf6' }} />}
                       AI Draft
                     </Button>
-                    <Button type="button" variant="outline" size="sm" onClick={() => setIsTemplateBrowserOpen(true)} className="h-8 text-xs">
-                      <Icon icon="solar:document-text-linear" className="mr-1.5 h-3.5 w-3.5" />
+                    <Button type="button" variant="outline" size="sm" onClick={() => setIsTemplateBrowserOpen(true)} className="h-8 text-xs border-teal-200 dark:border-teal-800 hover:bg-teal-50 dark:hover:bg-teal-900/20">
+                      <Icon icon="solar:document-text-linear" className="mr-1.5 h-3.5 w-3.5" style={{ color: '#14b8a6' }} />
                       Templates
                     </Button>
                   </div>
                 </div>
 
-                {/* Message Textarea */}
                 <div className="space-y-1.5">
                   <Label htmlFor="campaign-message" className="text-xs text-muted-foreground">Message</Label>
                   <Textarea id="campaign-message" value={campaignMessage} onChange={(e) => setCampaignMessage(e.target.value)} rows={5} placeholder={placeholderForCampaignMessage} className="resize-none" />
                   <p className="text-[10px] text-muted-foreground">
-                    Use <code className="px-1 py-0.5 bg-stone-200 dark:bg-stone-800 rounded text-[9px]">*{CONTACT_NAME_PLACEHOLDER}*</code> for personalization
+                    Use <code className="px-1 py-0.5 rounded text-[9px]" style={{ backgroundColor: '#dcfce7', color: '#166534' }}>*{CONTACT_NAME_PLACEHOLDER}*</code> for personalization
                   </p>
                 </div>
               </div>
@@ -586,9 +593,9 @@ Jane Smith,"919123456789"`;
               {/* Step 3: Test Send */}
               <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-4 space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-stone-200 dark:bg-stone-800 text-[10px] font-semibold">3</span>
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-semibold text-white" style={{ backgroundColor: '#f59e0b' }}>3</span>
                   <h3 className="font-semibold text-sm">Test Send</h3>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-muted-foreground">Optional</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#fef3c7', color: '#92400e' }}>Optional</span>
                 </div>
                 <div className="flex gap-2">
                   <Input type="tel" value={singleSendPhoneNumber} onChange={(e) => setSingleSendPhoneNumber(e.target.value)} placeholder="919876543210" className="h-9 flex-1" />
@@ -604,11 +611,12 @@ Jane Smith,"919123456789"`;
                 <div className="border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
                   <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
                     <div className="flex items-center gap-2">
-                      <span className="flex items-center justify-center w-5 h-5 rounded-full bg-stone-200 dark:bg-stone-800 text-[10px] font-semibold">4</span>
+                      <span className="flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-semibold text-white" style={{ backgroundColor: '#10b981' }}>4</span>
                       <h3 className="font-semibold text-sm">Send to List</h3>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1 ml-7">
-                      {messagesInitiatedCount} / {totalContactsInCampaignList} sent
+                    <p className="text-xs mt-1 ml-7">
+                      <span style={{ color: '#10b981' }}>{messagesInitiatedCount}</span>
+                      <span className="text-muted-foreground"> / {totalContactsInCampaignList} sent</span>
                     </p>
                   </div>
                   <div className="p-4 max-h-80 overflow-y-auto space-y-2">
@@ -649,9 +657,9 @@ Jane Smith,"919123456789"`;
 
               {/* Info Note */}
               <div className="flex items-start gap-3 p-3 border border-stone-200 dark:border-stone-800 rounded-lg">
-                <Icon icon="solar:info-circle-linear" className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                <Icon icon="solar:info-circle-linear" className="h-4 w-4 mt-0.5 flex-shrink-0" style={{ color: '#3b82f6' }} />
                 <p className="text-xs text-muted-foreground">
-                  Uses <code className="px-1 py-0.5 bg-stone-200 dark:bg-stone-800 rounded text-[10px]">wa.me</code> links. You'll press send manually in WhatsApp.
+                  Uses <code className="px-1 py-0.5 rounded text-[10px]" style={{ backgroundColor: '#dcfce7', color: '#166534' }}>wa.me</code> links. You'll press send manually in WhatsApp.
                 </p>
               </div>
             </div>
@@ -738,12 +746,12 @@ Jane Smith,"919123456789"`;
                 
                 {/* Preview Stats */}
                 <div className="mt-4 p-3 bg-stone-50 dark:bg-stone-900/50 rounded-lg border border-stone-200 dark:border-stone-800">
-                  <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-2">
-                    <span>{campaignMessage.length} characters</span>
-                    <span>{totalContactsInCampaignList} recipients</span>
+                  <div className="flex items-center justify-between text-[10px] mb-2">
+                    <span style={{ color: '#3b82f6' }}>{campaignMessage.length} characters</span>
+                    <span style={{ color: '#8b5cf6' }}>{totalContactsInCampaignList} recipients</span>
                   </div>
                   <p className="text-[10px] text-muted-foreground">
-                    <code className="px-1 py-0.5 bg-stone-200 dark:bg-stone-800 rounded">{`*{{Name}}*`}</code> will be replaced with contact names.
+                    <code className="px-1 py-0.5 rounded" style={{ backgroundColor: '#dcfce7', color: '#166534' }}>{`*{{Name}}*`}</code> will be replaced with contact names.
                   </p>
                 </div>
               </div>

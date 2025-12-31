@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Wand2, Copy, ClipboardCopy, Lightbulb, Sparkles as TiktokIcon } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import type { GenerateTiktokReelsAdContentInput, GenerateTiktokReelsAdContentOutput } from '@/ai/flows/generate-tiktok-reels-ad-content-flow';
 import { languageOptions } from '@/lib/language-options';
 
@@ -46,7 +47,11 @@ const TiktokReelsAdSectionComponent: React.FC<TiktokReelsAdSectionProps> = ({
              <div><Label htmlFor="tr-targetLanguage">Ad Language</Label><Select value={inputs.targetLanguage || 'English'} onValueChange={(value) => onInputChange('targetLanguage', value)}><SelectTrigger id="tr-targetLanguage"><SelectValue /></SelectTrigger><SelectContent>{languageOptions.map(lang => <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>)}</SelectContent></Select></div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isLoading}><Wand2 className="mr-2 h-4 w-4" /> {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Generate TikTok/Reels Ad Content</Button>
+            <Button type="submit" disabled={isLoading} className="text-white" style={{ background: 'linear-gradient(135deg, #d946ef 0%, #c026d3 100%)' }}>
+              <Icon icon="solar:music-note-linear" className="mr-2 h-4 w-4" /> 
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Generate TikTok/Reels Ad Content
+            </Button>
           </CardFooter>
         </form>
         {output && (

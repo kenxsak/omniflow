@@ -281,10 +281,17 @@ export default function PublicLandingPage({ params }: PublicLandingPageProps) {
 
           {/* Pricing Section */}
           {section.type === 'pricing' && (
-            <section className="py-16 px-4 bg-stone-50 dark:bg-stone-900/50">
+            <section className="py-12 sm:py-16 px-4 bg-stone-50 dark:bg-stone-900/50">
               <div className="max-w-5xl mx-auto">
-                <h2 className="text-2xl font-bold text-center mb-8 text-stone-900 dark:text-white">Pricing</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 sm:mb-8 text-stone-900 dark:text-white">Pricing</h2>
+                <div className={cn(
+                  "grid gap-4 sm:gap-6",
+                  (section.content.plans?.length || 3) === 1 
+                    ? "grid-cols-1 max-w-md mx-auto" 
+                    : (section.content.plans?.length || 3) === 2 
+                      ? "grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto"
+                      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                )}>
                   {(section.content.plans || [
                     { name: 'Starter', price: '$9', features: ['Feature 1', 'Feature 2'] },
                     { name: 'Pro', price: '$29', features: ['Everything in Starter', 'Feature 3', 'Feature 4'], popular: true },
@@ -293,8 +300,8 @@ export default function PublicLandingPage({ params }: PublicLandingPageProps) {
                     <div 
                       key={i} 
                       className={cn(
-                        "p-5 sm:p-6 rounded-2xl bg-white dark:bg-stone-950 border-2 flex flex-col",
-                        plan.popular ? "border-primary shadow-lg sm:scale-105" : "border-stone-200 dark:border-stone-800"
+                        "p-5 sm:p-6 rounded-2xl bg-white dark:bg-stone-950 border-2 flex flex-col h-full",
+                        plan.popular ? "border-primary shadow-lg sm:scale-105 z-10" : "border-stone-200 dark:border-stone-800"
                       )}
                     >
                       {plan.popular && (
@@ -302,11 +309,11 @@ export default function PublicLandingPage({ params }: PublicLandingPageProps) {
                           ⭐ Most Popular
                         </span>
                       )}
-                      <h3 className="text-lg font-semibold text-stone-900 dark:text-white">{plan.name}</h3>
-                      <p className="text-3xl sm:text-4xl font-bold my-3 text-stone-900 dark:text-white">{plan.price}<span className="text-sm font-normal text-stone-500 dark:text-stone-400">/mo</span></p>
-                      <ul className="space-y-2.5 mb-6 flex-1">
+                      <h3 className="text-base sm:text-lg font-semibold text-stone-900 dark:text-white">{plan.name}</h3>
+                      <p className="text-2xl sm:text-3xl lg:text-4xl font-bold my-2 sm:my-3 text-stone-900 dark:text-white">{plan.price}<span className="text-xs sm:text-sm font-normal text-stone-500 dark:text-stone-400">/mo</span></p>
+                      <ul className="space-y-2 sm:space-y-2.5 mb-4 sm:mb-6 flex-1">
                         {plan.features.map((f: string, fi: number) => (
-                          <li key={fi} className="text-sm flex items-start gap-2 text-stone-700 dark:text-stone-300">
+                          <li key={fi} className="text-xs sm:text-sm flex items-start gap-2 text-stone-700 dark:text-stone-300">
                             <Icon icon="solar:check-circle-bold" className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
                             <span>{f}</span>
                           </li>
@@ -316,7 +323,7 @@ export default function PublicLandingPage({ params }: PublicLandingPageProps) {
                         <a 
                           href={plan.buttonUrl}
                           className={cn(
-                            "block w-full text-center py-3 rounded-lg font-medium transition-colors",
+                            "block w-full text-center py-2.5 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base",
                             plan.popular 
                               ? "text-white" 
                               : "border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-900 dark:text-white"
@@ -326,7 +333,7 @@ export default function PublicLandingPage({ params }: PublicLandingPageProps) {
                           {plan.buttonText || 'Get Started'}
                         </a>
                       ) : (
-                        <Button className={cn("w-full py-3", plan.popular && "text-white")} variant={plan.popular ? 'default' : 'outline'} style={plan.popular ? { backgroundColor: primaryColor } : undefined}>
+                        <Button className={cn("w-full py-2.5 sm:py-3 text-sm sm:text-base", plan.popular && "text-white")} variant={plan.popular ? 'default' : 'outline'} style={plan.popular ? { backgroundColor: primaryColor } : undefined}>
                           {plan.buttonText || 'Get Started'}
                         </Button>
                       )}

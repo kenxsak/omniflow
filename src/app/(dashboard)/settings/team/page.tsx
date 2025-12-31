@@ -144,10 +144,10 @@ export default function TeamPage() {
 
   const getRoleBadge = (role: string) => {
     const styles: Record<string, string> = {
-      superadmin: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-      admin: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      manager: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-      user: 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
+      superadmin: 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300 border border-purple-200 dark:border-purple-800',
+      admin: 'bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300 border border-violet-200 dark:border-violet-800',
+      manager: 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800',
+      user: 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400 border border-stone-200 dark:border-stone-700',
     };
     return styles[role] || styles.user;
   };
@@ -284,25 +284,28 @@ export default function TeamPage() {
         )}
       </div>
 
-      {/* Team Stats */}
+      {/* Team Stats - Enhanced with colors */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-stone-50 dark:bg-stone-900/50 rounded-xl p-4 border border-stone-200 dark:border-stone-800">
-          <p className="text-2xl font-bold text-stone-900 dark:text-stone-100">
+        <div className="relative bg-white dark:bg-stone-950 rounded-xl p-4 border border-stone-200 dark:border-stone-800 overflow-hidden">
+          <div className="absolute inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: '#3b82f6' }} />
+          <p className="text-2xl font-bold" style={{ color: '#3b82f6' }}>
             {users.length}
           </p>
-          <p className="text-xs text-stone-500">Active Members</p>
+          <p className="text-xs text-muted-foreground">Active Members</p>
         </div>
-        <div className="bg-stone-50 dark:bg-stone-900/50 rounded-xl p-4 border border-stone-200 dark:border-stone-800">
-          <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+        <div className="relative bg-white dark:bg-stone-950 rounded-xl p-4 border border-stone-200 dark:border-stone-800 overflow-hidden">
+          <div className="absolute inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: '#f59e0b' }} />
+          <p className="text-2xl font-bold" style={{ color: '#f59e0b' }}>
             {invitations.length}
           </p>
-          <p className="text-xs text-stone-500">Pending Invites</p>
+          <p className="text-xs text-muted-foreground">Pending Invites</p>
         </div>
-        <div className="bg-stone-50 dark:bg-stone-900/50 rounded-xl p-4 border border-stone-200 dark:border-stone-800">
-          <p className="text-2xl font-bold text-stone-900 dark:text-stone-100">
+        <div className="relative bg-white dark:bg-stone-950 rounded-xl p-4 border border-stone-200 dark:border-stone-800 overflow-hidden">
+          <div className="absolute inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: '#8b5cf6' }} />
+          <p className="text-2xl font-bold" style={{ color: '#8b5cf6' }}>
             {users.filter((u) => u.role === 'admin' || u.role === 'manager').length}
           </p>
-          <p className="text-xs text-stone-500">Admins & Managers</p>
+          <p className="text-xs text-muted-foreground">Admins & Managers</p>
         </div>
       </div>
 

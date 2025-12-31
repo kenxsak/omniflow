@@ -501,11 +501,11 @@ export default function AICampaignStudioPage() {
           <div className="flex gap-2">
             <Button variant="outline" size="sm" asChild className="h-8 shadow-sm">
               <Link href="/campaigns/ai-email/saved-templates">
-                <Icon icon="solar:bookmark-linear" className="mr-1.5 h-4 w-4" />
+                <Icon icon="solar:bookmark-linear" className="mr-1.5 h-4 w-4" style={{ color: '#8b5cf6' }} />
                 Saved Templates
               </Link>
             </Button>
-            <Badge variant="secondary" className="text-xs">BETA</Badge>
+            <Badge className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-0">BETA</Badge>
           </div>
         </div>
       </header>
@@ -524,33 +524,43 @@ export default function AICampaignStudioPage() {
       {/* Progress Bar */}
       <div className="h-1 bg-stone-200 dark:bg-stone-800 rounded-full overflow-hidden">
         <div 
-          className="h-full bg-foreground transition-all duration-300" 
-          style={{ width: stage === 1 ? '33%' : stage === 2 ? '66%' : '100%' }}
+          className="h-full transition-all duration-300" 
+          style={{ 
+            width: stage === 1 ? '33%' : stage === 2 ? '66%' : '100%',
+            background: stage === 1 ? '#3b82f6' : stage === 2 ? '#14b8a6' : '#10b981'
+          }}
         />
       </div>
 
       {/* Stage Indicators */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { num: 1, label: 'Describe' },
-          { num: 2, label: 'Review' },
-          { num: 3, label: 'Publish' },
+          { num: 1, label: 'Describe', color: '#3b82f6' },
+          { num: 2, label: 'Review', color: '#14b8a6' },
+          { num: 3, label: 'Publish', color: '#10b981' },
         ].map((s) => (
           <div 
             key={s.num}
             className={`relative border rounded-xl p-3 transition-all ${
               stage >= s.num 
-                ? 'border-foreground bg-white dark:bg-stone-950' 
+                ? 'border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-950' 
                 : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950'
             }`}
           >
+            {stage >= s.num && (
+              <div className="absolute inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: s.color }} />
+            )}
             <div className="flex items-center gap-2">
-              <div className={`h-6 w-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                stage >= s.num 
-                  ? 'bg-foreground text-background' 
-                  : 'bg-stone-200 dark:bg-stone-800 text-muted-foreground'
-              }`}>
-                {s.num}
+              <div 
+                className="h-6 w-6 rounded-full flex items-center justify-center text-xs font-medium"
+                style={{ 
+                  background: stage >= s.num ? s.color : undefined,
+                  color: stage >= s.num ? 'white' : undefined
+                }}
+              >
+                {stage > s.num ? (
+                  <Icon icon="solar:check-read-linear" className="h-3.5 w-3.5" />
+                ) : s.num}
               </div>
               <span className="text-sm font-medium">{s.label}</span>
             </div>
@@ -562,9 +572,12 @@ export default function AICampaignStudioPage() {
       {/* Stage 1: Describe */}
       {stage === 1 && (
         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-blue-500 dark:bg-blue-400" />
-          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
-            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Stage 1: Describe Your Email Campaign</span>
+          <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #3b82f6, #6366f1)' }} />
+          <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800" style={{ background: 'linear-gradient(to right, rgba(59, 130, 246, 0.05), rgba(99, 102, 241, 0.05))' }}>
+            <div className="flex items-center gap-2">
+              <Icon icon="solar:pen-new-square-linear" className="h-4 w-4" style={{ color: '#3b82f6' }} />
+              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Stage 1: Describe Your Email Campaign</span>
+            </div>
             <p className="text-xs text-muted-foreground mt-0.5">Tell us about your campaign in plain language</p>
           </div>
           <div className="p-4 space-y-4">
@@ -601,7 +614,8 @@ export default function AICampaignStudioPage() {
             <Button 
               onClick={handleGenerateCampaign} 
               disabled={isGenerating || !campaignPrompt.trim()}
-              className="h-9 shadow-sm"
+              className="h-9 shadow-sm text-white"
+              style={{ background: 'linear-gradient(to right, #8b5cf6, #a855f7)' }}
             >
               {isGenerating ? (
                 <>
@@ -623,10 +637,13 @@ export default function AICampaignStudioPage() {
       {stage === 2 && parsedBrief && emailContent && (
         <div className="space-y-4">
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
-            <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-teal-500 dark:bg-teal-400" />
-            <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+            <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(to right, #14b8a6, #10b981)' }} />
+            <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between" style={{ background: 'linear-gradient(to right, rgba(20, 184, 166, 0.05), rgba(16, 185, 129, 0.05))' }}>
               <div>
-                <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Stage 2: Review & Customize Content</span>
+                <div className="flex items-center gap-2">
+                  <Icon icon="solar:eye-linear" className="h-4 w-4" style={{ color: '#14b8a6' }} />
+                  <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Stage 2: Review & Customize Content</span>
+                </div>
                 <p className="text-xs text-muted-foreground mt-0.5">Review and edit the AI-generated content for each channel</p>
               </div>
               <Button variant="outline" size="sm" onClick={handleGenerateCampaign} disabled={isGenerating} className="h-7 text-xs shadow-sm">

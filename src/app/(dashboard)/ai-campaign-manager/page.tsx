@@ -266,8 +266,8 @@ export default function AiAdsManagerPage() {
           <p className="text-xs text-muted-foreground">Plan and generate ad creatives across multiple platforms</p>
         </div>
         <Link href="/social-media">
-          <Button variant="outline" size="sm" className="h-8 text-xs">
-            <Icon icon="solar:document-text-linear" className="mr-1.5 h-3.5 w-3.5" />
+          <Button variant="outline" size="sm" className="h-8 text-xs border-purple-200 dark:border-purple-800 hover:bg-purple-50 dark:hover:bg-purple-900/20">
+            <Icon icon="solar:document-text-linear" className="mr-1.5 h-3.5 w-3.5" style={{ color: '#8b5cf6' }} />
             Content Factory
           </Button>
         </Link>

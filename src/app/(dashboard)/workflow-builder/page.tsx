@@ -323,14 +323,14 @@ export default function WorkflowBuilderPage() {
         </div>
       ) : workflows.length === 0 ? (
         <div className="h-full flex flex-col items-center justify-center text-center">
-          <div className="w-16 h-16 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center mb-4">
-            <Icon icon="solar:branching-paths-up-linear" className="h-8 w-8 text-muted-foreground" />
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)' }}>
+            <Icon icon="solar:branching-paths-up-linear" className="h-8 w-8" style={{ color: '#8b5cf6' }} />
           </div>
           <h3 className="font-semibold mb-1">No Workflows Yet</h3>
           <p className="text-sm text-muted-foreground mb-4 max-w-sm">
             Create automated workflows to send emails, SMS, or WhatsApp messages when contacts take actions.
           </p>
-          <Button onClick={createNewWorkflow} size="sm" disabled={isSaving}>
+          <Button onClick={createNewWorkflow} size="sm" disabled={isSaving} className="text-white" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
             {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <Icon icon="solar:add-circle-linear" className="mr-1.5 h-4 w-4" />
             Create Your First Workflow
@@ -344,13 +344,21 @@ export default function WorkflowBuilderPage() {
               <button
                 key={workflow.id}
                 onClick={() => setActiveWorkflow(workflow)}
-                className="p-4 border border-stone-200 dark:border-stone-800 rounded-xl text-left hover:border-stone-300 dark:hover:border-stone-700 transition-all group"
+                className="p-4 border border-stone-200 dark:border-stone-800 rounded-xl text-left hover:border-stone-300 dark:hover:border-stone-700 transition-all group relative overflow-hidden"
               >
+                <div className="absolute inset-x-4 top-0 h-0.5 rounded-b-full" style={{ backgroundColor: workflow.isActive ? '#10b981' : '#6b7280' }} />
                 <div className="flex items-start justify-between mb-2">
-                  <div className="w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                    <Icon icon="solar:branching-paths-up-linear" className="h-5 w-5 text-muted-foreground" />
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)' }}>
+                    <Icon icon="solar:branching-paths-up-linear" className="h-5 w-5" style={{ color: '#8b5cf6' }} />
                   </div>
-                  <Badge variant={workflow.isActive ? "default" : "secondary"} className="text-[10px]">
+                  <Badge 
+                    variant="outline" 
+                    className="text-[10px]"
+                    style={workflow.isActive 
+                      ? { backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)' }
+                      : { backgroundColor: 'rgba(107, 114, 128, 0.15)', color: '#6b7280', border: '1px solid rgba(107, 114, 128, 0.3)' }
+                    }
+                  >
                     {workflow.isActive ? 'Active' : 'Draft'}
                   </Badge>
                 </div>
@@ -359,9 +367,9 @@ export default function WorkflowBuilderPage() {
                   {workflow.nodes.length} nodes • {workflow.connections.length} connections
                 </p>
                 <div className="flex gap-2 text-xs text-muted-foreground">
-                  <span>{stats.totalRuns || 0} runs</span>
+                  <span style={{ color: '#3b82f6' }}>{stats.totalRuns || 0} runs</span>
                   {stats.activeExecutions > 0 && (
-                    <span className="text-emerald-600">• {stats.activeExecutions} active</span>
+                    <span style={{ color: '#10b981' }}>• {stats.activeExecutions} active</span>
                   )}
                 </div>
               </button>
@@ -510,9 +518,13 @@ export default function WorkflowBuilderPage() {
           <Button
             variant={activeWorkflow?.isActive ? "default" : "outline"}
             size="sm"
-            className="h-8 text-xs flex-1"
+            className="h-8 text-xs flex-1 text-white"
             onClick={toggleWorkflowActive}
             disabled={isSaving}
+            style={activeWorkflow?.isActive 
+              ? { background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }
+              : { background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }
+            }
           >
             {isSaving ? (
               <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
@@ -521,7 +533,7 @@ export default function WorkflowBuilderPage() {
             )}
             {activeWorkflow?.isActive ? 'Pause' : 'Activate'}
           </Button>
-          <Button size="sm" className="h-8 text-xs flex-1" onClick={saveWorkflow} disabled={isSaving}>
+          <Button size="sm" className="h-8 text-xs flex-1 text-white" onClick={saveWorkflow} disabled={isSaving} style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
             {isSaving ? (
               <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
             ) : (
@@ -887,7 +899,7 @@ export default function WorkflowBuilderPage() {
           </p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
-          <Button onClick={createNewWorkflow} size="sm" className="h-8 text-xs flex-1 sm:flex-none" disabled={isSaving}>
+          <Button onClick={createNewWorkflow} size="sm" className="h-8 text-xs flex-1 sm:flex-none text-white" disabled={isSaving} style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
             {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <Icon icon="solar:add-circle-linear" className="mr-1.5 h-3.5 w-3.5" />
             New Workflow
@@ -904,8 +916,9 @@ export default function WorkflowBuilderPage() {
             <Button 
               variant={mobileView === 'canvas' ? 'default' : 'outline'} 
               size="sm" 
-              className="flex-1 h-9"
+              className="flex-1 h-9 text-white"
               onClick={() => setMobileView('canvas')}
+              style={mobileView === 'canvas' ? { background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' } : {}}
             >
               <Icon icon="solar:widget-5-linear" className="h-4 w-4 mr-2" />
               Workflow
@@ -913,8 +926,9 @@ export default function WorkflowBuilderPage() {
             <Button 
               variant={mobileView === 'nodes' ? 'default' : 'outline'} 
               size="sm" 
-              className="flex-1 h-9"
+              className="flex-1 h-9 text-white"
               onClick={() => setMobileView('nodes')}
+              style={mobileView === 'nodes' ? { background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' } : {}}
             >
               <Icon icon="solar:add-square-linear" className="h-4 w-4 mr-2" />
               Add Nodes
