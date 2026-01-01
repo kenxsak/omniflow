@@ -264,24 +264,46 @@ export default function EditDigitalCardPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 w-full h-full">
-      {/* Header - Colorful style */}
-      <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 sm:gap-6 w-full h-full">
+      {/* Header */}
+      <div className="flex flex-col gap-3 sm:gap-4">
         <p className="text-stone-800 dark:text-stone-200 font-semibold text-lg">Edit Digital Card</p>
         
-        {/* Tabs - Colorful style */}
+        {/* Tabs - Grid layout on mobile, inline on desktop */}
         <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="bg-stone-100 dark:bg-stone-900">
-            <TabsTrigger value="basic" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">Basic</TabsTrigger>
-            <TabsTrigger value="contact" className="data-[state=active]:bg-teal-500 data-[state=active]:text-white">Contact</TabsTrigger>
-            <TabsTrigger value="links" className="data-[state=active]:bg-indigo-500 data-[state=active]:text-white">Links</TabsTrigger>
-            <TabsTrigger value="social" className="data-[state=active]:bg-pink-500 data-[state=active]:text-white">Social</TabsTrigger>
-            <TabsTrigger value="lead-capture" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">Leads</TabsTrigger>
-            <TabsTrigger value="branding" className="data-[state=active]:bg-violet-500 data-[state=active]:text-white">Brand</TabsTrigger>
-            <TabsTrigger value="embed" className="data-[state=active]:bg-amber-500 data-[state=active]:text-white">Embed</TabsTrigger>
+          {/* Mobile: 4-column grid, Desktop: inline flex */}
+          <TabsList className="grid grid-cols-4 sm:inline-flex sm:flex-wrap h-auto gap-1 bg-stone-100 dark:bg-stone-900 p-1.5 rounded-xl w-full sm:w-auto">
+            <TabsTrigger value="basic" className="flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 px-2 sm:px-4 py-2 sm:py-2 text-[10px] sm:text-sm whitespace-nowrap rounded-lg data-[state=active]:bg-blue-500 data-[state=active]:text-white h-auto">
+              <Icon icon="solar:user-circle-linear" className="h-4 w-4 sm:h-4 sm:w-4 shrink-0" />
+              <span>Basic</span>
+            </TabsTrigger>
+            <TabsTrigger value="contact" className="flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 px-2 sm:px-4 py-2 sm:py-2 text-[10px] sm:text-sm whitespace-nowrap rounded-lg data-[state=active]:bg-teal-500 data-[state=active]:text-white h-auto">
+              <Icon icon="solar:phone-linear" className="h-4 w-4 sm:h-4 sm:w-4 shrink-0" />
+              <span>Contact</span>
+            </TabsTrigger>
+            <TabsTrigger value="links" className="flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 px-2 sm:px-4 py-2 sm:py-2 text-[10px] sm:text-sm whitespace-nowrap rounded-lg data-[state=active]:bg-indigo-500 data-[state=active]:text-white h-auto">
+              <Icon icon="solar:link-linear" className="h-4 w-4 sm:h-4 sm:w-4 shrink-0" />
+              <span>Links</span>
+            </TabsTrigger>
+            <TabsTrigger value="social" className="flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 px-2 sm:px-4 py-2 sm:py-2 text-[10px] sm:text-sm whitespace-nowrap rounded-lg data-[state=active]:bg-pink-500 data-[state=active]:text-white h-auto">
+              <Icon icon="solar:share-linear" className="h-4 w-4 sm:h-4 sm:w-4 shrink-0" />
+              <span>Social</span>
+            </TabsTrigger>
+            <TabsTrigger value="lead-capture" className="flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 px-2 sm:px-4 py-2 sm:py-2 text-[10px] sm:text-sm whitespace-nowrap rounded-lg data-[state=active]:bg-emerald-500 data-[state=active]:text-white h-auto">
+              <Icon icon="solar:users-group-rounded-linear" className="h-4 w-4 sm:h-4 sm:w-4 shrink-0" />
+              <span>Leads</span>
+            </TabsTrigger>
+            <TabsTrigger value="branding" className="flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 px-2 sm:px-4 py-2 sm:py-2 text-[10px] sm:text-sm whitespace-nowrap rounded-lg data-[state=active]:bg-violet-500 data-[state=active]:text-white h-auto">
+              <Icon icon="solar:pallete-2-linear" className="h-4 w-4 sm:h-4 sm:w-4 shrink-0" />
+              <span>Brand</span>
+            </TabsTrigger>
+            <TabsTrigger value="embed" className="flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 px-2 sm:px-4 py-2 sm:py-2 text-[10px] sm:text-sm whitespace-nowrap rounded-lg data-[state=active]:bg-amber-500 data-[state=active]:text-white h-auto col-span-2 sm:col-span-1">
+              <Icon icon="solar:code-linear" className="h-4 w-4 sm:h-4 sm:w-4 shrink-0" />
+              <span>Embed</span>
+            </TabsTrigger>
           </TabsList>
           
-          <p className="text-stone-500 dark:text-stone-400 font-normal text-sm mt-4">
+          <p className="text-stone-500 dark:text-stone-400 font-normal text-xs sm:text-sm mt-3 sm:mt-4">
             Update your digital card settings and content
           </p>
 
@@ -300,34 +322,35 @@ export default function EditDigitalCardPage() {
 
         <TabsContent value="basic">
           <section className="rounded-2xl bg-gradient-to-br from-blue-50/50 to-indigo-50/30 dark:from-blue-950/20 dark:to-indigo-950/10 p-1">
-            <header className="flex items-center gap-2 px-5 py-3">
-              <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+            <header className="flex items-center gap-2 px-4 sm:px-5 py-3">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
                 <Icon icon="solar:user-circle-linear" className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <h2 className="text-sm font-semibold text-foreground">Basic Information</h2>
-                <p className="text-xs text-muted-foreground">Tell people about yourself or your business</p>
+                <p className="text-xs text-muted-foreground truncate">Tell people about yourself or your business</p>
               </div>
             </header>
             <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
-              <div className="p-5 space-y-4">
+              <div className="p-4 sm:p-5 space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Username (URL) *</Label>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">omniflow.app/card/</span>
+                <Label htmlFor="username" className="text-xs sm:text-sm">Username (URL) *</Label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <span className="text-xs sm:text-sm text-muted-foreground shrink-0">omniflow.app/card/</span>
                   <Input
                     id="username"
                     placeholder="your-name-or-business"
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
                     required
+                    className="h-10"
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">Use only lowercase letters, numbers, and hyphens</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">Use only lowercase letters, numbers, and hyphens</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="businessName">Name *</Label>
+                <Label htmlFor="businessName" className="text-xs sm:text-sm">Name *</Label>
                 <Input
                   id="businessName"
                   placeholder="Your Name or Business Name"
@@ -337,12 +360,13 @@ export default function EditDigitalCardPage() {
                     businessInfo: { ...formData.businessInfo!, name: e.target.value }
                   })}
                   required
+                  className="h-10"
                 />
-                <p className="text-xs text-muted-foreground">Your personal name, business name, or brand name</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">Your personal name, business name, or brand name</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="tagline">Professional Title / Tagline</Label>
+                <Label htmlFor="tagline" className="text-xs sm:text-sm">Professional Title / Tagline</Label>
                 <Input
                   id="tagline"
                   placeholder={
@@ -357,28 +381,30 @@ export default function EditDigitalCardPage() {
                     ...formData,
                     businessInfo: { ...formData.businessInfo!, tagline: e.target.value }
                   })}
+                  className="h-10"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
                   For personal: "Digital Marketing Consultant" | For business: "Best Coffee in Mumbai"
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description" className="text-xs sm:text-sm">Description</Label>
                 <Textarea
                   id="description"
                   placeholder="Tell people about yourself or your business..."
-                  rows={4}
+                  rows={3}
                   value={formData.businessInfo?.description || ''}
                   onChange={(e) => setFormData({
                     ...formData,
                     businessInfo: { ...formData.businessInfo!, description: e.target.value }
                   })}
+                  className="text-sm"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category" className="text-xs sm:text-sm">Category</Label>
                 <Select
                   value={formData.businessInfo?.category}
                   onValueChange={(value) => setFormData({
@@ -386,7 +412,7 @@ export default function EditDigitalCardPage() {
                     businessInfo: { ...formData.businessInfo!, category: value }
                   })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-10">
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -407,7 +433,7 @@ export default function EditDigitalCardPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="logo">Profile Image / Logo URL</Label>
+                <Label htmlFor="logo" className="text-xs sm:text-sm">Profile Image / Logo URL</Label>
                 <Input
                   id="logo"
                   type="url"
@@ -417,14 +443,15 @@ export default function EditDigitalCardPage() {
                     ...formData,
                     businessInfo: { ...formData.businessInfo!, logo: e.target.value }
                   })}
+                  className="h-10"
                 />
-                <p className="text-xs text-muted-foreground">
-                  Your photo or business logo. Recommended: <strong>400 x 400px</strong> (square, PNG or JPG)
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
+                  Your photo or business logo. Recommended: 400 x 400px (square)
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="coverImage">Cover Image / Banner URL</Label>
+                <Label htmlFor="coverImage" className="text-xs sm:text-sm">Cover Image / Banner URL</Label>
                 <Input
                   id="coverImage"
                   type="url"
@@ -434,9 +461,10 @@ export default function EditDigitalCardPage() {
                     ...formData,
                     businessInfo: { ...formData.businessInfo!, coverImage: e.target.value }
                   })}
+                  className="h-10"
                 />
-                <p className="text-xs text-muted-foreground">
-                  Recommended: <strong>780 x 300px</strong> (or 1560 x 600px for high-res). Keep text minimal for best display across devices.
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
+                  Recommended: 780 x 300px (or 1560 x 600px for high-res)
                 </p>
               </div>
               </div>
@@ -446,19 +474,19 @@ export default function EditDigitalCardPage() {
 
         <TabsContent value="contact">
           <section className="rounded-2xl bg-gradient-to-br from-teal-50/50 to-cyan-50/30 dark:from-teal-950/20 dark:to-cyan-950/10 p-1">
-            <header className="flex items-center gap-2 px-5 py-3">
-              <div className="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center">
+            <header className="flex items-center gap-2 px-4 sm:px-5 py-3">
+              <div className="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center shrink-0">
                 <Icon icon="solar:phone-linear" className="h-5 w-5 text-teal-600 dark:text-teal-400" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <h2 className="text-sm font-semibold text-foreground">Contact Information</h2>
-                <p className="text-xs text-muted-foreground">How can people reach you?</p>
+                <p className="text-xs text-muted-foreground truncate">How can people reach you?</p>
               </div>
             </header>
             <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
-              <div className="p-5 space-y-4">
+              <div className="p-4 sm:p-5 space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone" className="text-xs sm:text-sm">Phone Number</Label>
                 <Input
                   id="phone"
                   type="tel"
@@ -468,11 +496,12 @@ export default function EditDigitalCardPage() {
                     ...formData,
                     contact: { ...formData.contact!, phone: e.target.value }
                   })}
+                  className="h-10"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-xs sm:text-sm">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -482,11 +511,12 @@ export default function EditDigitalCardPage() {
                     ...formData,
                     contact: { ...formData.contact!, email: e.target.value }
                   })}
+                  className="h-10"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="whatsapp">WhatsApp Number</Label>
+                <Label htmlFor="whatsapp" className="text-xs sm:text-sm">WhatsApp Number</Label>
                 <Input
                   id="whatsapp"
                   type="tel"
@@ -496,23 +526,25 @@ export default function EditDigitalCardPage() {
                     ...formData,
                     contact: { ...formData.contact!, whatsapp: e.target.value }
                   })}
+                  className="h-10"
                 />
-                <p className="text-xs text-muted-foreground">
-                  Enter number with country code (e.g., +1 555-123-4567 or +91 98765 43210)
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
+                  Enter number with country code (e.g., +1 555-123-4567)
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
+                <Label htmlFor="address" className="text-xs sm:text-sm">Address</Label>
                 <Textarea
                   id="address"
                   placeholder="123 Main Street, City, Country"
-                  rows={3}
+                  rows={2}
                   value={formData.contact?.address || ''}
                   onChange={(e) => setFormData({
                     ...formData,
                     contact: { ...formData.contact!, address: e.target.value }
                   })}
+                  className="text-sm"
                 />
               </div>
               </div>
@@ -522,29 +554,29 @@ export default function EditDigitalCardPage() {
 
         <TabsContent value="links">
           <section className="rounded-2xl bg-gradient-to-br from-indigo-50/50 to-purple-50/30 dark:from-indigo-950/20 dark:to-purple-950/10 p-1">
-            <header className="flex items-center gap-2 px-5 py-3">
-              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+            <header className="flex items-center gap-2 px-4 sm:px-5 py-3">
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0">
                 <Icon icon="solar:link-linear" className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <h2 className="text-sm font-semibold text-foreground">Action Links</h2>
-                <p className="text-xs text-muted-foreground">Add buttons that link to your services, products, or booking pages</p>
+                <p className="text-xs text-muted-foreground truncate">Add buttons for services, products, or booking</p>
               </div>
             </header>
             <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
-              <div className="p-5 space-y-4">
+              <div className="p-4 sm:p-5 space-y-4">
               {formData.links && formData.links.length > 0 ? (
                 <div className="space-y-3">
                   {formData.links.map((link, index) => (
-                    <div key={link.id} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/30">
+                    <div key={link.id} className="p-3 sm:p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/30">
                       <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                          <GripVertical className="h-4 w-4 text-muted-foreground cursor-move" />
+                          <GripVertical className="h-4 w-4 text-muted-foreground cursor-move shrink-0" />
                           <Select
                             value={link.type}
                             onValueChange={(value) => updateLink(index, { type: value as any })}
                           >
-                            <SelectTrigger className="w-[180px]">
+                            <SelectTrigger className="flex-1 h-9 text-xs sm:text-sm">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -562,27 +594,29 @@ export default function EditDigitalCardPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => removeLink(index)}
+                            className="h-9 w-9 p-0 shrink-0"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 text-rose-500" />
                           </Button>
                         </div>
                         
                         <div className="space-y-3">
-                          <div className="space-y-2">
-                            <Label>Label</Label>
+                          <div className="space-y-1.5">
+                            <Label className="text-xs">Label</Label>
                             <Input
                               placeholder={link.type === 'whatsapp' ? 'Chat on WhatsApp' : 'Order Now'}
                               value={link.label}
                               onChange={(e) => updateLink(index, { label: e.target.value })}
+                              className="h-9 text-sm"
                             />
                           </div>
                           
                           {link.type === 'whatsapp' ? (
                             <>
-                              <div className="space-y-2">
-                                <Label>WhatsApp Number (with country code)</Label>
+                              <div className="space-y-1.5">
+                                <Label className="text-xs">WhatsApp Number</Label>
                                 <Input
-                                  placeholder="+1 234 567 8900 or 12345678900"
+                                  placeholder="+1 234 567 8900"
                                   value={link.url.replace('https://wa.me/', '').split('?')[0]}
                                   onChange={(e) => {
                                     const phone = e.target.value.replace(/\D/g, '');
@@ -592,13 +626,14 @@ export default function EditDigitalCardPage() {
                                       : '';
                                     updateLink(index, { url: waUrl });
                                   }}
+                                  className="h-9 text-sm"
                                 />
-                                <p className="text-xs text-muted-foreground">
-                                  Enter number with country code (e.g., 919876543210 for India, 12345678900 for USA)
+                                <p className="text-[10px] text-muted-foreground">
+                                  With country code (e.g., 919876543210)
                                 </p>
                               </div>
-                              <div className="space-y-2">
-                                <Label>Pre-filled Message (Optional)</Label>
+                              <div className="space-y-1.5">
+                                <Label className="text-xs">Pre-filled Message (Optional)</Label>
                                 <Textarea
                                   placeholder="Hi! I'd like to know more about..."
                                   rows={2}
@@ -611,15 +646,13 @@ export default function EditDigitalCardPage() {
                                       : '';
                                     updateLink(index, { url: waUrl });
                                   }}
+                                  className="text-sm"
                                 />
-                                <p className="text-xs text-muted-foreground">
-                                  This message will appear in the chat when someone clicks the button
-                                </p>
                               </div>
                             </>
                           ) : (
-                            <div className="space-y-2">
-                              <Label>URL</Label>
+                            <div className="space-y-1.5">
+                              <Label className="text-xs">URL</Label>
                               <Input
                                 placeholder={
                                   link.type === 'email' ? 'mailto:email@example.com' :
@@ -629,6 +662,7 @@ export default function EditDigitalCardPage() {
                                 }
                                 value={link.url}
                                 onChange={(e) => updateLink(index, { url: e.target.value })}
+                                className="h-9 text-sm"
                               />
                             </div>
                           )}
@@ -638,14 +672,14 @@ export default function EditDigitalCardPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-center text-muted-foreground py-8">
-                  No links added yet. Click the button below to add your first link.
+                <p className="text-center text-muted-foreground py-6 text-sm">
+                  No links added yet. Add your first link below.
                 </p>
               )}
               
               <div className="flex justify-center">
-                <Button onClick={addLink} variant="outline" className="w-full h-9 text-xs font-mono uppercase tracking-wide border-dashed border-stone-300 dark:border-stone-700 text-muted-foreground hover:text-foreground hover:border-stone-400 dark:hover:border-stone-600">
-                  <Plus className="h-3.5 w-3.5 mr-1.5" />
+                <Button onClick={addLink} variant="outline" className="w-full h-10 text-xs font-medium border-dashed border-stone-300 dark:border-stone-700 text-muted-foreground hover:text-foreground hover:border-stone-400 dark:hover:border-stone-600">
+                  <Plus className="h-4 w-4 mr-2" />
                   Add Link
                 </Button>
               </div>
@@ -656,20 +690,20 @@ export default function EditDigitalCardPage() {
 
         <TabsContent value="social">
           <section className="rounded-2xl bg-gradient-to-br from-pink-50/50 to-rose-50/30 dark:from-pink-950/20 dark:to-rose-950/10 p-1">
-            <header className="flex items-center gap-2 px-5 py-3">
-              <div className="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center">
+            <header className="flex items-center gap-2 px-4 sm:px-5 py-3">
+              <div className="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center shrink-0">
                 <Icon icon="solar:share-linear" className="h-5 w-5 text-pink-600 dark:text-pink-400" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <h2 className="text-sm font-semibold text-foreground">Social Media</h2>
                 <p className="text-xs text-muted-foreground">Add your social media profiles</p>
               </div>
             </header>
             <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
-              <div className="p-5 relative">
-              {/* Animated focus indicator */}
+              <div className="p-4 sm:p-5 relative">
+              {/* Animated focus indicator - hidden on mobile */}
               <div 
-                className="absolute left-0 w-1 bg-primary rounded-full transition-all duration-300 ease-out"
+                className="absolute left-0 w-1 bg-primary rounded-full transition-all duration-300 ease-out hidden sm:block"
                 style={{
                   height: '44px',
                   top: `${(focusedSocial ?? 0) * 60}px`,
@@ -677,14 +711,15 @@ export default function EditDigitalCardPage() {
                 }}
               />
               
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {/* Instagram */}
-                <div className="flex items-center gap-4">
-                  <div className="w-8 flex justify-center">
-                    <Icon icon="ri:instagram-fill" className="h-5 w-5 text-muted-foreground" />
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                  <div className="flex items-center gap-2 sm:w-8 sm:justify-center">
+                    <Icon icon="ri:instagram-fill" className="h-5 w-5 text-pink-500" />
+                    <span className="text-xs font-medium text-muted-foreground sm:hidden">Instagram</span>
                   </div>
-                  <div className="flex-1 flex items-center h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
-                    <span className="w-36 shrink-0 h-full flex items-center px-3 text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">instagram.com/</span>
+                  <div className="flex-1 flex items-center h-10 sm:h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
+                    <span className="w-28 sm:w-36 shrink-0 h-full flex items-center px-2 sm:px-3 text-xs sm:text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">instagram.com/</span>
                     <input
                       id="instagram"
                       placeholder="username"
@@ -695,18 +730,19 @@ export default function EditDigitalCardPage() {
                       })}
                       onFocus={() => setFocusedSocial(0)}
                       onBlur={() => setFocusedSocial(null)}
-                      className="flex-1 h-full px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                      className="flex-1 h-full px-2 sm:px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
 
                 {/* YouTube */}
-                <div className="flex items-center gap-4">
-                  <div className="w-8 flex justify-center">
-                    <Icon icon="ri:youtube-fill" className="h-5 w-5 text-muted-foreground" />
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                  <div className="flex items-center gap-2 sm:w-8 sm:justify-center">
+                    <Icon icon="ri:youtube-fill" className="h-5 w-5 text-red-500" />
+                    <span className="text-xs font-medium text-muted-foreground sm:hidden">YouTube</span>
                   </div>
-                  <div className="flex-1 flex items-center h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
-                    <span className="w-36 shrink-0 h-full flex items-center px-3 text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">youtube.com/</span>
+                  <div className="flex-1 flex items-center h-10 sm:h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
+                    <span className="w-28 sm:w-36 shrink-0 h-full flex items-center px-2 sm:px-3 text-xs sm:text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">youtube.com/</span>
                     <input
                       id="youtube"
                       placeholder="@channel"
@@ -717,18 +753,19 @@ export default function EditDigitalCardPage() {
                       })}
                       onFocus={() => setFocusedSocial(1)}
                       onBlur={() => setFocusedSocial(null)}
-                      className="flex-1 h-full px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                      className="flex-1 h-full px-2 sm:px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
 
                 {/* Facebook */}
-                <div className="flex items-center gap-4">
-                  <div className="w-8 flex justify-center">
-                    <Icon icon="ri:facebook-circle-fill" className="h-5 w-5 text-muted-foreground" />
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                  <div className="flex items-center gap-2 sm:w-8 sm:justify-center">
+                    <Icon icon="ri:facebook-circle-fill" className="h-5 w-5 text-blue-600" />
+                    <span className="text-xs font-medium text-muted-foreground sm:hidden">Facebook</span>
                   </div>
-                  <div className="flex-1 flex items-center h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
-                    <span className="w-36 shrink-0 h-full flex items-center px-3 text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">facebook.com/</span>
+                  <div className="flex-1 flex items-center h-10 sm:h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
+                    <span className="w-28 sm:w-36 shrink-0 h-full flex items-center px-2 sm:px-3 text-xs sm:text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">facebook.com/</span>
                     <input
                       id="facebook"
                       placeholder="page"
@@ -739,18 +776,19 @@ export default function EditDigitalCardPage() {
                       })}
                       onFocus={() => setFocusedSocial(2)}
                       onBlur={() => setFocusedSocial(null)}
-                      className="flex-1 h-full px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                      className="flex-1 h-full px-2 sm:px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
 
                 {/* Twitter / X */}
-                <div className="flex items-center gap-4">
-                  <div className="w-8 flex justify-center">
-                    <Icon icon="ri:twitter-x-fill" className="h-5 w-5 text-muted-foreground" />
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                  <div className="flex items-center gap-2 sm:w-8 sm:justify-center">
+                    <Icon icon="ri:twitter-x-fill" className="h-5 w-5 text-foreground" />
+                    <span className="text-xs font-medium text-muted-foreground sm:hidden">X (Twitter)</span>
                   </div>
-                  <div className="flex-1 flex items-center h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
-                    <span className="w-36 shrink-0 h-full flex items-center px-3 text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">x.com/</span>
+                  <div className="flex-1 flex items-center h-10 sm:h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
+                    <span className="w-28 sm:w-36 shrink-0 h-full flex items-center px-2 sm:px-3 text-xs sm:text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">x.com/</span>
                     <input
                       id="twitter"
                       placeholder="username"
@@ -761,18 +799,19 @@ export default function EditDigitalCardPage() {
                       })}
                       onFocus={() => setFocusedSocial(3)}
                       onBlur={() => setFocusedSocial(null)}
-                      className="flex-1 h-full px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                      className="flex-1 h-full px-2 sm:px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
 
                 {/* LinkedIn */}
-                <div className="flex items-center gap-4">
-                  <div className="w-8 flex justify-center">
-                    <Icon icon="ri:linkedin-box-fill" className="h-5 w-5 text-muted-foreground" />
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                  <div className="flex items-center gap-2 sm:w-8 sm:justify-center">
+                    <Icon icon="ri:linkedin-box-fill" className="h-5 w-5 text-blue-700" />
+                    <span className="text-xs font-medium text-muted-foreground sm:hidden">LinkedIn</span>
                   </div>
-                  <div className="flex-1 flex items-center h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
-                    <span className="w-36 shrink-0 h-full flex items-center px-3 text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">linkedin.com/in/</span>
+                  <div className="flex-1 flex items-center h-10 sm:h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800">
+                    <span className="w-28 sm:w-36 shrink-0 h-full flex items-center px-2 sm:px-3 text-xs sm:text-sm text-muted-foreground select-none bg-stone-200 dark:bg-stone-800">linkedin.com/in/</span>
                     <input
                       id="linkedin"
                       placeholder="profile"
@@ -783,7 +822,7 @@ export default function EditDigitalCardPage() {
                       })}
                       onFocus={() => setFocusedSocial(4)}
                       onBlur={() => setFocusedSocial(null)}
-                      className="flex-1 h-full px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                      className="flex-1 h-full px-2 sm:px-3 bg-stone-50 dark:bg-stone-900 border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
@@ -794,30 +833,37 @@ export default function EditDigitalCardPage() {
         </TabsContent>
 
         <TabsContent value="lead-capture">
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Contact Form Card - Colorful Style */}
             <section className="rounded-2xl bg-gradient-to-br from-emerald-50/50 to-teal-50/30 dark:from-emerald-950/20 dark:to-teal-950/10 p-1">
-              <header className="flex items-center gap-2 px-5 py-3">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+              <header className="flex items-center gap-2 px-4 sm:px-5 py-3">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
                   <Icon icon="solar:chat-square-linear" className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <h2 className="text-sm font-semibold text-foreground">Contact Form</h2>
+                <div className="min-w-0">
+                  <h2 className="text-sm font-semibold text-foreground">Contact Form</h2>
+                  <p className="text-xs text-muted-foreground truncate sm:hidden">Capture leads into CRM</p>
+                </div>
               </header>
               <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
-                <div className="p-5 space-y-5">
-                  {/* Toggle Row */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">Enable contact form</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">Capture leads directly into your CRM</p>
+                <div className="p-4 sm:p-5 space-y-4">
+                  {/* Toggle Row - Improved mobile layout */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-center justify-between sm:justify-start gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground">Enable contact form</p>
+                        <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">Capture leads directly into your CRM</p>
+                      </div>
+                      <Switch
+                        size="lg"
+                        checked={formData.contactForm?.enabled ?? true}
+                        onCheckedChange={(checked) => setFormData({
+                          ...formData,
+                          contactForm: { ...formData.contactForm!, enabled: checked }
+                        })}
+                        className="shrink-0 data-[state=checked]:bg-emerald-500"
+                      />
                     </div>
-                    <Switch
-                      checked={formData.contactForm?.enabled ?? true}
-                      onCheckedChange={(checked) => setFormData({
-                        ...formData,
-                        contactForm: { ...formData.contactForm!, enabled: checked }
-                      })}
-                    />
                   </div>
 
                   {formData.contactForm?.enabled && (
@@ -828,7 +874,7 @@ export default function EditDigitalCardPage() {
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-foreground">Button Text</label>
                         <Input
-                          className="h-9 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                          className="h-10 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
                           placeholder="Contact Us"
                           value={formData.contactForm?.buttonText || 'Contact Us'}
                           onChange={(e) => setFormData({
@@ -842,7 +888,7 @@ export default function EditDigitalCardPage() {
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-foreground">Form Title</label>
                         <Input
-                          className="h-9 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                          className="h-10 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
                           placeholder="Get in Touch"
                           value={formData.contactForm?.title || 'Get in Touch'}
                           onChange={(e) => setFormData({
@@ -856,7 +902,7 @@ export default function EditDigitalCardPage() {
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-foreground">Form Description</label>
                         <Textarea
-                          className="min-h-[72px] bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                          className="min-h-[72px] text-sm bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
                           placeholder="Send us a message and we'll get back to you soon!"
                           value={formData.contactForm?.description || "Send us a message and we'll get back to you soon!"}
                           onChange={(e) => setFormData({
@@ -871,10 +917,10 @@ export default function EditDigitalCardPage() {
                 
                 {/* Footer Notice */}
                 {formData.contactForm?.enabled && (
-                  <div className="px-5 py-3 border-t border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/50 rounded-b-xl">
-                    <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                      <Icon icon="solar:info-circle-linear" className="h-3.5 w-3.5" />
-                      Submissions automatically create leads in your CRM
+                  <div className="px-4 sm:px-5 py-3 border-t border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/50 rounded-b-xl">
+                    <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1.5">
+                      <Icon icon="solar:info-circle-linear" className="h-3.5 w-3.5 shrink-0" />
+                      <span>Submissions automatically create leads in your CRM</span>
                     </p>
                   </div>
                 )}
@@ -883,27 +929,34 @@ export default function EditDigitalCardPage() {
 
             {/* Calendar Booking Card - Colorful Style */}
             <section className="rounded-2xl bg-gradient-to-br from-blue-50/50 to-indigo-50/30 dark:from-blue-950/20 dark:to-indigo-950/10 p-1">
-              <header className="flex items-center gap-2 px-5 py-3">
-                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+              <header className="flex items-center gap-2 px-4 sm:px-5 py-3">
+                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
                   <Icon icon="solar:calendar-mark-linear" className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h2 className="text-sm font-semibold text-foreground">Calendar Booking</h2>
+                <div className="min-w-0">
+                  <h2 className="text-sm font-semibold text-foreground">Calendar Booking</h2>
+                  <p className="text-xs text-muted-foreground truncate sm:hidden">Book appointments</p>
+                </div>
               </header>
               <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
-                <div className="p-5 space-y-5">
-                  {/* Toggle Row */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">Enable Cal.com booking</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">Let visitors book appointments directly</p>
+                <div className="p-4 sm:p-5 space-y-4">
+                  {/* Toggle Row - Improved mobile layout */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-center justify-between sm:justify-start gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground">Enable Cal.com booking</p>
+                        <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">Let visitors book appointments directly</p>
+                      </div>
+                      <Switch
+                        size="lg"
+                        checked={formData.calendarBooking?.enabled || false}
+                        onCheckedChange={(checked) => setFormData({
+                          ...formData,
+                          calendarBooking: { ...formData.calendarBooking!, enabled: checked }
+                        })}
+                        className="shrink-0 data-[state=checked]:bg-blue-500"
+                      />
                     </div>
-                    <Switch
-                      checked={formData.calendarBooking?.enabled || false}
-                      onCheckedChange={(checked) => setFormData({
-                        ...formData,
-                        calendarBooking: { ...formData.calendarBooking!, enabled: checked }
-                      })}
-                    />
                   </div>
 
                   {formData.calendarBooking?.enabled && (
@@ -911,9 +964,9 @@ export default function EditDigitalCardPage() {
                       <div className="h-px bg-stone-200 dark:bg-stone-800" />
                       
                       {/* Info Banner */}
-                      <div className="flex items-start gap-2.5 p-3 rounded-lg bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+                      <div className="flex items-start gap-2 p-2.5 sm:p-3 rounded-lg bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
                         <Icon icon="solar:calendar-linear" className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">
                           Get a free Cal.com account at <a href="https://cal.com" target="_blank" rel="noopener noreferrer" className="underline font-medium hover:text-foreground">cal.com</a>
                         </p>
                       </div>
@@ -921,10 +974,10 @@ export default function EditDigitalCardPage() {
                       {/* Cal.com Username */}
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-foreground">Cal.com Username</label>
-                        <div className="flex items-center h-9 rounded-md overflow-hidden border border-stone-200 dark:border-stone-800 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
-                          <span className="h-full flex items-center px-3 text-xs text-muted-foreground bg-stone-100 dark:bg-stone-900 border-r border-stone-200 dark:border-stone-800 select-none">cal.com/</span>
+                        <div className="flex items-center h-10 rounded-lg overflow-hidden border border-stone-200 dark:border-stone-800 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
+                          <span className="w-20 sm:w-24 shrink-0 h-full flex items-center px-2 sm:px-3 text-xs sm:text-sm text-muted-foreground bg-stone-100 dark:bg-stone-900 border-r border-stone-200 dark:border-stone-800 select-none">cal.com/</span>
                           <input
-                            className="flex-1 h-full px-3 bg-stone-50 dark:bg-stone-900 text-sm outline-none"
+                            className="flex-1 h-full px-2 sm:px-3 bg-stone-50 dark:bg-stone-900 text-sm outline-none text-foreground placeholder:text-muted-foreground"
                             placeholder="your-username"
                             value={formData.calendarBooking?.calcomUsername || ''}
                             onChange={(e) => setFormData({
@@ -939,7 +992,7 @@ export default function EditDigitalCardPage() {
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-foreground">Event Type <span className="text-muted-foreground font-normal">(optional)</span></label>
                         <Input
-                          className="h-9 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                          className="h-10 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
                           placeholder="30min"
                           value={formData.calendarBooking?.calcomEventSlug || ''}
                           onChange={(e) => setFormData({
@@ -947,14 +1000,14 @@ export default function EditDigitalCardPage() {
                             calendarBooking: { ...formData.calendarBooking!, calcomEventSlug: e.target.value }
                           })}
                         />
-                        <p className="text-[11px] text-muted-foreground">Leave empty to show all event types</p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">Leave empty to show all event types</p>
                       </div>
 
                       {/* Button Text */}
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-foreground">Button Text</label>
                         <Input
-                          className="h-9 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                          className="h-10 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
                           placeholder="Book Appointment"
                           value={formData.calendarBooking?.buttonText || 'Book Appointment'}
                           onChange={(e) => setFormData({
@@ -969,38 +1022,44 @@ export default function EditDigitalCardPage() {
                 
                 {/* Footer Notice */}
                 {formData.calendarBooking?.enabled && (
-                  <div className="px-5 py-3 border-t border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/50 rounded-b-xl">
-                    <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                      <Icon icon="solar:info-circle-linear" className="h-3.5 w-3.5" />
-                      Bookings sync to CRM when Cal.com API is configured in Settings
+                  <div className="px-4 sm:px-5 py-3 border-t border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/50 rounded-b-xl">
+                    <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1.5">
+                      <Icon icon="solar:info-circle-linear" className="h-3.5 w-3.5 shrink-0" />
+                      <span>Bookings sync to CRM when Cal.com API is configured in Settings</span>
                     </p>
                   </div>
                 )}
               </div>
             </section>
 
-            {/* AI Voice Chatbot Card - Clerk Style */}
-            <section className="rounded-2xl bg-stone-50 dark:bg-stone-900/50 p-1">
-              <header className="flex items-center gap-2 px-5 py-3">
-                <AiChatbotIcon className="h-5 w-5 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">AI Voice Chatbot</h2>
-                <span className="ml-auto text-[10px] font-medium px-2 py-0.5 rounded-full bg-stone-200 dark:bg-stone-800 text-muted-foreground">109 Languages</span>
+            {/* Voice Chat AI Card - Colorful Style */}
+            <section className="rounded-2xl bg-gradient-to-br from-purple-50/50 to-fuchsia-50/30 dark:from-purple-950/20 dark:to-fuchsia-950/10 p-1">
+              <header className="flex items-center gap-2 px-4 sm:px-5 py-3">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
+                  <AiChatbotIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <h2 className="text-sm font-semibold text-foreground">Voice Chat AI</h2>
+                <span className="ml-auto text-[10px] font-medium px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 whitespace-nowrap">109 Languages</span>
               </header>
               <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
-                <div className="p-5 space-y-5">
-                  {/* Toggle Row */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">Enable AI chatbot</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">Voice & text chat with automatic lead capture</p>
+                <div className="p-4 sm:p-5 space-y-4">
+                  {/* Toggle Row - Improved mobile layout */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-center justify-between sm:justify-start gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground">Enable Voice Chat AI</p>
+                        <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">Voice & text chat with automatic lead capture</p>
+                      </div>
+                      <Switch
+                        size="lg"
+                        checked={formData.voiceChatbot?.enabled || false}
+                        onCheckedChange={(checked) => setFormData({
+                          ...formData,
+                          voiceChatbot: { ...formData.voiceChatbot!, enabled: checked }
+                        })}
+                        className="shrink-0 data-[state=checked]:bg-purple-500"
+                      />
                     </div>
-                    <Switch
-                      checked={formData.voiceChatbot?.enabled || false}
-                      onCheckedChange={(checked) => setFormData({
-                        ...formData,
-                        voiceChatbot: { ...formData.voiceChatbot!, enabled: checked }
-                      })}
-                    />
                   </div>
 
                   {formData.voiceChatbot?.enabled && (
@@ -1008,9 +1067,9 @@ export default function EditDigitalCardPage() {
                       <div className="h-px bg-stone-200 dark:bg-stone-800" />
                       
                       {/* Info Banner */}
-                      <div className="flex items-start gap-2.5 p-3 rounded-lg bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
-                        <Icon icon="solar:lightbulb-linear" className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                        <p className="text-xs text-muted-foreground">
+                      <div className="flex items-start gap-2 p-2.5 sm:p-3 rounded-lg bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800/50">
+                        <Icon icon="solar:lightbulb-linear" className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">
                           Configure Voice Chat AI in <span className="font-medium">Settings → API Integrations</span>
                         </p>
                       </div>
@@ -1019,7 +1078,7 @@ export default function EditDigitalCardPage() {
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-foreground">Custom Greeting <span className="text-muted-foreground font-normal">(optional)</span></label>
                         <Textarea
-                          className="min-h-[72px] bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                          className="min-h-[72px] text-sm bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800 focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
                           placeholder="Hi! I'm your AI assistant. How can I help you today?"
                           value={formData.voiceChatbot?.customGreeting || ''}
                           onChange={(e) => setFormData({
@@ -1039,7 +1098,7 @@ export default function EditDigitalCardPage() {
                             voiceChatbot: { ...formData.voiceChatbot!, position: value }
                           })}
                         >
-                          <SelectTrigger className="h-9 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800">
+                          <SelectTrigger className="h-10 bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -1050,15 +1109,15 @@ export default function EditDigitalCardPage() {
                       </div>
 
                       {/* Features List */}
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {[
                           'Voice & text in 109 languages',
                           'Automatic lead capture',
                           'Direct CRM integration',
                           'Auto follow-up campaigns'
                         ].map((feature, i) => (
-                          <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <Icon icon="solar:check-circle-bold" className="h-3.5 w-3.5 text-emerald-500" />
+                          <div key={i} className="flex items-center gap-2 text-[10px] sm:text-xs text-muted-foreground">
+                            <Icon icon="solar:check-circle-bold" className="h-3.5 w-3.5 text-purple-500 shrink-0" />
                             <span>{feature}</span>
                           </div>
                         ))}
@@ -1081,23 +1140,24 @@ export default function EditDigitalCardPage() {
 
         <TabsContent value="branding">
           <section className="rounded-2xl bg-gradient-to-br from-violet-50/50 to-purple-50/30 dark:from-violet-950/20 dark:to-purple-950/10 p-1">
-            <header className="flex items-center gap-2 px-5 py-3">
-              <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
+            <header className="flex items-center gap-2 px-4 sm:px-5 py-3">
+              <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center shrink-0">
                 <Icon icon="solar:palette-linear" className="h-5 w-5 text-violet-600 dark:text-violet-400" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <h2 className="text-sm font-semibold text-foreground">Branding & Theme</h2>
-                <p className="text-xs text-muted-foreground">Customize the look and feel of your digital card</p>
+                <p className="text-xs text-muted-foreground truncate">Customize the look and feel of your digital card</p>
               </div>
             </header>
             <div className="rounded-xl bg-white dark:bg-stone-950 shadow-sm ring-1 ring-stone-200/60 dark:ring-stone-800">
-              <div className="p-5 space-y-4">
-              <div className="flex items-end gap-3">
-                <div className="space-y-2">
+              <div className="p-4 sm:p-5 space-y-4">
+              {/* Color Pickers - Stack on mobile */}
+              <div className="flex flex-col sm:flex-row sm:items-end gap-3">
+                <div className="space-y-2 flex-1">
                   <Label className="text-xs font-medium text-muted-foreground">Primary Color</Label>
                   <div className="relative group">
-                    <div className="flex items-center h-11 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 overflow-hidden transition-all hover:border-stone-300 dark:hover:border-stone-700 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
-                      <div className="relative w-11 h-11 shrink-0">
+                    <div className="flex items-center h-10 sm:h-11 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 overflow-hidden transition-all hover:border-stone-300 dark:hover:border-stone-700 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
+                      <div className="relative w-10 sm:w-11 h-10 sm:h-11 shrink-0">
                         <input
                           type="color"
                           value={formData.branding?.primaryColor || '#3B82F6'}
@@ -1119,17 +1179,17 @@ export default function EditDigitalCardPage() {
                           ...formData,
                           branding: { ...formData.branding!, primaryColor: e.target.value }
                         })}
-                        className="flex-1 h-full px-3 bg-transparent font-mono text-sm uppercase text-foreground placeholder:text-muted-foreground focus:outline-none"
+                        className="flex-1 h-full px-2 sm:px-3 bg-transparent font-mono text-xs sm:text-sm uppercase text-foreground placeholder:text-muted-foreground focus:outline-none"
                         placeholder="#000000"
                       />
                     </div>
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 flex-1">
                   <Label className="text-xs font-medium text-muted-foreground">Secondary Color</Label>
                   <div className="relative group">
-                    <div className="flex items-center h-11 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 overflow-hidden transition-all hover:border-stone-300 dark:hover:border-stone-700 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
-                      <div className="relative w-11 h-11 shrink-0">
+                    <div className="flex items-center h-10 sm:h-11 rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 overflow-hidden transition-all hover:border-stone-300 dark:hover:border-stone-700 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
+                      <div className="relative w-10 sm:w-11 h-10 sm:h-11 shrink-0">
                         <input
                           type="color"
                           value={formData.branding?.secondaryColor || '#10B981'}
@@ -1151,27 +1211,29 @@ export default function EditDigitalCardPage() {
                           ...formData,
                           branding: { ...formData.branding!, secondaryColor: e.target.value }
                         })}
-                        className="flex-1 h-full px-3 bg-transparent font-mono text-sm uppercase text-foreground placeholder:text-muted-foreground focus:outline-none"
+                        className="flex-1 h-full px-2 sm:px-3 bg-transparent font-mono text-xs sm:text-sm uppercase text-foreground placeholder:text-muted-foreground focus:outline-none"
                         placeholder="#000000"
                       />
                     </div>
                   </div>
                 </div>
-                <ColorExtractor
-                  logoUrl={formData.businessInfo?.logo || ''}
-                  onColorsExtracted={(colors) => setFormData({
-                    ...formData,
-                    branding: {
-                      ...formData.branding!,
-                      primaryColor: colors.primary,
-                      secondaryColor: colors.secondary
-                    }
-                  })}
-                />
+                <div className="shrink-0">
+                  <ColorExtractor
+                    logoUrl={formData.businessInfo?.logo || ''}
+                    onColorsExtracted={(colors) => setFormData({
+                      ...formData,
+                      branding: {
+                        ...formData.branding!,
+                        primaryColor: colors.primary,
+                        secondaryColor: colors.secondary
+                      }
+                    })}
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="fontFamily">Font Family</Label>
+                <Label htmlFor="fontFamily" className="text-xs sm:text-sm">Font Family</Label>
                 <Select
                   value={formData.branding?.fontFamily || 'Inter'}
                   onValueChange={(value) => setFormData({
@@ -1179,7 +1241,7 @@ export default function EditDigitalCardPage() {
                     branding: { ...formData.branding!, fontFamily: value }
                   })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-10">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1194,7 +1256,7 @@ export default function EditDigitalCardPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="theme">Theme</Label>
+                <Label htmlFor="theme" className="text-xs sm:text-sm">Theme</Label>
                 <Select
                   value={formData.branding?.theme || 'modern'}
                   onValueChange={(value: any) => setFormData({
@@ -1202,7 +1264,7 @@ export default function EditDigitalCardPage() {
                     branding: { ...formData.branding!, theme: value }
                   })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-10">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1234,11 +1296,12 @@ export default function EditDigitalCardPage() {
         </Tabs>
       </div>
 
-      <div className="flex justify-end gap-4 mt-6">
+      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 mt-6">
         <Button
           variant="outline"
           onClick={() => router.push('/digital-card/manage')}
           disabled={saving}
+          className="w-full sm:w-auto h-10"
         >
           Cancel
         </Button>
@@ -1246,7 +1309,7 @@ export default function EditDigitalCardPage() {
           onClick={() => handleSubmit(true)}
           disabled={saving}
           variant="outline"
-          className="border-blue-200 text-blue-600 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-950"
+          className="w-full sm:w-auto h-10 border-blue-200 text-blue-600 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-950"
         >
           {saving ? (
             <>
@@ -1260,7 +1323,7 @@ export default function EditDigitalCardPage() {
         <Button
           onClick={() => handleSubmit(false)}
           disabled={saving}
-          className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+          className="w-full sm:w-auto h-10 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
         >
           {saving ? (
             <>

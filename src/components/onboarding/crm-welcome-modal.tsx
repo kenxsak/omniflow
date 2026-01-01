@@ -145,7 +145,7 @@ export function CrmWelcomeModal({ company, onDismiss, onComplete }: CrmWelcomeMo
               </div>
               <div className="min-w-0 flex-1">
                 <DialogTitle className="text-lg font-semibold">
-                  {currentStep === 0 ? 'Welcome to OmniFlow CRM!' : `Step ${currentStep + 1}: ${currentStepData.title}`}
+                  {currentStep === 0 ? 'Welcome to your CRM!' : `Step ${currentStep + 1}: ${currentStepData.title}`}
                 </DialogTitle>
                 <DialogDescription className="text-sm text-muted-foreground">
                   {currentStep === 0 

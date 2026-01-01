@@ -273,7 +273,7 @@ Jane Smith,"919123456789"`;
       const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'OmniFlow_WhatsApp_Contacts_Template.csv';
+      link.download = 'WhatsApp_Contacts_Template.csv';
       link.click();
       URL.revokeObjectURL(link.href);
       

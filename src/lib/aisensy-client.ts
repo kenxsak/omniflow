@@ -76,7 +76,7 @@ export async function sendBulkWhatsAppAiSensy(
 
         const requestBody = {
           apiKey: config.apiKey,
-          campaignName: input.campaignName || config.campaignName || 'OmniFlow Campaign',
+          campaignName: input.campaignName || config.campaignName || 'Default Campaign',
           destination: recipient.whatsappNumber,
           userName: recipient.userName,
           templateParams: templateParams,

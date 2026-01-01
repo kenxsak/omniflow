@@ -176,32 +176,30 @@ export default function ManageDigitalCardsPage() {
   return (
     <div className="flex flex-col space-y-6 w-full h-full">
       {/* Header - Autosend style */}
-      <div className="flex items-start justify-between">
-        <div className="w-full space-y-2">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div className="space-y-1">
           <p className="text-stone-800 dark:text-stone-200 font-semibold text-lg">Digital Cards</p>
           <p className="text-stone-500 dark:text-stone-400 font-normal text-sm">
             Create and manage your digital business cards from here.
           </p>
         </div>
-        <div>
-          <Button onClick={() => router.push('/digital-card/create')} size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-            <Plus className="h-4 w-4 -ml-1" />
-            New Card
-          </Button>
-        </div>
+        <Button onClick={() => router.push('/digital-card/create')} size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 w-full sm:w-auto shrink-0">
+          <Plus className="h-4 w-4 -ml-1" />
+          New Card
+        </Button>
       </div>
 
       {/* Card Limit Indicator - Colorful style */}
       {plan && userCount > 0 && (
         <div className="border border-stone-200 dark:border-stone-800 rounded-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 px-6 py-4 border-b border-stone-200 dark:border-stone-800">
-            <div className="flex items-center justify-between">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 px-4 sm:px-6 py-4 border-b border-stone-200 dark:border-stone-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <p className="text-stone-800 dark:text-stone-200 font-medium text-base">Card Usage</p>
                 <p className="text-stone-500 dark:text-stone-400 font-normal text-sm">{limitDescription}</p>
               </div>
               {limitStatus === 'limit_reached' && (
-                <Button size="sm" className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700" onClick={() => router.push('/settings/subscription')}>
+                <Button size="sm" className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 w-full sm:w-auto" onClick={() => router.push('/settings/subscription')}>
                   Upgrade Plan
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" className="-mr-1">
                     <path d="M5 12H19.5833M19.5833 12L12.5833 5M19.5833 12L12.5833 19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
@@ -210,35 +208,41 @@ export default function ManageDigitalCardsPage() {
               )}
             </div>
           </div>
-          <div className="bg-white dark:bg-stone-950 px-6 py-4">
-            <div className="flex items-center gap-8">
-              <div className="flex flex-col gap-1">
-                <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Used</p>
-                <p className="text-blue-600 dark:text-blue-400 font-semibold text-2xl font-mono">{currentCards}</p>
-              </div>
-              <div className="flex flex-col gap-1">
-                <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Limit</p>
-                <p className="text-stone-800 dark:text-stone-200 font-semibold text-2xl font-mono">{maxCards}</p>
-              </div>
-              <div className="flex-1">
-                <div className="w-full h-2 bg-stone-200 dark:bg-stone-700 rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full rounded-full transition-all ${
-                      limitStatus === 'limit_reached' ? 'bg-rose-500' :
-                      limitStatus === 'warning' ? 'bg-amber-500' :
-                      'bg-gradient-to-r from-blue-500 to-indigo-500'
-                    }`}
-                    style={{ width: `${Math.min(usagePercentage, 100)}%` }}
-                  />
+          <div className="bg-white dark:bg-stone-950 px-4 sm:px-6 py-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+              {/* Stats row - mobile: 2x2 grid, desktop: inline */}
+              <div className="grid grid-cols-2 sm:flex sm:items-center gap-4 sm:gap-8">
+                <div className="flex flex-col gap-1">
+                  <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Used</p>
+                  <p className="text-blue-600 dark:text-blue-400 font-semibold text-2xl font-mono">{currentCards}</p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Limit</p>
+                  <p className="text-stone-800 dark:text-stone-200 font-semibold text-2xl font-mono">{maxCards}</p>
                 </div>
               </div>
-              <div className="flex flex-col gap-1">
-                <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Usage</p>
-                <p className={`font-semibold text-lg font-mono ${
-                  limitStatus === 'limit_reached' ? 'text-rose-600 dark:text-rose-400' :
-                  limitStatus === 'warning' ? 'text-amber-600 dark:text-amber-400' :
-                  'text-blue-600 dark:text-blue-400'
-                }`}>{Math.round(usagePercentage)}%</p>
+              {/* Progress bar and percentage */}
+              <div className="flex items-center gap-4 flex-1">
+                <div className="flex-1">
+                  <div className="w-full h-2 bg-stone-200 dark:bg-stone-700 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all ${
+                        limitStatus === 'limit_reached' ? 'bg-rose-500' :
+                        limitStatus === 'warning' ? 'bg-amber-500' :
+                        'bg-gradient-to-r from-blue-500 to-indigo-500'
+                      }`}
+                      style={{ width: `${Math.min(usagePercentage, 100)}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1 shrink-0">
+                  <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] font-mono tracking-[0.4px] uppercase">Usage</p>
+                  <p className={`font-semibold text-lg font-mono ${
+                    limitStatus === 'limit_reached' ? 'text-rose-600 dark:text-rose-400' :
+                    limitStatus === 'warning' ? 'text-amber-600 dark:text-amber-400' :
+                    'text-blue-600 dark:text-blue-400'
+                  }`}>{Math.round(usagePercentage)}%</p>
+                </div>
               </div>
             </div>
           </div>
@@ -316,10 +320,11 @@ export default function ManageDigitalCardsPage() {
                 </div>
 
                 {/* Action buttons row */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center flex-wrap gap-2">
                   <Button
                     size="sm"
                     onClick={() => window.open(`/card/${card.username}`, '_blank')}
+                    className="text-xs sm:text-sm"
                   >
                     View Card
                     <ExternalLink className="h-3 w-3 -mr-1" />
@@ -328,6 +333,7 @@ export default function ManageDigitalCardsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => copyCardUrl(card.username)}
+                    className="text-xs sm:text-sm"
                   >
                     {copiedUrl === card.username ? 'Copied!' : 'Copy URL'}
                   </Button>
@@ -344,6 +350,7 @@ export default function ManageDigitalCardsPage() {
                     cardName={card.businessInfo.name}
                     variant="ghost"
                     size="sm"
+                    iconOnly
                   />
                 </div>
               </div>

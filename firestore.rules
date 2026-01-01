@@ -74,6 +74,24 @@ service cloud.firestore {
       
       
       // ==========================================
+      // INTEGRATIONS SUBCOLLECTION
+      // ==========================================
+      match /integrations/{integrationId} {
+        allow read, write: if isAuthenticated();
+      }
+      
+      
+      // ==========================================
+      // FACEBOOK WEBHOOK LOGS SUBCOLLECTION
+      // ==========================================
+      match /facebookWebhookLogs/{logId} {
+        allow read: if isAuthenticated();
+        // Write operations via Admin SDK only (webhook handler)
+        allow write: if false;
+      }
+      
+      
+      // ==========================================
       // USERS SUBCOLLECTION (Chat Sessions)
       // ==========================================
       match /users/{userId} {

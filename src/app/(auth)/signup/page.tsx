@@ -9,6 +9,7 @@ import { isFirebaseConfigured } from '@/lib/firebase-config';
 import { lightweightSignup } from '@/lib/lightweight-auth';
 import { PublicNavbar } from '@/components/layout/public-navbar';
 import { LogoIcon } from '@/components/ui/logo';
+import { usePublicWhiteLabel } from '@/components/providers/public-white-label-provider';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -17,8 +18,8 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const { brandName, privacyPolicyUrl, termsOfServiceUrl } = usePublicWhiteLabel();
 
-  // Password validation checks
   const passwordChecks = useMemo(() => ({
     hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
     hasUppercase: /[A-Z]/.test(password),
@@ -66,7 +67,6 @@ export default function SignUpPage() {
     }
   };
 
-  // Checkmark component
   const CheckIcon = ({ checked }: { checked: boolean }) => (
     <span className={checked ? 'text-emerald-500' : 'text-stone-300 dark:text-stone-600'}>
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -84,165 +84,121 @@ export default function SignUpPage() {
   return (
     <>
       <PublicNavbar />
-      <div className="min-h-screen flex flex-col items-center justify-center bg-stone-50 dark:bg-stone-950 px-4 pt-16">
-        <div className="flex flex-col items-center gap-6 flex-grow justify-center w-full max-w-sm">
-          {/* Logo Icon */}
+      <div className="min-h-screen flex flex-col items-center justify-center bg-stone-50 dark:bg-stone-950 px-3 sm:px-4 pt-16">
+        <div className="flex flex-col items-center gap-4 sm:gap-6 flex-grow justify-center w-full max-w-sm">
           <LogoIcon size={48} />
 
-        {/* Form Container */}
-        <div className="flex flex-col w-full isolate">
-          {/* Header Card */}
-          <div className="p-6 flex flex-col gap-6 rounded-2xl border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900 z-10 w-full">
-            <div className="flex flex-col gap-1">
-              <h3 className="text-stone-700 dark:text-stone-200 font-normal text-2xl leading-[120%]">
-                Create account
-              </h3>
-              <p className="text-stone-500 dark:text-stone-400 font-normal text-sm">
-                Already have an account?{' '}
-                <Link
-                  href="/login"
-                  className="font-semibold underline hover:text-indigo-600 dark:hover:text-indigo-400"
-                >
-                  Login.
-                </Link>
-              </p>
+          <div className="flex flex-col w-full isolate">
+            <div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-6 rounded-2xl border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900 z-10 w-full">
+              <div className="flex flex-col gap-1">
+                <h3 className="text-stone-700 dark:text-stone-200 font-normal text-xl sm:text-2xl leading-[120%]">
+                  Create account
+                </h3>
+                <p className="text-stone-500 dark:text-stone-400 font-normal text-xs sm:text-sm">
+                  Already have an account?{' '}
+                  <Link href="/login" className="font-semibold underline hover:text-indigo-600 dark:hover:text-indigo-400">
+                    Login.
+                  </Link>
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* Form Fields Card */}
-          <div className="flex flex-col items-stretch gap-6 pt-12 pb-6 px-6 w-full -mt-6 border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950 rounded-2xl">
-            <form noValidate onSubmit={handleSignUp} className="flex flex-col gap-6">
-              <div className="flex flex-col gap-4">
-                {/* Email Field */}
-                <div className="flex flex-col gap-1 group">
-                  <div className="flex justify-between items-center">
-                    <label
-                      htmlFor="email"
-                      className="text-sm font-medium text-stone-800 dark:text-stone-200"
-                    >
-                      Email
-                      <span className="text-rose-500">&nbsp;*</span>
+            <div className="flex flex-col items-stretch gap-4 sm:gap-6 pt-10 sm:pt-12 pb-4 sm:pb-6 px-4 sm:px-6 w-full -mt-6 border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950 rounded-2xl">
+              <form noValidate onSubmit={handleSignUp} className="flex flex-col gap-4 sm:gap-6">
+                <div className="flex flex-col gap-3 sm:gap-4">
+                  <div className="flex flex-col gap-1 group">
+                    <label htmlFor="email" className="text-xs sm:text-sm font-medium text-stone-800 dark:text-stone-200">
+                      Email<span className="text-rose-500">&nbsp;*</span>
                     </label>
-                  </div>
-                  <div className="relative">
                     <input
                       required
-                      className="w-full p-2 pl-3 outline-none text-sm rounded-lg border max-h-9 transition-all duration-100 border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-200 hover:border-stone-300 dark:hover:border-stone-600 focus:border-stone-400 dark:focus:border-stone-500 focus:ring-2 focus:ring-stone-200 dark:focus:ring-stone-800"
+                      className="w-full p-2 pl-3 outline-none text-sm rounded-lg border h-9 sm:h-10 transition-all duration-100 border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-200 hover:border-stone-300 dark:hover:border-stone-600 focus:border-stone-400 dark:focus:border-stone-500 focus:ring-2 focus:ring-stone-200 dark:focus:ring-stone-800"
                       id="email"
-                      placeholder=""
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={isLoading}
                     />
                   </div>
-                </div>
 
-                {/* Password Field with Requirements */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex flex-col gap-1 group">
-                    <div className="flex justify-between items-center">
-                      <label
-                        htmlFor="password"
-                        className="text-sm font-medium text-stone-800 dark:text-stone-200"
-                      >
-                        Password
-                        <span className="text-rose-500">&nbsp;*</span>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1 group">
+                      <label htmlFor="password" className="text-xs sm:text-sm font-medium text-stone-800 dark:text-stone-200">
+                        Password<span className="text-rose-500">&nbsp;*</span>
                       </label>
-                    </div>
-                    <div className="relative">
-                      <input
-                        required
-                        className="w-full p-2 pl-3 pr-9 outline-none text-sm rounded-lg border max-h-9 transition-all duration-100 border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-200 hover:border-stone-300 dark:hover:border-stone-600 focus:border-stone-400 dark:focus:border-stone-500 focus:ring-2 focus:ring-stone-200 dark:focus:ring-stone-800"
-                        id="password"
-                        placeholder=""
-                        type={showPassword ? 'text' : 'password'}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        disabled={isLoading}
-                      />
-                      <button
-                        type="button"
-                        aria-label="Toggle password visibility"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-0 top-0 p-2 text-stone-500 hover:text-stone-800 dark:hover:text-stone-300 size-9 cursor-pointer"
-                      >
-                        <Icon
-                          icon={showPassword ? 'solar:eye-linear' : 'solar:eye-closed-linear'}
-                          className="w-4 h-4"
+                      <div className="relative">
+                        <input
+                          required
+                          className="w-full p-2 pl-3 pr-9 outline-none text-sm rounded-lg border h-9 sm:h-10 transition-all duration-100 border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-200 hover:border-stone-300 dark:hover:border-stone-600 focus:border-stone-400 dark:focus:border-stone-500 focus:ring-2 focus:ring-stone-200 dark:focus:ring-stone-800"
+                          id="password"
+                          type={showPassword ? 'text' : 'password'}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          disabled={isLoading}
                         />
-                      </button>
+                        <button
+                          type="button"
+                          aria-label="Toggle password visibility"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-0 top-0 p-2 text-stone-500 hover:text-stone-800 dark:hover:text-stone-300 size-9 cursor-pointer"
+                        >
+                          <Icon icon={showPassword ? 'solar:eye-linear' : 'solar:eye-closed-linear'} className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Password Requirements Checklist */}
-                  <div className="flex flex-col gap-1">
-                    <div className="flex justify-between">
-                      <p className="text-stone-500 dark:text-stone-400 font-normal text-xs leading-4">
-                        At least 1 special character
-                      </p>
-                      <CheckIcon checked={passwordChecks.hasSpecialChar} />
-                    </div>
-                    <div className="flex justify-between">
-                      <p className="text-stone-500 dark:text-stone-400 font-normal text-xs leading-4">
-                        At least 1 uppercase letter
-                      </p>
-                      <CheckIcon checked={passwordChecks.hasUppercase} />
-                    </div>
-                    <div className="flex justify-between">
-                      <p className="text-stone-500 dark:text-stone-400 font-normal text-xs leading-4">
-                        At least 1 number
-                      </p>
-                      <CheckIcon checked={passwordChecks.hasNumber} />
-                    </div>
-                    <div className="flex justify-between">
-                      <p className="text-stone-500 dark:text-stone-400 font-normal text-xs leading-4">
-                        Min 8 characters
-                      </p>
-                      <CheckIcon checked={passwordChecks.hasMinLength} />
+                    <div className="flex flex-col gap-0.5 sm:gap-1">
+                      <div className="flex justify-between">
+                        <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] sm:text-xs leading-4">
+                          At least 1 special character
+                        </p>
+                        <CheckIcon checked={passwordChecks.hasSpecialChar} />
+                      </div>
+                      <div className="flex justify-between">
+                        <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] sm:text-xs leading-4">
+                          At least 1 uppercase letter
+                        </p>
+                        <CheckIcon checked={passwordChecks.hasUppercase} />
+                      </div>
+                      <div className="flex justify-between">
+                        <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] sm:text-xs leading-4">
+                          At least 1 number
+                        </p>
+                        <CheckIcon checked={passwordChecks.hasNumber} />
+                      </div>
+                      <div className="flex justify-between">
+                        <p className="text-stone-500 dark:text-stone-400 font-normal text-[10px] sm:text-xs leading-4">
+                          Min 8 characters
+                        </p>
+                        <CheckIcon checked={passwordChecks.hasMinLength} />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Submit Button - Indigo style */}
-              <button
-                type="submit"
-                disabled={isLoading || !isFirebaseConfigured || !isPasswordValid}
-                className="text-center text-sm cursor-pointer box-border flex items-center justify-center font-semibold font-mono uppercase border transition-all ease-in duration-75 whitespace-nowrap select-none disabled:shadow-none disabled:opacity-50 disabled:cursor-not-allowed gap-x-1 active:shadow-none active:scale-95 leading-5 rounded-xl px-4 py-1.5 h-9 text-white bg-indigo-500 border-indigo-600 hover:bg-indigo-600 dark:text-white dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:border-indigo-500"
-              >
-                {isLoading ? (
-                  <>
-                    <Icon icon="solar:refresh-linear" className="w-4 h-4 animate-spin mr-1" />
-                    Creating...
-                  </>
-                ) : (
-                  'Sign up'
-                )}
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  disabled={isLoading || !isFirebaseConfigured || !isPasswordValid}
+                  className="text-center text-sm cursor-pointer box-border flex items-center justify-center font-semibold font-mono uppercase border transition-all ease-in duration-75 whitespace-nowrap select-none disabled:shadow-none disabled:opacity-50 disabled:cursor-not-allowed gap-x-1 active:shadow-none active:scale-95 leading-5 rounded-xl px-4 py-1.5 h-9 sm:h-10 text-white bg-indigo-500 border-indigo-600 hover:bg-indigo-600 dark:text-white dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:border-indigo-500"
+                >
+                  {isLoading ? (
+                    <><Icon icon="solar:refresh-linear" className="w-4 h-4 animate-spin mr-1" />Creating...</>
+                  ) : (
+                    'Sign up'
+                  )}
+                </button>
+              </form>
+            </div>
           </div>
-        </div>
 
-        {/* Terms & Privacy */}
-        <p className="text-stone-500 dark:text-stone-500 font-normal text-xs text-center">
-          By signing up, you agree to OmniFlow{' '}
-          <Link
-            href="/terms"
-            className="underline font-semibold hover:text-indigo-600 dark:hover:text-indigo-400"
-          >
-            Terms
-          </Link>{' '}
-          and{' '}
-          <Link
-            href="/privacy-policy"
-            className="underline font-semibold hover:text-indigo-600 dark:hover:text-indigo-400"
-          >
-            Privacy Policy
-          </Link>
-        </p>
+          <p className="text-stone-500 dark:text-stone-500 font-normal text-[10px] sm:text-xs text-center px-2">
+            By signing up, you agree to {brandName}{' '}
+            <Link href={termsOfServiceUrl || '/terms'} className="underline font-semibold hover:text-indigo-600 dark:hover:text-indigo-400">Terms</Link>{' '}
+            and{' '}
+            <Link href={privacyPolicyUrl || '/privacy-policy'} className="underline font-semibold hover:text-indigo-600 dark:hover:text-indigo-400">Privacy Policy</Link>
+          </p>
+        </div>
       </div>
-    </div>
     </>
   );
 }

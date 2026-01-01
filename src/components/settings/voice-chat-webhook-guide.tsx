@@ -106,7 +106,7 @@ export default function VoiceChatWebhookGuide() {
           <CardTitle>Voice Chat AI Webhook Integration</CardTitle>
         </div>
         <CardDescription>
-          Configure your Voice Chat AI chatbot to automatically capture leads from digital cards into OmniFlow
+          Configure your Voice Chat AI chatbot to automatically capture leads from digital cards into your CRM
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -115,7 +115,7 @@ export default function VoiceChatWebhookGuide() {
           <AlertTitle>How This Works</AlertTitle>
           <AlertDescription>
             When someone chats with your AI voice chatbot on your digital card, their contact information 
-            and conversation are automatically sent to OmniFlow as a new lead. Configure these settings 
+            and conversation are automatically sent to your CRM as a new lead. Configure these settings 
             in your Voice Chat AI dashboard.
           </AlertDescription>
         </Alert>
@@ -221,7 +221,7 @@ export default function VoiceChatWebhookGuide() {
                 <AlertTitle>Important: Digital Card ID</AlertTitle>
                 <AlertDescription>
                   Make sure your Voice Chat AI sends the <code className="font-mono">card_id</code> field 
-                  with your OmniFlow Digital Card ID. This links conversations to the correct business card.
+                  with your Digital Card ID. This links conversations to the correct business card.
                 </AlertDescription>
               </Alert>
             </div>
@@ -269,7 +269,7 @@ export default function VoiceChatWebhookGuide() {
                   <Badge variant="destructive" className="text-xs">Required</Badge>
                   <div>
                     <code className="font-mono">card_id</code>
-                    <p className="text-muted-foreground">Your OmniFlow Digital Card ID</p>
+                    <p className="text-muted-foreground">Your Digital Card ID</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-2 bg-muted rounded">

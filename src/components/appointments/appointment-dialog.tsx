@@ -86,22 +86,22 @@ export function AppointmentDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl p-0 gap-0 overflow-hidden">
+      <DialogContent className="sm:max-w-2xl p-0 gap-0 overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 border-b border-stone-200 dark:border-stone-800">
+        <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 border-b border-stone-200 dark:border-stone-800 flex-shrink-0">
           <DialogHeader className="space-y-1">
-            <DialogTitle className="text-lg font-semibold">
+            <DialogTitle className="text-base sm:text-lg font-semibold pr-8">
               {contact ? `Schedule Appointment with ${contact.name}` : 'Schedule New Appointment'}
             </DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
+            <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
               {contact
                 ? 'Contact details are pre-filled. Set the appointment date, time, and reminders.'
                 : 'Create a new appointment with reminder settings'}
             </DialogDescription>
           </DialogHeader>
         </div>
-        {/* Body */}
-        <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
+        {/* Body - scrollable */}
+        <div className="px-4 sm:px-6 py-4 overflow-y-auto flex-1">
           <AppointmentForm
             defaultContact={contact}
             onSubmit={handleSubmit}

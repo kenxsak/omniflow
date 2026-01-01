@@ -56,83 +56,83 @@ export function PlanFeaturesModal({ plan, allPlans, trigger, className }: PlanFe
           </button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[85vh]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Icon icon="solar:checklist-bold" className="h-5 w-5 text-primary" />
-            {plan.name} Plan - All Features
+      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] sm:max-h-[85vh] p-0 overflow-hidden">
+        <DialogHeader className="p-4 sm:p-6 pb-0 sm:pb-0">
+          <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Icon icon="solar:checklist-bold" className="h-5 w-5 text-primary shrink-0" />
+            <span className="truncate">{plan.name} Plan - All Features</span>
           </DialogTitle>
         </DialogHeader>
         
-        <ScrollArea className="h-[60vh] pr-4">
-          <div className="space-y-6">
+        <ScrollArea className="h-[calc(90vh-80px)] sm:h-[calc(85vh-100px)]">
+          <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 pt-4">
             {/* Plan Limits Section */}
-            <div className="rounded-lg border p-4 bg-muted/30">
-              <h3 className="font-semibold mb-3 flex items-center gap-2">
-                <Icon icon="solar:chart-bold" className="h-4 w-4" />
+            <div className="rounded-xl border border-stone-200 dark:border-stone-800 p-4 bg-stone-50 dark:bg-stone-900/50">
+              <h3 className="font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
+                <Icon icon="solar:chart-bold" className="h-4 w-4 text-indigo-500" />
                 Plan Limits & Quotas
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+              <div className="grid grid-cols-2 gap-3 text-xs sm:text-sm">
                 <div className="flex items-center gap-2">
-                  <Icon icon="solar:users-group-rounded-bold" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:users-group-rounded-bold" className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span><strong>{plan.maxUsers}</strong> {plan.maxUsers === 1 ? 'User' : 'Users'}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Icon icon="solar:cpu-bolt-bold" className="h-4 w-4 text-muted-foreground" />
-                  <span><strong>{plan.aiCreditsPerMonth.toLocaleString()}</strong> AI Credits{plan.priceMonthlyUSD === 0 ? ' (one-time)' : '/mo'}</span>
+                  <Icon icon="solar:cpu-bolt-bold" className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="truncate"><strong>{plan.aiCreditsPerMonth.toLocaleString()}</strong> AI Credits{plan.priceMonthlyUSD === 0 ? '' : '/mo'}</span>
                 </div>
                 {plan.maxImagesPerMonth && (
                   <div className="flex items-center gap-2">
-                    <Icon icon="solar:gallery-bold" className="h-4 w-4 text-muted-foreground" />
+                    <Icon icon="solar:gallery-bold" className="h-4 w-4 text-muted-foreground shrink-0" />
                     <span><strong>{plan.maxImagesPerMonth.toLocaleString()}</strong> Images/mo</span>
                   </div>
                 )}
                 <div className="flex items-center gap-2">
-                  <Icon icon="solar:database-bold" className="h-4 w-4 text-muted-foreground" />
+                  <Icon icon="solar:database-bold" className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span><strong>{plan.maxContacts === null ? 'Unlimited' : plan.maxContacts?.toLocaleString()}</strong> Contacts</span>
                 </div>
                 {plan.maxLandingPages !== undefined && (
                   <div className="flex items-center gap-2">
-                    <Icon icon="solar:window-frame-bold" className="h-4 w-4 text-muted-foreground" />
+                    <Icon icon="solar:window-frame-bold" className="h-4 w-4 text-muted-foreground shrink-0" />
                     <span><strong>{plan.maxLandingPages === null ? 'Unlimited' : plan.maxLandingPages}</strong> Landing Pages</span>
                   </div>
                 )}
                 {plan.maxSavedPosts !== undefined && (
                   <div className="flex items-center gap-2">
-                    <Icon icon="solar:posts-carousel-horizontal-bold" className="h-4 w-4 text-muted-foreground" />
+                    <Icon icon="solar:posts-carousel-horizontal-bold" className="h-4 w-4 text-muted-foreground shrink-0" />
                     <span><strong>{plan.maxSavedPosts === null ? 'Unlimited' : plan.maxSavedPosts}</strong> Saved Posts</span>
                   </div>
                 )}
                 {plan.digitalCardsPerUser !== undefined && (
-                  <div className="flex items-center gap-2">
-                    <Icon icon="solar:card-bold" className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex items-center gap-2 col-span-2 sm:col-span-1">
+                    <Icon icon="solar:card-bold" className="h-4 w-4 text-muted-foreground shrink-0" />
                     <span><strong>{plan.digitalCardsPerUser}</strong> Digital Cards/User</span>
                   </div>
                 )}
               </div>
               
               {/* Special Badges */}
-              <div className="flex flex-wrap gap-2 mt-3">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3">
                 {plan.allowBYOK && (
-                  <Badge variant="default" className="bg-emerald-600">
+                  <Badge variant="default" className="bg-emerald-600 text-[10px] sm:text-xs px-2 py-0.5">
                     <Icon icon="solar:bolt-bold" className="h-3 w-3 mr-1" />
                     BYOK - Unlimited AI
                   </Badge>
                 )}
                 {plan.allowOverage && (
-                  <Badge variant="secondary">
+                  <Badge variant="secondary" className="text-[10px] sm:text-xs px-2 py-0.5">
                     <Icon icon="solar:add-circle-bold" className="h-3 w-3 mr-1" />
-                    Overage Credits Available
+                    Overage Credits
                   </Badge>
                 )}
                 {plan.allowBulkImport && (
-                  <Badge variant="outline">
+                  <Badge variant="outline" className="text-[10px] sm:text-xs px-2 py-0.5">
                     <Icon icon="solar:import-bold" className="h-3 w-3 mr-1" />
                     Bulk Import
                   </Badge>
                 )}
                 {plan.allowBulkExport && (
-                  <Badge variant="outline">
+                  <Badge variant="outline" className="text-[10px] sm:text-xs px-2 py-0.5">
                     <Icon icon="solar:export-bold" className="h-3 w-3 mr-1" />
                     Bulk Export
                   </Badge>
@@ -142,8 +142,8 @@ export function PlanFeaturesModal({ plan, allPlans, trigger, className }: PlanFe
 
             {/* All Features List */}
             <div>
-              <h3 className="font-semibold mb-3 flex items-center gap-2">
-                <Icon icon="solar:list-check-bold" className="h-4 w-4" />
+              <h3 className="font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
+                <Icon icon="solar:list-check-bold" className="h-4 w-4 text-emerald-500" />
                 Included Features ({plan.featureIds.length})
               </h3>
               <div className="grid gap-2">
@@ -152,13 +152,13 @@ export function PlanFeaturesModal({ plan, allPlans, trigger, className }: PlanFe
                   return (
                     <div 
                       key={featureId}
-                      className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                      className="flex items-start gap-2.5 sm:gap-3 p-3 rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950 hover:bg-stone-50 dark:hover:bg-stone-900/50 transition-colors"
                     >
-                      <Icon icon="solar:check-circle-bold" className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
-                      <div>
-                        <p className="font-medium text-sm">{feature.name}</p>
+                      <Icon icon="solar:check-circle-bold" className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-500 shrink-0 mt-0.5" />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-xs sm:text-sm">{feature.name}</p>
                         {feature.description && (
-                          <p className="text-xs text-muted-foreground mt-0.5">{feature.description}</p>
+                          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-2">{feature.description}</p>
                         )}
                       </div>
                     </div>
@@ -170,7 +170,7 @@ export function PlanFeaturesModal({ plan, allPlans, trigger, className }: PlanFe
             {/* Features NOT included */}
             {allUniqueFeatureIds.filter(id => !plan.featureIds.includes(id)).length > 0 && (
               <div>
-                <h3 className="font-semibold mb-3 flex items-center gap-2 text-muted-foreground">
+                <h3 className="font-semibold mb-3 flex items-center gap-2 text-muted-foreground text-sm sm:text-base">
                   <Icon icon="solar:close-circle-bold" className="h-4 w-4" />
                   Not Included (Upgrade to access)
                 </h3>
@@ -184,20 +184,22 @@ export function PlanFeaturesModal({ plan, allPlans, trigger, className }: PlanFe
                       return (
                         <div 
                           key={featureId}
-                          className="flex items-start gap-3 p-3 rounded-lg border border-dashed"
+                          className="flex items-start gap-2.5 sm:gap-3 p-3 rounded-lg border border-dashed border-stone-300 dark:border-stone-700"
                         >
-                          <Icon icon="solar:lock-bold" className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
-                          <div className="flex-1">
-                            <p className="font-medium text-sm">{feature.name}</p>
+                          <Icon icon="solar:lock-bold" className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground shrink-0 mt-0.5" />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="font-medium text-xs sm:text-sm">{feature.name}</p>
+                              {availableIn && (
+                                <Badge variant="outline" className="text-[9px] sm:text-[10px] shrink-0 px-1.5 py-0">
+                                  {availableIn.name}+
+                                </Badge>
+                              )}
+                            </div>
                             {feature.description && (
-                              <p className="text-xs text-muted-foreground mt-0.5">{feature.description}</p>
+                              <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-2">{feature.description}</p>
                             )}
                           </div>
-                          {availableIn && (
-                            <Badge variant="outline" className="text-[10px] shrink-0">
-                              {availableIn.name}+
-                            </Badge>
-                          )}
                         </div>
                       );
                     })}

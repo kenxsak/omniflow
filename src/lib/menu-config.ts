@@ -266,6 +266,17 @@ export const MENU_CONFIG: MenuItem[] = [
     showWhenLocked: true,
     minPlan: 'enterprise',
   },
+
+  // ═══════════════════════════════════════════════════════════════
+  // SECTION: Help Center
+  // ═══════════════════════════════════════════════════════════════
+  {
+    id: 'help-center',
+    href: '/help-center',
+    label: 'Help Center',
+    icon: 'solar:chat-round-dots-linear',
+    tooltip: 'Get help & support',
+  },
 ];
 
 // Super Admin navigation (separate from regular users)

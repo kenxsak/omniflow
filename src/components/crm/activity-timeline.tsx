@@ -147,22 +147,22 @@ export function ActivityTimeline({ contactId, companyId }: ActivityTimelineProps
       </div>
       <div className="p-4 sm:p-5">
         {isAddingNote && (
-          <div className="mb-4 p-3 border border-stone-200 dark:border-stone-700 rounded-lg bg-muted/30">
+          <div className="mb-4 p-3 sm:p-4 border border-stone-200 dark:border-stone-700 rounded-lg bg-muted/30">
             <Textarea
               placeholder="Write a note..."
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
-              className="min-h-[80px] mb-2 bg-white dark:bg-stone-900"
+              className="min-h-[80px] mb-3 bg-white dark:bg-stone-900 text-sm"
             />
-            <div className="flex justify-end gap-2">
-              <Button variant="ghost" size="sm" onClick={() => setIsAddingNote(false)} className="h-7 text-xs">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setIsAddingNote(false)} className="h-9 sm:h-7 text-xs w-full sm:w-auto">
                 Cancel
               </Button>
               <Button 
                 size="sm" 
                 onClick={handleAddNote}
                 disabled={isSaving || !newNote.trim()}
-                className="h-7 text-xs"
+                className="h-9 sm:h-7 text-xs w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600"
               >
                 {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
                 Save Note
@@ -171,7 +171,7 @@ export function ActivityTimeline({ contactId, companyId }: ActivityTimelineProps
           </div>
         )}
 
-        <ScrollArea className="h-[400px] pr-4">
+        <ScrollArea className="h-[350px] sm:h-[400px] pr-2 sm:pr-4">
           {activities.length === 0 ? (
             <div className="text-center py-8">
               <Icon icon="solar:document-text-linear" className="h-10 w-10 mx-auto text-muted-foreground/50 mb-2" />
@@ -185,16 +185,16 @@ export function ActivityTimeline({ contactId, companyId }: ActivityTimelineProps
                 const colorClass = activityColors[activity.type] || activityColors.note;
                 
                 return (
-                  <div key={activity.id} className="flex gap-3">
+                  <div key={activity.id} className="flex gap-2 sm:gap-3">
                     <div className="flex flex-col items-center">
-                      <div className={`p-2 rounded-full ${colorClass}`}>
-                        <Icon icon={iconName} className="h-4 w-4" />
+                      <div className={`p-1.5 sm:p-2 rounded-full ${colorClass}`}>
+                        <Icon icon={iconName} className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       </div>
                       {index < activities.length - 1 && (
                         <div className="w-px h-full bg-stone-200 dark:bg-stone-700 flex-1 my-1" />
                       )}
                     </div>
-                    <div className="flex-1 pb-4">
+                    <div className="flex-1 pb-4 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-foreground">
                           {ACTIVITY_TYPE_LABELS[activity.type]}
@@ -204,9 +204,9 @@ export function ActivityTimeline({ contactId, companyId }: ActivityTimelineProps
                         </span>
                       </div>
                       {activity.subject && (
-                        <p className="font-medium text-sm mb-1">{activity.subject}</p>
+                        <p className="font-medium text-xs sm:text-sm mb-1 truncate">{activity.subject}</p>
                       )}
-                      <p className="text-sm text-muted-foreground line-clamp-3">
+                      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 sm:line-clamp-3">
                         {activity.content}
                       </p>
                       <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">

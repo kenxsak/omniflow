@@ -23,11 +23,24 @@ export interface FeatureState {
 
 /**
  * Map plan IDs to plan tiers
+ * Handles various plan ID formats: plan_enterprise, Enterprise, enterprise, etc.
  */
 function getPlanTier(planId: string): PlanTier {
-    if (planId.includes('enterprise')) return 'enterprise';
-    if (planId.includes('pro')) return 'pro';
-    if (planId.includes('starter')) return 'starter';
+    const normalizedId = planId.toLowerCase();
+    
+    // Check for enterprise first (highest tier)
+    if (normalizedId.includes('enterprise') || normalizedId.includes('business')) {
+        return 'enterprise';
+    }
+    // Check for pro/professional
+    if (normalizedId.includes('pro') || normalizedId.includes('professional') || normalizedId.includes('growth')) {
+        return 'pro';
+    }
+    // Check for starter/basic
+    if (normalizedId.includes('starter') || normalizedId.includes('basic')) {
+        return 'starter';
+    }
+    // Default to free
     return 'free';
 }
 

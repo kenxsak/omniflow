@@ -27,11 +27,16 @@ export interface AppUser {
     email: string;
     role: Role;
     type: UserType; // Type of user (office/field)
-    companyId: string; // ID of the company the user belongs to
+    companyId: string; // ID of the company the user belongs to (primary/home company)
     name?: string; // Optional display name
     phone?: string;
     createdAt: any; // Firestore Timestamp
     idToken?: string; // Firebase ID token for authentication (auto-refreshed every 30 minutes)
+    
+    // Agency Mode - allows managing multiple client companies
+    isAgencyUser?: boolean; // If true, user can access multiple companies
+    agencyCompanyIds?: string[]; // List of client company IDs this user can manage
+    activeCompanyId?: string; // Currently selected company (defaults to companyId if not set)
 }
 
 
@@ -131,6 +136,35 @@ export interface Company {
     
     // White-Label Branding Settings (Enterprise feature)
     whiteLabelSettings?: WhiteLabelSettings;
+    
+    // Agency Mode Settings
+    isAgency?: boolean; // If true, this company is a digital agency
+    agencySettings?: AgencySettings;
+    parentAgencyId?: string; // If this is a client company, reference to the agency that manages it
+    managedByAgency?: boolean; // If true, this company is managed by an agency
+}
+
+/**
+ * Agency settings for digital marketing agencies managing multiple clients
+ * Enables multi-client management from a single dashboard
+ */
+export interface AgencySettings {
+    enabled: boolean;                        // Master toggle for agency mode
+    maxClients: number;                      // Maximum number of client companies allowed
+    clientCompanyIds: string[];              // List of client company IDs managed by this agency
+    
+    // Permissions
+    canCreateClients: boolean;               // Can create new client companies
+    canDeleteClients: boolean;               // Can delete client companies
+    canAccessClientBilling: boolean;         // Can view/manage client billing
+    canAccessClientApiKeys: boolean;         // Can view/manage client API keys
+    
+    // Branding for client accounts
+    applyWhiteLabelToClients: boolean;       // Apply agency's white-label to all clients
+    
+    // Metadata
+    createdAt?: string;                      // When agency mode was enabled
+    updatedAt?: string;                      // Last update timestamp
 }
 
 /**
@@ -257,6 +291,13 @@ export interface Plan {
     // Landing Pages & Social Media Limits (Free plan restrictions)
     maxLandingPages?: number | null;   // Maximum landing pages (null = unlimited, 1 for Free)
     maxSavedPosts?: number | null;     // Maximum saved social media posts (null = unlimited, 5 for Free)
+    
+    // Agency Mode (Multi-Client Management)
+    allowAgencyMode?: boolean;         // If true, plan allows agency mode (managing multiple clients)
+    maxAgencyClients?: number | null;  // Maximum client companies (null = unlimited, 0 = not allowed)
+    
+    // White-Label Branding
+    allowWhiteLabel?: boolean;         // If true, plan allows white-label branding customization
     
     // Visibility Control (Super Admin)
     isHidden?: boolean;                // If true, plan is hidden from regular users (only Super Admin can see)

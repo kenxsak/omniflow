@@ -132,7 +132,7 @@ function generateLeadNotificationEmail(
               </table>
               
               <p style="margin: 24px 0 0; color: #6b7280; font-size: 13px; text-align: center;">
-                This lead has been automatically saved to your CRM in OmniFlow.
+                This lead has been automatically saved to your CRM.
               </p>
             </td>
           </tr>
@@ -141,7 +141,7 @@ function generateLeadNotificationEmail(
           <tr>
             <td style="background-color: #f9fafb; padding: 24px 40px; text-align: center; border-top: 1px solid #e5e7eb;">
               <p style="margin: 0; color: #9ca3af; font-size: 12px;">
-                Powered by <strong>OmniFlow</strong> • Lead Capture for ${companyName}
+                Powered by <strong>${companyName}</strong> • Lead Capture
               </p>
             </td>
           </tr>
@@ -225,7 +225,7 @@ async function sendLeadNotificationEmail(
         username: process.env.SMTP_USER,
         password: process.env.SMTP_PASSWORD,
         fromEmail: process.env.SMTP_USER,
-        fromName: 'OmniFlow Notifications',
+        fromName: 'System Notifications',
       };
       
       const htmlContent = generateLeadNotificationEmail(

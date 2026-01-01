@@ -115,29 +115,71 @@ export function PricingTable() {
           {plans.map((plan) => {
             const isCurrentPlan = plan.id === currentPlan;
             const price = plan.priceMonthlyUSD === 0 ? 0 : getFixedPrice(plan.id, currency);
+            const isEnterprise = plan.id === 'plan_enterprise' || plan.name.toLowerCase().includes('enterprise');
+            
+            // Determine card styling based on state
+            const getCardStyles = () => {
+              if (isCurrentPlan) {
+                // Current plan - Green theme
+                return 'border-2 border-emerald-500 dark:border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-lg shadow-emerald-500/10';
+              }
+              if (plan.isFeatured && !isEnterprise) {
+                // Most Popular (Pro) - Indigo theme
+                return 'border-2 border-indigo-500 dark:border-indigo-500 bg-white dark:bg-stone-950 shadow-lg shadow-indigo-500/10';
+              }
+              if (isEnterprise) {
+                // Enterprise - Gold/Amber theme
+                return 'border border-amber-300 dark:border-amber-700 bg-gradient-to-b from-amber-50/50 to-white dark:from-amber-950/20 dark:to-stone-950';
+              }
+              // Default
+              return 'border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950';
+            };
             
             return (
               <div
                 key={plan.id}
                 className={cn(
-                  'relative rounded-xl border p-5 transition-all',
-                  plan.isFeatured
-                    ? 'border-indigo-500 dark:border-indigo-500 bg-white dark:bg-stone-950 shadow-lg'
-                    : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950',
-                  isCurrentPlan && 'ring-2 ring-indigo-500'
+                  'relative rounded-xl p-5 transition-all',
+                  getCardStyles()
                 )}
               >
-                {plan.isFeatured && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide rounded-full bg-indigo-600 text-white">
+                {/* Current Plan Badge - Green */}
+                {isCurrentPlan && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                    <span className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide rounded-full bg-emerald-600 text-white flex items-center gap-1 shadow-lg">
+                      <Icon icon="solar:check-circle-bold" className="h-3 w-3" />
+                      Your Plan
+                    </span>
+                  </div>
+                )}
+                
+                {/* Most Popular Badge - Indigo (only if not current plan) */}
+                {plan.isFeatured && !isCurrentPlan && !isEnterprise && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                    <span className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide rounded-full bg-indigo-600 text-white flex items-center gap-1 shadow-lg">
+                      <Icon icon="solar:star-bold" className="h-3 w-3" />
                       Most Popular
                     </span>
                   </div>
                 )}
+                
+                {/* Enterprise Badge - Gold */}
+                {isEnterprise && !isCurrentPlan && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                    <span className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center gap-1 shadow-lg">
+                      <Icon icon="solar:crown-bold" className="h-3 w-3" />
+                      Premium
+                    </span>
+                  </div>
+                )}
 
-                <div className="space-y-4">
+                <div className="space-y-4 pt-1">
                   <div>
-                    <h3 className="text-lg font-semibold">{plan.name}</h3>
+                    <h3 className={cn(
+                      "text-lg font-semibold",
+                      isCurrentPlan && "text-emerald-700 dark:text-emerald-400",
+                      isEnterprise && !isCurrentPlan && "text-amber-700 dark:text-amber-400"
+                    )}>{plan.name}</h3>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{plan.description}</p>
                   </div>
 
@@ -146,15 +188,26 @@ export function PricingTable() {
                       <span className="text-3xl font-bold">Free</span>
                     ) : (
                       <>
-                        <span className="text-xl font-bold text-muted-foreground">{getCurrencySymbol(currency)}</span>
-                        <span className="text-3xl font-bold">{price.toLocaleString()}</span>
+                        <span className={cn(
+                          "text-xl font-bold",
+                          isCurrentPlan ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"
+                        )}>{getCurrencySymbol(currency)}</span>
+                        <span className={cn(
+                          "text-3xl font-bold",
+                          isCurrentPlan && "text-emerald-700 dark:text-emerald-300",
+                          isEnterprise && !isCurrentPlan && "text-amber-700 dark:text-amber-300"
+                        )}>{price.toLocaleString()}</span>
                         <span className="text-sm text-muted-foreground">/month</span>
                       </>
                     )}
                   </div>
 
                   {plan.yearlyDiscountPercentage && plan.yearlyDiscountPercentage > 0 && (
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge variant="secondary" className={cn(
+                      "text-xs",
+                      isCurrentPlan && "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300",
+                      isEnterprise && !isCurrentPlan && "bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300"
+                    )}>
                       Save {plan.yearlyDiscountPercentage}% yearly
                     </Badge>
                   )}
@@ -185,7 +238,10 @@ export function PricingTable() {
                     </li>
                     {plan.featureIds.slice(0, 3).map((featureId, i) => (
                       <li key={i} className="flex items-center gap-2 text-sm">
-                        <Icon icon="solar:check-circle-bold" className="h-4 w-4 text-emerald-500 shrink-0" />
+                        <Icon icon="solar:check-circle-bold" className={cn(
+                          "h-4 w-4 shrink-0",
+                          isCurrentPlan ? "text-emerald-500" : "text-emerald-500"
+                        )} />
                         <span className="text-muted-foreground">{getFeatureName(featureId)}</span>
                       </li>
                     ))}
@@ -206,7 +262,8 @@ export function PricingTable() {
                   </ul>
 
                   {isCurrentPlan ? (
-                    <Button className="w-full" variant="outline" disabled>
+                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" disabled>
+                      <Icon icon="solar:check-circle-bold" className="h-4 w-4 mr-1.5" />
                       Current Plan
                     </Button>
                   ) : plan.priceMonthlyUSD === 0 ? (
@@ -221,7 +278,10 @@ export function PricingTable() {
                       currency={currency}
                       variant={plan.isFeatured ? 'default' : 'outline'}
                       size="default"
-                      className="w-full"
+                      className={cn(
+                        "w-full",
+                        isEnterprise && "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0"
+                      )}
                     />
                   )}
                 </div>

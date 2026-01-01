@@ -72,7 +72,7 @@ export async function submitPublicLeadAction(
       email,
       phone: phone || undefined,
       status: 'New',
-      source: formData.source || 'OmniFlow Public Form',
+      source: formData.source || 'Public Form',
       assignedTo: assignedTo, 
       attributes: {
         ROLE: message ? `Inquiry: ${message.substring(0, 100)}${message.length > 100 ? '...' : ''}` : undefined,

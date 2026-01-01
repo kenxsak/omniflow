@@ -179,217 +179,289 @@ export default function AdminManager() {
   };
 
 
+  // Render action menu for a company (reusable for both mobile and desktop)
+  const renderActionMenu = (admin: AppUser, company: Company) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>Manage Account</DropdownMenuLabel>
+        <DropdownMenuItem onSelect={() => handleImpersonate(admin)}>
+          <LogIn className="mr-2 h-4 w-4" /> Login as Admin
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel>Account Control</DropdownMenuLabel>
+        <DropdownMenuItem onSelect={() => handleStatusToggle(company.id, company.name, company.status)}>
+          {company.status === 'active' ? <PauseCircle className="mr-2 h-4 w-4" /> : <PlayCircle className="mr-2 h-4 w-4" />}
+          {company.status === 'active' ? 'Pause Account' : 'Activate Account'}
+        </DropdownMenuItem>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            <span>Extend Subscription</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem onSelect={() => handleExtend(company.id, { months: 1 })}>Extend 1 Month</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleExtend(company.id, { months: 3 })}>Extend 3 Months</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleExtend(company.id, { years: 1 })}>Extend 1 Year</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => handleOpenCustomDateDialog(company.id, company.name, company.planExpiresAt)}>
+              <CalendarClock className="mr-2 h-4 w-4" />
+              Set Custom Date
+            </DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Award className="mr-2 h-4 w-4" />
+            <span>Change Plan</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            {plans.map(plan => (
+              <DropdownMenuItem
+                key={plan.id}
+                disabled={company.planId === plan.id}
+                onSelect={() => handleChangePlan(company.id, company.name, plan.id, plan.name)}
+              >
+                {plan.name}
+                {company.planId === plan.id && <Check className="ml-auto h-4 w-4" />}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            <span>Billing Cycle</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem
+              disabled={company.billingCycle === 'monthly'}
+              onSelect={() => handleChangeBillingCycle(company.id, company.name, 'monthly', company.planId)}
+            >
+              Monthly
+              {company.billingCycle === 'monthly' && <Check className="ml-auto h-4 w-4" />}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={company.billingCycle === 'yearly'}
+              onSelect={() => handleChangeBillingCycle(company.id, company.name, 'yearly', company.planId)}
+            >
+              Yearly
+              {(() => {
+                const plan = plans.find(p => p.id === company.planId);
+                const discount = plan?.yearlyDiscountPercentage;
+                return discount ? (
+                  <span className="ml-1 text-xs text-success">({discount}% off)</span>
+                ) : null;
+              })()}
+              {company.billingCycle === 'yearly' && <Check className="ml-auto h-4 w-4" />}
+            </DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive">
+              <Trash2 className="mr-2 h-4 w-4" /> Delete Company
+            </DropdownMenuItem>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="w-[calc(100%-2rem)] max-w-[420px] rounded-xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-base sm:text-lg">Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription className="text-xs sm:text-sm">This will permanently delete the company "{company.name}" and all its users. This action cannot be undone.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2">
+              <AlertDialogCancel className="w-full sm:w-auto h-9 sm:h-10">Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => handleDeleteCompany(company.id, company.name)} className={cn(buttonVariants({ variant: "destructive" }), "w-full sm:w-auto h-9 sm:h-10")}>Delete Company</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel>Contact Admin</DropdownMenuLabel>
+        <DropdownMenuItem asChild>
+          <a href={`mailto:${admin.email}`}><Mail className="mr-2 h-4 w-4" /> Email Admin</a>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild disabled={!admin.phone}>
+          <a href={`tel:${admin.phone}`}><Phone className="mr-2 h-4 w-4" /> Call Admin</a>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild disabled={!admin.phone}>
+          <a href={`https://wa.me/${admin.phone?.replace(/\\D/g, '')}`} target="_blank" rel="noopener noreferrer">
+            <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp Admin
+          </a>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Admin & Company Management</CardTitle>
-        <CardDescription>View, filter, and manage all admin users and their company details across the platform.</CardDescription>
+      <CardHeader className="p-3 sm:p-4 lg:p-6">
+        <CardTitle className="text-sm sm:text-base">Admin & Company Management</CardTitle>
+        <CardDescription className="text-[10px] sm:text-xs">Manage all admin users and their company details.</CardDescription>
       </CardHeader>
-      <CardContent>
-         <div className="flex flex-col sm:flex-row gap-2 mb-4">
-            <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                    placeholder="Search Admin or Company..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-8 sm:w-64"
-                />
-            </div>
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="paused">Paused</SelectItem>
-                    <SelectItem value="expiring">Expiring Soon</SelectItem>
-                </SelectContent>
-            </Select>
+      <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
+        {/* Filters - Mobile First */}
+        <div className="flex flex-col gap-2 mb-3 sm:mb-4">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search Admin or Company..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8 h-9 sm:h-10 text-xs sm:text-sm"
+            />
+          </div>
+          <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <SelectTrigger className="w-full sm:w-[180px] h-9 sm:h-10 text-xs sm:text-sm">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="paused">Paused</SelectItem>
+              <SelectItem value="expiring">Expiring Soon</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <div className="overflow-x-auto">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                    <TableHead>Admin Email</TableHead>
-                    <TableHead>Company</TableHead>
-                    <TableHead>Plan</TableHead>
-                    <TableHead>Billing Cycle</TableHead>
-                    <TableHead>Account Status</TableHead>
-                    <TableHead>Plan Expires On</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+
+        {/* Mobile Card View */}
+        <div className="block lg:hidden space-y-2">
+          {filteredData.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="text-xs">No companies found</p>
+            </div>
+          ) : (
+            filteredData.map(({ admin, company }) => {
+              const expiryDate = company.planExpiresAt ? new Date(company.planExpiresAt) : null;
+              let expiryClass = "text-muted-foreground";
+              if (expiryDate) {
+                if (isBefore(expiryDate, new Date())) {
+                  expiryClass = "text-destructive font-semibold";
+                } else if (differenceInDays(expiryDate, new Date()) <= 30) {
+                  expiryClass = "text-orange-500 font-semibold";
+                }
+              }
+              return (
+                <div key={admin.uid} className="p-3 rounded-lg border border-stone-200 dark:border-stone-800">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-xs sm:text-sm truncate">{company.name}</p>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{admin.email}</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Badge variant={company.status === 'active' ? 'success' : 'warning'} className="text-[9px] px-1.5 py-0">
+                        {company.status}
+                      </Badge>
+                      {renderActionMenu(admin, company)}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <p className="text-[9px] text-muted-foreground">Plan</p>
+                      <p className="text-[10px] font-medium truncate">{getPlanName(company.planId)}</p>
+                    </div>
+                    <div>
+                      <p className="text-[9px] text-muted-foreground">Billing</p>
+                      <p className="text-[10px] font-medium capitalize">
+                        {company.billingCycle}
+                        {company.billingCycle === 'yearly' && (() => {
+                          const plan = plans.find(p => p.id === company.planId);
+                          const discount = plan?.yearlyDiscountPercentage;
+                          return discount ? <span className="text-success ml-0.5">-{discount}%</span> : null;
+                        })()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[9px] text-muted-foreground">Expires</p>
+                      <p className={cn("text-[10px] font-medium", expiryClass)}>
+                        {company.planExpiresAt ? format(new Date(company.planExpiresAt), 'MMM d') : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden lg:block overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-xs">Admin Email</TableHead>
+                <TableHead className="text-xs">Company</TableHead>
+                <TableHead className="text-xs">Plan</TableHead>
+                <TableHead className="text-xs">Billing Cycle</TableHead>
+                <TableHead className="text-xs">Status</TableHead>
+                <TableHead className="text-xs">Expires On</TableHead>
+                <TableHead className="text-right text-xs">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center text-sm text-muted-foreground">
+                    No companies found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredData.map(({ admin, company }) => {
+                  const expiryDate = company.planExpiresAt ? new Date(company.planExpiresAt) : null;
+                  let expiryClass = "";
+                  if (expiryDate) {
+                    if (isBefore(expiryDate, new Date())) {
+                      expiryClass = "text-destructive font-semibold";
+                    } else if (differenceInDays(expiryDate, new Date()) <= 30) {
+                      expiryClass = "text-orange-500 font-semibold";
+                    }
+                  }
+                  return (
+                    <TableRow key={admin.uid}>
+                      <TableCell className="font-medium text-sm">{admin.email}</TableCell>
+                      <TableCell className="text-sm">{company.name}</TableCell>
+                      <TableCell className="text-sm">{getPlanName(company.planId)}</TableCell>
+                      <TableCell className="capitalize text-sm">
+                        {company.billingCycle}
+                        {company.billingCycle === 'yearly' && (() => {
+                          const plan = plans.find(p => p.id === company.planId);
+                          const discount = plan?.yearlyDiscountPercentage;
+                          return discount ? (
+                            <span className="ml-1 text-xs text-success font-semibold">({discount}% off)</span>
+                          ) : null;
+                        })()}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={company.status === 'active' ? 'success' : 'warning'}>
+                          {company.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className={cn(expiryClass, "text-sm")}>
+                        {company.planExpiresAt ? format(new Date(company.planExpiresAt), 'PP') : 'N/A'}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {renderActionMenu(admin, company)}
+                      </TableCell>
                     </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {filteredData.map(({ admin, company }) => {
-                        const expiryDate = company.planExpiresAt ? new Date(company.planExpiresAt) : null;
-                       let expiryClass = "";
-                       if (expiryDate) {
-                           if (isBefore(expiryDate, new Date())) {
-                               expiryClass = "text-destructive font-semibold";
-                           } else if (differenceInDays(expiryDate, new Date()) <= 30) {
-                               expiryClass = "text-orange-500 font-semibold";
-                           }
-                       }
-                      return (
-                        <TableRow key={admin.uid}>
-                            <TableCell className="font-medium">{admin.email}</TableCell>
-                            <TableCell>{company.name}</TableCell>
-                            <TableCell>{getPlanName(company.planId)}</TableCell>
-                            <TableCell className="capitalize">
-                              {company.billingCycle}
-                              {company.billingCycle === 'yearly' && (() => {
-                                const plan = plans.find(p => p.id === company.planId);
-                                const discount = plan?.yearlyDiscountPercentage;
-                                return discount ? (
-                                  <span className="ml-1 text-xs text-success font-semibold">
-                                    ({discount}% off)
-                                  </span>
-                                ) : null;
-                              })()}
-                            </TableCell>
-                            <TableCell>
-                                <Badge variant={company.status === 'active' ? 'success' : 'warning'}>
-                                    {company.status}
-                                </Badge>
-                            </TableCell>
-                             <TableCell className={cn(expiryClass)}>
-                                {company.planExpiresAt ? format(new Date(company.planExpiresAt), 'PP') : 'N/A'}
-                            </TableCell>
-                            <TableCell className="text-right">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>Manage Account</DropdownMenuLabel>
-                                        <DropdownMenuItem onSelect={() => handleImpersonate(admin)}>
-                                            <LogIn className="mr-2 h-4 w-4" /> Login as Admin
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuLabel>Account Control</DropdownMenuLabel>
-                                        <DropdownMenuItem onSelect={() => handleStatusToggle(company.id, company.name, company.status)}>
-                                            {company.status === 'active' ? <PauseCircle className="mr-2 h-4 w-4" /> : <PlayCircle className="mr-2 h-4 w-4" />}
-                                            {company.status === 'active' ? 'Pause Account' : 'Activate Account'}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSub>
-                                            <DropdownMenuSubTrigger>
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                <span>Extend Subscription</span>
-                                            </DropdownMenuSubTrigger>
-                                            <DropdownMenuSubContent>
-                                                <DropdownMenuItem onSelect={() => handleExtend(company.id, { months: 1 })}>Extend 1 Month</DropdownMenuItem>
-                                                <DropdownMenuItem onSelect={() => handleExtend(company.id, { months: 3 })}>Extend 3 Months</DropdownMenuItem>
-                                                <DropdownMenuItem onSelect={() => handleExtend(company.id, { years: 1 })}>Extend 1 Year</DropdownMenuItem>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem onSelect={() => handleOpenCustomDateDialog(company.id, company.name, company.planExpiresAt)}>
-                                                    <CalendarClock className="mr-2 h-4 w-4" />
-                                                    Set Custom Date
-                                                </DropdownMenuItem>
-                                            </DropdownMenuSubContent>
-                                        </DropdownMenuSub>
-                                        <DropdownMenuSub>
-                                            <DropdownMenuSubTrigger>
-                                                <Award className="mr-2 h-4 w-4" />
-                                                <span>Change Plan</span>
-                                            </DropdownMenuSubTrigger>
-                                            <DropdownMenuSubContent>
-                                                {plans.map(plan => (
-                                                    <DropdownMenuItem
-                                                        key={plan.id}
-                                                        disabled={company.planId === plan.id}
-                                                        onSelect={() => handleChangePlan(company.id, company.name, plan.id, plan.name)}
-                                                    >
-                                                        {plan.name}
-                                                        {company.planId === plan.id && <Check className="ml-auto h-4 w-4" />}
-                                                    </DropdownMenuItem>
-                                                ))}
-                                            </DropdownMenuSubContent>
-                                        </DropdownMenuSub>
-                                        <DropdownMenuSub>
-                                            <DropdownMenuSubTrigger>
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                <span>Billing Cycle</span>
-                                            </DropdownMenuSubTrigger>
-                                            <DropdownMenuSubContent>
-                                                <DropdownMenuItem
-                                                    disabled={company.billingCycle === 'monthly'}
-                                                    onSelect={() => handleChangeBillingCycle(company.id, company.name, 'monthly', company.planId)}
-                                                >
-                                                    Monthly
-                                                    {company.billingCycle === 'monthly' && <Check className="ml-auto h-4 w-4" />}
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    disabled={company.billingCycle === 'yearly'}
-                                                    onSelect={() => handleChangeBillingCycle(company.id, company.name, 'yearly', company.planId)}
-                                                >
-                                                    Yearly
-                                                    {(() => {
-                                                        const plan = plans.find(p => p.id === company.planId);
-                                                        const discount = plan?.yearlyDiscountPercentage;
-                                                        return discount ? (
-                                                            <span className="ml-1 text-xs text-success">
-                                                                ({discount}% off)
-                                                            </span>
-                                                        ) : null;
-                                                    })()}
-                                                    {company.billingCycle === 'yearly' && <Check className="ml-auto h-4 w-4" />}
-                                                </DropdownMenuItem>
-                                            </DropdownMenuSubContent>
-                                        </DropdownMenuSub>
-                                        <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive">
-                                                    <Trash2 className="mr-2 h-4 w-4" /> Delete Company
-                                                </DropdownMenuItem>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                                    <AlertDialogDescription>This will permanently delete the company "{company.name}" and all its users. This action cannot be undone.</AlertDialogDescription>
-                                                </AlertDialogHeader>
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDeleteCompany(company.id, company.name)} className={buttonVariants({ variant: "destructive" })}>Delete Company</AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuLabel>Contact Admin</DropdownMenuLabel>
-                                        <DropdownMenuItem asChild>
-                                            <a href={`mailto:${admin.email}`}><Mail className="mr-2 h-4 w-4" /> Email Admin</a>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem asChild disabled={!admin.phone}>
-                                            <a href={`tel:${admin.phone}`}><Phone className="mr-2 h-4 w-4" /> Call Admin</a>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem asChild disabled={!admin.phone}>
-                                            <a href={`https://wa.me/${admin.phone?.replace(/\\D/g, '')}`} target="_blank" rel="noopener noreferrer">
-                                                <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp Admin
-                                            </a>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </TableCell>
-                        </TableRow>
-                        )
-                    })}
-                </TableBody>
-            </Table>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
         </div>
       </CardContent>
 
-      {/* Custom Date Picker Dialog */}
+      {/* Custom Date Picker Dialog - Mobile First */}
       <Dialog open={customDateDialogOpen} onOpenChange={setCustomDateDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Set Custom Expiry Date</DialogTitle>
-            <DialogDescription>
-              Select any date to set as the plan expiration for {selectedCompanyForDate?.name}. 
-              You can select past dates for testing or future dates for extending plans.
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[380px] sm:max-w-[420px] p-4 sm:p-6 rounded-xl">
+          <DialogHeader className="space-y-1 pb-2">
+            <DialogTitle className="text-base sm:text-lg">Set Custom Expiry Date</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
+              Select expiry date for {selectedCompanyForDate?.name}.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex justify-center py-4">
+          <div className="flex justify-center py-2 sm:py-4">
             <Calendar
               mode="single"
               selected={customDate}
@@ -398,18 +470,18 @@ export default function AdminManager() {
             />
           </div>
           {customDate && (
-            <div className="text-sm text-center text-muted-foreground">
-              Selected date: <span className="font-semibold">{format(customDate, 'PPP')}</span>
+            <div className="text-xs sm:text-sm text-center text-muted-foreground">
+              Selected: <span className="font-semibold">{format(customDate, 'PPP')}</span>
             </div>
           )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setCustomDateDialogOpen(false)}>
+          <div className="flex flex-col-reverse sm:flex-row gap-2 pt-3 sm:pt-4">
+            <Button variant="outline" onClick={() => setCustomDateDialogOpen(false)} className="w-full sm:w-auto h-9 sm:h-10 text-sm">
               Cancel
             </Button>
-            <Button onClick={handleSaveCustomDate} disabled={!customDate}>
+            <Button onClick={handleSaveCustomDate} disabled={!customDate} className="w-full sm:w-auto h-9 sm:h-10 text-sm">
               Save Date
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </Card>

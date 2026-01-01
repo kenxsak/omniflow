@@ -43,7 +43,7 @@ export function OnboardingCompletionBanner({ completedSteps, onDismiss }: Onboar
             Complete Your Setup ({completedCount}/{totalSteps} steps done)
           </AlertTitle>
           <AlertDescription>
-            You've made great progress! Complete the remaining setup steps to unlock the full power of OmniFlow.
+            You've made great progress! Complete the remaining setup steps to unlock the full power of your platform.
             <div className="mt-3 flex flex-wrap gap-2">
               {!completedSteps.leadsAdded && (
                 <span className="text-xs bg-info-muted/50 px-2 py-1 rounded">

@@ -362,21 +362,21 @@ export default function CompanySettingsPage() {
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <p className="text-xs text-muted-foreground mb-1">Organization ID</p>
-                <p className="text-xs font-mono bg-stone-50 dark:bg-stone-900 px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-800 break-all">
+                <p className="text-[10px] sm:text-xs font-mono bg-stone-50 dark:bg-stone-900 px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-800 break-all overflow-hidden">
                   {company.id}
                 </p>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-1.5">
                   <p className="text-xs text-muted-foreground mb-1">Status</p>
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
-                    <div className={cn('h-2 w-2 rounded-full', company.status === 'active' ? 'bg-emerald-500' : 'bg-stone-400')} />
-                    <p className="text-sm font-medium capitalize">{company.status}</p>
+                  <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+                    <div className={cn('h-2 w-2 rounded-full shrink-0', company.status === 'active' ? 'bg-emerald-500' : 'bg-stone-400')} />
+                    <p className="text-xs sm:text-sm font-medium capitalize truncate">{company.status}</p>
                   </div>
                 </div>
                 <div className="space-y-1.5">
                   <p className="text-xs text-muted-foreground mb-1">Current Plan</p>
-                  <p className="text-sm font-medium bg-stone-50 dark:bg-stone-900 px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-800 capitalize">
+                  <p className="text-xs sm:text-sm font-medium bg-stone-50 dark:bg-stone-900 px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-800 capitalize truncate">
                     {company.planId?.replace('plan_', '')}
                   </p>
                 </div>

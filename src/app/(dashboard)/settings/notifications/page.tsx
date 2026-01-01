@@ -7,6 +7,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { SettingsCard } from '@/components/settings/settings-ui';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import Link from 'next/link';
 
 interface NotificationSetting {
   id: string;
@@ -214,6 +216,21 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Email Provider Notice */}
+      <Alert className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30">
+        <Icon icon="solar:letter-linear" className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+        <AlertDescription className="text-sm">
+          <span className="font-medium text-blue-900 dark:text-blue-100">Email notifications require an email provider.</span>{' '}
+          <span className="text-blue-700 dark:text-blue-300">
+            Configure Brevo or SMTP in{' '}
+            <Link href="/settings/integrations" className="font-medium underline underline-offset-2 hover:text-blue-900 dark:hover:text-blue-100">
+              Settings → Integrations
+            </Link>{' '}
+            to receive task reminders and appointment notifications.
+          </span>
+        </AlertDescription>
+      </Alert>
+
       {/* Page Actions */}
       <div className="flex items-center justify-end">
         {hasChanges && (

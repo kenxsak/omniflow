@@ -262,7 +262,7 @@ export default function OnboardingChecklist() {
                 </span>
               </div>
               <p className="text-muted-foreground text-xs mt-0.5">
-                {nextStep ? `Next: ${nextStep.label}` : 'Complete setup to unlock OmniFlow'}
+                {nextStep ? `Next: ${nextStep.label}` : 'Complete setup to unlock all features'}
               </p>
               <div className="mt-2 h-1 w-full bg-stone-200 dark:bg-stone-800 rounded-full overflow-hidden">
                 <div 

@@ -32,7 +32,7 @@ const PausedAccountScreen = () => {
                     <CardDescription>
                         {impersonatingUser 
                             ? "This account is currently paused. You are viewing this as a superadmin."
-                            : "Your access to the OmniFlow dashboard is currently suspended."
+                            : "Your access to the dashboard is currently suspended."
                         }
                     </CardDescription>
                 </CardHeader>
@@ -49,7 +49,7 @@ const PausedAccountScreen = () => {
                         {impersonatingUser ? "Return to Superadmin" : "Logout"}
                     </Button>
                     {!impersonatingUser && (
-                        <Button asChild variant="secondary"><a href="mailto:support@omniflow.example.com">Contact Support</a></Button>
+                        <Button asChild variant="secondary"><a href="/help-center">Contact Support</a></Button>
                     )}
                 </CardFooter>
             </Card>
@@ -118,16 +118,16 @@ export default function DashboardGate({ children }: { children: React.ReactNode 
             {/* Light theme logo */}
             <img
               src="/favicon-light/android-chrome-192x192.png"
-              alt="OmniFlow"
+              alt="Loading"
               className="h-10 w-10 object-contain dark:hidden"
             />
             {/* Dark theme logo */}
             <img
               src="/favicon-dark/android-chrome-192x192.png"
-              alt="OmniFlow"
+              alt="Loading"
               className="h-10 w-10 object-contain hidden dark:block"
             />
-            <span className="text-xl font-semibold text-stone-900 dark:text-stone-100">OmniFlow</span>
+            <span className="text-xl font-semibold text-stone-900 dark:text-stone-100">Loading...</span>
           </div>
           <div className="flex items-center gap-2">
             <Loader2 className="h-5 w-5 animate-spin text-stone-500" />

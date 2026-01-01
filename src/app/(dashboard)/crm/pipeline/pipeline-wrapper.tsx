@@ -97,41 +97,42 @@ export function PipelineWrapper() {
     );
   }
 
-  // Lead card component - Clerk style
+  // Lead card component - Clerk style with improved mobile buttons
   const LeadCard = ({ lead }: { lead: Lead }) => (
     <div 
-      className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3 cursor-pointer transition-all hover:bg-stone-50 dark:hover:bg-stone-900/50"
+      className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 p-3 sm:p-4 cursor-pointer transition-all hover:bg-stone-50 dark:hover:bg-stone-900/50"
       onClick={() => handleLeadClick(lead.id)}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <div className="font-medium truncate text-sm text-foreground">{lead.name}</div>
-          <div className="text-xs text-muted-foreground truncate">{lead.email}</div>
+          <div className="font-medium truncate text-sm sm:text-base text-foreground">{lead.name}</div>
+          <div className="text-xs sm:text-sm text-muted-foreground truncate">{lead.email}</div>
           {lead.phone && (
-            <div className="text-xs text-muted-foreground truncate mt-0.5">{lead.phone}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground truncate mt-0.5">{lead.phone}</div>
           )}
         </div>
       </div>
-      <div className="flex gap-1 mt-2.5 pt-2.5 border-t border-stone-200 dark:border-stone-800">
+      {/* Action buttons - more prominent on mobile */}
+      <div className="flex gap-2 mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="h-7 px-2 text-xs flex-1 hover:bg-stone-100 dark:hover:bg-stone-800"
+          className="h-9 sm:h-8 px-3 text-xs flex-1 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50"
           onClick={(e) => {
             e.stopPropagation();
             handleLeadClick(lead.id);
           }}
         >
-          <Icon icon="solar:eye-linear" className="h-3 w-3 mr-1 text-muted-foreground" />
+          <Icon icon="solar:eye-linear" className="h-3.5 w-3.5 mr-1.5" />
           View
         </Button>
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="h-7 px-2 text-xs flex-1 hover:bg-stone-100 dark:hover:bg-stone-800"
+          className="h-9 sm:h-8 px-3 text-xs flex-1 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50"
           onClick={(e) => handleScheduleAppointment(lead, e)}
         >
-          <Icon icon="solar:calendar-linear" className="h-3 w-3 mr-1 text-muted-foreground" />
+          <Icon icon="solar:calendar-linear" className="h-3.5 w-3.5 mr-1.5" />
           Book
         </Button>
       </div>

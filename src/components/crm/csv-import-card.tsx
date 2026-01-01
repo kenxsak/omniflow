@@ -27,7 +27,7 @@ Jane Smith,jane@example.com,"918765432109",Sample Inc,Qualified`;
     const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' }); // BOM for Excel
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'OmniFlow_CRM_Contacts_Template.csv';
+    link.download = 'CRM_Contacts_Template.csv';
     link.click();
     URL.revokeObjectURL(link.href);
     

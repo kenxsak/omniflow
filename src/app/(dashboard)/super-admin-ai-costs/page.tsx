@@ -1,24 +1,13 @@
 'use client';
 
-/**
- * Super Admin AI Cost Monitoring Dashboard
- * 
- * This page provides platform-wide visibility into:
- * - Total AI operations and costs
- * - Revenue and profit margins
- * - Company-level usage breakdown
- * - Top consumers
- * - Monthly trends
- */
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import PageTitle from '@/components/ui/page-title';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import { Loader2, DollarSign, TrendingUp, Users, Activity, BarChart3, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Icon } from '@iconify/react';
 import {
   getPlatformAIStatisticsAction,
   getAllCompaniesAIUsageAction,
@@ -26,15 +15,6 @@ import {
   type PlatformAIOverview,
   type CompanyAIUsageDetail,
 } from '@/app/actions/super-admin-ai-stats-actions';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function SuperAdminAICostsPage() {
@@ -53,14 +33,9 @@ export default function SuperAdminAICostsPage() {
     totalGoogleCost: number;
   }>>([]);
 
-  // Redirect if not Super Admin
   useEffect(() => {
     if (!authLoading && (!appUser || appUser.role !== 'superadmin')) {
-      toast({
-        title: 'Access Denied',
-        description: 'This page is only accessible to Super Admins.',
-        variant: 'destructive',
-      });
+      toast({ title: 'Access Denied', description: 'Super Admin only.', variant: 'destructive' });
       router.push('/dashboard');
     }
   }, [appUser, authLoading, router, toast]);
@@ -74,310 +49,253 @@ export default function SuperAdminAICostsPage() {
         getHistoricalAIStatisticsAction(6),
       ]);
 
-      if (statsResult.success && statsResult.data) {
-        setPlatformStats(statsResult.data);
-      }
-
-      if (companiesResult.success && companiesResult.data) {
-        setCompanyDetails(companiesResult.data);
-      }
-
-      if (historyResult.success && historyResult.data) {
-        setHistoricalData(historyResult.data);
-      }
+      if (statsResult.success && statsResult.data) setPlatformStats(statsResult.data);
+      if (companiesResult.success && companiesResult.data) setCompanyDetails(companiesResult.data);
+      if (historyResult.success && historyResult.data) setHistoricalData(historyResult.data);
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to load AI cost statistics',
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: error.message || 'Failed to load', variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (appUser?.role === 'superadmin') {
-      loadData();
-    }
+    if (appUser?.role === 'superadmin') loadData();
   }, [appUser]);
 
   if (authLoading || !appUser || appUser.role !== 'superadmin') {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="flex items-center justify-center h-48">
+        <Icon icon="solar:refresh-bold" className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
-  };
-
-  const formatNumber = (value: number) => {
-    return new Intl.NumberFormat('en-US').format(value);
-  };
+  const formatCurrency = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(value);
+  const formatNumber = (value: number) => new Intl.NumberFormat('en-US').format(value);
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 p-3 sm:p-4 lg:p-6">
+      {/* Header - Mobile First */}
+      <div className="space-y-3">
         <div>
-          <PageTitle title="AI Cost Monitoring" />
-          <p className="text-muted-foreground">Platform-wide AI usage, costs, and profitability</p>
+          <h1 className="text-base sm:text-lg font-semibold">AI Cost Monitoring</h1>
+          <p className="text-[11px] sm:text-xs text-muted-foreground">
+            Platform-wide AI usage, costs, and profitability
+          </p>
         </div>
-        <Button onClick={loadData} disabled={isLoading} variant="outline">
-          <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+        <Button 
+          onClick={loadData} 
+          disabled={isLoading} 
+          variant="outline" 
+          size="sm" 
+          className="h-8 text-xs w-full sm:w-auto"
+        >
+          <Icon icon={isLoading ? "solar:refresh-bold" : "solar:refresh-linear"} className={`h-3.5 w-3.5 mr-1.5 ${isLoading ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
       </div>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin" />
+          <Icon icon="solar:refresh-bold" className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       ) : (
         <>
-          {/* Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Stats Cards - 2x2 Grid on Mobile */}
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
+            {/* Total Operations */}
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Operations</CardTitle>
-                <Activity className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {formatNumber(platformStats?.currentMonth.totalOperations || 0)}
+              <CardContent className="p-3">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] text-muted-foreground">Operations</span>
+                  <div className="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                    <Icon icon="solar:chart-2-bold" className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {platformStats?.currentMonth.activeCompaniesCount || 0} active companies
-                </p>
+                <div className="text-lg sm:text-xl font-bold">{formatNumber(platformStats?.currentMonth.totalOperations || 0)}</div>
+                <p className="text-[9px] text-muted-foreground">{platformStats?.currentMonth.activeCompaniesCount || 0} companies</p>
               </CardContent>
             </Card>
 
+            {/* Platform Costs */}
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Platform Costs</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-destructive">
-                  {formatCurrency(platformStats?.currentMonth.totalGoogleCost || 0)}
+              <CardContent className="p-3">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] text-muted-foreground">Costs</span>
+                  <div className="w-6 h-6 rounded-md bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center">
+                    <Icon icon="solar:dollar-bold" className="w-3 h-3 text-rose-600 dark:text-rose-400" />
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">Paid to Google APIs</p>
+                <div className="text-base sm:text-lg font-bold text-rose-600 dark:text-rose-400">{formatCurrency(platformStats?.currentMonth.totalGoogleCost || 0)}</div>
+                <p className="text-[9px] text-muted-foreground">Google APIs</p>
               </CardContent>
             </Card>
 
+            {/* Revenue */}
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-success">
-                  {formatCurrency(platformStats?.currentMonth.totalRevenue || 0)}
+              <CardContent className="p-3">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] text-muted-foreground">Revenue</span>
+                  <div className="w-6 h-6 rounded-md bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                    <Icon icon="solar:graph-up-bold" className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">Charged to users</p>
+                <div className="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(platformStats?.currentMonth.totalRevenue || 0)}</div>
+                <p className="text-[9px] text-muted-foreground">From users</p>
               </CardContent>
             </Card>
 
+            {/* Net Profit */}
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Net Profit</CardTitle>
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-primary">
-                  {formatCurrency(platformStats?.currentMonth.totalProfit || 0)}
+              <CardContent className="p-3">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] text-muted-foreground">Profit</span>
+                  <div className="w-6 h-6 rounded-md bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center">
+                    <Icon icon="solar:wallet-money-bold" className="w-3 h-3 text-violet-600 dark:text-violet-400" />
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {platformStats?.currentMonth.profitMarginPercent.toFixed(1)}% margin
-                </p>
+                <div className="text-base sm:text-lg font-bold text-violet-600 dark:text-violet-400">{formatCurrency(platformStats?.currentMonth.totalProfit || 0)}</div>
+                <p className="text-[9px] text-muted-foreground">{platformStats?.currentMonth.profitMarginPercent.toFixed(1)}% margin</p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Tabs for different views */}
+          {/* Tabs - Scrollable on Mobile */}
           <Tabs defaultValue="companies" className="w-full">
-            <TabsList>
-              <TabsTrigger value="companies">All Companies</TabsTrigger>
-              <TabsTrigger value="top-consumers">Top Consumers</TabsTrigger>
-              <TabsTrigger value="breakdown">Operation Breakdown</TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
+              <TabsList className="inline-flex w-auto min-w-full sm:w-full h-8 p-0.5">
+                <TabsTrigger value="companies" className="text-[10px] sm:text-xs px-2 sm:px-3 h-7 flex-1">Companies</TabsTrigger>
+                <TabsTrigger value="top" className="text-[10px] sm:text-xs px-2 sm:px-3 h-7 flex-1">Top 10</TabsTrigger>
+                <TabsTrigger value="breakdown" className="text-[10px] sm:text-xs px-2 sm:px-3 h-7 flex-1">Breakdown</TabsTrigger>
+              </TabsList>
+            </div>
 
-            {/* All Companies Table */}
-            <TabsContent value="companies">
+            {/* All Companies */}
+            <TabsContent value="companies" className="mt-3">
               <Card>
-                <CardHeader>
-                  <CardTitle>Company AI Usage Details</CardTitle>
-                  <CardDescription>
-                    Detailed breakdown of AI usage by company (sorted by revenue)
-                  </CardDescription>
+                <CardHeader className="p-3 pb-2">
+                  <CardTitle className="text-sm">Company Usage</CardTitle>
+                  <CardDescription className="text-[10px]">By revenue</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Company</TableHead>
-                        <TableHead>Plan</TableHead>
-                        <TableHead className="text-right">Operations</TableHead>
-                        <TableHead className="text-right">Credits Used</TableHead>
-                        <TableHead className="text-right">Our Cost</TableHead>
-                        <TableHead className="text-right">Revenue</TableHead>
-                        <TableHead className="text-right">Profit</TableHead>
-                        <TableHead>API Key</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {companyDetails.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={8} className="text-center text-muted-foreground">
-                            No AI usage data available
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        companyDetails.map((company) => (
-                          <TableRow key={company.companyId}>
-                            <TableCell className="font-medium">{company.companyName}</TableCell>
-                            <TableCell>
-                              <Badge variant="outline">{company.planName}</Badge>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              {formatNumber(company.currentMonth.operations)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              {formatNumber(company.currentMonth.creditsUsed)}
-                            </TableCell>
-                            <TableCell className="text-right text-destructive">
-                              {formatCurrency(company.currentMonth.estimatedCost)}
-                            </TableCell>
-                            <TableCell className="text-right text-success">
-                              {formatCurrency(company.currentMonth.platformRevenue)}
-                            </TableCell>
-                            <TableCell className="text-right text-primary">
-                              {formatCurrency(company.currentMonth.platformProfit)}
-                            </TableCell>
-                            <TableCell>
-                              {company.usingOwnApiKey ? (
-                                <Badge variant="secondary">Own Key</Badge>
-                              ) : (
-                                <Badge variant="default">Platform</Badge>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
+                <CardContent className="p-3 pt-0">
+                  {companyDetails.length === 0 ? (
+                    <div className="text-center py-6 text-muted-foreground">
+                      <Icon icon="solar:chart-2-linear" className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-xs">No data</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {companyDetails.map((company) => (
+                        <div key={company.companyId} className="p-2 rounded-lg border border-stone-200 dark:border-stone-800">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                              <span className="font-medium text-xs truncate">{company.companyName}</span>
+                              <Badge variant="outline" className="text-[8px] px-1 py-0 shrink-0">{company.planName}</Badge>
+                            </div>
+                            {company.usingOwnApiKey ? (
+                              <Badge variant="secondary" className="text-[8px] px-1 py-0 shrink-0">Own</Badge>
+                            ) : (
+                              <Badge className="text-[8px] px-1 py-0 bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300 shrink-0">Platform</Badge>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-4 gap-1 text-center">
+                            <div>
+                              <p className="text-[8px] text-muted-foreground">Ops</p>
+                              <p className="text-[10px] font-medium">{formatNumber(company.currentMonth.operations)}</p>
+                            </div>
+                            <div>
+                              <p className="text-[8px] text-muted-foreground">Cost</p>
+                              <p className="text-[10px] font-medium text-rose-600">{formatCurrency(company.currentMonth.estimatedCost)}</p>
+                            </div>
+                            <div>
+                              <p className="text-[8px] text-muted-foreground">Rev</p>
+                              <p className="text-[10px] font-medium text-emerald-600">{formatCurrency(company.currentMonth.platformRevenue)}</p>
+                            </div>
+                            <div>
+                              <p className="text-[8px] text-muted-foreground">Profit</p>
+                              <p className="text-[10px] font-medium text-violet-600">{formatCurrency(company.currentMonth.platformProfit)}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
 
             {/* Top Consumers */}
-            <TabsContent value="top-consumers">
+            <TabsContent value="top" className="mt-3">
               <Card>
-                <CardHeader>
-                  <CardTitle>Top 10 AI Consumers</CardTitle>
-                  <CardDescription>Companies with highest AI usage this month</CardDescription>
+                <CardHeader className="p-3 pb-2">
+                  <CardTitle className="text-sm">Top 10 Consumers</CardTitle>
+                  <CardDescription className="text-[10px]">Highest usage this month</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Rank</TableHead>
-                        <TableHead>Company</TableHead>
-                        <TableHead className="text-right">Operations</TableHead>
-                        <TableHead className="text-right">Revenue</TableHead>
-                        <TableHead className="text-right">Profit</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {platformStats?.topConsumers.map((company, index) => (
-                        <TableRow key={company.companyId}>
-                          <TableCell>
-                            <Badge variant={index < 3 ? 'default' : 'outline'}>#{index + 1}</Badge>
-                          </TableCell>
-                          <TableCell className="font-medium">{company.companyName}</TableCell>
-                          <TableCell className="text-right">
-                            {formatNumber(company.operations)}
-                          </TableCell>
-                          <TableCell className="text-right text-success">
-                            {formatCurrency(company.revenue)}
-                          </TableCell>
-                          <TableCell className="text-right text-primary">
-                            {formatCurrency(company.profit)}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                <CardContent className="p-3 pt-0">
+                  <div className="space-y-1.5">
+                    {platformStats?.topConsumers.map((company, index) => (
+                      <div key={company.companyId} className="flex items-center gap-2 p-2 rounded-lg bg-stone-50 dark:bg-stone-900/50">
+                        <Badge variant={index < 3 ? 'default' : 'outline'} className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] p-0 shrink-0">
+                          {index + 1}
+                        </Badge>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-xs truncate">{company.companyName}</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-[10px] font-medium">{formatNumber(company.operations)}</p>
+                          <p className="text-[9px] text-emerald-600">{formatCurrency(company.revenue)}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
             {/* Operation Breakdown */}
-            <TabsContent value="breakdown">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <TabsContent value="breakdown" className="mt-3">
+              <div className="grid gap-3">
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Operations by Type</CardTitle>
-                    <CardDescription>Distribution of AI operations this month</CardDescription>
+                  <CardHeader className="p-3 pb-2">
+                    <CardTitle className="text-sm">By Type</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Text Generation</span>
-                      <span className="text-sm font-medium">
-                        {formatNumber(platformStats?.operationBreakdown.textGeneration || 0)}
-                      </span>
+                  <CardContent className="p-3 pt-0 space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span>Text Generation</span>
+                      <span className="font-medium">{formatNumber(platformStats?.operationBreakdown.textGeneration || 0)}</span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Image Generation</span>
-                      <span className="text-sm font-medium">
-                        {formatNumber(platformStats?.operationBreakdown.imageGeneration || 0)}
-                      </span>
+                    <div className="flex items-center justify-between text-xs">
+                      <span>Image Generation</span>
+                      <span className="font-medium">{formatNumber(platformStats?.operationBreakdown.imageGeneration || 0)}</span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Text-to-Speech</span>
-                      <span className="text-sm font-medium">
-                        {formatNumber(platformStats?.operationBreakdown.textToSpeech || 0)}
-                      </span>
+                    <div className="flex items-center justify-between text-xs">
+                      <span>Text-to-Speech</span>
+                      <span className="font-medium">{formatNumber(platformStats?.operationBreakdown.textToSpeech || 0)}</span>
                     </div>
-                    <div className="flex items-center justify-between border-t pt-4">
-                      <span className="text-sm font-bold">Total</span>
-                      <span className="text-sm font-bold">
-                        {formatNumber(platformStats?.operationBreakdown.total || 0)}
-                      </span>
+                    <div className="flex items-center justify-between text-xs border-t pt-2">
+                      <span className="font-bold">Total</span>
+                      <span className="font-bold">{formatNumber(platformStats?.operationBreakdown.total || 0)}</span>
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card>
-                  <CardHeader>
-                    <CardTitle>API Key Distribution</CardTitle>
-                    <CardDescription>Companies by API key usage</CardDescription>
+                  <CardHeader className="p-3 pb-2">
+                    <CardTitle className="text-sm">API Keys</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Using Platform API</span>
-                      <Badge variant="default">
-                        {platformStats?.apiKeyDistribution.usingPlatformAPI || 0} companies
+                  <CardContent className="p-3 pt-0 space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span>Platform API</span>
+                      <Badge className="bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300 text-[9px]">
+                        {platformStats?.apiKeyDistribution.usingPlatformAPI || 0}
                       </Badge>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Using Own API Key</span>
-                      <Badge variant="secondary">
-                        {platformStats?.apiKeyDistribution.usingOwnAPI || 0} companies
+                    <div className="flex items-center justify-between text-xs">
+                      <span>Own API Key</span>
+                      <Badge variant="secondary" className="text-[9px]">
+                        {platformStats?.apiKeyDistribution.usingOwnAPI || 0}
                       </Badge>
-                    </div>
-                    <div className="mt-4 p-4 bg-muted/50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">
-                        Companies using their own API keys save 100% on our markup but still
-                        contribute to platform usage statistics.
-                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -385,43 +303,39 @@ export default function SuperAdminAICostsPage() {
             </TabsContent>
           </Tabs>
 
-          {/* Historical Trend (Simple Table View) */}
+          {/* Historical Trends */}
           <Card>
-            <CardHeader>
-              <CardTitle>Historical Trends (Last 6 Months)</CardTitle>
-              <CardDescription>Monthly AI usage and financial performance</CardDescription>
+            <CardHeader className="p-3 pb-2">
+              <CardTitle className="text-sm">Last 6 Months</CardTitle>
             </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Month</TableHead>
-                    <TableHead className="text-right">Operations</TableHead>
-                    <TableHead className="text-right">Our Cost</TableHead>
-                    <TableHead className="text-right">Revenue</TableHead>
-                    <TableHead className="text-right">Profit</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {historicalData.map((month) => (
-                    <TableRow key={month.month}>
-                      <TableCell className="font-medium">{month.month}</TableCell>
-                      <TableCell className="text-right">
-                        {formatNumber(month.totalOperations)}
-                      </TableCell>
-                      <TableCell className="text-right text-destructive">
-                        {formatCurrency(month.totalGoogleCost)}
-                      </TableCell>
-                      <TableCell className="text-right text-success">
-                        {formatCurrency(month.totalRevenue)}
-                      </TableCell>
-                      <TableCell className="text-right text-primary">
-                        {formatCurrency(month.totalProfit)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <CardContent className="p-3 pt-0">
+              <div className="space-y-1.5">
+                {historicalData.map((month) => (
+                  <div key={month.month} className="flex items-center gap-2 p-2 rounded-lg bg-stone-50 dark:bg-stone-900/50">
+                    <div className="w-12 shrink-0">
+                      <p className="font-medium text-[10px]">{month.month}</p>
+                    </div>
+                    <div className="flex-1 grid grid-cols-4 gap-1 text-center">
+                      <div>
+                        <p className="text-[8px] text-muted-foreground">Ops</p>
+                        <p className="text-[9px] font-medium">{formatNumber(month.totalOperations)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[8px] text-muted-foreground">Cost</p>
+                        <p className="text-[9px] font-medium text-rose-600">{formatCurrency(month.totalGoogleCost)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[8px] text-muted-foreground">Rev</p>
+                        <p className="text-[9px] font-medium text-emerald-600">{formatCurrency(month.totalRevenue)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[8px] text-muted-foreground">Profit</p>
+                        <p className="text-[9px] font-medium text-violet-600">{formatCurrency(month.totalProfit)}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </>

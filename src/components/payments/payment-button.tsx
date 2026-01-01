@@ -150,7 +150,7 @@ export function PaymentButton({
         key: key,
         amount: amount,
         currency: currency,
-        name: 'OmniFlow',
+        name: plan.name,
         description: `${plan.name} Plan - ${billingCycle === 'yearly' ? 'Annual' : 'Monthly'}`,
         order_id: orderId,
         handler: async function (response: any) {

@@ -145,7 +145,7 @@ const initialServices: ApiServiceIntegration[] = [
     description: 'Smart WhatsApp automation with AI-powered chatbots. Send bulk campaigns with advanced features like automated responses, workflow builder, and analytics. Great for SMEs.',
     fields: [
       { id: 'apiKey', label: 'AiSensy API Key', value: '', isProtected: true, placeholder: 'Enter your AiSensy API key', helperText: 'Get this from AiSensy Dashboard → Project → Manage Page → Copy API Key' },
-      { id: 'campaignName', label: 'Default Campaign Name (Optional)', value: '', isProtected: false, placeholder: 'e.g., Marketing Campaign', helperText: 'Create an API campaign in AiSensy dashboard first, then enter its name here. If not set, we\'ll use "OmniFlow Campaign".' },
+      { id: 'campaignName', label: 'Default Campaign Name (Optional)', value: '', isProtected: false, placeholder: 'e.g., Marketing Campaign', helperText: 'Create an API campaign in AiSensy dashboard first, then enter its name here. If not set, we\'ll use "Default Campaign".' },
     ],
     documentationLink: 'https://wiki.aisensy.com/en/articles/11501889-api-reference-docs',
     affiliateLink: 'https://aisensy.com',

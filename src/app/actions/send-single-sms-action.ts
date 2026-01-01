@@ -65,7 +65,7 @@ export async function sendSingleSmsAction(input: {
     const authKey = decryptApiKeyServerSide(company.apiKeys.msg91.authKey);
     
     // Get senderId from company config
-    const senderId = company.apiKeys.msg91.senderId || 'OmniFlow';
+    const senderId = company.apiKeys.msg91.senderId || 'NOTIFY';
     
     // Format phone number to MSG91 format (remove +, spaces, etc.)
     const formattedPhone = formatPhoneForMSG91(toPhoneNumber);

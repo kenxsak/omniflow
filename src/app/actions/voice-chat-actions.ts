@@ -234,9 +234,9 @@ export async function generateWidgetEmbedCode(
       }
     };
 
-    const embedCode = `<!-- OmniFlow Digital Card with Voice Chat AI Widget -->
+    const embedCode = `<!-- Digital Card with Voice Chat AI Widget -->
 <script>
-  window.OmniFlowVoiceChat = ${JSON.stringify(config, null, 2)};
+  window.VoiceChatConfig = ${JSON.stringify(config, null, 2)};
 </script>
 ${voiceChatConfig.widgetScript}`;
 

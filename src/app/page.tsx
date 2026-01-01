@@ -13,6 +13,7 @@ import { PublicNavbar } from '@/components/layout/public-navbar';
 import { LayoutLines } from '@/components/ui/layout-lines';
 import { Glow } from '@/components/ui/glow';
 import { PublicFooter } from '@/components/layout/public-footer';
+import { AIVoiceWidgetScript } from '@/components/ai-voice/ai-voice-widget';
 
 export default function HomePage() {
   const [currency, setCurrency] = useState<SupportedCurrency | undefined>(undefined);
@@ -999,6 +1000,122 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Automation Platforms Section */}
+        <section id="automation-platforms" className="py-16 sm:py-20 px-4 bg-background line-b relative">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-10 sm:mb-12">
+              <Badge variant="outline" className="mb-4">
+                <Icon icon="solar:bolt-circle-bold" className="w-4 h-4 mr-1 inline" />
+                5000+ App Integrations
+              </Badge>
+              <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 sm:mb-6">
+                Connect with Zapier, Pabbly, Make & More
+              </h2>
+              <p className="text-base sm:text-xl text-muted-foreground max-w-3xl mx-auto">
+                Extend OmniFlow's capabilities by connecting to thousands of apps via automation platforms
+              </p>
+            </div>
+
+            {/* Platform Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-8 sm:mb-10">
+              {[
+                { name: 'Zapier', icon: 'simple-icons:zapier', color: 'bg-orange-500', apps: '5000+' },
+                { name: 'Make', icon: 'simple-icons:integromat', color: 'bg-violet-500', apps: '1500+' },
+                { name: 'Pabbly', icon: 'solar:link-round-bold', color: 'bg-blue-500', apps: '1000+', badge: '🇮🇳' },
+                { name: 'n8n', icon: 'simple-icons:n8n', color: 'bg-rose-500', apps: 'Unlimited' },
+                { name: 'Integrately', icon: 'solar:bolt-circle-bold', color: 'bg-cyan-500', apps: '1100+' },
+              ].map((platform, i) => (
+                <Card key={i} className="text-center hover:shadow-lg transition-shadow">
+                  <CardContent className="p-3 sm:p-4">
+                    <div className={cn('w-10 h-10 sm:w-12 sm:h-12 rounded-xl mx-auto mb-2 sm:mb-3 flex items-center justify-center text-white', platform.color)}>
+                      <Icon icon={platform.icon} className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </div>
+                    <p className="font-semibold text-xs sm:text-sm flex items-center justify-center gap-1">
+                      {platform.name}
+                      {platform.badge && <span className="text-[10px]">{platform.badge}</span>}
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">{platform.apps} apps</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* How It Works */}
+            <Card className="glass-3 mb-8 sm:mb-10">
+              <CardContent className="p-4 sm:p-6">
+                <h3 className="font-semibold text-sm sm:text-base mb-4 flex items-center gap-2">
+                  <Icon icon="solar:rocket-2-bold" className="w-5 h-5 text-primary" />
+                  How It Works (3 Simple Steps)
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                  {[
+                    { step: 1, title: 'Copy API Key', desc: 'Get your unique API key from OmniFlow settings' },
+                    { step: 2, title: 'Create Automation', desc: 'Build a workflow in Zapier, Pabbly, or Make' },
+                    { step: 3, title: 'Connect & Go', desc: 'Paste webhook URL and start automating' },
+                  ].map((item) => (
+                    <div key={item.step} className="flex items-start gap-3 p-3 rounded-xl bg-muted/50 border">
+                      <span className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold shrink-0">
+                        {item.step}
+                      </span>
+                      <div>
+                        <p className="text-xs sm:text-sm font-medium">{item.title}</p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Use Cases Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-10">
+              {[
+                { icon: 'solar:cart-large-2-bold', title: 'E-Commerce Sync', desc: 'Shopify/WooCommerce orders → CRM leads' },
+                { icon: 'solar:calendar-bold', title: 'Calendar Booking', desc: 'Cal.com bookings → Auto follow-up' },
+                { icon: 'logos:google-ads', title: 'Ad Lead Capture', desc: 'Facebook/Google Ads → Instant SMS' },
+                { icon: 'solar:chat-round-dots-bold', title: 'Support Tickets', desc: 'Zendesk/Freshdesk → CRM notes' },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3 p-3 sm:p-4 rounded-xl border bg-card hover:shadow-md transition-shadow">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Icon icon={item.icon} className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xs sm:text-sm font-medium">{item.title}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Pabbly Highlight for India */}
+            <Card className="border-2 border-orange-200 dark:border-orange-800 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-white text-xl">
+                      🇮🇳
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-sm sm:text-base text-orange-900 dark:text-orange-100">
+                        Indian Businesses: Try Pabbly Connect
+                      </h3>
+                      <p className="text-xs sm:text-sm text-orange-700 dark:text-orange-300 mt-1">
+                        Lifetime deals available • Indian support • No per-task limits • Works perfectly with OmniFlow
+                      </p>
+                    </div>
+                  </div>
+                  <Button asChild variant="outline" className="border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/50 shrink-0">
+                    <a href="https://www.pabbly.com/connect/" target="_blank" rel="noopener noreferrer">
+                      Learn More
+                      <Icon icon="solar:arrow-right-up-linear" className="w-4 h-4 ml-1" />
+                    </a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
         {/* BYOK Explanation Section */}
         <section className="py-20 px-4 bg-background line-b relative">
           <div className="max-w-6xl mx-auto">
@@ -1489,6 +1606,8 @@ export default function HomePage() {
                       { feature: "AI Content Generation", free: "Limited", starter: "✓ Full", pro: "✓ Full", enterprise: "✓ Full" },
                       { feature: "AI Campaign Studio", free: "✗", starter: "✗", pro: "✓", enterprise: "✓" },
                       { feature: "AI Ads Manager", free: "✗", starter: "✗", pro: "✓", enterprise: "✓" },
+                      { feature: "Agency Mode (Multi-Client)", free: "✗", starter: "✗", pro: "✓ 10 clients", enterprise: "✓ 50 clients" },
+                      { feature: "White-Label Branding", free: "✗", starter: "✗", pro: "✗", enterprise: "✓ Full" },
                       { feature: "Enterprise Team Collaboration", free: "✗", starter: "✗", pro: "✗", enterprise: "✓" },
                       { feature: "Advanced Analytics", free: "✗", starter: "Basic", pro: "✓ Advanced", enterprise: "✓ Advanced" },
                       { feature: "Support", free: "Community", starter: "Email", pro: "Priority", enterprise: "Dedicated Manager" },
@@ -1858,6 +1977,223 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Agency Mode Section - Multi-Client Management */}
+        <section id="agency-mode" className="py-16 sm:py-20 px-4 bg-gradient-to-br from-violet-50/50 via-background to-fuchsia-50/50 dark:from-violet-950/20 dark:via-background dark:to-fuchsia-950/20 line-b relative overflow-hidden">
+          <div className="absolute top-4 right-4 sm:top-8 sm:right-8">
+            <Badge className="bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300 text-xs sm:text-sm px-3 py-1.5 rounded-xl border border-violet-200/60 dark:border-violet-700/60">
+              <Icon icon="solar:star-bold" className="w-3 h-3 sm:w-4 sm:h-4 mr-1 inline" />
+              Pro & Enterprise
+            </Badge>
+          </div>
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-8 sm:mb-12">
+              <Badge variant="default" className="mb-3 sm:mb-4 bg-violet-600 hover:bg-violet-700">
+                <Icon icon="solar:buildings-3-bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 inline" />
+                For Digital Agencies
+              </Badge>
+              <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 sm:mb-6">
+                Agency Mode: Manage All Your Clients <span className="text-violet-600">From One Dashboard</span>
+              </h2>
+              <p className="text-base sm:text-xl text-muted-foreground max-w-3xl mx-auto">
+                Digital marketing agencies can now manage email, SMS, WhatsApp, social media, and CRM for <strong>multiple client companies</strong> — all from a single login. Just like HubSpot Partner Hub and GoHighLevel.
+              </p>
+            </div>
+
+            {/* How It Works */}
+            <Card className="glass-4 mb-8 sm:mb-12 shadow-xl border-violet-200/50 dark:border-violet-800/50">
+              <CardContent className="p-4 sm:pt-8 sm:pb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-center">
+                  <div className="space-y-4 sm:space-y-6">
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">
+                      Switch Between Clients <span className="text-violet-600">Instantly</span>
+                    </h3>
+                    <p className="text-sm sm:text-lg text-muted-foreground">
+                      No more logging in and out of different accounts. With Agency Mode, you get a <strong>company switcher</strong> in your header — click to switch between your agency and any client company in seconds.
+                    </p>
+                    <ul className="space-y-2 sm:space-y-3">
+                      {[
+                        "One login, unlimited client companies",
+                        "Complete data isolation between clients",
+                        "Run campaigns for any client instantly",
+                        "Unified billing under your agency account",
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm sm:text-base">
+                          <Icon icon="solar:check-circle-bold" className="w-4 h-4 sm:w-5 sm:h-5 text-violet-600 flex-shrink-0 mt-0.5" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2">
+                      <Button asChild size="lg" className="w-full sm:w-auto h-10 sm:h-11 bg-violet-600 hover:bg-violet-700 shadow-lg">
+                        <Link href="/signup">
+                          Start Agency Trial <Icon icon="solar:arrow-right-linear" className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    {[
+                      { icon: "solar:users-group-rounded-bold", title: "Multi-Client CRM", desc: "Separate contact databases", badge: "ISOLATED" },
+                      { icon: "solar:letter-bold", title: "Client Campaigns", desc: "Email, SMS, WhatsApp per client", badge: "BRANDED" },
+                      { icon: "solar:chart-2-bold", title: "Per-Client Analytics", desc: "Track each client's ROI", badge: "DETAILED" },
+                      { icon: "solar:shield-check-bold", title: "Data Security", desc: "Complete client isolation", badge: "SECURE" },
+                    ].map((item, i) => (
+                      <Card key={i} className="glass-2">
+                        <CardContent className="p-3 sm:pt-4 sm:pb-4 text-center">
+                          <Badge className="mb-2 text-[9px] sm:text-[10px] bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300 rounded-lg px-1.5 sm:px-2 py-0.5 border border-violet-200/60 dark:border-violet-700/60">{item.badge}</Badge>
+                          <Icon icon={item.icon} className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1.5 sm:mb-2 text-violet-600" />
+                          <p className="font-semibold text-xs sm:text-sm">{item.title}</p>
+                          <p className="text-[10px] sm:text-xs text-muted-foreground">{item.desc}</p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Competitor Comparison - Global */}
+            <div className="mb-8 sm:mb-12">
+              <h3 className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">How We Compare to Global Agency Solutions</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse bg-background rounded-xl shadow-lg text-xs sm:text-sm">
+                  <thead>
+                    <tr className="border-b-2">
+                      <th className="p-2 sm:p-3 text-left font-bold">Feature</th>
+                      <th className="p-2 sm:p-3 text-center bg-violet-100/50 dark:bg-violet-900/30 font-bold">
+                        <div className="flex items-center justify-center gap-1">
+                          <Icon icon="solar:crown-bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-violet-600" />
+                          OmniFlow
+                        </div>
+                      </th>
+                      <th className="p-2 sm:p-3 text-center">GoHighLevel</th>
+                      <th className="p-2 sm:p-3 text-center">HubSpot</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { feature: "Agency Mode Cost", omniflow: "Included in Pro ($99)", ghl: "$297/mo minimum", hubspot: "Partner Program ($$)" },
+                      { feature: "Max Client Accounts", omniflow: "10 (Pro) / 50 (Enterprise)", ghl: "Unlimited ($297)", hubspot: "Varies by tier" },
+                      { feature: "White-Label Branding", omniflow: "✓ Enterprise", ghl: "✓ $497/mo", hubspot: "✓ Enterprise only" },
+                      { feature: "Per-Client Billing", omniflow: "✓ You control pricing", ghl: "✓ SaaS Mode", hubspot: "✓ Partner billing" },
+                      { feature: "AI Content for Clients", omniflow: "✓ Unlimited (BYOK)", ghl: "○ $97/mo extra", hubspot: "○ Add-on" },
+                      { feature: "Zero Markup Messaging", omniflow: "✓ SMS, WhatsApp, Email", ghl: "✗ 300% markup", hubspot: "✗ Third-party" },
+                    ].map((row, i) => (
+                      <tr key={i} className="border-b hover:bg-muted/30">
+                        <td className="p-2 sm:p-3 font-medium">{row.feature}</td>
+                        <td className="p-2 sm:p-3 text-center bg-violet-50/50 dark:bg-violet-900/20 font-bold text-violet-600">{row.omniflow}</td>
+                        <td className="p-2 sm:p-3 text-center text-muted-foreground">{row.ghl}</td>
+                        <td className="p-2 sm:p-3 text-center text-muted-foreground">{row.hubspot}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Competitor Comparison - India */}
+            <div className="mb-8 sm:mb-12">
+              <h3 className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">
+                <span className="inline-flex items-center gap-2">
+                  🇮🇳 vs Indian CRM Platforms
+                </span>
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse bg-background rounded-xl shadow-lg text-xs sm:text-sm">
+                  <thead>
+                    <tr className="border-b-2">
+                      <th className="p-2 sm:p-3 text-left font-bold">Feature</th>
+                      <th className="p-2 sm:p-3 text-center bg-violet-100/50 dark:bg-violet-900/30 font-bold">
+                        <div className="flex items-center justify-center gap-1">
+                          <Icon icon="solar:crown-bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-violet-600" />
+                          OmniFlow
+                        </div>
+                        <span className="text-[10px] font-normal">₹7,999/mo</span>
+                      </th>
+                      <th className="p-2 sm:p-3 text-center">Zoho CRM<br/><span className="text-[10px] font-normal">₹4,600/user</span></th>
+                      <th className="p-2 sm:p-3 text-center">LeadSquared<br/><span className="text-[10px] font-normal">₹3,000+/user</span></th>
+                      <th className="p-2 sm:p-3 text-center hidden sm:table-cell">Freshsales<br/><span className="text-[10px] font-normal">₹2,799/user</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { feature: "Agency Mode", omniflow: "✓ Full", zoho: "✗ None", leadsq: "✗ None", fresh: "✗ None" },
+                      { feature: "Multi-Client Dashboard", omniflow: "✓ 10-50 clients", zoho: "✗ Single", leadsq: "✗ Single", fresh: "✗ Single" },
+                      { feature: "Company Switcher", omniflow: "✓ One-click", zoho: "✗ Separate logins", leadsq: "✗ Separate", fresh: "✗ Separate" },
+                      { feature: "WhatsApp Marketing", omniflow: "✓ 6+ APIs", zoho: "○ Add-on", leadsq: "✓ Built-in", fresh: "○ Limited" },
+                      { feature: "AI Content (BYOK)", omniflow: "✓ Unlimited", zoho: "○ Zia", leadsq: "✗ None", fresh: "○ Freddy" },
+                      { feature: "White-Label", omniflow: "✓ Enterprise", zoho: "✗ None", leadsq: "✗ None", fresh: "✗ None" },
+                      { feature: "10 Users Cost", omniflow: "₹7,999 total", zoho: "₹46,000/mo", leadsq: "₹30,000+", fresh: "₹27,990" },
+                    ].map((row, i) => (
+                      <tr key={i} className="border-b hover:bg-muted/30">
+                        <td className="p-2 sm:p-3 font-medium">{row.feature}</td>
+                        <td className="p-2 sm:p-3 text-center bg-violet-50/50 dark:bg-violet-900/20 font-bold text-violet-600">{row.omniflow}</td>
+                        <td className="p-2 sm:p-3 text-center text-muted-foreground">{row.zoho}</td>
+                        <td className="p-2 sm:p-3 text-center text-muted-foreground">{row.leadsq}</td>
+                        <td className="p-2 sm:p-3 text-center text-muted-foreground hidden sm:table-cell">{row.fresh}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="mt-4 p-3 sm:p-4 rounded-xl bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 text-center">
+                <p className="text-xs sm:text-sm font-medium text-orange-800 dark:text-orange-200">
+                  <Icon icon="solar:info-circle-bold" className="w-4 h-4 inline mr-1" />
+                  <strong>India Market Gap:</strong> No major Indian CRM offers Agency Mode. OmniFlow is the first affordable solution for Indian digital agencies.
+                </p>
+              </div>
+            </div>
+
+            {/* Use Cases */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
+              {[
+                {
+                  icon: "solar:letter-bold",
+                  title: "Email Marketing Agencies",
+                  desc: "Manage newsletters, drip campaigns, and automations for all your clients from one place"
+                },
+                {
+                  icon: "solar:chat-square-bold",
+                  title: "WhatsApp Marketing Agencies",
+                  desc: "Run bulk WhatsApp campaigns for multiple businesses with zero markup on messages"
+                },
+                {
+                  icon: "solar:share-circle-bold",
+                  title: "Social Media Agencies",
+                  desc: "Schedule posts, manage content calendars, and track analytics for every client"
+                },
+              ].map((item, i) => (
+                <Card key={i} className="glass-2 hover:shadow-lg transition-shadow hover:border-violet-300 dark:hover:border-violet-700">
+                  <CardContent className="p-4 sm:pt-6 text-center">
+                    <Icon icon={item.icon} className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 sm:mb-3 text-violet-600" />
+                    <p className="font-bold text-sm sm:text-base mb-1 sm:mb-2">{item.title}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{item.desc}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Bottom CTA */}
+            <Card className="glass-4 max-w-3xl mx-auto border-violet-200/50 dark:border-violet-800/50">
+              <CardContent className="p-4 sm:pt-6 sm:pb-6">
+                <div className="text-center">
+                  <p className="text-base sm:text-lg font-bold mb-2">
+                    Agency Mode is included in <span className="text-violet-600">Pro ($99/mo)</span> and <span className="text-violet-600">Enterprise ($249/mo)</span> plans
+                  </p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-4">
+                    Pro: Up to 10 client companies | Enterprise: Up to 50 client companies + White-Label
+                  </p>
+                  <Button asChild size="lg" className="w-full sm:w-auto h-10 sm:h-11 bg-violet-600 hover:bg-violet-700">
+                    <Link href="/signup">
+                      Start Your Agency Today <Icon icon="solar:rocket-bold" className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
         {/* Social Proof Section */}
         <section className="py-20 px-4 bg-muted/30 line-b relative">
           <div className="max-w-7xl mx-auto">
@@ -1960,6 +2296,9 @@ export default function HomePage() {
 
       {/* Footer */}
       <PublicFooter />
+
+      {/* AI Voice Sales Widget */}
+      <AIVoiceWidgetScript type="sales" />
       </div>
     </>
   );

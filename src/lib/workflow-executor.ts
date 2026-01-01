@@ -97,8 +97,10 @@ async function executeActionNode(
     return { success: false, error: `Entity ${state.entityId} not found` };
   }
   
-  // Get API keys
-  const apiKeys = await getCompanyAPIKeys(companyId);
+  // Get API keys - company keys with platform fallback
+  const companyKeys = await getCompanyAPIKeys(companyId);
+  const platformKeys = getPlatformAPIKeys();
+  const apiKeys = mergeAPIKeys(companyKeys, platformKeys);
   
   let result: ExecutionResult;
   
@@ -302,7 +304,7 @@ async function executeSendEmail(
     return result;
   }
   
-  return { success: false, error: 'No email provider configured' };
+  return { success: false, error: 'No email provider configured. Configure in Settings → Integrations or contact platform admin.' };
 }
 
 async function executeSendSMS(
@@ -387,7 +389,7 @@ async function executeSendSMS(
     }
   }
   
-  return { success: false, error: 'No SMS provider configured. Please configure MSG91 or Fast2SMS in Settings → Integrations.' };
+  return { success: false, error: 'No SMS provider configured. Configure MSG91 or Fast2SMS in Settings → Integrations or contact platform admin.' };
 }
 
 async function executeSendWhatsApp(
@@ -509,7 +511,7 @@ async function executeSendWhatsApp(
     }
   }
   
-  return { success: false, error: 'No WhatsApp provider configured. Please configure Authkey, AiSensy, or Gupshup in Settings → Integrations.' };
+  return { success: false, error: 'No WhatsApp provider configured. Configure Authkey, AiSensy, or Gupshup in Settings → Integrations or contact platform admin.' };
 }
 
 async function executeAddTag(
@@ -724,6 +726,91 @@ async function getCompanyAPIKeys(companyId: string): Promise<CompanyAPIKeys> {
   }
   
   return {};
+}
+
+/**
+ * Get platform-level API keys from environment variables
+ * Used as fallback when company hasn't configured their own keys
+ */
+function getPlatformAPIKeys(): CompanyAPIKeys {
+  const platformKeys: CompanyAPIKeys = {};
+  
+  // Email - Brevo (platform default)
+  if (process.env.BREVO_API_KEY) {
+    platformKeys.brevo = {
+      apiKey: process.env.BREVO_API_KEY,
+      senderEmail: process.env.BREVO_SENDER_EMAIL || 'noreply@omniflow.com',
+      senderName: process.env.BREVO_SENDER_NAME || 'OmniFlow',
+    };
+  }
+  
+  // Email - Sender.net (alternative)
+  if (process.env.SENDER_API_KEY) {
+    platformKeys.sender = {
+      apiKey: process.env.SENDER_API_KEY,
+      senderEmail: process.env.SENDER_EMAIL || 'noreply@omniflow.com',
+      senderName: process.env.SENDER_NAME || 'OmniFlow',
+    };
+  }
+  
+  // SMS - MSG91
+  if (process.env.MSG91_AUTH_KEY) {
+    platformKeys.msg91 = {
+      authKey: process.env.MSG91_AUTH_KEY,
+      senderId: process.env.MSG91_SENDER_ID || 'OMNIFL',
+    };
+  }
+  
+  // SMS - Fast2SMS
+  if (process.env.FAST2SMS_API_KEY) {
+    platformKeys.fast2sms = {
+      apiKey: process.env.FAST2SMS_API_KEY,
+      senderId: process.env.FAST2SMS_SENDER_ID,
+    };
+  }
+  
+  // WhatsApp - Authkey (most cost-effective)
+  if (process.env.AUTHKEY_API_KEY) {
+    platformKeys.authkey = {
+      authKey: process.env.AUTHKEY_API_KEY,
+    };
+  }
+  
+  // WhatsApp - AiSensy
+  if (process.env.AISENSY_API_KEY) {
+    platformKeys.aisensy = {
+      apiKey: process.env.AISENSY_API_KEY,
+    };
+  }
+  
+  // WhatsApp - Gupshup
+  if (process.env.GUPSHUP_API_KEY && process.env.GUPSHUP_APP_NAME) {
+    platformKeys.gupshup = {
+      apiKey: process.env.GUPSHUP_API_KEY,
+      appName: process.env.GUPSHUP_APP_NAME,
+      srcName: process.env.GUPSHUP_SRC_NAME,
+      phoneNumber: process.env.GUPSHUP_PHONE_NUMBER,
+    };
+  }
+  
+  return platformKeys;
+}
+
+/**
+ * Merge company keys with platform fallback keys
+ * Company keys take priority, platform keys used as fallback
+ */
+function mergeAPIKeys(companyKeys: CompanyAPIKeys, platformKeys: CompanyAPIKeys): CompanyAPIKeys {
+  return {
+    brevo: companyKeys.brevo?.apiKey ? companyKeys.brevo : platformKeys.brevo,
+    sender: companyKeys.sender?.apiKey ? companyKeys.sender : platformKeys.sender,
+    smtp: companyKeys.smtp?.host ? companyKeys.smtp : undefined, // No platform SMTP fallback
+    msg91: companyKeys.msg91?.authKey ? companyKeys.msg91 : platformKeys.msg91,
+    fast2sms: companyKeys.fast2sms?.apiKey ? companyKeys.fast2sms : platformKeys.fast2sms,
+    authkey: companyKeys.authkey?.authKey ? companyKeys.authkey : platformKeys.authkey,
+    aisensy: companyKeys.aisensy?.apiKey ? companyKeys.aisensy : platformKeys.aisensy,
+    gupshup: companyKeys.gupshup?.apiKey ? companyKeys.gupshup : platformKeys.gupshup,
+  };
 }
 
 // ============ TRIGGER HANDLER ============

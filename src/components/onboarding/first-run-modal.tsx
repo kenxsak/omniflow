@@ -100,7 +100,7 @@ export function FirstRunModal({ company, onDismiss, onComplete }: FirstRunModalP
                 <Rocket className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <DialogTitle className="text-xl">Welcome to OmniFlow!</DialogTitle>
+                <DialogTitle className="text-xl">Welcome!</DialogTitle>
                 <DialogDescription>
                   Let&apos;s get you set up for success
                 </DialogDescription>

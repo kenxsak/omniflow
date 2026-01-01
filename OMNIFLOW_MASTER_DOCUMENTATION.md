@@ -497,6 +497,63 @@ Plan-based feature gating:
 | `generateImage` | `prompt` | `{success, imageUrl?}` |
 | `checkAIQuota` | `companyId` | `{remaining, limit}` |
 
+### Webhook Action Endpoints (For Zapier, Make, n8n, Pabbly)
+**Authentication:** `Authorization: Bearer omni_{companyId}_live`
+
+#### Create Lead
+**Endpoint:** `POST /api/webhooks/actions/create-lead`
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | No* | Lead's name |
+| `email` | No* | Lead's email |
+| `phone` | No* | Lead's phone |
+| `source` | No | Source identifier |
+| `notes` | No | Additional notes |
+| `customFields` | No | Custom field object |
+
+*At least one of name, email, or phone is required
+
+#### Send SMS
+**Endpoint:** `POST /api/webhooks/actions/send-sms`
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `to` | Yes | Phone number |
+| `message` | Yes | SMS content |
+| `templateId` | No | MSG91 template ID |
+
+#### Send Email
+**Endpoint:** `POST /api/webhooks/actions/send-email`
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `to` | Yes | Email address(es) |
+| `subject` | Yes | Email subject |
+| `body` | No* | Plain text body |
+| `htmlBody` | No* | HTML body |
+| `from.email` | No | Override sender email |
+| `from.name` | No | Override sender name |
+| `variables` | No | Template variables `{{key}}` |
+
+*Either body or htmlBody is required
+
+#### Send WhatsApp
+**Endpoint:** `POST /api/webhooks/actions/send-whatsapp`
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `to` | Yes | Phone number(s) |
+| `templateName` | Yes | WhatsApp template name |
+| `parameters` | No | Template variable values |
+| `languageCode` | No | Language code (default: en) |
+
+#### Facebook Lead Ads Webhook
+**Endpoint:** `POST /api/webhooks/facebook-leads`
+- Receives lead notifications from Facebook
+- Auto-syncs leads to CRM
+- Requires Facebook App configuration in Settings
+
 ### Payment Actions
 **Stripe:** `src/app/actions/stripe-payment-actions.ts`
 **Razorpay:** `src/app/actions/razorpay-payment-actions.ts`

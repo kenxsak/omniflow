@@ -11,6 +11,7 @@ import { doc, getDoc } from 'firebase/firestore';
 
 
 const IMPERSONATOR_UID_KEY = 'omniFlowImpersonatorUid'; // Use session storage for this
+const ACTIVE_COMPANY_KEY = 'omniFlowActiveCompanyId'; // For agency mode company switching
 
 interface AuthContextType {
   appUser: AppUser | null;
@@ -25,6 +26,8 @@ interface AuthContextType {
   isAdmin: boolean;
   isManager: boolean;
   isUser: boolean;
+  isAgencyUser: boolean; // New: true if user can manage multiple companies
+  agencyCompanies: Company[]; // New: list of companies user can access
   login: (email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
   signup: (email: string, password?: string) => Promise<{ success: boolean; error?: string; user?: AppUser }>;
   logout: () => void;
@@ -32,6 +35,7 @@ interface AuthContextType {
   stopImpersonation: () => void;
   refreshAuthContext: () => Promise<void>;
   getIdToken: () => Promise<string | null>;
+  switchCompany: (companyId: string) => Promise<void>; // New: switch active company for agency users
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -47,6 +51,8 @@ export const AuthContext = createContext<AuthContextType>({
     isAdmin: false,
     isManager: false,
     isUser: false,
+    isAgencyUser: false,
+    agencyCompanies: [],
     login: async () => ({ success: false, error: 'Auth not initialized' }),
     signup: async () => ({ success: false, error: 'Auth not initialized' }),
     logout: () => {},
@@ -54,6 +60,7 @@ export const AuthContext = createContext<AuthContextType>({
     stopImpersonation: () => {},
     refreshAuthContext: async () => {},
     getIdToken: async () => null,
+    switchCompany: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -63,15 +70,74 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [impersonatingUser, setImpersonatingUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [idToken, setIdToken] = useState<string | null>(null);
+  const [agencyCompanies, setAgencyCompanies] = useState<Company[]>([]);
 
-  const fetchUserAndCompany = useCallback(async (user: AppUser | null) => {
-    if (user?.companyId) {
-        const companySnap = await getDoc(doc(getFirebaseDb()!, "companies", user.companyId));
-        setCompany(companySnap.exists() ? {id: companySnap.id, ...companySnap.data()} as Company : null);
-    } else {
-        setCompany(null);
+  // Fetch company for a given companyId
+  const fetchCompanyById = useCallback(async (companyId: string): Promise<Company | null> => {
+    if (!companyId || !getFirebaseDb()) return null;
+    try {
+      const companySnap = await getDoc(doc(getFirebaseDb()!, "companies", companyId));
+      return companySnap.exists() ? { id: companySnap.id, ...companySnap.data() } as Company : null;
+    } catch (error) {
+      console.error('Error fetching company:', error);
+      return null;
     }
   }, []);
+
+  // Fetch all agency companies for agency users
+  const fetchAgencyCompanies = useCallback(async (user: AppUser | null) => {
+    if (!user?.isAgencyUser || !user?.agencyCompanyIds?.length || !getFirebaseDb()) {
+      setAgencyCompanies([]);
+      return;
+    }
+    
+    try {
+      const companies: Company[] = [];
+      
+      // Always include the user's primary company first
+      if (user.companyId) {
+        const primaryCompany = await fetchCompanyById(user.companyId);
+        if (primaryCompany) companies.push(primaryCompany);
+      }
+      
+      // Fetch all agency client companies
+      for (const companyId of user.agencyCompanyIds) {
+        if (companyId !== user.companyId) { // Don't duplicate primary
+          const clientCompany = await fetchCompanyById(companyId);
+          if (clientCompany) companies.push(clientCompany);
+        }
+      }
+      
+      setAgencyCompanies(companies);
+    } catch (error) {
+      console.error('Error fetching agency companies:', error);
+      setAgencyCompanies([]);
+    }
+  }, [fetchCompanyById]);
+
+  const fetchUserAndCompany = useCallback(async (user: AppUser | null) => {
+    if (!user) {
+      setCompany(null);
+      setAgencyCompanies([]);
+      return;
+    }
+    
+    // Check for stored active company (agency mode)
+    const storedActiveCompanyId = sessionStorage.getItem(ACTIVE_COMPANY_KEY);
+    const activeCompanyId = user.isAgencyUser && storedActiveCompanyId 
+      ? storedActiveCompanyId 
+      : user.companyId;
+    
+    if (activeCompanyId) {
+      const activeCompany = await fetchCompanyById(activeCompanyId);
+      setCompany(activeCompany);
+    } else {
+      setCompany(null);
+    }
+    
+    // Fetch agency companies if user is an agency user
+    await fetchAgencyCompanies(user);
+  }, [fetchCompanyById, fetchAgencyCompanies]);
 
   const fetchFullContext = useCallback(async (currentFirebaseUser: FirebaseUser | null) => {
     if (!getFirebaseDb() || !currentFirebaseUser) {
@@ -288,18 +354,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     if (!getFirebaseAuth()) return;
-    try {
-        await fetch('/api/auth/session', { method: 'DELETE' });
-    } catch (error) {
-        console.error('Error deleting session cookie:', error);
-    }
-    await signOut(getFirebaseAuth()!);
-    sessionStorage.removeItem(IMPERSONATOR_UID_KEY);
+    
+    // Clear local state immediately for faster UX
     setAppUser(null);
     setFirebaseUser(null);
     setImpersonatingUser(null);
     setCompany(null);
     setIdToken(null);
+    setAgencyCompanies([]);
+    sessionStorage.removeItem(IMPERSONATOR_UID_KEY);
+    sessionStorage.removeItem(ACTIVE_COMPANY_KEY);
+    
+    // Fire and forget - don't wait for these
+    fetch('/api/auth/session', { method: 'DELETE' }).catch(() => {});
+    signOut(getFirebaseAuth()!).catch((error) => {
+      console.error('Error signing out:', error);
+    });
   };
 
   const startImpersonation = (targetUser: AppUser) => {
@@ -335,11 +405,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return null;
     }
   }, [firebaseUser]);
+
+  // Switch active company for agency users
+  const switchCompany = useCallback(async (companyId: string) => {
+    if (!appUser?.isAgencyUser) {
+      console.warn('[Auth] switchCompany called but user is not an agency user');
+      return;
+    }
+    
+    // Verify user has access to this company
+    const hasAccess = companyId === appUser.companyId || 
+                      appUser.agencyCompanyIds?.includes(companyId);
+    
+    if (!hasAccess) {
+      console.error('[Auth] User does not have access to company:', companyId);
+      return;
+    }
+    
+    // Store active company in session
+    sessionStorage.setItem(ACTIVE_COMPANY_KEY, companyId);
+    
+    // Fetch and set the new active company
+    const newCompany = await fetchCompanyById(companyId);
+    setCompany(newCompany);
+    
+    console.log('[Auth] Switched to company:', newCompany?.name || companyId);
+  }, [appUser, fetchCompanyById]);
   
   const isSuperAdmin = appUser?.role === 'superadmin';
   const isAdmin = appUser?.role === 'admin';
   const isManager = appUser?.role === 'manager';
   const isUser = appUser?.role === 'user';
+  const isAgencyUser = appUser?.isAgencyUser ?? false;
   
   const value = {
     appUser,
@@ -354,6 +451,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isAdmin,
     isManager,
     isUser,
+    isAgencyUser,
+    agencyCompanies,
     login,
     signup,
     logout,
@@ -361,6 +460,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     stopImpersonation,
     refreshAuthContext,
     getIdToken,
+    switchCompany,
   };
 
   return (

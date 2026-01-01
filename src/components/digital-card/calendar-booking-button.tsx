@@ -20,6 +20,7 @@ interface CalendarBookingButtonProps {
   variant?: 'default' | 'outline' | 'ghost';
   size?: 'sm' | 'default' | 'lg';
   showIcon?: boolean;
+  className?: string;
 }
 
 export default function CalendarBookingButton({
@@ -29,7 +30,8 @@ export default function CalendarBookingButton({
   primaryColor = '#000000',
   variant = 'default',
   size = 'default',
-  showIcon = true
+  showIcon = true,
+  className = ''
 }: CalendarBookingButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -49,14 +51,14 @@ export default function CalendarBookingButton({
         <Button 
           variant={variant} 
           size={size}
-          className="w-full"
+          className={`w-full ${className}`}
           style={{
             backgroundColor: variant === 'default' ? primaryColor : undefined,
             borderColor: variant === 'outline' ? primaryColor : undefined,
             color: variant === 'outline' ? primaryColor : undefined,
           }}
         >
-          {showIcon && <CalendarDays className="h-4 w-4 mr-2" />}
+          {showIcon && <CalendarDays className="h-5 w-5 mr-2" />}
           {buttonText}
         </Button>
       </DialogTrigger>

@@ -1156,11 +1156,11 @@ async function processWhatsAppCampaign(job: CampaignJob, company: any): Promise<
   } else if (whatsappProvider === 'aisensy') {
     const config = { 
       apiKey: decryptApiKeyServerSide(company.apiKeys.aisensy.apiKey),
-      campaignName: broadcastName || 'OmniFlow Campaign',
+      campaignName: broadcastName || 'Default Campaign',
     };
 
     result = await sendBulkWhatsAppAiSensy(config, {
-      campaignName: broadcastName || 'OmniFlow Campaign',
+      campaignName: broadcastName || 'Default Campaign',
       recipients: validRecipients.map(r => ({
         whatsappNumber: r.phone!,
         userName: r.name || 'Customer',

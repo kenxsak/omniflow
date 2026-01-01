@@ -444,43 +444,43 @@ export default function TransactionsPage() {
       </Animated>
 
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Review Transaction</DialogTitle>
-            <DialogDescription>
-              Review and manually update the status of this transaction if needed.
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-[480px] p-4 sm:p-6 rounded-xl">
+          <DialogHeader className="space-y-1 pb-2">
+            <DialogTitle className="text-base sm:text-lg">Review Transaction</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
+              Review and update transaction status if needed.
             </DialogDescription>
           </DialogHeader>
           
           {selectedTransaction && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 p-3 bg-muted rounded-lg">
                 <div>
-                  <p className="text-xs text-muted-foreground">Company</p>
-                  <p className="font-medium">{selectedTransaction.companyName}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">Company</p>
+                  <p className="text-xs sm:text-sm font-medium truncate">{selectedTransaction.companyName}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Amount</p>
-                  <p className="font-medium">{formatCurrency(selectedTransaction.amount, selectedTransaction.currency)}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">Amount</p>
+                  <p className="text-xs sm:text-sm font-medium">{formatCurrency(selectedTransaction.amount, selectedTransaction.currency)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Gateway</p>
-                  <p className="font-medium capitalize">{selectedTransaction.gateway}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">Gateway</p>
+                  <p className="text-xs sm:text-sm font-medium capitalize">{selectedTransaction.gateway}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Current Status</p>
-                  <div className="mt-1">{getStatusBadge(selectedTransaction.status)}</div>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">Status</p>
+                  <div className="mt-0.5">{getStatusBadge(selectedTransaction.status)}</div>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-xs text-muted-foreground">Transaction ID</p>
-                  <code className="text-xs">{selectedTransaction.gatewayTransactionId}</code>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">Transaction ID</p>
+                  <code className="text-[10px] sm:text-xs break-all">{selectedTransaction.gatewayTransactionId}</code>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Update Status</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium">Update Status</Label>
                 <Select value={newStatus} onValueChange={(v) => setNewStatus(v as PaymentStatus)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9 sm:h-10 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -492,22 +492,23 @@ export default function TransactionsPage() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label>Review Notes (Optional)</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium">Review Notes (Optional)</Label>
                 <Textarea 
-                  placeholder="Add notes about this manual review..."
+                  placeholder="Add notes..."
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
+                  className="min-h-[70px] sm:min-h-[80px] text-sm resize-none"
                 />
               </div>
             </div>
           )}
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+          <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 pt-3 sm:pt-4">
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)} className="w-full sm:w-auto h-9 sm:h-10 text-sm">
               Cancel
             </Button>
-            <Button onClick={handleUpdateStatus} disabled={isUpdating}>
+            <Button onClick={handleUpdateStatus} disabled={isUpdating} className="w-full sm:w-auto h-9 sm:h-10 text-sm">
               {isUpdating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Update Status
             </Button>

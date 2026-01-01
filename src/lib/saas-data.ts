@@ -35,6 +35,7 @@ export const initialFeatures: Feature[] = [
     
     // Enterprise Features
     { id: 'feat_enterprise_team', name: 'Enterprise Team Collaboration', description: 'Lead Claiming (prevent duplicate work), Full Audit Trail (compliance tracking), Auto Lead Distribution (fair assignment), and Enterprise Settings page.', active: true },
+    { id: 'feat_team_management', name: 'Team Management', description: 'Add team members, assign roles, manage permissions, and track team activity.', active: true },
     { id: 'feat_advanced_analytics', name: 'Advanced Analytics & Business Reports', description: 'Access to advanced business intelligence, conversion tracking, ROI calculations, and predictive analytics.', active: true },
     { id: 'feat_white_label', name: 'White Label Branding', description: 'Custom branding, logo, colors, and domain for agencies and resellers. Enterprise only.', active: true },
     { id: 'feat_api_integrations', name: 'API & Integrations', description: 'REST API access, webhooks, Zapier integration, and third-party app connections.', active: true },
@@ -198,7 +199,7 @@ const initialSaasPlans: Plan[] = [
       'feat_sms_whatsapp', 'feat_social_media', 'feat_ai_ads_manager',
       'feat_landing_pages', 'feat_blog', 'feat_ai_chat', 'feat_workflow_builder',
       'feat_automations', 'feat_enterprise_team', 'feat_advanced_analytics',
-      'feat_white_label', 'feat_api_integrations'
+      'feat_white_label', 'feat_api_integrations', 'feat_team_management'
     ],
     maxUsers: 50,
     

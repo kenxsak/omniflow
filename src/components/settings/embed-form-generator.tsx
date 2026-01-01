@@ -93,8 +93,8 @@ export function EmbedFormGenerator() {
       `<option value="${c.code}" ${c.code === defaultCountryCode ? 'selected' : ''}>${c.country} ${c.code}</option>`
     ).join('\n              ');
     
-    return `<!-- OmniFlow Lead Capture Form -->
-<form action="${appUrl}/api/embed-lead" method="POST" style="max-width:400px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;" onsubmit="return validateOmniflowForm(this)">
+    return `<!-- Lead Capture Form -->
+<form action="${appUrl}/api/embed-lead" method="POST" style="max-width:400px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;" onsubmit="return validateEmbedForm(this)">
   <input type="hidden" name="access_key" value="${accessKey}">
   <input type="hidden" name="source" value="${customSource}">
   <input type="text" name="_honeypot" style="display:none" tabindex="-1" autocomplete="off">
@@ -135,12 +135,12 @@ export function EmbedFormGenerator() {
   </button>
   
   <p style="margin-top:12px;font-size:11px;color:#9ca3af;text-align:center;">
-    Powered by <a href="https://omniflow.wmart.in" target="_blank" style="color:#6366f1;text-decoration:none;">OmniFlow</a>
+    Powered by <a href="${appUrl}" target="_blank" style="color:#6366f1;text-decoration:none;">${company?.name || 'OmniFlow'}</a>
   </p>
 </form>
 
 <script>
-function validateOmniflowForm(form) {
+function validateEmbedForm(form) {
   var countryCode = form.country_code.value;
   var phoneNumber = form.phone_number.value.replace(/\\D/g, '');
   // Combine country code and phone number into hidden field
@@ -157,7 +157,7 @@ function validateOmniflowForm(form) {
 
   // Generate React/Next.js code with country code selector
   const generateReactCode = () => {
-    return `// OmniFlow Lead Capture Form - React Component
+    return `// Lead Capture Form - React Component
 import { useState } from 'react';
 
 const COUNTRY_CODES = [
@@ -262,30 +262,30 @@ ${generateHtmlCode()}
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
+      <CardHeader className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
               <Icon icon="solar:code-square-bold" className="h-5 w-5" />
               Embed Lead Capture Form
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs sm:text-sm mt-1">
               Add a contact form to any website. Leads go directly to your CRM with email notifications.
             </CardDescription>
           </div>
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className="text-[10px] sm:text-xs w-fit shrink-0">
             <Icon icon="solar:shield-check-bold" className="h-3 w-3 mr-1" />
             Spam Protected
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 p-4 sm:p-6 pt-0 sm:pt-0">
         {/* Access Key Section */}
         <div className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
             <Label className="text-sm font-medium">Your Access Key</Label>
             {accessKey && (
-              <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={handleGenerateKey}>
+              <Button variant="ghost" size="sm" className="h-7 text-xs w-fit" onClick={handleGenerateKey}>
                 <Icon icon="solar:refresh-linear" className="h-3 w-3 mr-1" />
                 Regenerate
               </Button>
@@ -293,16 +293,17 @@ ${generateHtmlCode()}
           </div>
           
           {accessKey ? (
-            <div className="flex items-center gap-2">
-              <code className="flex-1 px-3 py-2 bg-white dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-lg text-sm font-mono">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <code className="flex-1 px-3 py-2.5 bg-white dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-lg text-xs sm:text-sm font-mono break-all overflow-hidden">
                 {accessKey}
               </code>
-              <Button variant="outline" size="sm" onClick={() => copyToClipboard(accessKey, 'Access Key')}>
-                <Icon icon="solar:copy-linear" className="h-4 w-4" />
+              <Button variant="outline" size="sm" className="h-10 sm:h-auto shrink-0" onClick={() => copyToClipboard(accessKey, 'Access Key')}>
+                <Icon icon="solar:copy-linear" className="h-4 w-4 mr-1.5 sm:mr-0" />
+                <span className="sm:hidden">Copy Key</span>
               </Button>
             </div>
           ) : (
-            <Button onClick={handleGenerateKey} disabled={isGenerating}>
+            <Button onClick={handleGenerateKey} disabled={isGenerating} className="w-full sm:w-auto">
               {isGenerating ? (
                 <>
                   <Icon icon="solar:refresh-linear" className="h-4 w-4 mr-2 animate-spin" />
@@ -325,20 +326,20 @@ ${generateHtmlCode()}
         {accessKey && (
           <>
             {/* Customization Options */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-xs">Source Label</Label>
                 <Input 
                   value={customSource} 
                   onChange={(e) => setCustomSource(e.target.value)}
                   placeholder="Website Contact Form"
-                  className="h-9 text-sm"
+                  className="h-10 text-sm"
                 />
               </div>
               <div className="space-y-2">
                 <Label className="text-xs">Default Country</Label>
                 <Select value={defaultCountryCode} onValueChange={setDefaultCountryCode}>
-                  <SelectTrigger className="h-9 text-sm">
+                  <SelectTrigger className="h-10 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -357,12 +358,12 @@ ${generateHtmlCode()}
                     type="color" 
                     value={primaryColor} 
                     onChange={(e) => setPrimaryColor(e.target.value)}
-                    className="h-9 w-12 p-1 cursor-pointer"
+                    className="h-10 w-14 p-1 cursor-pointer"
                   />
                   <Input 
                     value={primaryColor} 
                     onChange={(e) => setPrimaryColor(e.target.value)}
-                    className="h-9 text-sm font-mono"
+                    className="h-10 text-sm font-mono flex-1"
                   />
                 </div>
               </div>
@@ -371,7 +372,7 @@ ${generateHtmlCode()}
                 <Button 
                   variant={showMessage ? 'default' : 'outline'} 
                   size="sm" 
-                  className="h-9 text-xs w-full"
+                  className="h-10 text-xs w-full"
                   onClick={() => setShowMessage(!showMessage)}
                 >
                   {showMessage ? '✓ Message Field' : 'Add Message Field'}
@@ -381,30 +382,30 @@ ${generateHtmlCode()}
 
             {/* Code Tabs */}
             <Tabs defaultValue="html" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="html" className="text-xs">
-                  <Icon icon="solar:code-linear" className="h-3.5 w-3.5 mr-1.5" />
-                  HTML
+              <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+                <TabsTrigger value="html" className="text-[10px] sm:text-xs py-2">
+                  <Icon icon="solar:code-linear" className="h-3.5 w-3.5 mr-1 sm:mr-1.5" />
+                  <span className="hidden sm:inline">HTML</span>
                 </TabsTrigger>
-                <TabsTrigger value="react" className="text-xs">
-                  <Icon icon="logos:react" className="h-3.5 w-3.5 mr-1.5" />
-                  React
+                <TabsTrigger value="react" className="text-[10px] sm:text-xs py-2">
+                  <Icon icon="logos:react" className="h-3.5 w-3.5 mr-1 sm:mr-1.5" />
+                  <span className="hidden sm:inline">React</span>
                 </TabsTrigger>
-                <TabsTrigger value="wordpress" className="text-xs">
-                  <Icon icon="logos:wordpress-icon" className="h-3.5 w-3.5 mr-1.5" />
-                  WordPress
+                <TabsTrigger value="wordpress" className="text-[10px] sm:text-xs py-2">
+                  <Icon icon="logos:wordpress-icon" className="h-3.5 w-3.5 mr-1 sm:mr-1.5" />
+                  <span className="hidden sm:inline">WordPress</span>
                 </TabsTrigger>
               </TabsList>
               
               <TabsContent value="html" className="mt-4">
                 <div className="relative">
-                  <pre className="p-4 bg-stone-950 text-stone-100 rounded-xl text-xs overflow-x-auto max-h-[300px]">
+                  <pre className="p-3 sm:p-4 bg-stone-950 text-stone-100 rounded-xl text-[10px] sm:text-xs overflow-x-auto max-h-[250px] sm:max-h-[300px]">
                     <code>{generateHtmlCode()}</code>
                   </pre>
                   <Button 
                     variant="secondary" 
                     size="sm" 
-                    className="absolute top-2 right-2 h-7 text-xs"
+                    className="absolute top-2 right-2 h-7 text-[10px] sm:text-xs"
                     onClick={() => copyToClipboard(generateHtmlCode(), 'HTML Code')}
                   >
                     <Icon icon="solar:copy-linear" className="h-3 w-3 mr-1" />
@@ -415,13 +416,13 @@ ${generateHtmlCode()}
               
               <TabsContent value="react" className="mt-4">
                 <div className="relative">
-                  <pre className="p-4 bg-stone-950 text-stone-100 rounded-xl text-xs overflow-x-auto max-h-[300px]">
+                  <pre className="p-3 sm:p-4 bg-stone-950 text-stone-100 rounded-xl text-[10px] sm:text-xs overflow-x-auto max-h-[250px] sm:max-h-[300px]">
                     <code>{generateReactCode()}</code>
                   </pre>
                   <Button 
                     variant="secondary" 
                     size="sm" 
-                    className="absolute top-2 right-2 h-7 text-xs"
+                    className="absolute top-2 right-2 h-7 text-[10px] sm:text-xs"
                     onClick={() => copyToClipboard(generateReactCode(), 'React Code')}
                   >
                     <Icon icon="solar:copy-linear" className="h-3 w-3 mr-1" />
@@ -432,13 +433,13 @@ ${generateHtmlCode()}
               
               <TabsContent value="wordpress" className="mt-4">
                 <div className="relative">
-                  <pre className="p-4 bg-stone-950 text-stone-100 rounded-xl text-xs overflow-x-auto max-h-[300px]">
+                  <pre className="p-3 sm:p-4 bg-stone-950 text-stone-100 rounded-xl text-[10px] sm:text-xs overflow-x-auto max-h-[250px] sm:max-h-[300px]">
                     <code>{generateWordPressCode()}</code>
                   </pre>
                   <Button 
                     variant="secondary" 
                     size="sm" 
-                    className="absolute top-2 right-2 h-7 text-xs"
+                    className="absolute top-2 right-2 h-7 text-[10px] sm:text-xs"
                     onClick={() => copyToClipboard(generateWordPressCode(), 'WordPress Code')}
                   >
                     <Icon icon="solar:copy-linear" className="h-3 w-3 mr-1" />

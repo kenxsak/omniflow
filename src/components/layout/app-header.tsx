@@ -13,6 +13,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { CompanySwitcher } from "@/components/agency/company-switcher";
 
 export default function AppHeader() {
   const { isMobile } = useSidebar();
@@ -55,7 +56,8 @@ export default function AppHeader() {
 
         {/* Right side - Actions */}
         <div className="flex items-center gap-2">
-
+          {/* Agency Company Switcher */}
+          <CompanySwitcher />
 
           {/* User menu - Clerk style */}
           <DropdownMenu>

@@ -48,7 +48,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </SidebarContent>
         <SidebarFooter className="p-3 text-[10px] text-sidebar-foreground group-data-[collapsible=icon]:hidden">
           <div className="flex items-center justify-between">
-            <span>© {new Date().getFullYear()} OmniFlow</span>
+            <span>© {new Date().getFullYear()}</span>
             <span className="opacity-50">v2.0</span>
           </div>
         </SidebarFooter>

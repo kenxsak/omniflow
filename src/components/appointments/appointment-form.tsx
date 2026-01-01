@@ -710,21 +710,33 @@ export function AppointmentForm({
           )}
         />
 
-        {/* Footer Actions */}
-        <div className="flex items-center justify-end gap-2 pt-2 border-t border-stone-200 dark:border-stone-800">
-          <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={isSubmitting} className="h-8 text-xs">
+        {/* Footer Actions - Sticky on mobile */}
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-4 mt-2 border-t border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950 sticky bottom-0 -mx-4 sm:-mx-6 px-4 sm:px-6 pb-4 sm:pb-0">
+          <Button 
+            type="button" 
+            variant="outline" 
+            size="sm" 
+            onClick={onCancel} 
+            disabled={isSubmitting} 
+            className="h-10 sm:h-9 text-sm sm:text-xs w-full sm:w-auto"
+          >
             Cancel
           </Button>
-          <Button type="submit" size="sm" disabled={isSubmitting} className="h-8 text-xs">
+          <Button 
+            type="submit" 
+            size="sm" 
+            disabled={isSubmitting} 
+            className="h-10 sm:h-9 text-sm sm:text-xs w-full sm:w-auto bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white"
+          >
             {isSubmitting ? (
               <>
-                <Icon icon="solar:refresh-linear" className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                <Icon icon="solar:refresh-linear" className="mr-1.5 h-4 w-4 sm:h-3.5 sm:w-3.5 animate-spin" />
                 {appointment ? 'Updating...' : 'Scheduling...'}
               </>
             ) : (
               <>
-                <Icon icon="solar:calendar-add-linear" className="mr-1.5 h-3.5 w-3.5" />
-                {appointment ? 'Update' : 'Schedule Appointment'}
+                <Icon icon="solar:calendar-add-linear" className="mr-1.5 h-4 w-4 sm:h-3.5 sm:w-3.5" />
+                {appointment ? 'Update Appointment' : 'Schedule Appointment'}
               </>
             )}
           </Button>

@@ -618,142 +618,225 @@ export default function PlanManager() {
     <div className="space-y-6">
       {/* SaaS Plan Management Card */}
       <Card>
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <CardHeader className="p-3 sm:p-4 lg:p-6">
+          <div className="space-y-3">
             <div>
-              <CardTitle>SaaS Plan Management</CardTitle>
-              <CardDescription>View, create, edit, and delete your application's subscription plans.</CardDescription>
+              <CardTitle className="text-sm sm:text-base">SaaS Plan Management</CardTitle>
+              <CardDescription className="text-[10px] sm:text-xs">Manage subscription plans and pricing.</CardDescription>
             </div>
-            <div className="flex gap-2 flex-wrap">
-              <Button onClick={handleSyncPlans} variant="outline" disabled={isSyncing} className="self-start sm:self-center">
-                {isSyncing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {!isSyncing && <span className="mr-2">🔄</span>}
-                Sync Plans from Code
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button onClick={handleSyncPlans} variant="outline" disabled={isSyncing} size="sm" className="w-full sm:w-auto h-9 text-xs">
+                {isSyncing && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+                {!isSyncing && <span className="mr-1.5">🔄</span>}
+                Sync Plans
               </Button>
-              <Button onClick={handleCreateNew} className="self-start sm:self-center">
-                <PlusCircle className="mr-2 h-4 w-4" /> Create New Plan
+              <Button onClick={handleCreateNew} size="sm" className="w-full sm:w-auto h-9 text-xs">
+                <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Create Plan
               </Button>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 sm:p-4 lg:p-6">
           {isLoading ? (
-            <div className="flex justify-center items-center h-40"><Loader2 className="h-8 w-8 animate-spin" /></div>
+            <div className="flex justify-center items-center h-40"><Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin" /></div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Plan Name</TableHead>
-                    <TableHead>{priceColumnHeader}</TableHead>
-                    <TableHead className="hidden sm:table-cell">Max Users</TableHead>
-                    <TableHead className="hidden md:table-cell">AI Credits</TableHead>
-                    <TableHead className="hidden md:table-cell">CRM Access</TableHead>
-                    <TableHead className="hidden lg:table-cell">Contact Limit</TableHead>
-                    <TableHead className="hidden xl:table-cell">BYOK</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {plans.length > 0 ? (
-                    plans.map(plan => (
-                      <TableRow key={plan.id}>
-                        <TableCell className="font-medium">
-                          <div className="flex flex-col gap-1">
-                            <span>{plan.name}</span>
-                            {plan.isFeatured && <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded w-fit">Featured</span>}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {plan.priceMonthlyUSD === 0 ? 'Free' : formatCurrency(convertedPrices[plan.id] || plan.priceMonthlyUSD)}
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">{plan.maxUsers ?? 'N/A'}</TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          <div className="flex flex-col gap-0.5">
-                            <span>{plan.aiCreditsPerMonth?.toLocaleString() ?? '0'}</span>
-                            {plan.maxImagesPerMonth && (
-                              <span className="text-xs text-muted-foreground">{plan.maxImagesPerMonth} img/mo</span>
+            <>
+              {/* Mobile Card View */}
+              <div className="block lg:hidden space-y-2">
+                {plans.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Layers className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-xs">No plans found. Create one to get started.</p>
+                  </div>
+                ) : (
+                  plans.map(plan => (
+                    <div key={plan.id} className="p-3 rounded-lg border border-stone-200 dark:border-stone-800">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-medium text-xs sm:text-sm">{plan.name}</span>
+                            {plan.isFeatured && (
+                              <span className="text-[8px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded">Featured</span>
+                            )}
+                            {plan.isHidden && (
+                              <span className="text-[8px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded">Hidden</span>
                             )}
                           </div>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          <div className="flex flex-col gap-0.5">
-                            <span className={plan.crmAccessLevel === 'full' ? 'text-success' : 'text-muted-foreground'}>
-                              {plan.crmAccessLevel === 'full' ? 'Full CRM' : 'Basic CRM'}
-                            </span>
-                            <div className="flex gap-1 text-xs">
-                              {plan.allowBulkImport && <span className="bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-300 px-1 py-0.5 rounded">Import</span>}
-                              {plan.allowBulkExport && <span className="bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-300 px-1 py-0.5 rounded">Export</span>}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="hidden lg:table-cell">
-                          <span className={(plan.maxContacts === null || plan.maxContacts === undefined) ? 'text-success' : ''}>
-                            {(plan.maxContacts === null || plan.maxContacts === undefined) ? '∞ Unlimited' : `${plan.maxContacts.toLocaleString()} max`}
-                          </span>
-                        </TableCell>
-                        <TableCell className="hidden xl:table-cell">
-                          {plan.allowBYOK ? (
-                            <span className="text-success">✓ Yes</span>
-                          ) : (
-                            <span className="text-muted-foreground">✗ No</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right">
+                          <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{plan.description}</p>
+                        </div>
+                        <div className="flex items-center gap-0.5 shrink-0">
                           <Button 
                             variant="ghost" 
                             size="icon" 
+                            className="h-7 w-7"
                             onClick={() => handleToggleVisibility(plan)}
                             title={plan.isHidden ? "Show to users" : "Hide from users"}
                           >
-                            {plan.isHidden ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-green-500" />}
+                            {plan.isHidden ? <EyeOff className="h-3.5 w-3.5 text-muted-foreground" /> : <Eye className="h-3.5 w-3.5 text-green-500" />}
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleEdit(plan)}><Edit className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEdit(plan)}>
+                            <Edit className="h-3.5 w-3.5" />
+                          </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                              <Button variant="ghost" size="icon" className="h-7 w-7"><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
                             </AlertDialogTrigger>
-                            <AlertDialogContent>
+                            <AlertDialogContent className="w-[calc(100%-2rem)] max-w-[420px] rounded-xl">
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure you want to delete this plan?</AlertDialogTitle>
-                                <AlertDialogDescription>This action cannot be undone. This will permanently delete the "{plan.name}" plan.</AlertDialogDescription>
+                                <AlertDialogTitle className="text-base sm:text-lg">Delete "{plan.name}"?</AlertDialogTitle>
+                                <AlertDialogDescription className="text-xs sm:text-sm">This action cannot be undone.</AlertDialogDescription>
                               </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDelete(plan)} className={buttonVariants({ variant: "destructive" })}>Delete Plan</AlertDialogAction>
+                              <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2">
+                                <AlertDialogCancel className="w-full sm:w-auto h-9 sm:h-10">Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDelete(plan)} className={buttonVariants({ variant: "destructive" }) + " w-full sm:w-auto h-9 sm:h-10"}>Delete</AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow><TableCell colSpan={7} className="h-24 text-center">No plans found. Create one to get started.</TableCell></TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-4 gap-1.5 text-center">
+                        <div className="p-1.5 rounded bg-stone-50 dark:bg-stone-900/50">
+                          <p className="text-[8px] text-muted-foreground">Price</p>
+                          <p className="text-[10px] font-semibold">
+                            {plan.priceMonthlyUSD === 0 ? 'Free' : formatCurrency(convertedPrices[plan.id] || plan.priceMonthlyUSD)}
+                          </p>
+                        </div>
+                        <div className="p-1.5 rounded bg-stone-50 dark:bg-stone-900/50">
+                          <p className="text-[8px] text-muted-foreground">Users</p>
+                          <p className="text-[10px] font-semibold">{plan.maxUsers ?? 'N/A'}</p>
+                        </div>
+                        <div className="p-1.5 rounded bg-stone-50 dark:bg-stone-900/50">
+                          <p className="text-[8px] text-muted-foreground">AI Credits</p>
+                          <p className="text-[10px] font-semibold">{plan.aiCreditsPerMonth?.toLocaleString() ?? '0'}</p>
+                        </div>
+                        <div className="p-1.5 rounded bg-stone-50 dark:bg-stone-900/50">
+                          <p className="text-[8px] text-muted-foreground">CRM</p>
+                          <p className={`text-[10px] font-semibold ${plan.crmAccessLevel === 'full' ? 'text-success' : 'text-muted-foreground'}`}>
+                            {plan.crmAccessLevel === 'full' ? 'Full' : 'Basic'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden lg:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs">Plan Name</TableHead>
+                      <TableHead className="text-xs">{priceColumnHeader}</TableHead>
+                      <TableHead className="text-xs">Max Users</TableHead>
+                      <TableHead className="text-xs">AI Credits</TableHead>
+                      <TableHead className="text-xs">CRM Access</TableHead>
+                      <TableHead className="text-xs">Contact Limit</TableHead>
+                      <TableHead className="text-xs">BYOK</TableHead>
+                      <TableHead className="text-right text-xs">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {plans.length > 0 ? (
+                      plans.map(plan => (
+                        <TableRow key={plan.id}>
+                          <TableCell className="font-medium">
+                            <div className="flex flex-col gap-1">
+                              <span className="text-sm">{plan.name}</span>
+                              {plan.isFeatured && <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded w-fit">Featured</span>}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            {plan.priceMonthlyUSD === 0 ? 'Free' : formatCurrency(convertedPrices[plan.id] || plan.priceMonthlyUSD)}
+                          </TableCell>
+                          <TableCell className="text-sm">{plan.maxUsers ?? 'N/A'}</TableCell>
+                          <TableCell>
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-sm">{plan.aiCreditsPerMonth?.toLocaleString() ?? '0'}</span>
+                              {plan.maxImagesPerMonth && (
+                                <span className="text-xs text-muted-foreground">{plan.maxImagesPerMonth} img/mo</span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-col gap-0.5">
+                              <span className={`text-sm ${plan.crmAccessLevel === 'full' ? 'text-success' : 'text-muted-foreground'}`}>
+                                {plan.crmAccessLevel === 'full' ? 'Full CRM' : 'Basic CRM'}
+                              </span>
+                              <div className="flex gap-1 text-xs">
+                                {plan.allowBulkImport && <span className="bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-300 px-1 py-0.5 rounded">Import</span>}
+                                {plan.allowBulkExport && <span className="bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-300 px-1 py-0.5 rounded">Export</span>}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <span className={`text-sm ${(plan.maxContacts === null || plan.maxContacts === undefined) ? 'text-success' : ''}`}>
+                              {(plan.maxContacts === null || plan.maxContacts === undefined) ? '∞ Unlimited' : `${plan.maxContacts.toLocaleString()} max`}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            {plan.allowBYOK ? (
+                              <span className="text-success text-sm">✓ Yes</span>
+                            ) : (
+                              <span className="text-muted-foreground text-sm">✗ No</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => handleToggleVisibility(plan)}
+                              title={plan.isHidden ? "Show to users" : "Hide from users"}
+                            >
+                              {plan.isHidden ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-green-500" />}
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleEdit(plan)}><Edit className="h-4 w-4" /></Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="w-[calc(100%-2rem)] max-w-[420px] rounded-xl">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle className="text-base sm:text-lg">Delete "{plan.name}"?</AlertDialogTitle>
+                                  <AlertDialogDescription className="text-xs sm:text-sm">This action cannot be undone.</AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2">
+                                  <AlertDialogCancel className="w-full sm:w-auto h-9 sm:h-10">Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDelete(plan)} className={buttonVariants({ variant: "destructive" }) + " w-full sm:w-auto h-9 sm:h-10"}>Delete</AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow><TableCell colSpan={8} className="h-24 text-center text-sm">No plans found. Create one to get started.</TableCell></TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
-         <CardFooter className="flex-col items-start border-t pt-4">
+         <CardFooter className="flex-col items-start border-t p-3 sm:p-4 lg:p-6">
              {trialSettings && (
-                 <div className="w-full space-y-4">
-                    <h4 className="font-semibold text-md flex items-center"><Timer className="mr-2 h-5 w-5 text-primary"/>Free Trial Configuration</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="trial-plan">Trial Plan</Label>
+                 <div className="w-full space-y-3 sm:space-y-4">
+                    <h4 className="font-semibold text-xs sm:text-sm flex items-center"><Timer className="mr-1.5 h-4 w-4 text-primary"/>Free Trial Configuration</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="trial-plan" className="text-xs">Trial Plan</Label>
                           <Select value={trialSettings.trialPlanId} onValueChange={(planId) => handleTrialSettingsChange('trialPlanId', planId)}>
-                            <SelectTrigger id="trial-plan"><SelectValue /></SelectTrigger>
+                            <SelectTrigger id="trial-plan" className="h-9 sm:h-10 text-sm"><SelectValue /></SelectTrigger>
                             <SelectContent>{plans.map(plan => (<SelectItem key={plan.id} value={plan.id}>{plan.name}</SelectItem>))}</SelectContent>
                           </Select>
-                           <p className="text-xs text-muted-foreground mt-1">This plan will be assigned to new companies on signup.</p>
+                           <p className="text-[10px] text-muted-foreground">Assigned to new companies on signup.</p>
                         </div>
-                        <div>
-                          <Label htmlFor="trial-duration">Trial Duration (days)</Label>
-                          <Input id="trial-duration" type="number" value={trialSettings.trialDurationDays} onChange={(e) => handleTrialSettingsChange('trialDurationDays', Number(e.target.value))} min="1" />
+                        <div className="space-y-1.5">
+                          <Label htmlFor="trial-duration" className="text-xs">Trial Duration (days)</Label>
+                          <Input id="trial-duration" type="number" value={trialSettings.trialDurationDays} onChange={(e) => handleTrialSettingsChange('trialDurationDays', Number(e.target.value))} min="1" className="h-9 sm:h-10 text-sm" />
                         </div>
                     </div>
-                    <Button onClick={handleSaveTrialSettings} size="sm">Save Trial Settings</Button>
+                    <Button onClick={handleSaveTrialSettings} size="sm" className="w-full sm:w-auto h-9 text-xs">Save Trial Settings</Button>
                 </div>
              )}
          </CardFooter>
@@ -761,49 +844,55 @@ export default function PlanManager() {
       
       {/* Unified Feature Management Card */}
       <Card>
-          <CardHeader>
-              <CardTitle className="flex items-center"><Flag className="mr-2 h-5 w-5 text-primary" />Feature Management</CardTitle>
-              <CardDescription>Create new features and manage their global availability. Inactive features cannot be added to plans.</CardDescription>
+          <CardHeader className="p-3 sm:p-4 lg:p-6">
+              <CardTitle className="flex items-center text-sm sm:text-base"><Flag className="mr-1.5 h-4 w-4 text-primary" />Feature Management</CardTitle>
+              <CardDescription className="text-[10px] sm:text-xs">Create features and manage availability. Inactive features cannot be added to plans.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-              <div className="border rounded-md p-4">
-                <h4 className="text-md font-semibold mb-2">Create New Feature</h4>
-                 <div className="flex flex-col sm:flex-row gap-4 items-end">
-                      <div className="flex-grow space-y-1">
+          <CardContent className="p-3 sm:p-4 lg:p-6 pt-0 space-y-3 sm:space-y-4">
+              <div className="border rounded-lg p-3 sm:p-4">
+                <h4 className="text-xs sm:text-sm font-semibold mb-2 sm:mb-3">Create New Feature</h4>
+                 <div className="flex flex-col gap-3">
+                      <div className="space-y-1.5">
                           <Label htmlFor="new-feature-name" className="text-xs">Feature Name</Label>
-                          <Input id="new-feature-name" value={newFeatureName} onChange={e => setNewFeatureName(e.target.value)} placeholder="e.g., Advanced Reporting"/>
+                          <Input id="new-feature-name" value={newFeatureName} onChange={e => setNewFeatureName(e.target.value)} placeholder="e.g., Advanced Reporting" className="h-9 sm:h-10 text-sm"/>
                       </div>
-                      <div className="flex-grow space-y-1">
-                          <Label htmlFor="new-feature-desc" className="text-xs">Feature Description (Optional)</Label>
-                          <Input id="new-feature-desc" value={newFeatureDescription} onChange={e => setNewFeatureDescription(e.target.value)} placeholder="e.g., Generate detailed PDF reports"/>
+                      <div className="space-y-1.5">
+                          <Label htmlFor="new-feature-desc" className="text-xs">Description (Optional)</Label>
+                          <Input id="new-feature-desc" value={newFeatureDescription} onChange={e => setNewFeatureDescription(e.target.value)} placeholder="e.g., Generate detailed PDF reports" className="h-9 sm:h-10 text-sm"/>
                       </div>
-                      <Button onClick={handleAddNewFeature} disabled={isAddingFeature} className="w-full sm:w-auto">
-                        {isAddingFeature && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      <Button onClick={handleAddNewFeature} disabled={isAddingFeature} size="sm" className="w-full sm:w-auto h-9 text-xs">
+                        {isAddingFeature && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
                         Add Feature
                       </Button>
                  </div>
               </div>
               <div>
-                <h4 className="text-md font-semibold mb-2">Available Features</h4>
-                <div className="space-y-2">
-                    {isLoading ? <div className="flex justify-center items-center h-20"><Loader2 className="h-6 w-6 animate-spin" /></div> :
+                <h4 className="text-xs sm:text-sm font-semibold mb-2">Available Features</h4>
+                <div className="space-y-1.5 sm:space-y-2">
+                    {isLoading ? <div className="flex justify-center items-center h-20"><Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin" /></div> :
                         allFeatures.map(feature => (
-                          <div key={feature.id} className="flex items-center justify-between p-3 border rounded-md hover:bg-muted/30">
-                            <div>
-                                <Label htmlFor={`feature-toggle-${feature.id}`} className="font-medium cursor-pointer">{feature.name}</Label>
-                                <p className="text-xs text-muted-foreground">{feature.description || 'No description'}</p>
+                          <div key={feature.id} className="flex items-center justify-between p-2.5 sm:p-3 border rounded-lg hover:bg-muted/30">
+                            <div className="flex-1 min-w-0 mr-2">
+                                <Label htmlFor={`feature-toggle-${feature.id}`} className="font-medium cursor-pointer text-xs sm:text-sm">{feature.name}</Label>
+                                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{feature.description || 'No description'}</p>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                                 <Switch id={`feature-toggle-${feature.id}`} checked={feature.active} onCheckedChange={(checked) => handleFeatureToggle(feature.id, checked)} />
                                 <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" title={`Delete ${feature.name}`} disabled={initialFeatures.some(f => f.id === feature.id)}>
-                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                    <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" title={`Delete ${feature.name}`} disabled={initialFeatures.some(f => f.id === feature.id)}>
+                                        <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-destructive" />
                                     </Button>
                                 </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader><AlertDialogTitle>Delete Feature "{feature.name}"?</AlertDialogTitle><AlertDialogDescription>This will permanently delete the feature from the master list. This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
-                                    <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleDeleteFeature(feature.id, feature.name)} className={buttonVariants({ variant: "destructive" })}>Delete Feature</AlertDialogAction></AlertDialogFooter>
+                                <AlertDialogContent className="w-[calc(100%-2rem)] max-w-[420px] rounded-xl">
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle className="text-base sm:text-lg">Delete "{feature.name}"?</AlertDialogTitle>
+                                      <AlertDialogDescription className="text-xs sm:text-sm">This will permanently delete the feature. This action cannot be undone.</AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2">
+                                      <AlertDialogCancel className="w-full sm:w-auto h-9 sm:h-10">Cancel</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => handleDeleteFeature(feature.id, feature.name)} className={buttonVariants({ variant: "destructive" }) + " w-full sm:w-auto h-9 sm:h-10"}>Delete</AlertDialogAction>
+                                    </AlertDialogFooter>
                                 </AlertDialogContent>
                                 </AlertDialog>
                             </div>

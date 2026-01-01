@@ -317,6 +317,20 @@ const INTEGRATIONS: IntegrationDef[] = [
       { key: 'webhookUrl', label: 'Webhook URL', placeholder: 'https://b24-....bitrix24.com/rest/...', type: 'text' },
       { key: 'userId', label: 'User ID (Optional)', placeholder: '...', type: 'text' }
     ]
+  },
+  // Lead Generation
+  {
+    id: 'facebookLeads',
+    name: 'Facebook Lead Ads',
+    description: 'Auto-sync leads from Facebook Lead Ad forms to your CRM',
+    category: 'CRM',
+    icon: 'logos:facebook',
+    docLink: 'https://developers.facebook.com/docs/marketing-api/guides/lead-ads/',
+    fields: [
+      { key: 'appId', label: 'App ID', placeholder: '123456789012345', type: 'text', help: 'Find in Facebook Developer Console > Your App > Settings > Basic' },
+      { key: 'appSecret', label: 'App Secret', placeholder: '...', type: 'password', help: 'Find in Facebook Developer Console > Your App > Settings > Basic' },
+      { key: 'pageAccessToken', label: 'Page Access Token', placeholder: 'EAABsbCS1iHgBO...', type: 'password', help: 'Generate via Graph API Explorer with pages_read_engagement, leads_retrieval permissions' }
+    ]
   }
   // Note: Social Media publishing uses Copy & Paste approach (Settings > Connections > Social Media)
   // Buffer API closed to new developers since 2019
@@ -485,6 +499,8 @@ export default function IntegrationsPage() {
   const { toast } = useToast();
   const [apiKeys, setApiKeys] = useState<Record<string, Record<string, string>>>({});
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   // Load keys on mount
   useEffect(() => {
@@ -494,10 +510,13 @@ export default function IntegrationsPage() {
         const { fetchCompanyApiKeysAction } = await import('@/app/actions/api-keys-actions');
         // We also need to get voice chat config manually since it's separate
         const { getVoiceChatConfig } = await import('@/app/actions/voice-chat-actions');
+        // Get Facebook Leads config
+        const { getFacebookLeadsConfig } = await import('@/app/actions/facebook-leads-actions');
 
-        const [keysResult, voiceChatResult] = await Promise.all([
+        const [keysResult, voiceChatResult, facebookLeadsResult] = await Promise.all([
           fetchCompanyApiKeysAction(appUser.companyId),
           getVoiceChatConfig(appUser.companyId),
+          getFacebookLeadsConfig(appUser.companyId),
         ]);
 
         let loadedKeys = keysResult.success && keysResult.apiKeys ? keysResult.apiKeys : {};
@@ -509,6 +528,18 @@ export default function IntegrationsPage() {
             voiceChat: {
               widgetId: voiceChatResult.config.chatbotId || '',
               apiKey: voiceChatResult.config.widgetScript || ''
+            }
+          };
+        }
+
+        // Merge Facebook Leads config if exists
+        if (facebookLeadsResult.success && facebookLeadsResult.config?.isConnected) {
+          loadedKeys = {
+            ...loadedKeys,
+            facebookLeads: {
+              appId: facebookLeadsResult.config.appId || '',
+              // Don't expose secrets, just mark as configured
+              configured: 'true'
             }
           };
         }
@@ -536,6 +567,16 @@ export default function IntegrationsPage() {
         const result = await saveVoiceChatConfig(appUser.companyId, widgetScript);
         success = result.success;
         error = result.message || 'Failed';
+      } else if (integrationId === 'facebookLeads') {
+        // Special handling for Facebook Lead Ads
+        const { saveFacebookLeadsConfig } = await import('@/app/actions/facebook-leads-actions');
+        const result = await saveFacebookLeadsConfig(appUser.companyId, {
+          appId: values.appId || '',
+          appSecret: values.appSecret || '',
+          pageAccessToken: values.pageAccessToken || '',
+        });
+        success = result.success;
+        error = result.error || 'Failed';
       } else {
         // Standard handling
         const res = await saveApiKeysAction(appUser.companyId, integrationId, values);
@@ -557,11 +598,41 @@ export default function IntegrationsPage() {
     }
   };
 
+  // Check which essential integrations are configured
+  const isConfigured = (id: string) => apiKeys[id] && Object.keys(apiKeys[id]).length > 0 && Object.values(apiKeys[id]).some(v => !!v);
+  const hasEmailProvider = isConfigured('brevo') || isConfigured('smtp') || isConfigured('sender');
+  const hasSmsProvider = isConfigured('twilio') || isConfigured('msg91') || isConfigured('fast2sms');
+  const hasWhatsAppProvider = isConfigured('metaWhatsApp') || isConfigured('msg91WhatsApp') || isConfigured('gupshup') || isConfigured('aisensy') || isConfigured('authkey');
+  const hasAiProvider = isConfigured('googleAi');
+
+  // Get active email provider name
+  const getActiveEmailProvider = () => {
+    if (isConfigured('brevo')) return 'Brevo';
+    if (isConfigured('smtp')) return 'Custom SMTP';
+    if (isConfigured('sender')) return 'Sender.net';
+    return null;
+  };
+
   // Group by category
   // Order categories logically
   const ORDERED_CATEGORIES = ['AI', 'Voice & Chatbot', 'Communication', 'Email', 'SMS', 'WhatsApp', 'CRM', 'Other'];
   const availableCategories = Array.from(new Set(INTEGRATIONS.map(i => i.category)));
   const sortedCategories = ORDERED_CATEGORIES.filter(c => availableCategories.includes(c as any));
+
+  // Filter integrations based on search and category
+  const filteredIntegrations = INTEGRATIONS.filter(integration => {
+    const matchesSearch = searchQuery === '' || 
+      integration.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      integration.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      integration.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === null || integration.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Get filtered categories (only show categories that have matching integrations)
+  const filteredCategories = sortedCategories.filter(cat => 
+    filteredIntegrations.some(i => i.category === cat)
+  );
 
   if (loading) {
     return (
@@ -576,16 +647,226 @@ export default function IntegrationsPage() {
   }
 
   return (
-    <div className="space-y-8 pb-10 max-w-7xl mx-auto">
-      {/* Intro Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-stone-900 dark:text-stone-100">Integrations Directory</h2>
-          <p className="text-sm text-stone-500">Connect and manage your third-party tools and services</p>
+    <div className="space-y-6 pb-10 max-w-7xl mx-auto">
+      {/* Quick Setup Status Banner */}
+      <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-gradient-to-br from-stone-50 to-stone-100/50 dark:from-stone-900/50 dark:to-stone-950 p-4 sm:p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <Icon icon="solar:rocket-2-linear" className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+          <h3 className="font-semibold text-sm text-stone-900 dark:text-stone-100">Quick Setup Status</h3>
+        </div>
+        <p className="text-xs text-stone-500 mb-4">Essential integrations for your CRM to work properly</p>
+        
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {/* Email Status */}
+          <div className={cn(
+            'rounded-lg p-3 border transition-colors',
+            hasEmailProvider 
+              ? 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800' 
+              : 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800'
+          )}>
+            <div className="flex items-center gap-2 mb-1">
+              <Icon 
+                icon={hasEmailProvider ? 'solar:check-circle-bold' : 'solar:danger-triangle-linear'} 
+                className={cn('h-4 w-4', hasEmailProvider ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400')} 
+              />
+              <span className="text-xs font-medium text-stone-700 dark:text-stone-300">Email</span>
+            </div>
+            <p className={cn('text-[10px]', hasEmailProvider ? 'text-green-700 dark:text-green-300' : 'text-amber-700 dark:text-amber-300')}>
+              {hasEmailProvider ? getActiveEmailProvider() : 'Not configured'}
+            </p>
+          </div>
+
+          {/* SMS Status */}
+          <div className={cn(
+            'rounded-lg p-3 border transition-colors',
+            hasSmsProvider 
+              ? 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800' 
+              : 'bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800'
+          )}>
+            <div className="flex items-center gap-2 mb-1">
+              <Icon 
+                icon={hasSmsProvider ? 'solar:check-circle-bold' : 'solar:chat-line-linear'} 
+                className={cn('h-4 w-4', hasSmsProvider ? 'text-green-600 dark:text-green-400' : 'text-stone-400')} 
+              />
+              <span className="text-xs font-medium text-stone-700 dark:text-stone-300">SMS</span>
+            </div>
+            <p className={cn('text-[10px]', hasSmsProvider ? 'text-green-700 dark:text-green-300' : 'text-stone-500')}>
+              {hasSmsProvider ? 'Connected' : 'Optional'}
+            </p>
+          </div>
+
+          {/* WhatsApp Status */}
+          <div className={cn(
+            'rounded-lg p-3 border transition-colors',
+            hasWhatsAppProvider 
+              ? 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800' 
+              : 'bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800'
+          )}>
+            <div className="flex items-center gap-2 mb-1">
+              <Icon 
+                icon={hasWhatsAppProvider ? 'solar:check-circle-bold' : 'solar:chat-round-dots-linear'} 
+                className={cn('h-4 w-4', hasWhatsAppProvider ? 'text-green-600 dark:text-green-400' : 'text-stone-400')} 
+              />
+              <span className="text-xs font-medium text-stone-700 dark:text-stone-300">WhatsApp</span>
+            </div>
+            <p className={cn('text-[10px]', hasWhatsAppProvider ? 'text-green-700 dark:text-green-300' : 'text-stone-500')}>
+              {hasWhatsAppProvider ? 'Connected' : 'Optional'}
+            </p>
+          </div>
+
+          {/* AI Status */}
+          <div className={cn(
+            'rounded-lg p-3 border transition-colors',
+            hasAiProvider 
+              ? 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800' 
+              : 'bg-stone-100 dark:bg-stone-900 border-stone-200 dark:border-stone-800'
+          )}>
+            <div className="flex items-center gap-2 mb-1">
+              <Icon 
+                icon={hasAiProvider ? 'solar:check-circle-bold' : 'solar:magic-stick-3-linear'} 
+                className={cn('h-4 w-4', hasAiProvider ? 'text-green-600 dark:text-green-400' : 'text-stone-400')} 
+              />
+              <span className="text-xs font-medium text-stone-700 dark:text-stone-300">AI</span>
+            </div>
+            <p className={cn('text-[10px]', hasAiProvider ? 'text-green-700 dark:text-green-300' : 'text-stone-500')}>
+              {hasAiProvider ? 'Connected' : 'Optional'}
+            </p>
+          </div>
+        </div>
+
+        {!hasEmailProvider && (
+          <div className="mt-4 flex items-start gap-2 p-3 rounded-lg bg-amber-100/50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+            <Icon icon="solar:info-circle-linear" className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-800 dark:text-amber-200">
+              <span className="font-medium">Email provider required</span> for task reminders, appointment notifications, and email campaigns. 
+              Configure <button onClick={() => setSearchQuery('brevo')} className="font-semibold underline underline-offset-2">Brevo</button> (free 300 emails/day) or <button onClick={() => setSearchQuery('smtp')} className="font-semibold underline underline-offset-2">Custom SMTP</button> below.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Search and Filter */}
+      <div className="flex flex-col gap-3">
+        <div className="relative">
+          <Icon icon="solar:magnifer-linear" className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
+          <Input
+            type="text"
+            placeholder="Search integrations..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 h-10 text-sm"
+          />
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-stone-100 dark:hover:bg-stone-800"
+            >
+              <Icon icon="solar:close-circle-linear" className="h-4 w-4 text-stone-400" />
+            </button>
+          )}
+        </div>
+        
+        {/* Category Filter Pills - All categories with horizontal scroll and colors */}
+        <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+          <Button
+            variant={selectedCategory === null ? 'default' : 'outline'}
+            size="sm"
+            className="h-9 text-xs whitespace-nowrap shrink-0"
+            onClick={() => setSelectedCategory(null)}
+          >
+            All
+          </Button>
+          {sortedCategories.map(cat => {
+            const isSelected = selectedCategory === cat;
+            // Category-specific colors
+            const categoryButtonColors: Record<string, { selected: string; unselected: string }> = {
+              'AI': { 
+                selected: 'bg-violet-600 hover:bg-violet-700 text-white border-violet-600', 
+                unselected: 'border-violet-300 dark:border-violet-800 text-violet-700 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/50' 
+              },
+              'Voice & Chatbot': { 
+                selected: 'bg-cyan-600 hover:bg-cyan-700 text-white border-cyan-600', 
+                unselected: 'border-cyan-300 dark:border-cyan-800 text-cyan-700 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/50' 
+              },
+              'Email': { 
+                selected: 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600', 
+                unselected: 'border-blue-300 dark:border-blue-800 text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50' 
+              },
+              'SMS': { 
+                selected: 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600', 
+                unselected: 'border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50' 
+              },
+              'WhatsApp': { 
+                selected: 'bg-green-600 hover:bg-green-700 text-white border-green-600', 
+                unselected: 'border-green-300 dark:border-green-800 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/50' 
+              },
+              'CRM': { 
+                selected: 'bg-orange-600 hover:bg-orange-700 text-white border-orange-600', 
+                unselected: 'border-orange-300 dark:border-orange-800 text-orange-700 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950/50' 
+              },
+              'Other': { 
+                selected: 'bg-stone-600 hover:bg-stone-700 text-white border-stone-600', 
+                unselected: 'border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-900' 
+              },
+            };
+            const colors = categoryButtonColors[cat] || categoryButtonColors['Other'];
+            
+            return (
+              <Button
+                key={cat}
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "h-9 text-xs whitespace-nowrap shrink-0 transition-colors",
+                  isSelected ? colors.selected : colors.unselected
+                )}
+                onClick={() => setSelectedCategory(isSelected ? null : cat)}
+              >
+                {cat}
+              </Button>
+            );
+          })}
         </div>
       </div>
 
-      {sortedCategories.map(cat => {
+      {/* Results count */}
+      {(searchQuery || selectedCategory) && (
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-stone-500">
+            Showing {filteredIntegrations.length} of {INTEGRATIONS.length} integrations
+            {selectedCategory && <span className="font-medium"> in {selectedCategory}</span>}
+          </p>
+          {(searchQuery || selectedCategory) && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-7 text-xs"
+              onClick={() => { setSearchQuery(''); setSelectedCategory(null); }}
+            >
+              Clear filters
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* No results message */}
+      {filteredIntegrations.length === 0 && (
+        <div className="text-center py-12">
+          <Icon icon="solar:magnifer-zoom-out-linear" className="h-12 w-12 text-stone-300 dark:text-stone-700 mx-auto mb-4" />
+          <h3 className="text-sm font-medium text-stone-900 dark:text-stone-100 mb-1">No integrations found</h3>
+          <p className="text-xs text-stone-500">Try adjusting your search or filter</p>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="mt-4"
+            onClick={() => { setSearchQuery(''); setSelectedCategory(null); }}
+          >
+            Clear filters
+          </Button>
+        </div>
+      )}
+
+      {filteredCategories.map(cat => {
         // Category color mapping
         const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
           'AI': { bg: 'bg-violet-100 dark:bg-violet-900/40', text: 'text-violet-600 dark:text-violet-400', border: 'border-violet-200 dark:border-violet-800' },
@@ -598,6 +879,7 @@ export default function IntegrationsPage() {
           'Other': { bg: 'bg-stone-100 dark:bg-stone-800', text: 'text-stone-600 dark:text-stone-400', border: 'border-stone-200 dark:border-stone-700' },
         };
         const colors = categoryColors[cat] || categoryColors['Other'];
+        const categoryIntegrations = filteredIntegrations.filter(i => i.category === cat);
         
         return (
         <div key={cat} className="space-y-4">
@@ -607,11 +889,11 @@ export default function IntegrationsPage() {
             </div>
             <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100 uppercase tracking-wider">{cat}</h3>
             <span className={cn('text-xs px-2 py-0.5 rounded-full', colors.bg, colors.text)}>
-              {INTEGRATIONS.filter(i => i.category === cat).length}
+              {categoryIntegrations.length}
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
-            {INTEGRATIONS.filter(i => i.category === cat).map(integration => (
+            {categoryIntegrations.map(integration => (
               <IntegrationCard
                 key={integration.id}
                 integration={integration}

@@ -51,6 +51,14 @@ export default function WhatsAppMarketingPage() {
   const [singleSendPhoneNumber, setSingleSendPhoneNumber] = useState("");
   const [isUploadingContacts, setIsUploadingContacts] = useState(false);
   const [isTemplateBrowserOpen, setIsTemplateBrowserOpen] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  // Common emojis for quick access
+  const quickEmojis = ['👋', '🎉', '✨', '🔥', '💯', '❤️', '👍', '🙏', '📢', '🎁', '💰', '⭐', '🚀', '📞', '💬', '✅'];
+
+  const insertEmoji = (emoji: string) => {
+    setCampaignMessage(prev => prev + emoji);
+  };
 
   const placeholderForCampaignMessage = `Hi *${CONTACT_NAME_PLACEHOLDER}*,\n\nExciting news from *${profileBusinessName}*!\n\n[Your message here]\n\nBest regards,\n*${profileBusinessName}*`;
 
@@ -582,10 +590,46 @@ Jane Smith,"919123456789"`;
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="campaign-message" className="text-xs text-muted-foreground">Message</Label>
-                  <Textarea id="campaign-message" value={campaignMessage} onChange={(e) => setCampaignMessage(e.target.value)} rows={5} placeholder={placeholderForCampaignMessage} className="resize-none" />
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="campaign-message" className="text-xs text-muted-foreground">Message</Label>
+                    <div className="relative">
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                        className="h-7 px-2 text-xs"
+                      >
+                        <Icon icon="solar:sticker-smile-circle-linear" className="h-4 w-4 mr-1" />
+                        Emoji
+                      </Button>
+                      {showEmojiPicker && (
+                        <div className="absolute right-0 top-8 z-50 p-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl shadow-lg">
+                          <div className="grid grid-cols-8 gap-1 w-[200px]">
+                            {quickEmojis.map((emoji) => (
+                              <button
+                                key={emoji}
+                                type="button"
+                                onClick={() => {
+                                  insertEmoji(emoji);
+                                  setShowEmojiPicker(false);
+                                }}
+                                className="w-6 h-6 flex items-center justify-center text-base hover:bg-stone-100 dark:hover:bg-stone-800 rounded transition-colors"
+                              >
+                                {emoji}
+                              </button>
+                            ))}
+                          </div>
+                          <div className="border-t border-stone-200 dark:border-stone-700 mt-2 pt-2">
+                            <p className="text-[9px] text-muted-foreground text-center">Click to insert emoji</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <Textarea id="campaign-message" value={campaignMessage} onChange={(e) => setCampaignMessage(e.target.value)} rows={5} placeholder={placeholderForCampaignMessage} className="resize-none text-sm" />
                   <p className="text-[10px] text-muted-foreground">
-                    Use <code className="px-1 py-0.5 rounded text-[9px]" style={{ backgroundColor: '#dcfce7', color: '#166534' }}>*{CONTACT_NAME_PLACEHOLDER}*</code> for personalization
+                    Use <code className="px-1 py-0.5 rounded text-[9px]" style={{ backgroundColor: '#dcfce7', color: '#166534' }}>*{CONTACT_NAME_PLACEHOLDER}*</code> for personalization • <code className="px-1 py-0.5 rounded text-[9px]" style={{ backgroundColor: '#dbeafe', color: '#1e40af' }}>*bold*</code> for bold text
                   </p>
                 </div>
               </div>
@@ -700,11 +744,18 @@ Jane Smith,"919123456789"`;
                             <p className="text-xs text-white whitespace-pre-wrap break-words leading-relaxed">
                               {(() => {
                                 const contactName = contactsForSending[0]?.name || 'Contact';
-                                // Replace {{Name}} or *{{Name}}* with actual contact name
+                                // Replace {{Name}} or *{{Name}}* with actual contact name (keep bold)
                                 let previewMsg = campaignMessage
-                                  .replace(/\*?\{\{\s*Name\s*\}\}\*?/gi, contactName)
-                                  .replace(/\*([^*]+)\*/g, '$1'); // Remove bold markers for clean preview
-                                return previewMsg;
+                                  .replace(/\*?\{\{\s*Name\s*\}\}\*?/gi, contactName);
+                                
+                                // Convert WhatsApp bold (*text*) to HTML bold for preview
+                                // Split by bold markers and render with proper styling
+                                const parts = previewMsg.split(/\*([^*]+)\*/g);
+                                return parts.map((part, idx) => 
+                                  idx % 2 === 1 
+                                    ? <strong key={idx} className="font-semibold">{part}</strong> 
+                                    : part
+                                );
                               })()}
                             </p>
                             <div className="flex items-center justify-end gap-1 mt-1">
@@ -762,21 +813,21 @@ Jane Smith,"919123456789"`;
 
       {/* Create List Dialog */}
       <Dialog open={isCreateListDialogOpen} onOpenChange={setIsCreateListDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader className="relative">
-            <DialogTitle>Create New List</DialogTitle>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-[480px] p-4 sm:p-6 rounded-xl">
+          <DialogHeader className="relative space-y-1 pb-2">
+            <DialogTitle className="text-base sm:text-lg">Create New List</DialogTitle>
             <DialogCloseButton />
           </DialogHeader>
           <form onSubmit={(e) => { e.preventDefault(); handleCreateList(); }}>
-            <DialogBody>
+            <DialogBody className="py-3 sm:py-4">
               <div className="space-y-1.5">
-                <Label htmlFor="new-list-name" className="text-xs text-muted-foreground">List Name</Label>
-                <Input id="new-list-name" value={newListName} onChange={(e) => setNewListName(e.target.value)} placeholder="e.g., New Leads Q1" required className="h-9" />
+                <Label htmlFor="new-list-name" className="text-xs font-medium">List Name</Label>
+                <Input id="new-list-name" value={newListName} onChange={(e) => setNewListName(e.target.value)} placeholder="e.g., New Leads Q1" required className="h-9 sm:h-10 text-sm" />
               </div>
             </DialogBody>
-            <DialogFooter>
-              <Button type="button" variant="ghost" onClick={() => setIsCreateListDialogOpen(false)}>Cancel</Button>
-              <Button type="submit">Create</Button>
+            <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 pt-2">
+              <Button type="button" variant="ghost" onClick={() => setIsCreateListDialogOpen(false)} className="w-full sm:w-auto h-9 sm:h-10">Cancel</Button>
+              <Button type="submit" className="w-full sm:w-auto h-9 sm:h-10">Create List</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -784,25 +835,26 @@ Jane Smith,"919123456789"`;
 
       {/* Add Contact Dialog */}
       <Dialog open={isAddContactDialogOpen} onOpenChange={setIsAddContactDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader className="relative">
-            <DialogTitle>Add Contact</DialogTitle>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-[480px] p-4 sm:p-6 rounded-xl">
+          <DialogHeader className="relative space-y-1 pb-2">
+            <DialogTitle className="text-base sm:text-lg">Add Contact</DialogTitle>
             <DialogCloseButton />
           </DialogHeader>
           <form onSubmit={(e) => { e.preventDefault(); handleAddContactToList(); }}>
-            <DialogBody className="space-y-4">
+            <DialogBody className="space-y-3 sm:space-y-4 py-3 sm:py-4">
               <div className="space-y-1.5">
-                <Label htmlFor="contact-name" className="text-xs text-muted-foreground">Name *</Label>
-                <Input id="contact-name" value={newContactName} onChange={(e) => setNewContactName(e.target.value)} required className="h-9" />
+                <Label htmlFor="contact-name" className="text-xs font-medium">Name *</Label>
+                <Input id="contact-name" value={newContactName} onChange={(e) => setNewContactName(e.target.value)} placeholder="John Doe" required className="h-9 sm:h-10 text-sm" />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="contact-phone" className="text-xs text-muted-foreground">Phone *</Label>
-                <Input id="contact-phone" type="tel" value={newContactPhoneNumber} onChange={(e) => setNewContactPhoneNumber(e.target.value)} placeholder="919876543210" required className="h-9" />
+                <Label htmlFor="contact-phone" className="text-xs font-medium">Phone Number *</Label>
+                <Input id="contact-phone" type="tel" value={newContactPhoneNumber} onChange={(e) => setNewContactPhoneNumber(e.target.value)} placeholder="+919876543210" required className="h-9 sm:h-10 text-sm" />
+                <p className="text-[10px] text-muted-foreground">Include country code (e.g., +91 for India)</p>
               </div>
             </DialogBody>
-            <DialogFooter>
-              <Button type="button" variant="ghost" onClick={() => setIsAddContactDialogOpen(false)}>Cancel</Button>
-              <Button type="submit">Add</Button>
+            <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 pt-2">
+              <Button type="button" variant="ghost" onClick={() => setIsAddContactDialogOpen(false)} className="w-full sm:w-auto h-9 sm:h-10">Cancel</Button>
+              <Button type="submit" className="w-full sm:w-auto h-9 sm:h-10">Add Contact</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -810,12 +862,12 @@ Jane Smith,"919123456789"`;
 
       {/* Template Browser Dialog */}
       <Dialog open={isTemplateBrowserOpen} onOpenChange={setIsTemplateBrowserOpen}>
-        <DialogContent className="sm:max-w-4xl">
-          <DialogHeader className="relative">
-            <DialogTitle>Select Template</DialogTitle>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-4xl p-4 sm:p-6 rounded-xl">
+          <DialogHeader className="relative space-y-1 pb-2">
+            <DialogTitle className="text-base sm:text-lg">Select Template</DialogTitle>
             <DialogCloseButton />
           </DialogHeader>
-          <DialogBody className="max-h-[60vh] overflow-y-auto">
+          <DialogBody className="max-h-[50vh] sm:max-h-[60vh] overflow-y-auto">
             <TemplateBrowser filterType="sms" onApply={handleApplyTemplate} />
           </DialogBody>
         </DialogContent>

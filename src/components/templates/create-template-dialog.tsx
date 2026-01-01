@@ -366,7 +366,7 @@ export default function CreateTemplateDialog() {
               htmlFor="isPublic"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Make this template public (Share with other OmniFlow users)
+              Make this template public (Share with other users on this platform)
             </label>
           </div>
           </DialogBody>

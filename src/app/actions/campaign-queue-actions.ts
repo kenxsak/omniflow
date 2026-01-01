@@ -95,7 +95,7 @@ export async function queueEmailCampaignAction(input: {
             }
 
             // Use provider-specific sender email
-            finalSenderName = finalSenderName || company.name || 'OmniFlow';
+            finalSenderName = finalSenderName || company.name || 'Notifications';
             if (!finalSenderEmail) {
               // CRITICAL: Use provider-specific sender email to avoid mixing Brevo/Sender.net configs
               if (finalProvider === 'sender') {

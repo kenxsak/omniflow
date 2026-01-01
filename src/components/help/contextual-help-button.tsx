@@ -28,20 +28,24 @@ export function ContextualHelpButton({
         className={cn(
           "fixed bottom-4 right-4 sm:bottom-6 sm:right-6",
           "h-12 w-12 sm:h-14 sm:w-14",
-          "rounded-full shadow-xl hover:shadow-2xl",
-          "border-2 border-primary/50 hover:border-primary",
-          "hover:scale-110 active:scale-95 transition-all duration-200",
-          "bg-background/95 backdrop-blur-sm",
-          "text-primary hover:bg-primary hover:text-primary-foreground",
-          isOpen &&
-            "bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90",
+          "rounded-full shadow-lg hover:shadow-xl",
+          "transition-all duration-200 ease-out",
+          "hover:scale-105 active:scale-95",
+          // Light mode: Blue gradient with white icon
+          // Dark mode: Purple/violet gradient with white icon
+          isOpen
+            ? "bg-rose-500 hover:bg-rose-600 border-rose-400 text-white"
+            : "bg-gradient-to-br from-blue-500 to-indigo-600 dark:from-violet-500 dark:to-purple-600 border-blue-400 dark:border-violet-400 text-white hover:from-blue-600 hover:to-indigo-700 dark:hover:from-violet-600 dark:hover:to-purple-700",
+          "border-2",
+          // Pulse animation when not open to draw attention
+          !isOpen && "animate-pulse-subtle",
           className
         )}
         style={{ zIndex: 99999 }}
         aria-label={isOpen ? "Close help" : "Open help"}
       >
-        <AppIcon name={isOpen ? "x" : "help"} size={24} className="sm:hidden" />
-        <AppIcon name={isOpen ? "x" : "help"} size={28} className="hidden sm:block" />
+        <AppIcon name={isOpen ? "x" : "help"} size={22} className="sm:hidden drop-shadow-sm" />
+        <AppIcon name={isOpen ? "x" : "help"} size={26} className="hidden sm:block drop-shadow-sm" />
       </Button>
 
       <HelpPanel pageId={pageId} isOpen={isOpen} onClose={() => setIsOpen(false)} />

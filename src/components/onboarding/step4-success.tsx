@@ -103,7 +103,7 @@ export function Step4Success({ completedSteps, onComplete }: Step4SuccessProps) 
           </div>
           <CardTitle className="text-3xl mb-2">You&apos;re All Set! 🎉</CardTitle>
           <CardDescription className="text-base">
-            Great job! Your OmniFlow is ready to use
+            Great job! Your workspace is ready to use
           </CardDescription>
         </CardHeader>
         <CardContent>

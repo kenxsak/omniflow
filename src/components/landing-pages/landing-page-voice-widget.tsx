@@ -68,7 +68,7 @@ export default function LandingPageVoiceWidget({
     const defaultGreeting = greeting || `Hi! Welcome to ${pageName}. How can I help you today?`;
 
     // Set global config for the widget
-    (window as any).OmniFlowVoiceChat = {
+    (window as any).VoiceChatConfig = {
       pageId: pageId,
       pageName: pageName,
       greeting: defaultGreeting,
@@ -121,7 +121,7 @@ export default function LandingPageVoiceWidget({
         if (document.body.contains(script)) {
           document.body.removeChild(script);
         }
-        delete (window as any).OmniFlowVoiceChat;
+        delete (window as any).VoiceChatConfig;
       };
     } else {
       console.error('❌ No script tag found in widget code');

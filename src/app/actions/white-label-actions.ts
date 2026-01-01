@@ -181,3 +181,37 @@ export async function getWhiteLabelByDomain(domain: string): Promise<{
     return { success: false, error: 'Failed to get settings' };
   }
 }
+
+/**
+ * Get platform default branding settings
+ * Used for public pages when no specific company context
+ */
+export async function getPlatformBranding(): Promise<{
+  success: boolean;
+  settings: {
+    brandName: string;
+    logoUrl?: string;
+    logoDarkUrl?: string;
+    faviconUrl?: string;
+    primaryColor: string;
+    supportEmail?: string;
+    privacyPolicyUrl?: string;
+    termsOfServiceUrl?: string;
+  };
+}> {
+  // Return platform defaults - these could be stored in a platform_settings collection
+  // For now, return hardcoded defaults that match OmniFlow branding
+  return {
+    success: true,
+    settings: {
+      brandName: process.env.NEXT_PUBLIC_BRAND_NAME || 'OmniFlow',
+      logoUrl: process.env.NEXT_PUBLIC_LOGO_URL,
+      logoDarkUrl: process.env.NEXT_PUBLIC_LOGO_DARK_URL,
+      faviconUrl: process.env.NEXT_PUBLIC_FAVICON_URL,
+      primaryColor: process.env.NEXT_PUBLIC_PRIMARY_COLOR || '#6366f1',
+      supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@worldmart.in',
+      privacyPolicyUrl: '/privacy-policy',
+      termsOfServiceUrl: '/terms',
+    },
+  };
+}

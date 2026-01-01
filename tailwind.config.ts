@@ -167,6 +167,10 @@ export default {
           '0%, 100%': { boxShadow: '0 0 0 0 color-mix(in oklch, var(--primary) 40%, transparent)' },
           '50%': { boxShadow: '0 0 20px 5px color-mix(in oklch, var(--primary) 20%, transparent)' }
         },
+        'pulse-subtle': {
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(99, 102, 241, 0.4)', transform: 'scale(1)' },
+          '50%': { boxShadow: '0 0 0 8px rgba(99, 102, 241, 0)', transform: 'scale(1.02)' }
+        },
         'shimmer': {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' }
@@ -187,6 +191,7 @@ export default {
         'slide-in-right': 'slide-in-right 0.4s ease-out',
         'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
         'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+        'pulse-subtle': 'pulse-subtle 2.5s ease-in-out infinite',
         'shimmer': 'shimmer 2s linear infinite',
         'spin-slow': 'spin-slow 3s linear infinite'
   		},

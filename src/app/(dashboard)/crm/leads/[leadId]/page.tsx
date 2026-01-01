@@ -145,8 +145,31 @@ export default function LeadDossierPage() {
     const brevoColor = syncStatusColors[brevoSyncStatus];
     const hubspotColor = syncStatusColors[hubspotSyncStatus];
 
+    // Format phone for WhatsApp
+    const formatPhoneForWhatsApp = (phone: string) => {
+        return phone.replace(/[^\d+]/g, '').replace(/^\+/, '');
+    };
+
+    // Quick action handlers for mobile sticky bar
+    const handleQuickWhatsApp = () => {
+        if (!lead.phone) return;
+        const phone = formatPhoneForWhatsApp(lead.phone);
+        const message = encodeURIComponent(`Hi ${lead.name}, `);
+        window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+    };
+
+    const handleQuickEmail = () => {
+        if (!lead.email) return;
+        window.location.href = `mailto:${lead.email}?subject=Following up&body=Hi ${lead.name},%0D%0A%0D%0A`;
+    };
+
+    const handleQuickCall = () => {
+        if (!lead.phone) return;
+        window.location.href = `tel:${lead.phone}`;
+    };
+
     return (
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-4 sm:space-y-6 pb-20 lg:pb-0">
             {/* Header */}
             <div className="flex items-center gap-3 sm:gap-4">
                 <Button variant="outline" size="icon" asChild className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg">
@@ -184,7 +207,75 @@ export default function LeadDossierPage() {
                             </div>
                         </div>
                         <div className="p-4 sm:p-5">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                            {/* Mobile: Stacked layout with better spacing */}
+                            <div className="space-y-3 sm:hidden">
+                                <div className="flex items-center justify-between py-2 border-b border-stone-100 dark:border-stone-800">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Icon icon="solar:user-circle-linear" className="h-4 w-4 flex-shrink-0"/>
+                                        <span className="text-xs font-medium">Assigned To</span>
+                                    </div>
+                                    <span className="text-sm text-foreground">{lead.assignedTo || 'Unassigned'}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-2 border-b border-stone-100 dark:border-stone-800">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Icon icon="solar:letter-linear" className="h-4 w-4 flex-shrink-0"/>
+                                        <span className="text-xs font-medium">Email</span>
+                                    </div>
+                                    <span className="text-sm text-foreground truncate max-w-[180px]">{lead.email}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-2 border-b border-stone-100 dark:border-stone-800">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Icon icon="solar:phone-linear" className="h-4 w-4 flex-shrink-0"/>
+                                        <span className="text-xs font-medium">Phone</span>
+                                    </div>
+                                    <span className="text-sm text-foreground">{lead.phone || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-2 border-b border-stone-100 dark:border-stone-800">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Icon icon="solar:buildings-linear" className="h-4 w-4 flex-shrink-0"/>
+                                        <span className="text-xs font-medium">Company</span>
+                                    </div>
+                                    <span className="text-sm text-foreground truncate max-w-[180px]">{lead.attributes?.COMPANY_NAME || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-2 border-b border-stone-100 dark:border-stone-800">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Icon icon="solar:case-linear" className="h-4 w-4 flex-shrink-0"/>
+                                        <span className="text-xs font-medium">Role</span>
+                                    </div>
+                                    <span className="text-sm text-foreground">{lead.attributes?.ROLE || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-2 border-b border-stone-100 dark:border-stone-800">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Icon icon="solar:link-linear" className="h-4 w-4 flex-shrink-0"/>
+                                        <span className="text-xs font-medium">Source</span>
+                                    </div>
+                                    <span className="text-sm text-foreground">{lead.source}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-2 border-b border-stone-100 dark:border-stone-800">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Icon icon="solar:calendar-linear" className="h-4 w-4 flex-shrink-0"/>
+                                        <span className="text-xs font-medium">Created</span>
+                                    </div>
+                                    <span className="text-xs text-foreground">{createdAtDate ? format(createdAtDate, 'PP') : 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-2 border-b border-stone-100 dark:border-stone-800">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Icon icon="solar:calendar-linear" className="h-4 w-4 flex-shrink-0"/>
+                                        <span className="text-xs font-medium">Last Contact</span>
+                                    </div>
+                                    <span className="text-xs text-foreground">{lastContactedDate ? format(lastContactedDate, 'PP') : 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-2">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Icon icon="solar:clipboard-check-linear" className="h-4 w-4 flex-shrink-0"/>
+                                        <span className="text-xs font-medium">Status</span>
+                                    </div>
+                                    <Badge className={`${statusColors[lead.status]} text-xs`}>{lead.status}</Badge>
+                                </div>
+                            </div>
+                            
+                            {/* Desktop: Grid layout */}
+                            <div className="hidden sm:grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                                 <div className="flex items-center gap-2">
                                     <Icon icon="solar:user-circle-linear" className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
                                     <span className="font-medium text-muted-foreground">Assigned To:</span>
@@ -225,7 +316,7 @@ export default function LeadDossierPage() {
                                     <span className="font-medium text-muted-foreground">Last Contact:</span>
                                     <span className="text-foreground text-xs">{lastContactedDate ? format(lastContactedDate, 'PPp') : 'N/A'}</span>
                                 </div>
-                                <div className="flex items-center gap-2 sm:col-span-2">
+                                <div className="flex items-center gap-2 col-span-2">
                                     <Icon icon="solar:clipboard-check-linear" className="h-4 w-4 text-muted-foreground flex-shrink-0"/>
                                     <span className="font-medium text-muted-foreground">Status:</span>
                                     <Badge className={`${statusColors[lead.status]} text-xs`}>{lead.status}</Badge>
@@ -240,31 +331,31 @@ export default function LeadDossierPage() {
                             <TabsList className="w-full h-auto p-0 bg-transparent border-b border-stone-200 dark:border-stone-800 rounded-none grid grid-cols-4">
                                 <TabsTrigger 
                                     value="activity" 
-                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-500 data-[state=active]:bg-transparent text-xs sm:text-sm data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400"
+                                    className="flex flex-col items-center gap-1 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-500 data-[state=active]:bg-indigo-50/50 dark:data-[state=active]:bg-indigo-950/30 text-[10px] sm:text-sm data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400"
                                 >
-                                    <Icon icon="solar:chart-2-linear" className="h-4 w-4" />
-                                    <span className="hidden sm:inline">Activity</span>
+                                    <Icon icon="solar:chart-2-linear" className="h-5 w-5 sm:h-4 sm:w-4" />
+                                    <span className="font-medium">Activity</span>
                                 </TabsTrigger>
                                 <TabsTrigger 
                                     value="deals" 
-                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:bg-transparent text-xs sm:text-sm data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400"
+                                    className="flex flex-col items-center gap-1 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:bg-emerald-50/50 dark:data-[state=active]:bg-emerald-950/30 text-[10px] sm:text-sm data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400"
                                 >
-                                    <Icon icon="solar:dollar-linear" className="h-4 w-4" />
-                                    <span className="hidden sm:inline">Deals</span>
+                                    <Icon icon="solar:dollar-linear" className="h-5 w-5 sm:h-4 sm:w-4" />
+                                    <span className="font-medium">Deals</span>
                                 </TabsTrigger>
                                 <TabsTrigger 
                                     value="tasks" 
-                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-amber-500 data-[state=active]:bg-transparent text-xs sm:text-sm data-[state=active]:text-amber-600 dark:data-[state=active]:text-amber-400"
+                                    className="flex flex-col items-center gap-1 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-amber-500 data-[state=active]:bg-amber-50/50 dark:data-[state=active]:bg-amber-950/30 text-[10px] sm:text-sm data-[state=active]:text-amber-600 dark:data-[state=active]:text-amber-400"
                                 >
-                                    <Icon icon="solar:checklist-linear" className="h-4 w-4" />
-                                    <span className="hidden sm:inline">Tasks</span>
+                                    <Icon icon="solar:checklist-linear" className="h-5 w-5 sm:h-4 sm:w-4" />
+                                    <span className="font-medium">Tasks</span>
                                 </TabsTrigger>
                                 <TabsTrigger 
                                     value="appointments" 
-                                    className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent text-xs sm:text-sm data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400"
+                                    className="flex flex-col items-center gap-1 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-blue-50/50 dark:data-[state=active]:bg-blue-950/30 text-[10px] sm:text-sm data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400"
                                 >
-                                    <Icon icon="solar:calendar-linear" className="h-4 w-4" />
-                                    <span className="hidden sm:inline">Appointments</span>
+                                    <Icon icon="solar:calendar-linear" className="h-5 w-5 sm:h-4 sm:w-4" />
+                                    <span className="font-medium">Appts</span>
                                 </TabsTrigger>
                             </TabsList>
                         </div>
@@ -484,6 +575,39 @@ export default function LeadDossierPage() {
                     loadData();
                 }}
             />
+
+            {/* Mobile Sticky Action Bar */}
+            <div className="fixed bottom-0 left-0 right-0 lg:hidden z-40 bg-white dark:bg-stone-950 border-t border-stone-200 dark:border-stone-800 px-4 py-3 safe-area-inset-bottom">
+                <div className="flex gap-2 max-w-lg mx-auto">
+                    <Button
+                        variant="outline"
+                        className="flex-1 h-11 gap-2 border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/50"
+                        onClick={handleQuickWhatsApp}
+                        disabled={!lead.phone}
+                    >
+                        <Icon icon="logos:whatsapp-icon" className="h-5 w-5" />
+                        <span className="text-sm font-medium">WhatsApp</span>
+                    </Button>
+                    <Button
+                        variant="outline"
+                        className="flex-1 h-11 gap-2 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50"
+                        onClick={handleQuickEmail}
+                        disabled={!lead.email}
+                    >
+                        <Icon icon="solar:letter-linear" className="h-5 w-5" />
+                        <span className="text-sm font-medium">Email</span>
+                    </Button>
+                    <Button
+                        variant="outline"
+                        className="flex-1 h-11 gap-2 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50"
+                        onClick={handleQuickCall}
+                        disabled={!lead.phone}
+                    >
+                        <Icon icon="solar:phone-linear" className="h-5 w-5" />
+                        <span className="text-sm font-medium">Call</span>
+                    </Button>
+                </div>
+            </div>
         </div>
     );
 }

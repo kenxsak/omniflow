@@ -285,27 +285,27 @@ export default function TeamPage() {
       </div>
 
       {/* Team Stats - Enhanced with colors */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="relative bg-white dark:bg-stone-950 rounded-xl p-4 border border-stone-200 dark:border-stone-800 overflow-hidden">
-          <div className="absolute inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: '#3b82f6' }} />
-          <p className="text-2xl font-bold" style={{ color: '#3b82f6' }}>
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        <div className="relative bg-white dark:bg-stone-950 rounded-xl p-3 sm:p-4 border border-stone-200 dark:border-stone-800 overflow-hidden">
+          <div className="absolute inset-x-4 sm:inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: '#3b82f6' }} />
+          <p className="text-xl sm:text-2xl font-bold" style={{ color: '#3b82f6' }}>
             {users.length}
           </p>
-          <p className="text-xs text-muted-foreground">Active Members</p>
+          <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">Active Members</p>
         </div>
-        <div className="relative bg-white dark:bg-stone-950 rounded-xl p-4 border border-stone-200 dark:border-stone-800 overflow-hidden">
-          <div className="absolute inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: '#f59e0b' }} />
-          <p className="text-2xl font-bold" style={{ color: '#f59e0b' }}>
+        <div className="relative bg-white dark:bg-stone-950 rounded-xl p-3 sm:p-4 border border-stone-200 dark:border-stone-800 overflow-hidden">
+          <div className="absolute inset-x-4 sm:inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: '#f59e0b' }} />
+          <p className="text-xl sm:text-2xl font-bold" style={{ color: '#f59e0b' }}>
             {invitations.length}
           </p>
-          <p className="text-xs text-muted-foreground">Pending Invites</p>
+          <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">Pending Invites</p>
         </div>
-        <div className="relative bg-white dark:bg-stone-950 rounded-xl p-4 border border-stone-200 dark:border-stone-800 overflow-hidden">
-          <div className="absolute inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: '#8b5cf6' }} />
-          <p className="text-2xl font-bold" style={{ color: '#8b5cf6' }}>
+        <div className="relative bg-white dark:bg-stone-950 rounded-xl p-3 sm:p-4 border border-stone-200 dark:border-stone-800 overflow-hidden">
+          <div className="absolute inset-x-4 sm:inset-x-6 top-0 h-0.5 rounded-b-full" style={{ background: '#8b5cf6' }} />
+          <p className="text-xl sm:text-2xl font-bold" style={{ color: '#8b5cf6' }}>
             {users.filter((u) => u.role === 'admin' || u.role === 'manager').length}
           </p>
-          <p className="text-xs text-muted-foreground">Admins & Managers</p>
+          <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">Admins & Managers</p>
         </div>
       </div>
 
@@ -319,16 +319,16 @@ export default function TeamPage() {
           {users.map((user) => (
             <div
               key={user.uid}
-              className="flex items-center justify-between px-5 py-4 hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors"
+              className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-5 py-4 hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors gap-3"
             >
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10 border border-stone-200 dark:border-stone-700">
+              <div className="flex items-center gap-3 min-w-0">
+                <Avatar className="h-10 w-10 border border-stone-200 dark:border-stone-700 shrink-0">
                   <AvatarFallback className="bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-800 dark:to-stone-900 text-stone-600 dark:text-stone-400 text-sm font-medium">
                     {getInitials(user)}
                   </AvatarFallback>
                 </Avatar>
-                <div>
-                  <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">
                     {user.name || 'Unnamed User'}
                     {user.uid === appUser?.uid && (
                       <span className="ml-2 text-[10px] font-normal text-stone-500">
@@ -336,19 +336,19 @@ export default function TeamPage() {
                       </span>
                     )}
                   </p>
-                  <p className="text-xs text-stone-500">{user.email}</p>
+                  <p className="text-xs text-stone-500 truncate">{user.email}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 pl-13 sm:pl-0 shrink-0">
                 <span
                   className={cn(
-                    'px-2 py-0.5 text-[10px] font-semibold uppercase rounded-md',
+                    'px-2 py-1 text-[10px] font-semibold uppercase rounded-md whitespace-nowrap',
                     getRoleBadge(user.role)
                   )}
                 >
                   {user.role}
                 </span>
-                <span className="px-2 py-0.5 text-[10px] font-medium uppercase rounded-md bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-500">
+                <span className="px-2 py-1 text-[10px] font-medium uppercase rounded-md bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-500 whitespace-nowrap">
                   {user.type}
                 </span>
               </div>
@@ -368,26 +368,26 @@ export default function TeamPage() {
             {invitations.map((invitation) => (
               <div
                 key={invitation.id}
-                className="flex items-center justify-between px-5 py-4 hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-5 py-4 hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors gap-3"
               >
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
                     <Icon
                       icon="solar:hourglass-linear"
                       className="h-5 w-5 text-amber-600 dark:text-amber-400"
                     />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">
                       {invitation.email}
                     </p>
                     <p className="text-xs text-stone-500">Invitation pending</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 pl-13 sm:pl-0 shrink-0">
                   <span
                     className={cn(
-                      'px-2 py-0.5 text-[10px] font-semibold uppercase rounded-md',
+                      'px-2 py-1 text-[10px] font-semibold uppercase rounded-md whitespace-nowrap',
                       getRoleBadge(invitation.role)
                     )}
                   >
@@ -397,7 +397,7 @@ export default function TeamPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+                      className="h-8 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 whitespace-nowrap"
                       onClick={() => handleCancelInvitation(invitation.id)}
                     >
                       Cancel

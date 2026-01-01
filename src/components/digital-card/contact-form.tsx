@@ -61,6 +61,7 @@ interface ContactFormProps {
   variant?: 'default' | 'outline' | 'ghost';
   size?: 'sm' | 'default' | 'lg';
   showIcon?: boolean;
+  className?: string;
 }
 
 export default function ContactForm({ 
@@ -72,7 +73,8 @@ export default function ContactForm({
   primaryColor = '#000000',
   variant = 'default',
   size = 'default',
-  showIcon = true
+  showIcon = true,
+  className = ''
 }: ContactFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -174,14 +176,14 @@ export default function ContactForm({
         <Button 
           variant={variant} 
           size={size}
-          className="w-full"
+          className={`w-full ${className}`}
           style={{
             backgroundColor: variant === 'default' ? primaryColor : undefined,
             borderColor: variant === 'outline' ? primaryColor : undefined,
             color: variant === 'outline' ? primaryColor : undefined,
           }}
         >
-          {showIcon && <MessageSquare className="h-4 w-4 mr-2" />}
+          {showIcon && <MessageSquare className="h-5 w-5 mr-2" />}
           {buttonText}
         </Button>
       </DialogTrigger>

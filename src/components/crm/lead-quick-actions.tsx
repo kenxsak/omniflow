@@ -32,9 +32,10 @@ interface LeadQuickActionsProps {
     companyId: string;
   };
   onActivityLogged?: () => void;
+  compact?: boolean;
 }
 
-export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsProps) {
+export function LeadQuickActions({ lead, onActivityLogged, compact = false }: LeadQuickActionsProps) {
   const { toast } = useToast();
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [sending, setSending] = useState(false);
@@ -175,20 +176,20 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="outline" 
-                className="w-full justify-start gap-2 h-10 border-stone-200 dark:border-stone-700 hover:bg-muted/50" 
+                className="w-full justify-start gap-2 h-11 sm:h-10 border-stone-200 dark:border-stone-700 hover:bg-muted/50 hover:border-green-300 dark:hover:border-green-700" 
                 disabled={!lead.phone}
               >
-                <Icon icon="logos:whatsapp-icon" className="h-4 w-4" />
-                <span className="flex-1 text-left text-sm">WhatsApp</span>
+                <Icon icon="logos:whatsapp-icon" className="h-5 w-5 sm:h-4 sm:w-4" />
+                <span className="flex-1 text-left text-sm font-medium">WhatsApp</span>
                 <Icon icon="solar:alt-arrow-down-linear" className="h-3 w-3 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
-              <DropdownMenuItem onClick={handleWhatsAppDirect}>
+              <DropdownMenuItem onClick={handleWhatsAppDirect} className="py-2.5">
                 <Icon icon="solar:link-linear" className="h-4 w-4 mr-2" />
                 Send via wa.me
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleWhatsAppWeb}>
+              <DropdownMenuItem onClick={handleWhatsAppWeb} className="py-2.5">
                 <Icon icon="solar:monitor-linear" className="h-4 w-4 mr-2" />
                 Open WhatsApp Web
               </DropdownMenuItem>
@@ -200,20 +201,20 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="outline" 
-                className="w-full justify-start gap-2 h-10 border-stone-200 dark:border-stone-700 hover:bg-muted/50" 
+                className="w-full justify-start gap-2 h-11 sm:h-10 border-stone-200 dark:border-stone-700 hover:bg-muted/50 hover:border-blue-300 dark:hover:border-blue-700" 
                 disabled={!lead.email}
               >
-                <Icon icon="solar:letter-linear" className="h-4 w-4" style={{ color: '#3b82f6' }} />
-                <span className="flex-1 text-left text-sm">Email</span>
+                <Icon icon="solar:letter-linear" className="h-5 w-5 sm:h-4 sm:w-4" style={{ color: '#3b82f6' }} />
+                <span className="flex-1 text-left text-sm font-medium">Email</span>
                 <Icon icon="solar:alt-arrow-down-linear" className="h-3 w-3 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
-              <DropdownMenuItem onClick={() => setEmailDialogOpen(true)}>
+              <DropdownMenuItem onClick={() => setEmailDialogOpen(true)} className="py-2.5">
                 <Icon icon="solar:plain-linear" className="h-4 w-4 mr-2" />
                 Compose & Send
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleEmailClient}>
+              <DropdownMenuItem onClick={handleEmailClient} className="py-2.5">
                 <Icon icon="solar:mailbox-linear" className="h-4 w-4 mr-2" />
                 Open Email Client
               </DropdownMenuItem>
@@ -223,12 +224,12 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
           {/* Phone Call */}
           <Button 
             variant="outline" 
-            className="w-full justify-start gap-2 h-10 border-stone-200 dark:border-stone-700 hover:bg-muted/50" 
+            className="w-full justify-start gap-2 h-11 sm:h-10 border-stone-200 dark:border-stone-700 hover:bg-muted/50 hover:border-emerald-300 dark:hover:border-emerald-700" 
             onClick={handleCall}
             disabled={!lead.phone}
           >
-            <Icon icon="solar:phone-linear" className="h-4 w-4" style={{ color: '#10b981' }} />
-            <span className="flex-1 text-left text-sm truncate">
+            <Icon icon="solar:phone-linear" className="h-5 w-5 sm:h-4 sm:w-4" style={{ color: '#10b981' }} />
+            <span className="flex-1 text-left text-sm font-medium truncate">
               Call {lead.phone ? lead.phone : '(No phone)'}
             </span>
           </Button>
@@ -244,43 +245,49 @@ export function LeadQuickActions({ lead, onActivityLogged }: LeadQuickActionsPro
 
       {/* Email Compose Dialog */}
       <Dialog open={emailDialogOpen} onOpenChange={setEmailDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>Send Email to {lead.name}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">Send Email to {lead.name}</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
               Compose and send an email directly. This will be logged in the activity timeline.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-4 flex-1 overflow-y-auto">
             <div className="space-y-2">
-              <Label>To</Label>
-              <Input value={lead.email || ''} disabled className="bg-muted/50" />
+              <Label className="text-xs sm:text-sm">To</Label>
+              <Input value={lead.email || ''} disabled className="bg-muted/50 h-10" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="subject">Subject</Label>
+              <Label htmlFor="subject" className="text-xs sm:text-sm">Subject</Label>
               <Input
                 id="subject"
                 value={emailSubject}
                 onChange={(e) => setEmailSubject(e.target.value)}
                 placeholder="Following up on our conversation..."
+                className="h-10"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="body">Message</Label>
+              <Label htmlFor="body" className="text-xs sm:text-sm">Message</Label>
               <Textarea
                 id="body"
                 value={emailBody}
                 onChange={(e) => setEmailBody(e.target.value)}
                 placeholder={`Hi ${lead.name},\n\n`}
                 rows={6}
+                className="min-h-[120px]"
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEmailDialogOpen(false)}>
+          <DialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-0 pt-4 border-t border-stone-200 dark:border-stone-800">
+            <Button variant="outline" onClick={() => setEmailDialogOpen(false)} className="w-full sm:w-auto h-10">
               Cancel
             </Button>
-            <Button onClick={handleSendEmail} disabled={sending}>
+            <Button 
+              onClick={handleSendEmail} 
+              disabled={sending}
+              className="w-full sm:w-auto h-10 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
+            >
               {sending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Send Email
             </Button>

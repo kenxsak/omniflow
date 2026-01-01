@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { runAllAutomations } from '@/lib/automation-runner';
 import { runAllCampaignJobs } from '@/lib/campaign-job-processor';
 import { processScheduledPostsAction } from '@/app/actions/social-accounts-actions';
+import { processScheduledReminders } from '@/lib/appointment-reminders';
+import { processAllTaskReminders } from '@/lib/task-reminders';
 import { adminDb } from '@/lib/firebase-admin';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { executeWorkflowNode } from '@/lib/workflow-executor';
@@ -20,6 +22,8 @@ const CRON_SECRET = process.env.CRON_SECRET;
  * 2. Campaign Jobs (bulk Email/SMS/WhatsApp)
  * 3. Workflow Builder automations
  * 4. Scheduled Social Media Posts
+ * 5. Appointment Reminders (Email/SMS/WhatsApp)
+ * 6. Task Reminders (Daily digest emails)
  * 
  * This reduces the need for multiple cron jobs to just ONE.
  * Set up a single cron job to call this endpoint every 2-5 minutes.
@@ -40,6 +44,8 @@ export async function GET(request: NextRequest) {
     campaigns: { success: false, error: null as string | null, details: null as any },
     workflows: { success: false, error: null as string | null, details: null as any },
     socialPosts: { success: false, error: null as string | null, details: null as any },
+    appointmentReminders: { success: false, error: null as string | null, details: null as any },
+    taskReminders: { success: false, error: null as string | null, details: null as any },
   };
 
   // 1. Run Email Automations
@@ -110,8 +116,60 @@ export async function GET(request: NextRequest) {
     };
   }
 
+  // 5. Process Appointment Reminders (Email/SMS/WhatsApp)
+  try {
+    const appointmentResult = await processScheduledReminders();
+    results.appointmentReminders = {
+      success: appointmentResult.successful > 0 || appointmentResult.processed === 0,
+      error: appointmentResult.errors.length > 0 ? appointmentResult.errors.join('; ') : null,
+      details: {
+        processed: appointmentResult.processed,
+        successful: appointmentResult.successful,
+        failed: appointmentResult.failed,
+      },
+    };
+  } catch (error: any) {
+    console.error('[Cron] Appointment reminders error:', error);
+    results.appointmentReminders = {
+      success: false,
+      error: error.message,
+      details: null,
+    };
+  }
+
+  // 6. Process Task Reminders (Daily digest - only run once per day)
+  // Check if it's between 7-9 AM to send daily task reminders
+  const currentHour = new Date().getHours();
+  if (currentHour >= 7 && currentHour <= 9) {
+    try {
+      const taskResult = await processAllTaskReminders();
+      results.taskReminders = {
+        success: taskResult.totalEmailsSent > 0 || taskResult.totalUsersProcessed === 0,
+        error: taskResult.errors.length > 0 ? taskResult.errors.slice(0, 5).join('; ') : null,
+        details: {
+          companiesProcessed: taskResult.companiesProcessed,
+          usersNotified: taskResult.totalUsersProcessed,
+          emailsSent: taskResult.totalEmailsSent,
+        },
+      };
+    } catch (error: any) {
+      console.error('[Cron] Task reminders error:', error);
+      results.taskReminders = {
+        success: false,
+        error: error.message,
+        details: null,
+      };
+    }
+  } else {
+    results.taskReminders = {
+      success: true,
+      error: null,
+      details: { skipped: true, reason: 'Outside daily reminder window (7-9 AM)' },
+    };
+  }
+
   results.duration = Date.now() - startTime;
-  results.success = results.automations.success || results.campaigns.success || results.workflows.success || results.socialPosts.success;
+  results.success = results.automations.success || results.campaigns.success || results.workflows.success || results.socialPosts.success || results.appointmentReminders.success;
 
   console.log(`[Cron] Unified job completed in ${results.duration}ms`);
 
