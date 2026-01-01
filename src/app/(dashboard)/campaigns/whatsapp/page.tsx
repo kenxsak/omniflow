@@ -61,6 +61,9 @@ export default function WhatsAppMarketingPage() {
   const imageUploadRef = useRef<HTMLInputElement>(null);
   const campaignTextareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Store last uploaded image URL for easy access
+  const [lastUploadedImageUrl, setLastUploadedImageUrl] = useState<string>("");
+
   // New feature states
   const [contactSearchQuery, setContactSearchQuery] = useState("");
   const [savedMessages, setSavedMessages] = useState<{ id: string; name: string; content: string }[]>([]);
@@ -222,7 +225,12 @@ export default function WhatsAppMarketingPage() {
   // Handle image upload to ImgBB
   const handleCampaignImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.log('No file selected');
+      return;
+    }
+
+    console.log('File selected:', file.name, file.type, file.size);
 
     if (!file.type.startsWith('image/')) {
       toast({ title: 'Invalid file', description: 'Please select an image file.', variant: 'destructive' });
@@ -234,40 +242,61 @@ export default function WhatsAppMarketingPage() {
       return;
     }
 
-    // Store cursor position before upload
-    const textarea = campaignTextareaRef.current;
-    const cursorPos = textarea ? textarea.selectionStart : campaignMessage.length;
-
     setIsUploadingImage(true);
+    toast({ title: 'Uploading...', description: 'Please wait while we upload your image.' });
+    
+    // Reset input immediately to allow re-uploading same file
+    if (event.target) event.target.value = '';
+    
     try {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const base64Data = e.target?.result as string;
-        try {
-          const imageUrl = await uploadImageToImgBB(base64Data);
-          const formattedLink = `\n\n📸 *Image:* ${imageUrl}`;
-          // Insert at stored cursor position
-          setCampaignMessage(prev => {
-            return prev.substring(0, cursorPos) + formattedLink + prev.substring(cursorPos);
-          });
-          toast({ title: 'Image uploaded!', description: 'Link added to message.' });
-        } catch (uploadError: any) {
-          toast({ title: 'Upload failed', description: uploadError.message, variant: 'destructive' });
-        } finally {
-          setIsUploadingImage(false);
-        }
-      };
-      reader.onerror = () => {
-        toast({ title: 'Error', description: 'Failed to read file.', variant: 'destructive' });
-        setIsUploadingImage(false);
-      };
-      reader.readAsDataURL(file);
-    } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      // Convert file to base64 using Promise
+      const base64Data = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      });
+      
+      console.log('File read complete, base64 length:', base64Data?.length);
+      
+      if (!base64Data) {
+        throw new Error('Failed to read file data');
+      }
+      
+      console.log('Uploading to ImgBB...');
+      const imageUrl = await uploadImageToImgBB(base64Data);
+      console.log('Upload successful:', imageUrl);
+      
+      // Store the URL for easy access
+      setLastUploadedImageUrl(imageUrl);
+      
+      // Add to message - use functional update to ensure we get latest state
+      const formattedLink = `\n\n📸 *Image:* ${imageUrl}`;
+      setCampaignMessage(currentMessage => {
+        const newMessage = currentMessage + formattedLink;
+        console.log('Message updated, new length:', newMessage.length);
+        return newMessage;
+      });
+      
+      // Copy to clipboard
+      try {
+        await navigator.clipboard.writeText(imageUrl);
+        toast({ 
+          title: '✅ Image uploaded & copied!', 
+          description: 'URL copied to clipboard and added to message.',
+        });
+      } catch {
+        toast({ 
+          title: '✅ Image uploaded!', 
+          description: 'Link added to message.',
+        });
+      }
+    } catch (uploadError: any) {
+      console.error('Upload error:', uploadError);
+      toast({ title: 'Upload failed', description: uploadError.message || 'Unknown error', variant: 'destructive' });
+    } finally {
       setIsUploadingImage(false);
     }
-
-    if (event.target) event.target.value = '';
   };
 
   const placeholderForCampaignMessage = `Hi *${CONTACT_NAME_PLACEHOLDER}*,\n\nExciting news from *${profileBusinessName}*!\n\n[Your message here]\n\nBest regards,\n*${profileBusinessName}*`;
@@ -1020,6 +1049,39 @@ Jane Smith,"919123456789"`;
                       {isOverLimit && <span className="ml-1">⚠️ Too long!</span>}
                     </div>
                   </div>
+                  
+                  {/* Last Uploaded Image URL */}
+                  {lastUploadedImageUrl && (
+                    <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                      <Icon icon="solar:gallery-check-linear" className="h-4 w-4 flex-shrink-0" style={{ color: '#22c55e' }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-medium" style={{ color: '#166534' }}>Last Uploaded Image</p>
+                        <p className="text-[10px] text-muted-foreground truncate">{lastUploadedImageUrl}</p>
+                      </div>
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => {
+                          navigator.clipboard.writeText(lastUploadedImageUrl);
+                          toast({ title: 'Copied!', description: 'URL copied to clipboard' });
+                        }}
+                        className="h-7 px-2 text-[10px]"
+                      >
+                        <Icon icon="solar:copy-linear" className="h-3.5 w-3.5 mr-1" />
+                        Copy
+                      </Button>
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => window.open(lastUploadedImageUrl, '_blank')}
+                        className="h-7 px-2 text-[10px]"
+                      >
+                        <Icon icon="solar:eye-linear" className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1285,6 +1347,40 @@ Jane Smith,"919123456789"`;
           <DialogBody className="max-h-[50vh] sm:max-h-[60vh] overflow-y-auto">
             <TemplateBrowser filterType="sms" onApply={handleApplyTemplate} />
           </DialogBody>
+        </DialogContent>
+      </Dialog>
+
+      {/* Save Message Dialog */}
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-[480px] p-4 sm:p-6 rounded-xl">
+          <DialogHeader className="relative space-y-1 pb-2">
+            <DialogTitle className="text-base sm:text-lg">Save Message</DialogTitle>
+            <DialogCloseButton />
+          </DialogHeader>
+          <DialogBody className="py-3 sm:py-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="save-msg-name" className="text-xs font-medium">Message Name</Label>
+              <Input 
+                id="save-msg-name" 
+                value={saveMessageName} 
+                onChange={(e) => setSaveMessageName(e.target.value)} 
+                placeholder="e.g., Product Launch, Follow-up" 
+                className="h-9 sm:h-10 text-sm" 
+              />
+              <p className="text-[10px] text-muted-foreground">Give your message a name so you can find it later.</p>
+            </div>
+            <div className="mt-3 p-2 bg-stone-50 dark:bg-stone-900/50 rounded-lg border border-stone-200 dark:border-stone-800">
+              <p className="text-[10px] text-muted-foreground mb-1">Preview:</p>
+              <p className="text-xs line-clamp-3">{campaignMessage.substring(0, 150)}{campaignMessage.length > 150 ? '...' : ''}</p>
+            </div>
+          </DialogBody>
+          <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 pt-2">
+            <Button type="button" variant="ghost" onClick={() => setShowSaveDialog(false)} className="w-full sm:w-auto h-9 sm:h-10">Cancel</Button>
+            <Button type="button" onClick={handleSaveMessage} className="w-full sm:w-auto h-9 sm:h-10">
+              <Icon icon="solar:bookmark-linear" className="h-4 w-4 mr-1.5" />
+              Save Message
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

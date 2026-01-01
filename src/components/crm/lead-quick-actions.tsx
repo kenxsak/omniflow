@@ -26,6 +26,7 @@ import { Icon } from '@iconify/react';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImageToImgBB } from '@/lib/imgbb-upload';
+import { cn } from '@/lib/utils';
 
 interface LeadQuickActionsProps {
   lead: {
@@ -73,6 +74,12 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
   // Link insertion state
   const [linkUrl, setLinkUrl] = useState('');
   const [linkType, setLinkType] = useState<'image' | 'pdf' | 'video' | 'link'>('link');
+
+  // Character limit for WhatsApp
+  const WHATSAPP_CHAR_LIMIT = 4096;
+  const charCount = whatsappMessage.length;
+  const isNearLimit = charCount > WHATSAPP_CHAR_LIMIT * 0.9;
+  const isOverLimit = charCount > WHATSAPP_CHAR_LIMIT;
 
   // Format phone for WhatsApp (remove spaces, dashes, etc. but keep the number clean)
   const formatPhoneForWhatsApp = (phone: string) => {
@@ -135,7 +142,12 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
   // Handle image upload to ImgBB
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.log('No file selected');
+      return;
+    }
+
+    console.log('File selected:', file.name, file.type, file.size);
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
@@ -149,42 +161,52 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
       return;
     }
 
-    // Store cursor position before upload
-    const textarea = whatsappTextareaRef.current;
-    const cursorPos = textarea ? textarea.selectionStart : whatsappMessage.length;
-
     setIsUploadingImage(true);
+    toast({ title: 'Uploading...', description: 'Please wait while we upload your image.' });
+    
+    // Reset input immediately to allow re-uploading same file
+    if (event.target) event.target.value = '';
+    
     try {
-      // Convert to base64
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const base64Data = e.target?.result as string;
-        try {
-          const imageUrl = await uploadImageToImgBB(base64Data);
-          const formattedLink = `\n\n📸 *Image:* ${imageUrl}`;
-          // Insert at stored cursor position
-          setWhatsappMessage(prev => {
-            return prev.substring(0, cursorPos) + formattedLink + prev.substring(cursorPos);
-          });
-          toast({ title: 'Image uploaded!', description: 'Link added to message.' });
-        } catch (uploadError: any) {
-          toast({ title: 'Upload failed', description: uploadError.message, variant: 'destructive' });
-        } finally {
-          setIsUploadingImage(false);
-        }
-      };
-      reader.onerror = () => {
-        toast({ title: 'Error', description: 'Failed to read file.', variant: 'destructive' });
-        setIsUploadingImage(false);
-      };
-      reader.readAsDataURL(file);
-    } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      // Convert file to base64 using Promise
+      const base64Data = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      });
+      
+      console.log('File read complete, base64 length:', base64Data?.length);
+      
+      if (!base64Data) {
+        throw new Error('Failed to read file data');
+      }
+      
+      console.log('Uploading to ImgBB...');
+      const imageUrl = await uploadImageToImgBB(base64Data);
+      console.log('Upload successful:', imageUrl);
+      
+      // Add to message - use functional update to ensure we get latest state
+      const formattedLink = `\n\n📸 *Image:* ${imageUrl}`;
+      setWhatsappMessage(currentMessage => {
+        const newMessage = currentMessage + formattedLink;
+        console.log('Message updated, new length:', newMessage.length);
+        return newMessage;
+      });
+      
+      // Copy to clipboard
+      try {
+        await navigator.clipboard.writeText(imageUrl);
+        toast({ title: '✅ Image uploaded & copied!', description: 'URL copied to clipboard and added to message.' });
+      } catch {
+        toast({ title: '✅ Image uploaded!', description: 'Link added to message.' });
+      }
+    } catch (uploadError: any) {
+      console.error('Upload error:', uploadError);
+      toast({ title: 'Upload failed', description: uploadError.message || 'Unknown error', variant: 'destructive' });
+    } finally {
       setIsUploadingImage(false);
     }
-
-    // Reset input
-    if (event.target) event.target.value = '';
   };
 
   // Open WhatsApp compose dialog
@@ -617,12 +639,17 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
                 onChange={(e) => setWhatsappMessage(e.target.value)}
                 placeholder={`Hi ${lead.name} 👋,\n\nYour message here...`}
                 rows={6}
-                className="min-h-[140px] text-sm resize-none"
+                className={cn("min-h-[140px] text-sm resize-none", isOverLimit && "border-red-500 focus-visible:ring-red-500")}
               />
-              <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
-                <span><code className="px-1 py-0.5 rounded" style={{ backgroundColor: '#dcfce7', color: '#166534' }}>*bold*</code> for bold</span>
-                <span><code className="px-1 py-0.5 rounded" style={{ backgroundColor: '#dbeafe', color: '#1e40af' }}>_italic_</code> for italic</span>
-                <span>Upload 📸 or paste any link 🔗</span>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
+                  <span><code className="px-1 py-0.5 rounded" style={{ backgroundColor: '#dcfce7', color: '#166534' }}>*bold*</code> for bold</span>
+                  <span><code className="px-1 py-0.5 rounded" style={{ backgroundColor: '#dbeafe', color: '#1e40af' }}>_italic_</code> for italic</span>
+                </div>
+                <div className={cn("text-[10px] font-medium", isOverLimit ? "text-red-500" : isNearLimit ? "text-amber-500" : "text-muted-foreground")}>
+                  {charCount.toLocaleString()} / {WHATSAPP_CHAR_LIMIT.toLocaleString()}
+                  {isOverLimit && <span className="ml-1">⚠️</span>}
+                </div>
               </div>
             </div>
 
