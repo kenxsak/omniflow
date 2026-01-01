@@ -21,6 +21,7 @@ import { showAIContentReadyToast } from '@/lib/ai-toast-helpers';
 import TemplateBrowser from '@/components/templates/template-browser';
 import { uploadImageToImgBB } from '@/lib/imgbb-upload';
 import { Loader2 } from 'lucide-react';
+import { openWhatsApp } from '@/lib/open-external-link';
 
 interface ContactForSending extends WhatsAppContact {
   hasBeenSent?: boolean;
@@ -433,23 +434,8 @@ export default function WhatsAppMarketingPage() {
       return;
     }
     
-    // Properly encode the message for wa.me URL
-    // encodeURIComponent handles UTF-8 encoding including emojis
-    // But we need to ensure the string is properly normalized first
-    const normalizedMessage = personalizedMessage.normalize('NFC');
-    const encodedMessage = encodeURIComponent(normalizedMessage);
-    
-    // Build the wa.me URL
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanedPhoneNumber}&text=${encodedMessage}`;
-    
-    // Use anchor element to reliably open in new tab
-    const link = document.createElement('a');
-    link.href = whatsappUrl;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Use utility to open WhatsApp in new tab
+    openWhatsApp(cleanedPhoneNumber, personalizedMessage);
     
     toast({ title: "Opening WhatsApp", description: `Message for ${contactName || phoneNumber}` });
   };
@@ -1047,9 +1033,27 @@ Jane Smith,"919123456789"`;
                       <span><code className="px-1 py-0.5 rounded" style={{ backgroundColor: '#dcfce7', color: '#166534' }}>*{CONTACT_NAME_PLACEHOLDER}*</code> personalization</span>
                       <span><code className="px-1 py-0.5 rounded" style={{ backgroundColor: '#dbeafe', color: '#1e40af' }}>*bold*</code> formatting</span>
                     </div>
-                    <div className={cn("text-[10px] font-medium", isOverLimit ? "text-red-500" : isNearLimit ? "text-amber-500" : "text-muted-foreground")}>
-                      {charCount.toLocaleString()} / {WHATSAPP_CHAR_LIMIT.toLocaleString()} chars
-                      {isOverLimit && <span className="ml-1">⚠️ Too long!</span>}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          if (campaignMessage.trim()) {
+                            navigator.clipboard.writeText(campaignMessage);
+                            toast({ title: 'Copied!', description: 'Message copied to clipboard' });
+                          }
+                        }}
+                        disabled={!campaignMessage.trim()}
+                        className="h-6 px-2 text-[10px]"
+                      >
+                        <Icon icon="solar:copy-linear" className="h-3 w-3 mr-1" />
+                        Copy
+                      </Button>
+                      <span className={cn("text-[10px] font-medium", isOverLimit ? "text-red-500" : isNearLimit ? "text-amber-500" : "text-muted-foreground")}>
+                        {charCount.toLocaleString()} / {WHATSAPP_CHAR_LIMIT.toLocaleString()}
+                        {isOverLimit && <span className="ml-1">⚠️</span>}
+                      </span>
                     </div>
                   </div>
                   

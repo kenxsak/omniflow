@@ -25,8 +25,12 @@ import { Label } from '@/components/ui/label';
 import { Icon } from '@iconify/react';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 import { uploadImageToImgBB } from '@/lib/imgbb-upload';
 import { cn } from '@/lib/utils';
+import { openWhatsApp, openWhatsAppWeb } from '@/lib/open-external-link';
+import { logWhatsAppActivity } from '@/app/actions/activity-actions';
+import { useAuth } from '@/hooks/use-auth';
 
 interface LeadQuickActionsProps {
   lead: {
@@ -55,6 +59,7 @@ const messageTemplates = [
 
 export function LeadQuickActions({ lead, onActivityLogged, compact = false }: LeadQuickActionsProps) {
   const { toast } = useToast();
+  const { appUser } = useAuth();
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [whatsappDialogOpen, setWhatsappDialogOpen] = useState(false);
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
@@ -216,7 +221,7 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
   };
 
   // Send WhatsApp message via api.whatsapp.com (FREE - opens WhatsApp with pre-filled message)
-  const handleSendWhatsApp = () => {
+  const handleSendWhatsApp = async () => {
     if (!lead.phone) {
       toast({ title: 'No phone number', description: 'This contact has no phone number.', variant: 'destructive' });
       return;
@@ -227,25 +232,44 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
     }
     
     const phone = formatPhoneForWhatsApp(lead.phone);
+    openWhatsApp(phone, whatsappMessage);
     
-    // Normalize and encode message for proper emoji support
-    const normalizedMessage = whatsappMessage.normalize('NFC');
-    const encodedMessage = encodeURIComponent(normalizedMessage);
+    // Log WhatsApp activity to timeline with full message content
+    if (appUser) {
+      try {
+        await logWhatsAppActivity(
+          lead.companyId,
+          lead.id,
+          whatsappMessage.trim(),
+          appUser.uid,
+          appUser.name || appUser.email,
+          lead.phone
+        );
+        onActivityLogged?.();
+      } catch (error) {
+        console.error('Failed to log WhatsApp activity:', error);
+      }
+    }
     
-    // Use api.whatsapp.com/send for better emoji/unicode support (FREE - not Business API)
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodedMessage}`;
+    // Show toast with follow-up option
+    toast({ 
+      title: '✅ WhatsApp opened', 
+      description: `Message logged for ${lead.name}`,
+      action: (
+        <ToastAction
+          altText="Set follow-up reminder"
+          onClick={() => {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(10, 0, 0, 0);
+            window.open(`/tasks?newTask=true&leadId=${lead.id}&leadName=${encodeURIComponent(lead.name)}&dueDate=${tomorrow.toISOString()}&title=${encodeURIComponent(`Follow up with ${lead.name}`)}`, '_self');
+          }}
+        >
+          Set Reminder
+        </ToastAction>
+      ),
+    });
     
-    // Use anchor element to reliably open in new tab
-    const link = document.createElement('a');
-    link.href = whatsappUrl;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    toast({ title: 'Opening WhatsApp', description: `Message ready for ${lead.name}` });
-    logActivity('whatsapp_message', `Sent WhatsApp message to ${lead.name}`);
     setWhatsappDialogOpen(false);
     setWhatsappMessage('');
   };
@@ -257,20 +281,9 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
       return;
     }
     const phone = formatPhoneForWhatsApp(lead.phone);
-    const message = `Hi ${lead.name} 👋,\n\n`.normalize('NFC');
-    const encodedMessage = encodeURIComponent(message);
+    const message = `Hi ${lead.name} 👋,\n\n`;
     
-    // Use api.whatsapp.com/send for better emoji support
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodedMessage}`;
-    
-    // Use anchor element to reliably open in new tab
-    const link = document.createElement('a');
-    link.href = whatsappUrl;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    openWhatsApp(phone, message);
     
     toast({ title: 'Opening WhatsApp', description: `Starting chat with ${lead.name}` });
     logActivity('whatsapp_opened', `Opened WhatsApp chat with ${lead.name}`);
@@ -283,9 +296,10 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
       return;
     }
     const phone = formatPhoneForWhatsApp(lead.phone);
-    const message = `Hi ${lead.name} 👋,\n\n`.normalize('NFC');
-    const encodedMessage = encodeURIComponent(message);
-    window.open(`https://web.whatsapp.com/send?phone=${phone}&text=${encodedMessage}`, '_blank');
+    const message = `Hi ${lead.name} 👋,\n\n`;
+    
+    openWhatsAppWeb(phone, message);
+    
     logActivity('whatsapp_web_opened', `Opened WhatsApp Web chat with ${lead.name}`);
   };
 
@@ -450,6 +464,68 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
               Call {lead.phone ? lead.phone : '(No phone)'}
             </span>
           </Button>
+
+          {/* Set Reminder / Follow-up */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start gap-2 h-11 sm:h-10 border-stone-200 dark:border-stone-700 hover:bg-muted/50 hover:border-amber-300 dark:hover:border-amber-700"
+              >
+                <Icon icon="solar:bell-linear" className="h-5 w-5 sm:h-4 sm:w-4" style={{ color: '#f59e0b' }} />
+                <span className="flex-1 text-left text-sm font-medium">Set Reminder</span>
+                <Icon icon="solar:alt-arrow-down-linear" className="h-3 w-3 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuItem 
+                onClick={() => {
+                  const tomorrow = new Date();
+                  tomorrow.setDate(tomorrow.getDate() + 1);
+                  tomorrow.setHours(10, 0, 0, 0);
+                  window.open(`/tasks?newTask=true&leadId=${lead.id}&leadName=${encodeURIComponent(lead.name)}&dueDate=${tomorrow.toISOString()}&title=${encodeURIComponent(`Follow up with ${lead.name}`)}`, '_self');
+                }} 
+                className="py-2.5"
+              >
+                <Icon icon="solar:calendar-linear" className="h-4 w-4 mr-2" style={{ color: '#f59e0b' }} />
+                Tomorrow (10 AM)
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => {
+                  const in3Days = new Date();
+                  in3Days.setDate(in3Days.getDate() + 3);
+                  in3Days.setHours(10, 0, 0, 0);
+                  window.open(`/tasks?newTask=true&leadId=${lead.id}&leadName=${encodeURIComponent(lead.name)}&dueDate=${in3Days.toISOString()}&title=${encodeURIComponent(`Follow up with ${lead.name}`)}`, '_self');
+                }} 
+                className="py-2.5"
+              >
+                <Icon icon="solar:calendar-linear" className="h-4 w-4 mr-2" style={{ color: '#f59e0b' }} />
+                In 3 Days
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => {
+                  const nextWeek = new Date();
+                  nextWeek.setDate(nextWeek.getDate() + 7);
+                  nextWeek.setHours(10, 0, 0, 0);
+                  window.open(`/tasks?newTask=true&leadId=${lead.id}&leadName=${encodeURIComponent(lead.name)}&dueDate=${nextWeek.toISOString()}&title=${encodeURIComponent(`Follow up with ${lead.name}`)}`, '_self');
+                }} 
+                className="py-2.5"
+              >
+                <Icon icon="solar:calendar-linear" className="h-4 w-4 mr-2" style={{ color: '#f59e0b' }} />
+                Next Week
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => {
+                  window.open(`/tasks?newTask=true&leadId=${lead.id}&leadName=${encodeURIComponent(lead.name)}&title=${encodeURIComponent(`Follow up with ${lead.name}`)}`, '_self');
+                }} 
+                className="py-2.5"
+              >
+                <Icon icon="solar:settings-linear" className="h-4 w-4 mr-2" style={{ color: '#6b7280' }} />
+                Custom Date...
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Quick Info */}
           <div className="pt-3 mt-3 border-t border-stone-200 dark:border-stone-700">
@@ -654,9 +730,27 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
                   <span><code className="px-1 py-0.5 rounded" style={{ backgroundColor: '#dcfce7', color: '#166534' }}>*bold*</code> for bold</span>
                   <span><code className="px-1 py-0.5 rounded" style={{ backgroundColor: '#dbeafe', color: '#1e40af' }}>_italic_</code> for italic</span>
                 </div>
-                <div className={cn("text-[10px] font-medium", isOverLimit ? "text-red-500" : isNearLimit ? "text-amber-500" : "text-muted-foreground")}>
-                  {charCount.toLocaleString()} / {WHATSAPP_CHAR_LIMIT.toLocaleString()}
-                  {isOverLimit && <span className="ml-1">⚠️</span>}
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (whatsappMessage.trim()) {
+                        navigator.clipboard.writeText(whatsappMessage);
+                        toast({ title: 'Copied!', description: 'Message copied to clipboard' });
+                      }
+                    }}
+                    disabled={!whatsappMessage.trim()}
+                    className="h-6 px-2 text-[10px]"
+                  >
+                    <Icon icon="solar:copy-linear" className="h-3 w-3 mr-1" />
+                    Copy
+                  </Button>
+                  <span className={cn("text-[10px] font-medium", isOverLimit ? "text-red-500" : isNearLimit ? "text-amber-500" : "text-muted-foreground")}>
+                    {charCount.toLocaleString()} / {WHATSAPP_CHAR_LIMIT.toLocaleString()}
+                    {isOverLimit && <span className="ml-1">⚠️</span>}
+                  </span>
                 </div>
               </div>
             </div>

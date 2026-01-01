@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getStoredLeads, type Lead } from '@/lib/mock-data';
-import { getStoredTasks, type Task } from '@/lib/task-data';
+import { getStoredTasks } from '@/lib/task-data';
+import type { Task } from '@/types/task';
 import { format } from 'date-fns';
 import { ArrowLeft, Loader2, AlertTriangle, CheckCircle, Link as LinkIcon, Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -16,6 +17,7 @@ import { ActivityTimeline } from '@/components/crm/activity-timeline';
 import { ContactDeals } from '@/components/crm/contact-deals';
 import { AppointmentDialog } from '@/components/appointments/appointment-dialog';
 import { LeadQuickActions } from '@/components/crm/lead-quick-actions';
+import { openWhatsApp } from '@/lib/open-external-link';
 
 const statusColors: Record<Lead['status'], string> = {
   New: 'bg-info-muted text-info-muted-foreground border border-info-border',
@@ -154,19 +156,8 @@ export default function LeadDossierPage() {
     const handleQuickWhatsApp = () => {
         if (!lead.phone) return;
         const phone = formatPhoneForWhatsApp(lead.phone);
-        // Use api.whatsapp.com/send for proper emoji support (FREE - not Business API)
-        const message = `Hi ${lead.name} 👋,\n\n`.normalize('NFC');
-        const encodedMessage = encodeURIComponent(message);
-        const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodedMessage}`;
-        
-        // Use anchor element to reliably open in new tab
-        const link = document.createElement('a');
-        link.href = whatsappUrl;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const message = `Hi ${lead.name} 👋,\n\n`;
+        openWhatsApp(phone, message);
     };
 
     const handleQuickEmail = () => {
