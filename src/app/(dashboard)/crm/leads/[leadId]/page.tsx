@@ -154,8 +154,14 @@ export default function LeadDossierPage() {
     const handleQuickWhatsApp = () => {
         if (!lead.phone) return;
         const phone = formatPhoneForWhatsApp(lead.phone);
-        const message = encodeURIComponent(`Hi ${lead.name}, `);
-        window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+        // Use api.whatsapp.com/send for proper emoji support (FREE - not Business API)
+        const message = `Hi ${lead.name} 👋,\n\n`.normalize('NFC');
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodedMessage}`;
+        const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+        if (!newWindow) {
+            window.location.href = whatsappUrl;
+        }
     };
 
     const handleQuickEmail = () => {

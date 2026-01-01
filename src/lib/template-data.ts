@@ -531,3 +531,212 @@ Thank you for being a loyal customer!
     createdAt: baseDate,
   },
 ];
+
+
+// WhatsApp Templates with Link Placeholders
+export const whatsappTemplates: Template[] = [
+  {
+    id: 'wa-invoice-001',
+    type: 'sms', // Using 'sms' type for WhatsApp templates
+    industry: ['general', 'service', 'ecommerce'],
+    category: 'followup',
+    name: 'Invoice Sharing',
+    description: 'Share invoice with payment link',
+    content: `Hi *{name}* 👋,
+
+Here's your invoice for {service}:
+
+📄 *Invoice:* {invoiceLink}
+
+💰 *Amount:* ₹{amount}
+📅 *Due Date:* {dueDate}
+
+Pay online: {paymentLink}
+
+Questions? Just reply to this message! 🙏
+
+Best regards,
+*{business}*`,
+    variables: ['name', 'business', 'service', 'invoiceLink', 'amount', 'dueDate', 'paymentLink'],
+    popularity: 0,
+    createdBy: 'omniflow',
+    createdAt: baseDate,
+  },
+  {
+    id: 'wa-quotation-001',
+    type: 'sms',
+    industry: ['general', 'service'],
+    category: 'followup',
+    name: 'Quotation/Estimate',
+    description: 'Send quotation with document link',
+    content: `Hi *{name}* 👋,
+
+Thank you for your interest! Here's your quotation:
+
+📋 *Quotation:* {quotationLink}
+
+*Service:* {service}
+*Estimated Cost:* ₹{price}
+*Valid Until:* {validDate}
+
+Ready to proceed? Just reply YES! ✅
+
+Best regards,
+*{business}*`,
+    variables: ['name', 'business', 'service', 'quotationLink', 'price', 'validDate'],
+    popularity: 0,
+    createdBy: 'omniflow',
+    createdAt: baseDate,
+  },
+  {
+    id: 'wa-catalog-001',
+    type: 'sms',
+    industry: ['ecommerce', 'general'],
+    category: 'promotional',
+    name: 'Product Catalog',
+    description: 'Share product catalog or brochure',
+    content: `Hi *{name}* 👋,
+
+Check out our latest collection! ✨
+
+📸 *View Catalog:* {catalogLink}
+
+🔥 *Highlights:*
+• New arrivals
+• Exclusive designs
+• Special prices
+
+Interested in something? Just send the product name! 🛒
+
+*{business}*`,
+    variables: ['name', 'business', 'catalogLink'],
+    popularity: 0,
+    createdBy: 'omniflow',
+    createdAt: baseDate,
+  },
+  {
+    id: 'wa-meeting-001',
+    type: 'sms',
+    industry: ['general', 'coaching', 'service'],
+    category: 'reminder',
+    name: 'Meeting/Video Call Link',
+    description: 'Share meeting link with details',
+    content: `Hi *{name}* 👋,
+
+Your meeting is scheduled! 📅
+
+🎥 *Join Meeting:* {meetingLink}
+
+*Date:* {date}
+*Time:* {time}
+*Duration:* {duration}
+
+Please join 5 minutes early. See you there! 🚀
+
+*{business}*`,
+    variables: ['name', 'business', 'meetingLink', 'date', 'time', 'duration'],
+    popularity: 0,
+    createdBy: 'omniflow',
+    createdAt: baseDate,
+  },
+  {
+    id: 'wa-payment-reminder-001',
+    type: 'sms',
+    industry: ['general', 'service'],
+    category: 'reminder',
+    name: 'Payment Reminder',
+    description: 'Remind about pending payment',
+    content: `Hi *{name}* 👋,
+
+Friendly reminder about your pending payment:
+
+📄 *Invoice:* {invoiceLink}
+💰 *Amount Due:* ₹{amount}
+📅 *Due Date:* {dueDate}
+
+Pay now: {paymentLink}
+
+Already paid? Please ignore this message. 🙏
+
+*{business}*`,
+    variables: ['name', 'business', 'invoiceLink', 'amount', 'dueDate', 'paymentLink'],
+    popularity: 0,
+    createdBy: 'omniflow',
+    createdAt: baseDate,
+  },
+  {
+    id: 'wa-product-image-001',
+    type: 'sms',
+    industry: ['ecommerce', 'general'],
+    category: 'promotional',
+    name: 'Product with Image',
+    description: 'Share product details with image',
+    content: `Hi *{name}* 👋,
+
+Check out this amazing product! ✨
+
+📸 *View Image:* {imageLink}
+
+*{productName}*
+💰 Price: ₹{price}
+📦 {description}
+
+Interested? Reply to order! 🛒
+
+*{business}*`,
+    variables: ['name', 'business', 'imageLink', 'productName', 'price', 'description'],
+    popularity: 0,
+    createdBy: 'omniflow',
+    createdAt: baseDate,
+  },
+  {
+    id: 'wa-video-demo-001',
+    type: 'sms',
+    industry: ['general', 'service', 'coaching'],
+    category: 'followup',
+    name: 'Video Demo/Tutorial',
+    description: 'Share video demonstration link',
+    content: `Hi *{name}* 👋,
+
+Here's the video you requested:
+
+🎥 *Watch Video:* {videoLink}
+
+*{videoTitle}*
+
+Let me know your thoughts after watching! 💬
+
+*{business}*`,
+    variables: ['name', 'business', 'videoLink', 'videoTitle'],
+    popularity: 0,
+    createdBy: 'omniflow',
+    createdAt: baseDate,
+  },
+  {
+    id: 'wa-order-confirm-001',
+    type: 'sms',
+    industry: ['ecommerce', 'restaurant'],
+    category: 'followup',
+    name: 'Order Confirmation',
+    description: 'Confirm order with receipt',
+    content: `Hi *{name}* 👋,
+
+Your order is confirmed! ✅
+
+🧾 *Order Receipt:* {receiptLink}
+
+*Order ID:* #{orderId}
+*Items:* {items}
+*Total:* ₹{total}
+
+Track your order: {trackingLink}
+
+Thank you for shopping with us! 🙏
+
+*{business}*`,
+    variables: ['name', 'business', 'receiptLink', 'orderId', 'items', 'total', 'trackingLink'],
+    popularity: 0,
+    createdBy: 'omniflow',
+    createdAt: baseDate,
+  },
+];

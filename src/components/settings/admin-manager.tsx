@@ -285,7 +285,7 @@ export default function AdminManager() {
           <a href={`tel:${admin.phone}`}><Phone className="mr-2 h-4 w-4" /> Call Admin</a>
         </DropdownMenuItem>
         <DropdownMenuItem asChild disabled={!admin.phone}>
-          <a href={`https://wa.me/${admin.phone?.replace(/\\D/g, '')}`} target="_blank" rel="noopener noreferrer">
+          <a href={`https://api.whatsapp.com/send?phone=${admin.phone?.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer">
             <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp Admin
           </a>
         </DropdownMenuItem>

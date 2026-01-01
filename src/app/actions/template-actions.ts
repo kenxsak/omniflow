@@ -1,8 +1,11 @@
 'use server';
 
-import { defaultTemplates } from '@/lib/template-data';
+import { defaultTemplates, whatsappTemplates } from '@/lib/template-data';
 import type { Template, TemplateType, Industry, TemplateCategory, ApplyTemplateInput, ApplyTemplateOutput } from '@/types/templates';
 import { getAllTemplates } from './template-marketplace-actions';
+
+// Combine default templates with WhatsApp-specific templates
+const allDefaultTemplates = [...defaultTemplates, ...whatsappTemplates];
 
 export async function getTemplates(
   type?: TemplateType,
@@ -26,8 +29,8 @@ export async function getTemplates(
     }
   }
   
-  // Fallback to default templates only
-  let filtered = [...defaultTemplates];
+  // Fallback to default templates only (including WhatsApp templates)
+  let filtered = [...allDefaultTemplates];
 
   if (type) {
     filtered = filtered.filter(t => t.type === type);
@@ -58,8 +61,8 @@ export async function applyTemplate(
   input: ApplyTemplateInput,
   companyId?: string
 ): Promise<ApplyTemplateOutput | null> {
-  // First check default templates
-  let template = defaultTemplates.find(t => t.id === input.templateId);
+  // First check all default templates (including WhatsApp templates)
+  let template = allDefaultTemplates.find(t => t.id === input.templateId);
 
   // If not found and companyId is provided, check custom templates
   if (!template && companyId) {
@@ -94,8 +97,8 @@ export async function getTemplateById(
   templateId: string,
   companyId?: string
 ): Promise<Template | null> {
-  // First check default templates
-  const template = defaultTemplates.find(t => t.id === templateId);
+  // First check all default templates (including WhatsApp templates)
+  const template = allDefaultTemplates.find(t => t.id === templateId);
   if (template) {
     return template;
   }
