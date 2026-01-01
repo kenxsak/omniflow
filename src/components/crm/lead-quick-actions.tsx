@@ -235,10 +235,14 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
     // Use api.whatsapp.com/send for better emoji/unicode support (FREE - not Business API)
     const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodedMessage}`;
     
-    const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    if (!newWindow) {
-      window.location.href = whatsappUrl;
-    }
+    // Use anchor element to reliably open in new tab
+    const link = document.createElement('a');
+    link.href = whatsappUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     
     toast({ title: 'Opening WhatsApp', description: `Message ready for ${lead.name}` });
     logActivity('whatsapp_message', `Sent WhatsApp message to ${lead.name}`);
@@ -259,10 +263,14 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
     // Use api.whatsapp.com/send for better emoji support
     const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodedMessage}`;
     
-    const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    if (!newWindow) {
-      window.location.href = whatsappUrl;
-    }
+    // Use anchor element to reliably open in new tab
+    const link = document.createElement('a');
+    link.href = whatsappUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     
     toast({ title: 'Opening WhatsApp', description: `Starting chat with ${lead.name}` });
     logActivity('whatsapp_opened', `Opened WhatsApp chat with ${lead.name}`);

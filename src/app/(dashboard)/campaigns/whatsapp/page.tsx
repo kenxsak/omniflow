@@ -442,11 +442,14 @@ export default function WhatsAppMarketingPage() {
     // Build the wa.me URL
     const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanedPhoneNumber}&text=${encodedMessage}`;
     
-    // Try to open in new tab, fallback to same window
-    const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    if (!newWindow) {
-      window.location.href = whatsappUrl;
-    }
+    // Use anchor element to reliably open in new tab
+    const link = document.createElement('a');
+    link.href = whatsappUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     
     toast({ title: "Opening WhatsApp", description: `Message for ${contactName || phoneNumber}` });
   };

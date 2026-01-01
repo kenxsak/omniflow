@@ -158,10 +158,15 @@ export default function LeadDossierPage() {
         const message = `Hi ${lead.name} 👋,\n\n`.normalize('NFC');
         const encodedMessage = encodeURIComponent(message);
         const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodedMessage}`;
-        const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-        if (!newWindow) {
-            window.location.href = whatsappUrl;
-        }
+        
+        // Use anchor element to reliably open in new tab
+        const link = document.createElement('a');
+        link.href = whatsappUrl;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     const handleQuickEmail = () => {
