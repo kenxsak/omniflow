@@ -96,12 +96,15 @@ export async function trackAIUsage(params: {
         } else if (model === 'imagen-3') {
           costModel = 'imagen-3';
         }
-        const imageCost = calculateImageGenerationCost(imageCount, costModel);
+        // CRITICAL: Default to 1 image if imageCount is 0 or undefined for image_generation
+        const actualImageCount = imageCount > 0 ? imageCount : 1;
+        const imageCost = calculateImageGenerationCost(actualImageCount, costModel);
         rawCost = imageCost.rawCost;
         platformCost = imageCost.platformCost;
         margin = imageCost.margin;
         // THE DEFINITIVE FIX: Correctly pass the image count to calculate credits.
-        creditsConsumed = calculateCreditsConsumed(operationType, DEFAULT_CREDIT_CONFIG, { images: imageCount });
+        creditsConsumed = calculateCreditsConsumed(operationType, DEFAULT_CREDIT_CONFIG, { images: actualImageCount });
+        console.log(`[AI Usage] Image generation: ${actualImageCount} image(s), ${creditsConsumed} credits consumed`);
       } else if (operationType === 'text_to_speech') {
         const ttsCost = calculateTTSCost(characterCount);
         rawCost = ttsCost.rawCost;

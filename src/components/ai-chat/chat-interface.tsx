@@ -284,10 +284,18 @@ export default function ChatInterface({
         nextSteps: aiMessage.nextSteps
       });
 
+      // Show credits toast for all AI operations
       if (result.creditsConsumed && result.creditsConsumed > 0) {
         toast({
           title: '✨ AI Credits Used',
           description: `${result.creditsConsumed} credits consumed for this request`,
+          duration: 3000
+        });
+      } else if (result.type === 'image') {
+        // For image generation, always show a success toast even if using BYOK
+        toast({
+          title: '🎨 Image Generated',
+          description: 'Your AI image has been created successfully',
           duration: 3000
         });
       }
@@ -678,6 +686,15 @@ export default function ChatInterface({
           nextSteps: aiMessage.nextSteps
         });
 
+        // Show credits consumed toast
+        if (result.creditsConsumed && result.creditsConsumed > 0) {
+          toast({
+            title: '✨ AI Credits Used',
+            description: `${result.creditsConsumed} credits consumed for this request`,
+            duration: 3000
+          });
+        }
+
         setIsLoading(false);
       }
 
@@ -740,7 +757,16 @@ export default function ChatInterface({
         nextSteps: result.nextSteps
       });
 
-      toast({ title: '✨ Response Regenerated', duration: 4000 });
+      // Show credits consumed toast
+      if (result.creditsConsumed && result.creditsConsumed > 0) {
+        toast({ 
+          title: '✨ Response Regenerated', 
+          description: `${result.creditsConsumed} credits consumed`,
+          duration: 4000 
+        });
+      } else {
+        toast({ title: '✨ Response Regenerated', duration: 4000 });
+      }
 
     } catch (error: any) {
       toast({ title: 'Error', description: error.message || 'Failed to regenerate response', variant: 'destructive' });
