@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Dark logo for light backgrounds (no background) -->
+  
+  <!-- Outer ring -->
+  <circle cx="256" cy="256" r="180" stroke="#1a1a1a" stroke-width="24" fill="none"/>
+  
+  <!-- Inner stylized "O" -->
+  <circle cx="256" cy="256" r="100" stroke="#1a1a1a" stroke-width="20" fill="none"/>
+  
+  <!-- Flow accent lines -->
+  <path d="M 156 256 Q 206 180, 256 180 Q 306 180, 356 256" stroke="#1a1a1a" stroke-width="16" fill="none" stroke-linecap="round"/>
+  <path d="M 156 256 Q 206 332, 256 332 Q 306 332, 356 256" stroke="#1a1a1a" stroke-width="16" fill="none" stroke-linecap="round"/>
+  
+  <!-- Center dot -->
+  <circle cx="256" cy="256" r="24" fill="#1a1a1a"/>
+</svg>

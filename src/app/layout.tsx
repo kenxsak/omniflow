@@ -41,10 +41,11 @@ export const metadata: Metadata = {
     icon: [
       { url: '/favicon-light/favicon.ico', media: '(prefers-color-scheme: light)' },
       { url: '/favicon-dark/favicon.ico', media: '(prefers-color-scheme: dark)' },
-      { url: '/favicon-light/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/favicon-dark/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/favicon-dark/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
     apple: [
-      { url: '/favicon-light/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/favicon-dark/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
   },
   appleWebApp: {
@@ -61,7 +62,7 @@ export const metadata: Metadata = {
     siteName: 'OmniFlow',
     images: [
       {
-        url: '/favicon-light/android-chrome-512x512.png',
+        url: '/favicon-dark/android-chrome-512x512.png',
         width: 512,
         height: 512,
         alt: 'OmniFlow - AI-Powered All-in-One Sales & Marketing Platform',
@@ -72,7 +73,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'OmniFlow - AI Marketing Automation That Replaces 10+ Tools',
     description: 'Save $30,000/year with OmniFlow. All-in-one platform: CRM, Email, WhatsApp, SMS & AI content. Free 14-day trial.',
-    images: ['/favicon-light/android-chrome-512x512.png'],
+    images: ['/favicon-dark/android-chrome-512x512.png'],
     creator: '@omniflow',
   },
   alternates: {
