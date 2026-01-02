@@ -69,21 +69,23 @@ export function Logo({
         </>
       ) : (
         <>
-          {/* Default light theme logo - dark logo on light bg */}
-          <img
-            src="/logo-dark.svg"
+          {/* Default light theme logo */}
+          <Image
+            src="/favicon-light/android-chrome-192x192.png"
             alt={brandName}
             width={logoSize}
             height={logoSize}
             className="object-contain dark:hidden"
+            priority
           />
-          {/* Default dark theme logo - white logo on dark bg */}
-          <img
-            src="/logo-white.svg"
+          {/* Default dark theme logo */}
+          <Image
+            src="/favicon-dark/android-chrome-192x192.png"
             alt={brandName}
             width={logoSize}
             height={logoSize}
             className="object-contain hidden dark:block"
+            priority
           />
         </>
       )}
@@ -149,21 +151,23 @@ export function LogoIcon({ size = 32, className }: { size?: number; className?: 
 
   return (
     <>
-      {/* Light theme icon - dark logo */}
-      <img
-        src="/logo-dark.svg"
+      {/* Light theme icon */}
+      <Image
+        src="/favicon-light/android-chrome-192x192.png"
         alt={brandName}
         width={size}
         height={size}
         className={cn("object-contain dark:hidden", className)}
+        priority
       />
-      {/* Dark theme icon - white logo */}
-      <img
-        src="/logo-white.svg"
+      {/* Dark theme icon */}
+      <Image
+        src="/favicon-dark/android-chrome-192x192.png"
         alt={brandName}
         width={size}
         height={size}
         className={cn("object-contain hidden dark:block", className)}
+        priority
       />
     </>
   );
