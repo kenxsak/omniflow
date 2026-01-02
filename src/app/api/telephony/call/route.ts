@@ -25,36 +25,56 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch company's telephony API keys from Firestore
-    const apiKeysDoc = await adminDb.collection('companies').doc(companyId).collection('settings').doc('apiKeys').get();
-    const apiKeys = apiKeysDoc.exists ? apiKeysDoc.data() : {};
+    // API keys are stored encrypted in the company document's apiKeys field
+    const companyDoc = await adminDb.collection('companies').doc(companyId).get();
+    const companyData = companyDoc.exists ? companyDoc.data() : {};
+    const encryptedApiKeys = companyData?.apiKeys || {};
 
-    // Build telephony config from saved API keys
+    // Import decryption function
+    const { decryptApiKeyServerSide } = await import('@/lib/encryption-server');
+
+    // Build telephony config from saved API keys (decrypt them first)
     const config: TelephonyConfig = {};
 
-    if (apiKeys?.plivo) {
-      config.plivo = {
-        authId: apiKeys.plivo.authId,
-        authToken: apiKeys.plivo.authToken,
-        phoneNumber: apiKeys.plivo.phoneNumber,
-      };
+    if (encryptedApiKeys?.plivo) {
+      try {
+        const authId = decryptApiKeyServerSide(encryptedApiKeys.plivo.authId);
+        const authToken = decryptApiKeyServerSide(encryptedApiKeys.plivo.authToken);
+        const phoneNumber = encryptedApiKeys.plivo.phoneNumber ? decryptApiKeyServerSide(encryptedApiKeys.plivo.phoneNumber) : undefined;
+        if (authId && authToken) {
+          config.plivo = { authId, authToken, phoneNumber: phoneNumber || '' };
+        }
+      } catch (e) {
+        console.error('[Telephony] Failed to decrypt Plivo keys:', e);
+      }
     }
 
-    if (apiKeys?.exotel) {
-      config.exotel = {
-        sid: apiKeys.exotel.sid,
-        apiKey: apiKeys.exotel.apiKey,
-        apiToken: apiKeys.exotel.apiToken,
-        subdomain: apiKeys.exotel.subdomain || 'api4',
-        callerId: apiKeys.exotel.callerId,
-      };
+    if (encryptedApiKeys?.exotel) {
+      try {
+        const sid = decryptApiKeyServerSide(encryptedApiKeys.exotel.sid);
+        const apiKey = decryptApiKeyServerSide(encryptedApiKeys.exotel.apiKey);
+        const apiToken = decryptApiKeyServerSide(encryptedApiKeys.exotel.apiToken);
+        const callerId = encryptedApiKeys.exotel.callerId ? decryptApiKeyServerSide(encryptedApiKeys.exotel.callerId) : undefined;
+        const subdomain = encryptedApiKeys.exotel.subdomain ? decryptApiKeyServerSide(encryptedApiKeys.exotel.subdomain) : 'api4';
+        if (sid && apiKey && apiToken) {
+          config.exotel = { sid, apiKey, apiToken, subdomain, callerId: callerId || '' };
+        }
+      } catch (e) {
+        console.error('[Telephony] Failed to decrypt Exotel keys:', e);
+      }
     }
 
-    if (apiKeys?.twilio) {
-      config.twilio = {
-        accountSid: apiKeys.twilio.accountSid,
-        authToken: apiKeys.twilio.authToken,
-        phoneNumber: apiKeys.twilio.phoneNumber,
-      };
+    if (encryptedApiKeys?.twilio) {
+      try {
+        const accountSid = decryptApiKeyServerSide(encryptedApiKeys.twilio.accountSid);
+        const authToken = decryptApiKeyServerSide(encryptedApiKeys.twilio.authToken);
+        const phoneNumber = encryptedApiKeys.twilio.phoneNumber ? decryptApiKeyServerSide(encryptedApiKeys.twilio.phoneNumber) : undefined;
+        if (accountSid && authToken) {
+          config.twilio = { accountSid, authToken, phoneNumber: phoneNumber || '' };
+        }
+      } catch (e) {
+        console.error('[Telephony] Failed to decrypt Twilio keys:', e);
+      }
     }
 
     // Format phone number

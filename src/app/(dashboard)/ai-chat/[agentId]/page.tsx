@@ -8,7 +8,8 @@ import Link from 'next/link';
 import ChatInterface from '@/components/ai-chat/chat-interface';
 import ConversationHistorySidebar from '@/components/ai-chat/conversation-history-sidebar';
 import { getAgentById } from '@/config/ai-agents';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { cn } from '@/lib/utils';
 import {
   Tooltip,
@@ -187,6 +188,9 @@ export default function AgentChatPage() {
                     </Button>
                   </SheetTrigger>
                   <SheetContent side="left" className="w-[280px] p-0">
+                    <VisuallyHidden.Root>
+                      <SheetTitle>Chat History</SheetTitle>
+                    </VisuallyHidden.Root>
                     <ConversationHistorySidebar
                       currentSessionId={currentSessionId}
                       onSelectSession={handleSelectSession}

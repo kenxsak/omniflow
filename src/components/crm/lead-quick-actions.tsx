@@ -509,6 +509,7 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
               <DropdownMenuItem 
                 onClick={async () => {
                   if (!lead.phone) return;
+                  // Show provider selection - try Vapi first
                   try {
                     const response = await fetch('/api/telephony/ai-call', {
                       method: 'POST',
@@ -518,23 +519,56 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
                         leadId: lead.id,
                         leadName: lead.name,
                         companyId: lead.companyId,
+                        provider: 'vapi',
                       }),
                     });
                     const data = await response.json();
                     if (data.success) {
-                      toast({ title: 'AI Call Initiated', description: `AI agent calling ${lead.name} via ${data.provider}...` });
-                      logActivity('ai_call_initiated', `AI voice call to ${lead.name} via ${data.provider}`);
+                      toast({ title: 'AI Call Initiated', description: `AI agent calling ${lead.name} via Vapi.ai...` });
+                      logActivity('ai_call_initiated', `AI voice call to ${lead.name} via Vapi.ai`);
                     } else {
                       toast({ title: 'AI Call Failed', description: data.error, variant: 'destructive' });
                     }
                   } catch (error) {
-                    toast({ title: 'Error', description: 'Failed to initiate AI call. Check Vapi/Bland settings.', variant: 'destructive' });
+                    toast({ title: 'Error', description: 'Failed to initiate AI call. Check Vapi settings.', variant: 'destructive' });
+                  }
+                }} 
+                className="py-2.5"
+              >
+                <Icon icon="solar:cpu-bolt-linear" className="h-4 w-4 mr-2 text-green-600" />
+                Vapi.ai Agent
+                <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 font-medium">AI</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={async () => {
+                  if (!lead.phone) return;
+                  try {
+                    const response = await fetch('/api/telephony/ai-call', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        to: lead.phone,
+                        leadId: lead.id,
+                        leadName: lead.name,
+                        companyId: lead.companyId,
+                        provider: 'bland',
+                      }),
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                      toast({ title: 'AI Call Initiated', description: `AI agent calling ${lead.name} via Bland.ai...` });
+                      logActivity('ai_call_initiated', `AI voice call to ${lead.name} via Bland.ai`);
+                    } else {
+                      toast({ title: 'AI Call Failed', description: data.error, variant: 'destructive' });
+                    }
+                  } catch (error) {
+                    toast({ title: 'Error', description: 'Failed to initiate AI call. Check Bland settings.', variant: 'destructive' });
                   }
                 }} 
                 className="py-2.5"
               >
                 <Icon icon="solar:cpu-bolt-linear" className="h-4 w-4 mr-2 text-purple-600" />
-                AI Voice Agent
+                Bland.ai Agent
                 <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 font-medium">AI</span>
               </DropdownMenuItem>
             </DropdownMenuContent>

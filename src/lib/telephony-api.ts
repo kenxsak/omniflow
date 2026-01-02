@@ -59,6 +59,7 @@ export interface AICallOptions {
   script?: string;
   voice?: string;
   firstMessage?: string;
+  maxDuration?: number;
   metadata?: Record<string, string>;
 }
 
@@ -232,27 +233,65 @@ async function makeAICallWithVapi(config: TelephonyConfig, options: AICallOption
     return { success: false, provider: 'vapi', error: 'Vapi API key not configured' };
   }
 
+  // Validate API key format
+  if (vapiConfig.apiKey.length < 10) {
+    console.error('[Vapi] API key appears invalid, length:', vapiConfig.apiKey.length);
+    return { success: false, provider: 'vapi', error: 'Vapi API key appears invalid' };
+  }
+
   const assistantId = options.assistantId || vapiConfig.assistantId;
+  
+  // For outbound calls, we need either an assistantId or to create a transient assistant
+  if (!assistantId) {
+    console.log('[Vapi] No assistantId provided, will use transient assistant');
+  }
+
+  console.log('[Vapi] Making call to:', options.to);
+  console.log('[Vapi] API key length:', vapiConfig.apiKey.length);
+  console.log('[Vapi] Assistant ID:', assistantId || 'none (transient)');
 
   try {
+    // Build request body based on Vapi API docs
+    const requestBody: Record<string, any> = {
+      customer: {
+        number: options.to,
+      },
+    };
+
+    // Add assistant configuration
+    if (assistantId) {
+      requestBody.assistantId = assistantId;
+    } else {
+      // Create a transient assistant for this call
+      requestBody.assistant = {
+        firstMessage: options.firstMessage || 'Hello! How can I help you today?',
+        model: {
+          provider: 'openai',
+          model: 'gpt-3.5-turbo',
+        },
+        voice: {
+          provider: '11labs',
+          voiceId: 'rachel',
+        },
+      };
+    }
+
+    if (options.metadata) {
+      requestBody.metadata = options.metadata;
+    }
+
     const response = await fetch('https://api.vapi.ai/call/phone', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${vapiConfig.apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        phoneNumberId: options.to,
-        assistantId: assistantId,
-        customer: {
-          number: options.to,
-        },
-        ...(options.firstMessage && { firstMessage: options.firstMessage }),
-        ...(options.metadata && { metadata: options.metadata }),
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     const data = await response.json();
+    console.log('[Vapi] Response status:', response.status);
+    console.log('[Vapi] Response:', JSON.stringify(data).substring(0, 500));
 
     if (response.ok) {
       return {
@@ -262,8 +301,9 @@ async function makeAICallWithVapi(config: TelephonyConfig, options: AICallOption
       };
     }
 
-    return { success: false, provider: 'vapi', error: data.message || 'Failed to initiate AI call' };
+    return { success: false, provider: 'vapi', error: data.message || data.error || 'Failed to initiate AI call' };
   } catch (error) {
+    console.error('[Vapi] Error:', error);
     return { success: false, provider: 'vapi', error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
@@ -275,23 +315,49 @@ async function makeAICallWithBland(config: TelephonyConfig, options: AICallOptio
     return { success: false, provider: 'bland', error: 'Bland API key not configured' };
   }
 
+  console.log('[Bland] Making call to:', options.to);
+  console.log('[Bland] Script length:', options.script?.length || 0);
+  console.log('[Bland] Voice:', options.voice || 'maya');
+  console.log('[Bland] Max duration:', options.maxDuration || 300);
+
   try {
+    // Build the request body with all Bland.ai options
+    const requestBody: Record<string, any> = {
+      phone_number: options.to,
+      task: options.script || options.firstMessage || 'Have a friendly conversation. Be helpful and professional.',
+      voice: options.voice || 'maya',
+      reduce_latency: true,
+      record: true, // Always record for transcript
+      wait_for_greeting: true,
+      max_duration: options.maxDuration || 300, // Use configured duration or 5 minutes default
+    };
+
+    // Add webhook URL for call completion
+    if (process.env.NEXT_PUBLIC_APP_URL) {
+      requestBody.webhook = `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/bland`;
+    }
+
+    // Add metadata for tracking
+    if (options.metadata) {
+      requestBody.metadata = options.metadata;
+    }
+
+    // Add first message if provided
+    if (options.firstMessage) {
+      requestBody.first_sentence = options.firstMessage;
+    }
+
     const response = await fetch('https://api.bland.ai/v1/calls', {
       method: 'POST',
       headers: {
         'Authorization': blandConfig.apiKey,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        phone_number: options.to,
-        task: options.script || options.firstMessage || 'Have a friendly conversation',
-        voice: options.voice || 'maya',
-        reduce_latency: true,
-        ...(options.metadata && { metadata: options.metadata }),
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     const data = await response.json();
+    console.log('[Bland] Response:', JSON.stringify(data).substring(0, 300));
 
     if (response.ok && data.call_id) {
       return {

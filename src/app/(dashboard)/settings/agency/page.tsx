@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@iconify/react';
 import { useToast } from '@/hooks/use-toast';
@@ -21,13 +21,7 @@ import {
   DialogBody,
   DialogCloseButton 
 } from '@/components/ui/dialog';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
+
 import { 
   enableAgencyMode, 
   addClientCompany, 
@@ -405,13 +399,13 @@ export default function AgencySettingsPage() {
                   Companies you manage on behalf of your clients
                 </CardDescription>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={() => setIsAddClientOpen(true)}
                   disabled={clientCompanies.length >= maxClients}
-                  className="h-8 text-xs"
+                  className="h-9 sm:h-8 text-xs w-full sm:w-auto"
                 >
                   <Icon icon="solar:link-linear" className="h-3.5 w-3.5 mr-1.5" />
                   Link Existing
@@ -420,7 +414,7 @@ export default function AgencySettingsPage() {
                   size="sm" 
                   onClick={() => setIsCreateClientOpen(true)}
                   disabled={clientCompanies.length >= maxClients}
-                  className="h-8 text-xs"
+                  className="h-9 sm:h-8 text-xs w-full sm:w-auto"
                 >
                   <Icon icon="solar:add-circle-linear" className="h-3.5 w-3.5 mr-1.5" />
                   Create New

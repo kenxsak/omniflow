@@ -86,6 +86,7 @@ const getSuperAdminNav = (): NavGroup[] => [
       { href: '/settings/email-sms-setup', label: 'Email Service', icon: 'solar:letter-linear' },
       { href: '/settings/whatsapp-setup', label: 'WhatsApp', icon: 'solar:chat-round-dots-linear' },
       { href: '/settings/ai-setup', label: 'AI Services', icon: 'solar:magic-stick-3-linear' },
+      { href: '/settings/ai-calling', label: 'AI Calling', icon: 'solar:phone-calling-linear', badge: 'NEW', badgeColor: 'bg-emerald-500' },
       { href: '/settings/ai-voice-widgets', label: 'AI Voice Widgets', icon: 'solar:microphone-3-linear', badge: 'NEW', badgeColor: 'bg-violet-500' },
       { href: '/settings/cron-jobs', label: 'Cron Jobs', icon: 'solar:clock-circle-linear' },
     ],
@@ -123,6 +124,7 @@ const getUserNav = (): NavGroup[] => [
     items: [
       { href: '/settings/integrations', label: 'Integrations', icon: 'solar:plug-circle-linear', adminOnly: true },
       { href: '/settings/webhooks', label: 'Webhooks', icon: 'solar:programming-linear', adminOnly: true },
+      { href: '/settings/ai-calling', label: 'AI Calling', icon: 'solar:phone-calling-linear', adminOnly: true, badge: 'NEW', badgeColor: 'bg-emerald-500' },
     ],
   },
   {
