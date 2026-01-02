@@ -72,7 +72,7 @@ export function PlanFeaturesModal({ plan, allPlans, trigger, className }: PlanFe
                 <Icon icon="solar:chart-bold" className="h-4 w-4 text-indigo-500" />
                 Plan Limits & Quotas
               </h3>
-              <div className="grid grid-cols-2 gap-3 text-xs sm:text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
                 <div className="flex items-center gap-2">
                   <Icon icon="solar:users-group-rounded-bold" className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span><strong>{plan.maxUsers}</strong> {plan.maxUsers === 1 ? 'User' : 'Users'}</span>

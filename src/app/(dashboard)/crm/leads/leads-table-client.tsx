@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { LeadActionsProvider, useLeadActions } from '@/components/crm/lead-actions-provider';
 import { ContactUsageIndicator } from '@/components/crm/contact-usage-indicator';
 import { BulkAssignDialog } from '@/components/crm/bulk-assign-dialog';
+import { SavedViews } from '@/components/crm/saved-views';
 import { Icon } from '@iconify/react';
 import { AppointmentDialog } from '@/components/appointments/appointment-dialog';
 import { useToast } from '@/hooks/use-toast';
@@ -88,6 +89,7 @@ function LeadsTableInner({
   const [isDeleting, setIsDeleting] = useState(false);
   const [defaultCountryCode, setDefaultCountryCode] = useState('+91');
   const [activeTab, setActiveTab] = useState<'my' | 'all' | 'unassigned'>('all');
+  const [activeViewFilter, setActiveViewFilter] = useState<any>(null);
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [appointmentDialogOpen, setAppointmentDialogOpen] = useState(false);
   const [selectedLeadForAppointment, setSelectedLeadForAppointment] = useState<Lead | null>(null);
@@ -264,7 +266,45 @@ Jane Smith,jane@example.com,"918765432109",Sample Inc,Qualified`;
 
   const tabFilteredLeads = getFilteredByTab();
   
-  const filteredLeads = tabFilteredLeads.filter(lead =>
+  // Apply saved view filter if active
+  const viewFilteredLeads = activeViewFilter 
+    ? tabFilteredLeads.filter(lead => {
+        // Apply status filter
+        if (activeViewFilter.status && activeViewFilter.status.length > 0) {
+          if (!activeViewFilter.status.includes(lead.status)) return false;
+        }
+        // Apply source filter
+        if (activeViewFilter.source && activeViewFilter.source.length > 0) {
+          if (!activeViewFilter.source.includes(lead.source)) return false;
+        }
+        // Apply date range filter
+        if (activeViewFilter.dateRange) {
+          const leadDate = lead.createdAt?.toDate?.() || new Date(lead.createdAt);
+          const now = new Date();
+          let startDate: Date;
+          switch (activeViewFilter.dateRange) {
+            case 'today':
+              startDate = new Date(now.setHours(0, 0, 0, 0));
+              break;
+            case 'week':
+              startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+              break;
+            case 'month':
+              startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+              break;
+            case 'quarter':
+              startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+              break;
+            default:
+              startDate = new Date(0);
+          }
+          if (leadDate < startDate) return false;
+        }
+        return true;
+      })
+    : tabFilteredLeads;
+  
+  const filteredLeads = viewFilteredLeads.filter(lead =>
     lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     lead.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -420,6 +460,13 @@ Jane Smith,jane@example.com,"918765432109",Sample Inc,Qualified`;
           compact={true}
         />
       )}
+
+      {/* Saved Views */}
+      <SavedViews 
+        currentFilters={activeViewFilter || {}}
+        onApplyView={(filters) => setActiveViewFilter(Object.keys(filters).length > 0 ? filters : null)}
+        companyId={companyId}
+      />
 
       {/* Table Filters Section - Clerk Style */}
       <section>

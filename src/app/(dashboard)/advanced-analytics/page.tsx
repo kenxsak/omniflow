@@ -492,7 +492,7 @@ export default function AdvancedAnalyticsPage() {
                   </div>
                 </div>
               </div>
-              <div className="p-6">
+              <div className="p-3 sm:p-4 md:p-6">
                 {predictive ? (
                   <PredictiveChart analytics={predictive} historicalLeads={historicalLeads} />
                 ) : (
@@ -516,7 +516,7 @@ export default function AdvancedAnalyticsPage() {
                   </div>
                 </div>
               </div>
-              <div className="p-6">
+              <div className="p-3 sm:p-4 md:p-6">
                 {attribution ? <AttributionBreakdown attribution={attribution} /> : <EmptyState message="No attribution data available" icon="solar:pie-chart-2-bold-duotone" />}
               </div>
             </div>

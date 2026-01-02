@@ -59,7 +59,7 @@ export default function CampaignDetailsDialog({
 }: CampaignDetailsDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-2xl rounded-xl">
         <DialogHeader>
           <DialogTitle>{campaign?.name}</DialogTitle>
           <DialogDescription>
@@ -67,7 +67,7 @@ export default function CampaignDetailsDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
             <div>
               <span className="text-muted-foreground">Platform:</span>
               <span className="ml-2">{campaign?.platform?.toUpperCase()}</span>

@@ -171,20 +171,20 @@ export async function getUserFromServerSession(): Promise<{
     role?: string;
     companyId?: string;
   };
-} | { success: false; error: string }> {
+} | { success: false; error: string; code?: string }> {
   try {
     const { cookies } = await import('next/headers');
     const cookieStore = await cookies();
     const sessionToken = cookieStore.get('firebase-auth-token')?.value;
 
     if (!sessionToken) {
-      return { success: false, error: 'No session token found' };
+      return { success: false, error: 'No session token found', code: 'NO_TOKEN' };
     }
 
     // Verify the session token with Firebase Admin
     const tokenResult = await verifyAuthToken(sessionToken);
     if (!tokenResult.success) {
-      return { success: false, error: tokenResult.error };
+      return { success: false, error: tokenResult.error, code: tokenResult.code };
     }
 
     // Get user document from Firestore to retrieve role and companyId
@@ -223,7 +223,7 @@ export async function getUserFromServerSession(): Promise<{
  */
 export async function verifyAuthToken(
   idToken: string
-): Promise<{ success: true; uid: string; email?: string } | { success: false; error: string }> {
+): Promise<{ success: true; uid: string; email?: string } | { success: false; error: string; code?: string }> {
   if (!adminAuth) {
     const error = getAdminInitError() || 'Firebase Admin not initialized';
     console.error('❌ Cannot verify auth token:', error);
@@ -241,10 +241,20 @@ export async function verifyAuthToken(
       email: decodedToken.email,
     };
   } catch (error: any) {
-    console.error('❌ Token verification failed:', error.message);
+    const errorCode = error.code || '';
+    const isExpired = errorCode.includes('id-token-expired') || 
+                      error.message?.includes('expired');
+    
+    if (isExpired) {
+      console.warn('⚠️ Token expired - client should refresh');
+    } else {
+      console.error('❌ Token verification failed:', error.message);
+    }
+    
     return {
       success: false,
       error: error.message || 'Invalid authentication token',
+      code: isExpired ? 'TOKEN_EXPIRED' : 'TOKEN_INVALID',
     };
   }
 }

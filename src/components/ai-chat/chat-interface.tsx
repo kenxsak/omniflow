@@ -109,7 +109,11 @@ export default function ChatInterface({
   const [editedContent, setEditedContent] = useState('');
   const [regeneratingMessageId, setRegeneratingMessageId] = useState<string | null>(null);
   const [activePreviewTab, setActivePreviewTab] = useState<'preview' | 'code'>('preview');
+  const [expandedImageId, setExpandedImageId] = useState<string | null>(null);
+  const [referenceImage, setReferenceImage] = useState<string | null>(null);
+  const [referenceImageName, setReferenceImageName] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const { appUser } = useAuth();
   const { toast } = useToast();
 
@@ -247,8 +251,16 @@ export default function ChatInterface({
         userMessage.content, 
         appUser.companyId, 
         appUser.uid,
-        conversationHistory
+        conversationHistory,
+        referenceImage || undefined, // Pass reference image for branded image generation
+        selectedAgent?.id // Pass selected agent ID for intent detection
       );
+
+      // Clear reference image after use
+      if (referenceImage) {
+        setReferenceImage(null);
+        setReferenceImageName('');
+      }
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -301,6 +313,56 @@ export default function ChatInterface({
       e.preventDefault();
       handleSend();
     }
+  };
+
+  // Handle reference image upload for branded image generation
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: 'Invalid file type',
+        description: 'Please upload a JPG, PNG, GIF, or WebP image',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: 'File too large',
+        description: 'Please upload an image under 2MB',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onload = () => {
+      setReferenceImage(reader.result as string);
+      setReferenceImageName(file.name);
+      toast({
+        title: '📷 Reference image added',
+        description: 'Your brand logo/image will be used for consistent image generation',
+        duration: 3000
+      });
+    };
+    reader.readAsDataURL(file);
+    
+    // Reset input
+    if (imageInputRef.current) {
+      imageInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveReferenceImage = () => {
+    setReferenceImage(null);
+    setReferenceImageName('');
   };
 
   const handleCopy = (content: string) => {
@@ -525,11 +587,20 @@ export default function ChatInterface({
 
         setMessages(prev => [...prev, imageMessage]);
 
-        toast({
-          title: '✨ Image Generated',
-          description: 'Your AI-generated image is ready',
-          duration: 5000
-        });
+        // Show credits consumed toast for image generation
+        if (result.creditsConsumed && result.creditsConsumed > 0) {
+          toast({
+            title: '✨ AI Credits Used',
+            description: `${result.creditsConsumed} credits consumed for image generation`,
+            duration: 4000
+          });
+        } else {
+          toast({
+            title: '✨ Image Generated',
+            description: 'Your AI-generated image is ready',
+            duration: 4000
+          });
+        }
       }
     } catch (error: any) {
       toast({
@@ -736,16 +807,16 @@ export default function ChatInterface({
       {!showGuidedFlow && (
         <>
           <div className="flex-1 overflow-y-auto">
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-4">
+            <div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 space-y-3 sm:space-y-4">
               {/* Empty State */}
               {messages.length === 0 && (
-                <div className="text-center py-12">
-                  <Icon icon="solar:chat-round-dots-linear" className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
-                  <h2 className="text-base font-medium mb-1">Start a conversation</h2>
-                  <p className="text-muted-foreground text-xs max-w-sm mx-auto mb-6">
+                <div className="text-center py-8 sm:py-12">
+                  <Icon icon="solar:chat-round-dots-linear" className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground/40 mx-auto mb-2 sm:mb-3" />
+                  <h2 className="text-sm sm:text-base font-medium mb-1">Start a conversation</h2>
+                  <p className="text-muted-foreground text-[10px] sm:text-xs max-w-sm mx-auto mb-4 sm:mb-6">
                     Tell me what you need in plain English
                   </p>
-                  <div className="text-left max-w-md mx-auto space-y-1.5">
+                  <div className="text-left max-w-md mx-auto space-y-1 sm:space-y-1.5">
                     {[
                       'Create an Instagram post about my new product',
                       'Write an email to thank my customers',
@@ -755,7 +826,7 @@ export default function ChatInterface({
                       <button
                         key={i}
                         onClick={() => setInput(example)}
-                        className="w-full text-left px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-900/50 transition-all text-xs text-muted-foreground hover:text-foreground"
+                        className="w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-900/50 transition-all text-[10px] sm:text-xs text-muted-foreground hover:text-foreground"
                       >
                         {example}
                       </button>
@@ -766,120 +837,171 @@ export default function ChatInterface({
 
               {/* Messages */}
               {messages.map((message, index) => (
-                <div key={message.id} className={cn("flex gap-2.5", message.role === 'user' ? 'justify-end' : 'justify-start')}>
+                <div key={message.id} className={cn("flex gap-2 sm:gap-2.5", message.role === 'user' ? 'justify-end' : 'justify-start')}>
                   {/* AI Avatar */}
                   {message.role === 'assistant' && (
-                    <div className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
                       <Icon 
                         icon={selectedAgent ? (agentIcons[selectedAgent.id] || 'solar:stars-linear') : 'solar:stars-linear'} 
-                        className="h-3.5 w-3.5 text-muted-foreground" 
+                        className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground" 
                       />
                     </div>
                   )}
 
-                  <div className={cn("flex flex-col gap-1 max-w-[80%]", message.role === 'user' && 'items-end')}>
+                  <div className={cn("flex flex-col gap-1 max-w-[85%] sm:max-w-[80%]", message.role === 'user' && 'items-end')}>
                     {/* Message Bubble */}
                     <div className={cn(
-                      "rounded-xl px-3 py-2.5",
+                      "rounded-xl px-2.5 sm:px-3 py-2 sm:py-2.5",
                       message.role === 'user'
                         ? "bg-foreground text-background"
                         : "bg-stone-100 dark:bg-stone-800/80"
                     )}>
                       {/* Image Message */}
                       {message.type === 'image' && message.metadata?.imageUrl ? (
-                        <div className="space-y-3">
-                          <p className="text-sm">{message.content}</p>
+                        <div className="space-y-2 sm:space-y-3">
+                          <p className="text-xs sm:text-sm">{message.content}</p>
                           {message.metadata.imageUrl.startsWith('data:') && (
-                            <div className="relative w-full aspect-square max-w-sm rounded-xl overflow-hidden border border-stone-200 dark:border-stone-700">
-                              <Image
-                                src={message.metadata.imageUrl}
-                                alt={message.metadata.prompt || 'Generated image'}
-                                fill
-                                className="object-cover"
-                                unoptimized
-                              />
+                            <div className="relative group">
+                              {/* Collapsed/Thumbnail View */}
+                              {expandedImageId !== message.id ? (
+                                <div 
+                                  className="relative w-full max-w-[200px] sm:max-w-[280px] aspect-square rounded-lg sm:rounded-xl overflow-hidden border border-stone-200 dark:border-stone-700 cursor-pointer"
+                                  onClick={() => setExpandedImageId(message.id)}
+                                >
+                                  <Image
+                                    src={message.metadata.imageUrl}
+                                    alt={message.metadata.prompt || 'Generated image'}
+                                    fill
+                                    className="object-cover"
+                                    unoptimized
+                                  />
+                                  {/* Expand overlay */}
+                                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 rounded-full p-2">
+                                      <Icon icon="solar:maximize-square-linear" className="w-4 h-4 text-white" />
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                /* Expanded View */
+                                <div className="relative w-full max-w-sm sm:max-w-md rounded-lg sm:rounded-xl overflow-hidden border border-stone-200 dark:border-stone-700">
+                                  <Image
+                                    src={message.metadata.imageUrl}
+                                    alt={message.metadata.prompt || 'Generated image'}
+                                    width={400}
+                                    height={400}
+                                    className="w-full h-auto object-contain"
+                                    unoptimized
+                                  />
+                                  {/* Close button */}
+                                  <button
+                                    onClick={() => setExpandedImageId(null)}
+                                    className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 hover:bg-black/80 transition-colors"
+                                  >
+                                    <Icon icon="solar:close-circle-linear" className="w-4 h-4 text-white" />
+                                  </button>
+                                  {/* Action buttons */}
+                                  <div className="absolute bottom-2 right-2 flex gap-1.5">
+                                    <button
+                                      onClick={() => handleCopy(message.metadata.imageUrl)}
+                                      className="p-1.5 rounded-full bg-black/60 hover:bg-black/80 transition-colors"
+                                      title="Copy image"
+                                    >
+                                      <Icon icon="solar:copy-linear" className="w-3.5 h-3.5 text-white" />
+                                    </button>
+                                    <a
+                                      href={message.metadata.imageUrl}
+                                      download="ai-generated-image.png"
+                                      className="p-1.5 rounded-full bg-black/60 hover:bg-black/80 transition-colors"
+                                      title="Download image"
+                                    >
+                                      <Icon icon="solar:download-linear" className="w-3.5 h-3.5 text-white" />
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
                       ) : message.type === 'error' ? (
-                        <p className="text-sm text-red-500">{message.content}</p>
+                        <p className="text-xs sm:text-sm text-red-500">{message.content}</p>
                       ) : message.metadata?.htmlContent ? (
                         /* HTML Content (Blog/Sales Page) */
-                        <div className="space-y-3">
-                          <p className="text-sm font-medium">{message.content}</p>
+                        <div className="space-y-2 sm:space-y-3">
+                          <p className="text-xs sm:text-sm font-medium">{message.content}</p>
                           
                           {/* Preview Tabs */}
-                          <div className="mt-3">
+                          <div className="mt-2 sm:mt-3">
                             <div className="flex gap-1 mb-2">
                               <button
                                 onClick={() => setActivePreviewTab('preview')}
                                 className={cn(
-                                  "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                                  "px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-medium transition-all",
                                   activePreviewTab === 'preview'
                                     ? "bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900"
                                     : "text-muted-foreground hover:text-foreground"
                                 )}
                               >
-                                <Icon icon="solar:eye-linear" className="w-3.5 h-3.5 inline mr-1.5" />
+                                <Icon icon="solar:eye-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 inline mr-1 sm:mr-1.5" />
                                 Preview
                               </button>
                               <button
                                 onClick={() => setActivePreviewTab('code')}
                                 className={cn(
-                                  "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                                  "px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-medium transition-all",
                                   activePreviewTab === 'code'
                                     ? "bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900"
                                     : "text-muted-foreground hover:text-foreground"
                                 )}
                               >
-                                <Icon icon="solar:code-linear" className="w-3.5 h-3.5 inline mr-1.5" />
+                                <Icon icon="solar:code-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 inline mr-1 sm:mr-1.5" />
                                 HTML
                               </button>
                             </div>
                             
                             {activePreviewTab === 'preview' ? (
                               <div className="space-y-2">
-                                <div className="border border-stone-200 dark:border-stone-700 rounded-xl overflow-hidden bg-white">
+                                <div className="border border-stone-200 dark:border-stone-700 rounded-lg sm:rounded-xl overflow-hidden bg-white">
                                   <iframe
                                     srcDoc={message.metadata.htmlContent}
-                                    className="w-full h-[400px] border-0"
+                                    className="w-full h-[280px] sm:h-[400px] border-0"
                                     title="Content Preview"
                                     sandbox="allow-same-origin"
                                   />
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2">
                                   <Button 
                                     variant="outline" 
                                     size="sm" 
-                                    className="flex-1 h-8 text-xs"
+                                    className="w-full sm:flex-1 h-8 text-[10px] sm:text-xs"
                                     onClick={() => handlePreviewInNewTab(message.metadata.htmlContent)}
                                   >
-                                    <Icon icon="solar:square-arrow-right-up-linear" className="w-3.5 h-3.5 mr-1.5" />
+                                    <Icon icon="solar:square-arrow-right-up-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-1.5" />
                                     Open in New Tab
                                   </Button>
                                   <Button 
                                     variant="outline" 
                                     size="sm" 
-                                    className="flex-1 h-8 text-xs"
+                                    className="w-full sm:flex-1 h-8 text-[10px] sm:text-xs"
                                     onClick={() => handleCopy(message.metadata.htmlContent)}
                                   >
-                                    <Icon icon="solar:copy-linear" className="w-3.5 h-3.5 mr-1.5" />
+                                    <Icon icon="solar:copy-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-1.5" />
                                     Copy HTML
                                   </Button>
                                 </div>
                               </div>
                             ) : (
                               <div className="space-y-2">
-                                <ScrollArea className="h-[300px] border border-stone-200 dark:border-stone-700 rounded-xl bg-stone-50 dark:bg-stone-900 p-3">
-                                  <pre className="text-xs whitespace-pre-wrap font-mono leading-relaxed text-muted-foreground">{message.metadata.htmlContent}</pre>
+                                <ScrollArea className="h-[200px] sm:h-[300px] border border-stone-200 dark:border-stone-700 rounded-lg sm:rounded-xl bg-stone-50 dark:bg-stone-900 p-2 sm:p-3">
+                                  <pre className="text-[10px] sm:text-xs whitespace-pre-wrap font-mono leading-relaxed text-muted-foreground">{message.metadata.htmlContent}</pre>
                                 </ScrollArea>
                                 <Button 
                                   variant="outline" 
                                   size="sm" 
-                                  className="w-full h-8 text-xs"
+                                  className="w-full h-8 text-[10px] sm:text-xs"
                                   onClick={() => handleCopy(message.metadata.htmlContent)}
                                 >
-                                  <Icon icon="solar:copy-linear" className="w-3.5 h-3.5 mr-1.5" />
+                                  <Icon icon="solar:copy-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-1.5" />
                                   Copy HTML Code
                                 </Button>
                               </div>
@@ -892,23 +1014,23 @@ export default function ChatInterface({
                           <Textarea
                             value={editedContent}
                             onChange={(e) => setEditedContent(e.target.value)}
-                            className="min-h-[80px] text-sm bg-transparent border-stone-300 dark:border-stone-600"
+                            className="min-h-[60px] sm:min-h-[80px] text-xs sm:text-sm bg-transparent border-stone-300 dark:border-stone-600"
                             autoFocus
                           />
                           <div className="flex gap-2 justify-end">
-                            <Button size="sm" variant="ghost" onClick={handleCancelEdit} className="h-7 text-xs">
+                            <Button size="sm" variant="ghost" onClick={handleCancelEdit} className="h-7 text-[10px] sm:text-xs">
                               Cancel
                             </Button>
-                            <Button size="sm" onClick={() => handleSaveEdit(message)} disabled={!editedContent.trim() || isSavingMessage} className="h-7 text-xs">
-                              {isSavingMessage ? <Icon icon="solar:refresh-linear" className="w-3.5 h-3.5 animate-spin" /> : 'Save'}
+                            <Button size="sm" onClick={() => handleSaveEdit(message)} disabled={!editedContent.trim() || isSavingMessage} className="h-7 text-[10px] sm:text-xs">
+                              {isSavingMessage ? <Icon icon="solar:refresh-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-spin" /> : 'Save'}
                             </Button>
                           </div>
                         </div>
                       ) : (
                         /* Regular Text */
                         <div>
-                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                          {message.isEdited && <p className="text-[10px] text-muted-foreground mt-1 italic">Edited</p>}
+                          <p className="text-xs sm:text-sm whitespace-pre-wrap">{message.content}</p>
+                          {message.isEdited && <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1 italic">Edited</p>}
                         </div>
                       )}
                     </div>
@@ -939,17 +1061,17 @@ export default function ChatInterface({
 
                     {/* Next Steps */}
                     {message.nextSteps && message.nextSteps.length > 0 && message.role === 'assistant' && (
-                      <div className="mt-2 space-y-2">
+                      <div className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2">
                         <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Next Steps</p>
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-1.5 sm:gap-2">
                           {message.nextSteps.map((step, idx) => (
                             <button
                               key={idx}
                               onClick={() => handleQuickAction(step.prompt)}
-                              className="px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-200 dark:border-stone-700 hover:border-stone-300 dark:hover:border-stone-600 hover:bg-stone-50 dark:hover:bg-stone-800 transition-all"
+                              className="w-full sm:w-auto px-2.5 sm:px-3 py-2 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-medium border border-stone-200 dark:border-stone-700 hover:border-stone-300 dark:hover:border-stone-600 hover:bg-stone-50 dark:hover:bg-stone-800 transition-all text-left sm:text-center"
                             >
-                              <span className="mr-1">{step.icon}</span>
-                              {step.label}
+                              <span className="mr-1.5">{step.icon}</span>
+                              <span className="truncate">{step.label}</span>
                             </button>
                           ))}
                         </div>
@@ -957,8 +1079,8 @@ export default function ChatInterface({
                     )}
 
                     {/* Message Actions */}
-                    <div className="flex items-center gap-1 mt-1">
-                      <span className="text-[10px] text-muted-foreground mr-2">
+                    <div className="flex flex-wrap items-center gap-0.5 sm:gap-1 mt-1.5 sm:mt-1">
+                      <span className="text-[9px] sm:text-[10px] text-muted-foreground mr-1 sm:mr-2">
                         {format(message.timestamp, 'h:mm a')}
                       </span>
 
@@ -966,49 +1088,49 @@ export default function ChatInterface({
                         <>
                           {/* Version Cycling */}
                           {message.versions && message.versions.length > 1 && (
-                            <div className="flex items-center gap-0.5 mr-1 pr-2 border-r border-stone-200 dark:border-stone-700">
+                            <div className="flex items-center gap-0.5 mr-1 pr-1 sm:pr-2 border-r border-stone-200 dark:border-stone-700">
                               <button
                                 onClick={() => handleCycleVersion(message, 'prev')}
                                 className="p-1 rounded hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
                               >
-                                <Icon icon="solar:alt-arrow-left-linear" className="w-3.5 h-3.5 text-muted-foreground" />
+                                <Icon icon="solar:alt-arrow-left-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
                               </button>
-                              <span className="text-[10px] text-muted-foreground px-1">
+                              <span className="text-[9px] sm:text-[10px] text-muted-foreground px-0.5 sm:px-1">
                                 {(message.currentVersionIndex ?? message.versions.length - 1) + 1}/{message.versions.length}
                               </span>
                               <button
                                 onClick={() => handleCycleVersion(message, 'next')}
                                 className="p-1 rounded hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
                               >
-                                <Icon icon="solar:alt-arrow-right-linear" className="w-3.5 h-3.5 text-muted-foreground" />
+                                <Icon icon="solar:alt-arrow-right-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
                               </button>
                             </div>
                           )}
-                          <button onClick={() => handleCopy(message.content)} className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors" title="Copy">
-                            <Icon icon="solar:copy-linear" className="w-3.5 h-3.5 text-muted-foreground" />
+                          <button onClick={() => handleCopy(message.content)} className="p-1 sm:p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors" title="Copy">
+                            <Icon icon="solar:copy-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
                           </button>
-                          <button onClick={() => handleSaveClick(message)} disabled={isGeneratingImage} className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors" title="Save">
-                            <Icon icon="solar:download-linear" className="w-3.5 h-3.5 text-muted-foreground" />
+                          <button onClick={() => handleSaveClick(message)} disabled={isGeneratingImage} className="p-1 sm:p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors" title="Save">
+                            <Icon icon="solar:download-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
                           </button>
-                          <button className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors" title="Good response">
-                            <Icon icon="solar:like-linear" className="w-3.5 h-3.5 text-muted-foreground" />
+                          <button className="p-1 sm:p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors" title="Good response">
+                            <Icon icon="solar:like-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
                           </button>
                           <button
                             onClick={() => handleRegenerateResponse(message, index)}
                             disabled={regeneratingMessageId === message.id}
-                            className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                            className="p-1 sm:p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
                             title="Regenerate"
                           >
                             <Icon 
                               icon={regeneratingMessageId === message.id ? "solar:refresh-linear" : "solar:refresh-linear"} 
-                              className={cn("w-3.5 h-3.5 text-muted-foreground", regeneratingMessageId === message.id && "animate-spin")} 
+                              className={cn("w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground", regeneratingMessageId === message.id && "animate-spin")} 
                             />
                           </button>
                         </>
                       ) : (
                         editingMessageId !== message.id && (
-                          <button onClick={() => handleEditMessage(message)} className="p-1.5 rounded-lg hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors" title="Edit">
-                            <Icon icon="solar:pen-linear" className="w-3.5 h-3.5 text-stone-400" />
+                          <button onClick={() => handleEditMessage(message)} className="p-1 sm:p-1.5 rounded-lg hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors" title="Edit">
+                            <Icon icon="solar:pen-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-stone-400" />
                           </button>
                         )
                       )}
@@ -1017,8 +1139,8 @@ export default function ChatInterface({
 
                   {/* User Avatar */}
                   {message.role === 'user' && (
-                    <div className="w-7 h-7 rounded-lg bg-stone-200 dark:bg-stone-700 flex items-center justify-center flex-shrink-0">
-                      <span className="text-xs font-medium">{appUser?.name?.charAt(0) || 'U'}</span>
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-stone-200 dark:bg-stone-700 flex items-center justify-center flex-shrink-0">
+                      <span className="text-[10px] sm:text-xs font-medium">{appUser?.name?.charAt(0) || 'U'}</span>
                     </div>
                   )}
                 </div>
@@ -1026,16 +1148,16 @@ export default function ChatInterface({
 
               {/* Loading State */}
               {isLoading && (
-                <div className="flex gap-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
+                <div className="flex gap-2 sm:gap-2.5">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
                     <Icon 
                       icon={selectedAgent ? (agentIcons[selectedAgent.id] || 'solar:stars-linear') : 'solar:stars-linear'} 
-                      className="h-3.5 w-3.5 text-muted-foreground" 
+                      className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground" 
                     />
                   </div>
-                  <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-stone-100 dark:bg-stone-800/80">
-                    <Icon icon="solar:refresh-linear" className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">Creating your content...</span>
+                  <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-xl bg-stone-100 dark:bg-stone-800/80">
+                    <Icon icon="solar:refresh-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-spin text-muted-foreground" />
+                    <span className="text-xs sm:text-sm text-muted-foreground">Creating your content...</span>
                   </div>
                 </div>
               )}
@@ -1045,28 +1167,70 @@ export default function ChatInterface({
           </div>
 
           {/* Input Area */}
-          <div className="border-t border-stone-200 dark:border-stone-800 p-3 sm:p-4">
+          <div className="border-t border-stone-200 dark:border-stone-800 p-2.5 sm:p-3 md:p-4">
             <div className="max-w-3xl mx-auto">
+              {/* Reference Image Preview */}
+              {referenceImage && (
+                <div className="mb-2 flex items-center gap-2 p-2 bg-stone-100 dark:bg-stone-800 rounded-lg">
+                  <img 
+                    src={referenceImage} 
+                    alt="Reference" 
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded object-cover"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] sm:text-xs font-medium truncate">{referenceImageName}</p>
+                    <p className="text-[9px] sm:text-[10px] text-muted-foreground">Brand reference for image generation</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleRemoveReferenceImage}
+                    className="h-6 w-6 sm:h-7 sm:w-7 flex-shrink-0"
+                  >
+                    <Icon icon="solar:close-circle-linear" className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  </Button>
+                </div>
+              )}
+              
               <div className="flex gap-2 items-end">
+                {/* Image Upload Button */}
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => imageInputRef.current?.click()}
+                  disabled={isLoading}
+                  className="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 rounded-lg"
+                  title="Add brand logo/reference image for consistent image generation"
+                >
+                  <Icon icon="solar:gallery-add-linear" className="h-4 w-4 sm:h-5 sm:w-5" />
+                </Button>
+                
                 <div className="flex-1 relative">
                   <Textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Ask anything, create anything..."
-                    className="min-h-[44px] max-h-[160px] resize-none text-sm border-stone-200 dark:border-stone-800 rounded-lg pr-10"
+                    placeholder={referenceImage ? "Describe the image you want (your brand logo will be used)..." : "Ask anything, create anything..."}
+                    className="min-h-[40px] sm:min-h-[44px] max-h-[120px] sm:max-h-[160px] resize-none text-xs sm:text-sm border-stone-200 dark:border-stone-800 rounded-lg pr-9 sm:pr-10"
                     disabled={isLoading}
                   />
                   <Button
                     onClick={handleSend}
                     disabled={!input.trim() || isLoading}
                     size="icon"
-                    className="absolute right-1.5 bottom-1.5 h-7 w-7 rounded-md"
+                    className="absolute right-1 sm:right-1.5 bottom-1 sm:bottom-1.5 h-6 w-6 sm:h-7 sm:w-7 rounded-md"
                   >
                     {isLoading ? (
-                      <Icon icon="solar:refresh-linear" className="h-3.5 w-3.5 animate-spin" />
+                      <Icon icon="solar:refresh-linear" className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-spin" />
                     ) : (
-                      <Icon icon="solar:arrow-up-linear" className="h-3.5 w-3.5" />
+                      <Icon icon="solar:arrow-up-linear" className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                     )}
                   </Button>
                 </div>
@@ -1074,15 +1238,15 @@ export default function ChatInterface({
 
               {/* Quick Actions */}
               {selectedAgent && selectedAgent.quickActions.length > 0 && messages.length <= 1 && (
-                <div className="mt-2.5">
-                  <p className="text-[9px] font-semibold tracking-wider text-muted-foreground/60 uppercase mb-1.5">Quick Actions</p>
+                <div className="mt-2 sm:mt-2.5">
+                  <p className="text-[8px] sm:text-[9px] font-semibold tracking-wider text-muted-foreground/60 uppercase mb-1 sm:mb-1.5">Quick Actions</p>
                   <div className="flex flex-wrap gap-1">
                     {selectedAgent.quickActions.map((action, index) => (
                       <button
                         key={index}
                         onClick={() => handleQuickAction(action.prompt)}
                         disabled={isLoading}
-                        className="px-2.5 py-1 rounded-md text-[11px] border border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-900/50 transition-all disabled:opacity-50"
+                        className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] border border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-900/50 transition-all disabled:opacity-50"
                       >
                         {action.label}
                       </button>
@@ -1097,20 +1261,22 @@ export default function ChatInterface({
 
       {/* Image Generation Dialog */}
       <AlertDialog open={showImageDialog} onOpenChange={setShowImageDialog}>
-        <AlertDialogContent className="sm:max-w-md">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Generate Featured Image?</AlertDialogTitle>
-            <AlertDialogDescription>
+        <AlertDialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-[480px] p-4 sm:p-6 rounded-xl">
+          <AlertDialogHeader className="space-y-1 pb-2">
+            <AlertDialogTitle className="text-base sm:text-lg">Generate Featured Image?</AlertDialogTitle>
+            <AlertDialogDescription className="text-xs sm:text-sm">
               Would you like to generate an AI image before saving? This will consume additional credits.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleSaveWithoutImage}>Skip & Save</AlertDialogCancel>
-            <AlertDialogAction onClick={handleGenerateAndSave} disabled={isGeneratingImage}>
+          <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-3">
+            <AlertDialogCancel onClick={handleSaveWithoutImage} className="w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm">
+              Skip & Save
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleGenerateAndSave} disabled={isGeneratingImage} className="w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm">
               {isGeneratingImage ? (
-                <><Icon icon="solar:refresh-linear" className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
+                <><Icon icon="solar:refresh-linear" className="mr-1.5 h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" /> Generating...</>
               ) : (
-                <><Icon icon="solar:gallery-add-linear" className="mr-2 h-4 w-4" /> Generate & Save</>
+                <><Icon icon="solar:gallery-add-linear" className="mr-1.5 h-3.5 w-3.5 sm:h-4 sm:w-4" /> Generate & Save</>
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

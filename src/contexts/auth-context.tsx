@@ -268,7 +268,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Refresh token every 30 minutes (Firebase tokens expire at 60 minutes)
     const intervalId = setInterval(refreshToken, 30 * 60 * 1000);
     
-    return () => clearInterval(intervalId);
+    // Also refresh when user returns to the tab (visibility change)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('[Auth] Tab became visible, refreshing token...');
+        refreshToken();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [firebaseUser]);
 
 

@@ -138,11 +138,11 @@ export function WeekOverWeekCard({ stats, loading }: WeekOverWeekCardProps) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {metrics.map((metric) => (
               <div 
                 key={metric.label}
-                className="p-3 rounded-lg border border-border/50 dark:border-white/[0.04] bg-muted/40 dark:bg-white/[0.04]"
+                className="p-2.5 sm:p-3 rounded-lg border border-border/50 dark:border-white/[0.04] bg-muted/40 dark:bg-white/[0.04]"
               >
                 <div className="h-6 w-6 rounded-lg bg-muted/60 dark:bg-white/[0.06] flex items-center justify-center mb-2">
                   <AppIcon name={metric.icon} size={14} className="text-muted-foreground" />

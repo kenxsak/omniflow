@@ -100,6 +100,124 @@ export async function bulkDeleteLeadsAction(leadIds: string[]) {
   }
 }
 
+/**
+ * Bulk update lead status
+ * Used by BulkActionsBar component
+ */
+export async function bulkUpdateStatusAction(leadIds: string[], status: Lead['status']) {
+  if (!adminDb) {
+    throw new Error('Database not initialized');
+  }
+
+  if (!leadIds || leadIds.length === 0) {
+    throw new Error('No leads selected');
+  }
+
+  // Verify user is authenticated
+  const currentUser = await getUserFromServerSession();
+  if (!currentUser.success) {
+    throw new Error('Unauthorized: Please log in');
+  }
+
+  const { companyId } = currentUser.user;
+  if (!companyId) {
+    throw new Error('Company context missing');
+  }
+
+  try {
+    const batch = adminDb.batch();
+    const now = new Date().toISOString();
+    
+    for (const leadId of leadIds) {
+      const leadRef = adminDb.collection('leads').doc(leadId);
+      batch.update(leadRef, { 
+        status,
+        updatedAt: now,
+        ...(status === 'Won' ? { wonDate: now } : {}),
+      });
+    }
+    
+    await batch.commit();
+    
+    revalidatePath('/crm');
+    revalidatePath('/crm/leads');
+    revalidatePath('/crm/pipeline');
+    revalidatePath('/crm/dashboard');
+    revalidatePath('/daily-planner');
+    
+    return { success: true, updatedCount: leadIds.length };
+  } catch (error: any) {
+    console.error('Error in bulkUpdateStatusAction:', error);
+    throw new Error(error?.message || 'Failed to update status');
+  }
+}
+
+/**
+ * Check for duplicate leads before creating
+ * Returns potential duplicates based on email/phone
+ */
+export async function checkDuplicatesAction(
+  companyId: string,
+  email: string,
+  phone?: string,
+  name?: string
+): Promise<{ duplicates: Lead[]; hasDuplicates: boolean }> {
+  if (!adminDb) {
+    return { duplicates: [], hasDuplicates: false };
+  }
+
+  try {
+    const leads = await getServerLeads(companyId);
+    const { findDuplicates } = await import('@/lib/crm/duplicate-detection');
+    
+    const matches = findDuplicates(
+      { name: name || '', email, phone },
+      leads,
+      70 // 70% confidence threshold
+    );
+    
+    return {
+      duplicates: matches.map(m => m.lead),
+      hasDuplicates: matches.length > 0,
+    };
+  } catch (error) {
+    console.error('Error checking duplicates:', error);
+    return { duplicates: [], hasDuplicates: false };
+  }
+}
+
+/**
+ * Update lead score based on activity
+ */
+export async function updateLeadScoreAction(leadId: string) {
+  if (!adminDb) {
+    throw new Error('Database not initialized');
+  }
+
+  try {
+    const leadDoc = await adminDb.collection('leads').doc(leadId).get();
+    if (!leadDoc.exists) {
+      throw new Error('Lead not found');
+    }
+
+    const leadData = leadDoc.data() as Lead;
+    const { calculateLeadScore, getLeadTemperature } = await import('@/lib/crm/lead-scoring');
+    
+    const scoreBreakdown = calculateLeadScore(leadData);
+    const temperature = getLeadTemperature(scoreBreakdown.total);
+    
+    await adminDb.collection('leads').doc(leadId).update({
+      leadScore: scoreBreakdown.total,
+      temperature,
+    });
+    
+    return { success: true, score: scoreBreakdown.total, temperature };
+  } catch (error: any) {
+    console.error('Error updating lead score:', error);
+    throw new Error(error?.message || 'Failed to update lead score');
+  }
+}
+
 export async function deleteAllLeadsAction(companyId: string) {
   try {
     if (!companyId) {

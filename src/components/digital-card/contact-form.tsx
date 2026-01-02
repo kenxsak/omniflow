@@ -238,7 +238,7 @@ export default function ContactForm({
                   placeholder="Your name"
                   required
                   disabled={isSubmitting}
-                  className="h-10"
+                  className="h-9 sm:h-10"
                 />
                 {errors.name && (
                   <p className="text-xs text-destructive">{errors.name}</p>
@@ -258,7 +258,7 @@ export default function ContactForm({
                   onChange={handleChange}
                   placeholder="your.email@example.com"
                   disabled={isSubmitting}
-                  className="h-10"
+                  className="h-9 sm:h-10"
                 />
                 {errors.email && (
                   <p className="text-xs text-destructive">{errors.email}</p>
@@ -270,7 +270,7 @@ export default function ContactForm({
                 <Label className="text-sm font-medium">Phone</Label>
                 <div className="flex gap-2">
                   <Select value={countryCode} onValueChange={setCountryCode}>
-                    <SelectTrigger className="w-[100px] h-10 flex-shrink-0">
+                    <SelectTrigger className="w-[90px] sm:w-[100px] h-9 sm:h-10 flex-shrink-0">
                       <SelectValue placeholder="Code" />
                     </SelectTrigger>
                     <SelectContent>
@@ -289,7 +289,7 @@ export default function ContactForm({
                     onChange={handleChange}
                     placeholder="9876543210"
                     disabled={isSubmitting}
-                    className="flex-1 h-10"
+                    className="flex-1 h-9 sm:h-10"
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">

@@ -62,16 +62,16 @@ export function BYOKCostComparison({
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-lg border bg-card p-4">
-                <div className="text-sm text-muted-foreground">Plan Subscription</div>
-                <div className="text-2xl font-bold">${currentPlan.monthlyPrice}</div>
-                <div className="text-xs text-muted-foreground">per month</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="rounded-lg border bg-card p-3 sm:p-4">
+                <div className="text-xs sm:text-sm text-muted-foreground">Plan Subscription</div>
+                <div className="text-xl sm:text-2xl font-bold">${currentPlan.monthlyPrice}</div>
+                <div className="text-[10px] sm:text-xs text-muted-foreground">per month</div>
               </div>
-              <div className="rounded-lg border bg-card p-4">
-                <div className="text-sm text-muted-foreground">Google API Cost</div>
-                <div className="text-2xl font-bold">${estimatedGoogleDirectCost.toFixed(2)}</div>
-                <div className="text-xs text-muted-foreground">this month</div>
+              <div className="rounded-lg border bg-card p-3 sm:p-4">
+                <div className="text-xs sm:text-sm text-muted-foreground">Google API Cost</div>
+                <div className="text-xl sm:text-2xl font-bold">${estimatedGoogleDirectCost.toFixed(2)}</div>
+                <div className="text-[10px] sm:text-xs text-muted-foreground">this month</div>
               </div>
             </div>
 
@@ -115,14 +115,14 @@ export function BYOKCostComparison({
               <Badge>Current</Badge>
               <span className="font-semibold">Platform Credits</span>
             </div>
-            <div className="grid grid-cols-2 gap-4 mt-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-3">
               <div>
-                <div className="text-sm text-muted-foreground">Monthly Plan</div>
-                <div className="text-xl font-bold">${currentPlan.monthlyPrice}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Monthly Plan</div>
+                <div className="text-lg sm:text-xl font-bold">${currentPlan.monthlyPrice}</div>
               </div>
               <div>
-                <div className="text-sm text-muted-foreground">Included Credits</div>
-                <div className="text-xl font-bold">{currentPlan.creditsIncluded.toLocaleString()}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Included Credits</div>
+                <div className="text-lg sm:text-xl font-bold">{currentPlan.creditsIncluded.toLocaleString()}</div>
               </div>
             </div>
             <div className="mt-3 space-y-2 text-sm">
@@ -144,14 +144,14 @@ export function BYOKCostComparison({
               <Badge variant="outline" className="bg-success-muted text-success-muted-foreground">BYOK Option</Badge>
               <span className="font-semibold">Bring Your Own Key</span>
             </div>
-            <div className="grid grid-cols-2 gap-4 mt-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-3">
               <div>
-                <div className="text-sm text-muted-foreground">Monthly Plan</div>
-                <div className="text-xl font-bold">${currentPlan.monthlyPrice}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Monthly Plan</div>
+                <div className="text-lg sm:text-xl font-bold">${currentPlan.monthlyPrice}</div>
               </div>
               <div>
-                <div className="text-sm text-muted-foreground">Google API Cost</div>
-                <div className="text-xl font-bold">${estimatedGoogleDirectCost.toFixed(2)}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Google API Cost</div>
+                <div className="text-lg sm:text-xl font-bold">${estimatedGoogleDirectCost.toFixed(2)}</div>
               </div>
             </div>
             <div className="mt-3 space-y-2 text-sm">

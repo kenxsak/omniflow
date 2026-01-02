@@ -425,7 +425,7 @@ export default function TemplatesPage() {
               <div key={template.id} className="border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-900 overflow-hidden">
                 <div className="grid lg:grid-cols-2 gap-0">
                   {/* Left: Template Info */}
-                  <div className="p-6 border-b lg:border-b-0 lg:border-r border-stone-200 dark:border-stone-800">
+                  <div className="p-3 sm:p-4 md:p-6 border-b lg:border-b-0 lg:border-r border-stone-200 dark:border-stone-800">
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
                         <Icon icon="solar:letter-bold" className="h-5 w-5 text-blue-500" />
@@ -505,7 +505,7 @@ export default function TemplatesPage() {
               <div key={template.id} className="border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-900 overflow-hidden">
                 <div className="grid lg:grid-cols-2 gap-0">
                   {/* Left: Template Info */}
-                  <div className="p-6 border-b lg:border-b-0 lg:border-r border-stone-200 dark:border-stone-800">
+                  <div className="p-3 sm:p-4 md:p-6 border-b lg:border-b-0 lg:border-r border-stone-200 dark:border-stone-800">
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
                         <Icon icon="solar:chat-square-bold" className="h-5 w-5 text-emerald-500" />
@@ -605,7 +605,7 @@ export default function TemplatesPage() {
               <div key={template.id} className="border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-900 overflow-hidden">
                 <div className="grid lg:grid-cols-2 gap-0">
                   {/* Left: Template Info */}
-                  <div className="p-6 border-b lg:border-b-0 lg:border-r border-stone-200 dark:border-stone-800">
+                  <div className="p-3 sm:p-4 md:p-6 border-b lg:border-b-0 lg:border-r border-stone-200 dark:border-stone-800">
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center shrink-0">
                         <Icon icon="solar:chat-round-dots-bold" className="h-5 w-5 text-green-500" />

@@ -113,8 +113,8 @@ export default function SubscriptionDetails() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="border border-primary/50 rounded-lg p-6 bg-primary/5">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="border border-primary/50 rounded-lg p-3 sm:p-4 md:p-6 bg-primary/5">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div className="flex-grow">
                 <h3 className="text-xl font-bold text-primary flex items-center">
                 {currentPlan.isFeatured && <Star className="h-5 w-5 mr-2 text-warning fill-warning" />}

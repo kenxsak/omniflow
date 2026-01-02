@@ -297,7 +297,7 @@ ${generateHtmlCode()}
               <code className="flex-1 px-3 py-2.5 bg-white dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-lg text-xs sm:text-sm font-mono break-all overflow-hidden">
                 {accessKey}
               </code>
-              <Button variant="outline" size="sm" className="h-10 sm:h-auto shrink-0" onClick={() => copyToClipboard(accessKey, 'Access Key')}>
+              <Button variant="outline" size="sm" className="h-9 sm:h-10 shrink-0" onClick={() => copyToClipboard(accessKey, 'Access Key')}>
                 <Icon icon="solar:copy-linear" className="h-4 w-4 mr-1.5 sm:mr-0" />
                 <span className="sm:hidden">Copy Key</span>
               </Button>
@@ -333,13 +333,13 @@ ${generateHtmlCode()}
                   value={customSource} 
                   onChange={(e) => setCustomSource(e.target.value)}
                   placeholder="Website Contact Form"
-                  className="h-10 text-sm"
+                  className="h-9 sm:h-10 text-sm"
                 />
               </div>
               <div className="space-y-2">
                 <Label className="text-xs">Default Country</Label>
                 <Select value={defaultCountryCode} onValueChange={setDefaultCountryCode}>
-                  <SelectTrigger className="h-10 text-sm">
+                  <SelectTrigger className="h-9 sm:h-10 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -358,12 +358,12 @@ ${generateHtmlCode()}
                     type="color" 
                     value={primaryColor} 
                     onChange={(e) => setPrimaryColor(e.target.value)}
-                    className="h-10 w-14 p-1 cursor-pointer"
+                    className="h-9 sm:h-10 w-14 p-1 cursor-pointer"
                   />
                   <Input 
                     value={primaryColor} 
                     onChange={(e) => setPrimaryColor(e.target.value)}
-                    className="h-10 text-sm font-mono flex-1"
+                    className="h-9 sm:h-10 text-sm font-mono flex-1"
                   />
                 </div>
               </div>
@@ -372,7 +372,7 @@ ${generateHtmlCode()}
                 <Button 
                   variant={showMessage ? 'default' : 'outline'} 
                   size="sm" 
-                  className="h-10 text-xs w-full"
+                  className="h-9 sm:h-10 text-xs w-full"
                   onClick={() => setShowMessage(!showMessage)}
                 >
                   {showMessage ? '✓ Message Field' : 'Add Message Field'}

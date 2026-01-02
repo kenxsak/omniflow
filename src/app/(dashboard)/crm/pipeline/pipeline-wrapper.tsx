@@ -9,16 +9,20 @@ import type { Lead } from '@/lib/mock-data';
 import { getPipelineData } from '@/app/actions/pipeline-actions';
 import { cn } from '@/lib/utils';
 import { AppointmentDialog } from '@/components/appointments/appointment-dialog';
+import { PipelineManager } from '@/components/crm/pipeline-manager';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
 
 export function PipelineWrapper() {
   const router = useRouter();
   const { toast } = useToast();
+  const { appUser } = useAuth();
   const [leadsByStatus, setLeadsByStatus] = useState<Record<Lead['status'], Lead[]> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [appointmentDialogOpen, setAppointmentDialogOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [showPipelineManager, setShowPipelineManager] = useState(false);
 
   const handleLeadClick = (leadId: string) => {
     router.push(`/crm/leads/${leadId}`);
@@ -142,11 +146,25 @@ export function PipelineWrapper() {
   return (
     <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
       {/* Header - Clerk style */}
-      <div className="mb-4 sm:mb-6">
-        <h1 className="text-lg sm:text-xl font-semibold text-foreground">Pipeline</h1>
-        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
-          Visualize your sales pipeline
-        </p>
+      <div className="mb-4 sm:mb-6 flex items-center justify-between gap-3">
+        <div>
+          <h1 className="text-lg sm:text-xl font-semibold text-foreground">Pipeline</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
+            Visualize your sales pipeline
+          </p>
+        </div>
+        {appUser?.companyId && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowPipelineManager(true)}
+            className="h-8 sm:h-9 text-xs sm:text-sm"
+          >
+            <Icon icon="solar:settings-linear" className="w-3.5 h-3.5 mr-1.5" />
+            <span className="hidden sm:inline">Manage Pipelines</span>
+            <span className="sm:hidden">Manage</span>
+          </Button>
+        )}
       </div>
       
       {/* Summary Stats - Clerk style cards */}
@@ -294,6 +312,21 @@ export function PipelineWrapper() {
           setSelectedLead(null);
         }}
       />
+
+      {/* Pipeline Manager */}
+      {appUser?.companyId && (
+        <PipelineManager
+          companyId={appUser.companyId}
+          open={showPipelineManager}
+          onOpenChange={setShowPipelineManager}
+          onPipelineChange={(pipeline) => {
+            toast({
+              title: 'Pipeline Updated',
+              description: `Switched to ${pipeline.name}`,
+            });
+          }}
+        />
+      )}
     </div>
   );
 }

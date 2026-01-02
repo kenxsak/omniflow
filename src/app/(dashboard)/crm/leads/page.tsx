@@ -2,6 +2,7 @@ import { LeadsTableClient } from './leads-table-client';
 import { getPaginatedLeadsForCompany } from '@/lib/crm/lead-data';
 import { getUserFromServerSession } from '@/lib/firebase-admin';
 import { getPlanMetadata } from '@/lib/plan-helpers-server';
+import { SessionExpiredMessage } from '@/components/auth/session-expired-message';
 
 // Force dynamic rendering - this page uses cookies for auth
 export const dynamic = 'force-dynamic';
@@ -13,7 +14,20 @@ export default async function LeadsTablePage() {
   
   console.log('[LeadsTablePage] User session result:', JSON.stringify(userResult, null, 2));
   
-  if (!userResult.success || !userResult.user.companyId) {
+  if (!userResult.success) {
+    // Check if token expired - show refresh prompt
+    if (userResult.code === 'TOKEN_EXPIRED') {
+      return <SessionExpiredMessage />;
+    }
+    
+    return (
+      <div className="flex justify-center items-center py-12">
+        <p className="text-muted-foreground">Please log in to view your contacts.</p>
+      </div>
+    );
+  }
+  
+  if (!userResult.user.companyId) {
     return (
       <div className="flex justify-center items-center py-12">
         <p className="text-muted-foreground">Please log in to view your contacts.</p>

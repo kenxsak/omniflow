@@ -154,4 +154,71 @@ export const brandLogoUrls = {
   calcom: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Cal.com%2C_Inc._Logo.svg/2560px-Cal.com%2C_Inc._Logo.svg.png',
   hubspot: 'https://1000logos.net/wp-content/uploads/2022/12/HubSpot-Logo.png',
   bitrix24: 'https://logo-teka.com/wp-content/uploads/2025/06/bitrix24-logo-eng.png',
+  // Telephony & Voice
+  vapi: 'https://vapi.ai/logo.png',
+  bland: 'https://www.bland.ai/favicon.ico',
+  plivo: 'https://www.plivo.com/static/images/plivo-logo.svg',
+  exotel: 'https://exotel.com/wp-content/uploads/2023/05/exotel-logo.svg',
 };
+
+// Vapi.ai Logo - AI Voice Agents (Green gradient V shape)
+export const VapiIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <defs>
+      <linearGradient id="vapiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#10B981" />
+        <stop offset="100%" stopColor="#059669" />
+      </linearGradient>
+    </defs>
+    <rect width="24" height="24" rx="6" fill="url(#vapiGrad)" />
+    <path d="M7 7L12 17L17 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    <circle cx="12" cy="7" r="1.5" fill="white" />
+  </svg>
+);
+
+// Bland.ai Logo - AI Phone Calls (Purple B with wave)
+export const BlandIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <defs>
+      <linearGradient id="blandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#8B5CF6" />
+        <stop offset="100%" stopColor="#6D28D9" />
+      </linearGradient>
+    </defs>
+    <rect width="24" height="24" rx="6" fill="url(#blandGrad)" />
+    <path d="M8 6h4c2.2 0 4 1.8 4 4 0 1.5-.8 2.7-2 3.4.8.5 1.5 1.5 1.5 2.6 0 2.2-1.8 4-4 4H8V6z" fill="white" />
+    <path d="M10 8v3h2c1.1 0 2-.9 2-2s-.9-2-2-2h-2zm0 5v3h2.5c1.1 0 2-.9 2-2s-.9-2-2-2H10z" fill="url(#blandGrad)" />
+  </svg>
+);
+
+// Plivo Logo - Voice & SMS (Green circle with P)
+export const PlivoIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <defs>
+      <linearGradient id="plivoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#22C55E" />
+        <stop offset="100%" stopColor="#16A34A" />
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="11" fill="url(#plivoGrad)" />
+    <path d="M9 6h5c2.2 0 4 1.8 4 4s-1.8 4-4 4h-3v4H9V6z" fill="white" />
+    <path d="M11 8v4h3c1.1 0 2-.9 2-2s-.9-2-2-2h-3z" fill="url(#plivoGrad)" />
+  </svg>
+);
+
+// Exotel Logo - India Voice (Blue with phone icon)
+export const ExotelIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <defs>
+      <linearGradient id="exotelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#3B82F6" />
+        <stop offset="100%" stopColor="#1D4ED8" />
+      </linearGradient>
+    </defs>
+    <rect width="24" height="24" rx="6" fill="url(#exotelGrad)" />
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold" fontFamily="Arial, sans-serif">Ex</text>
+    <circle cx="18" cy="6" r="3" fill="#FCD34D" />
+    <path d="M17 5.5l1 1 1.5-1.5" stroke="url(#exotelGrad)" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+  </svg>
+);
+

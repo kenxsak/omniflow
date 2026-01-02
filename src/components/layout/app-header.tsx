@@ -14,6 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CompanySwitcher } from "@/components/agency/company-switcher";
+import { NotificationBell } from "@/components/layout/notification-bell";
+import CommandPalette from "@/components/layout/command-palette";
 
 export default function AppHeader() {
   const { isMobile } = useSidebar();
@@ -46,16 +48,31 @@ export default function AppHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950 px-4">
+      <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950 px-3 sm:px-4">
         {/* Left side - Mobile sidebar trigger */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {isMounted && isMobile && (
             <SidebarTrigger className="h-8 w-8 shrink-0" />
           )}
+          
+          {/* Command Palette / Search */}
+          <CommandPalette />
         </div>
 
         {/* Right side - Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Ask AI Quick Button - Mobile */}
+          <button
+            onClick={() => router.push('/ai-chat')}
+            className="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 transition-colors"
+          >
+            <Icon icon="solar:stars-linear" className="w-4 h-4" />
+            <span className="text-xs font-medium">AI</span>
+          </button>
+          
+          {/* Notification Bell */}
+          <NotificationBell />
+          
           {/* Agency Company Switcher */}
           <CompanySwitcher />
 

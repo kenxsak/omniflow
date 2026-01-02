@@ -67,7 +67,7 @@ export default function ROICalculator() {
       
       <div className="p-4 space-y-5">
         {/* Input Fields */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="revenue" className="text-[11px] text-muted-foreground">Total Revenue ($)</Label>
             <Input

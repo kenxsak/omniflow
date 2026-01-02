@@ -73,7 +73,7 @@ const CHECKLIST_ITEMS: ChecklistItemConfig[] = [
     description: 'Let AI help write your marketing content',
     icon: 'solar:magic-stick-3-linear',
     actionLabel: 'Try AI Writer',
-    actionLink: '/ai-content-writer',
+    actionLink: '/ai-chat/content-writer',
   },
   {
     key: 'setupAutomation',

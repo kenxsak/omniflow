@@ -10,6 +10,7 @@ import { generateTiktokReelsAdContent } from '@/ai/flows/generate-tiktok-reels-a
 import { generateGoogleAdsKeywords } from '@/ai/flows/generate-google-ads-keywords-flow';
 import { generateHashtagSuggestions } from '@/ai/flows/generate-hashtag-suggestions-flow';
 import { generateImageWithAiFlow } from '@/ai/flows/generate-image-with-ai-flow';
+import { PLATFORM_PRESETS, IMAGE_STYLES, type PlatformPreset, type ImageStyle } from '@/ai/image-generation-presets';
 import { getTrendingTopicSuggestions } from '@/ai/flows/get-trending-topic-suggestions-flow';
 import { generateEnhancedPrompt } from '@/ai/flows/generate-enhanced-prompt-flow';
 import { aiReviewResponder } from '@/ai/flows/ai-review-responder';
@@ -376,7 +377,9 @@ export async function handleAIChatMessage(
   userMessage: string,
   companyId: string,
   userId: string,
-  conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>
+  conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>,
+  referenceImage?: string, // Brand logo/reference image as base64 data URI
+  agentId?: string // Selected AI agent ID to influence intent detection
 ): Promise<ChatResponse> {
   try {
     // Limit conversation history to last 10 messages or ~2000 tokens
@@ -397,8 +400,8 @@ export async function handleAIChatMessage(
       }
     }
 
-    // Parse intent from user message
-    const intent = detectIntent(userMessage);
+    // Parse intent from user message, considering the selected agent
+    const intent = detectIntent(userMessage, agentId);
 
     switch (intent.type) {
       case 'social_post':
@@ -411,7 +414,7 @@ export async function handleAIChatMessage(
         return await handleAdCopy(userMessage, intent, companyId, userId);
 
       case 'image':
-        return await handleImage(userMessage, intent, companyId, userId);
+        return await handleImage(userMessage, intent, companyId, userId, referenceImage);
 
       case 'hashtags':
         return await handleHashtags(userMessage, intent, companyId, userId);
@@ -452,9 +455,72 @@ export async function handleAIChatMessage(
   }
 }
 
-function detectIntent(message: string): { type: string; platform?: string; topic?: string; adPlatform?: string } {
+function detectIntent(message: string, agentId?: string): { type: string; platform?: string; topic?: string; adPlatform?: string } {
   const lowerMessage = message.toLowerCase();
 
+  // AGENT-BASED INTENT OVERRIDE
+  // If a specific agent is selected, prioritize that agent's primary function
+  if (agentId) {
+    switch (agentId) {
+      case 'visual-designer':
+        // Visual Designer should ALWAYS generate images unless explicitly asking for something else
+        const topic = extractTopic(message, ['image', 'picture', 'photo', 'visual', 'of', 'for', 'about', 'create', 'generate', 'make']);
+        return { type: 'image', topic: topic || message };
+      
+      case 'content-writer':
+        // Content Writer - check for specific content types, default to blog
+        if (lowerMessage.includes('email')) {
+          return { type: 'email', topic: extractTopic(message, ['email', 'about', 'to']) };
+        }
+        if (lowerMessage.includes('sales page') || lowerMessage.includes('landing page')) {
+          return { type: 'sales_page', topic: extractTopic(message, ['sales page', 'landing page', 'for', 'about']) };
+        }
+        if (lowerMessage.includes('instagram') || lowerMessage.includes('facebook') || lowerMessage.includes('linkedin') || lowerMessage.includes('twitter') || lowerMessage.includes('social')) {
+          return { type: 'social_post', platform: detectPlatform(lowerMessage), topic: extractTopic(message, ['post', 'about', 'for']) };
+        }
+        // Default to blog for content writer
+        return { type: 'blog', topic: extractTopic(message, ['blog', 'about', 'write']) || message };
+      
+      case 'ad-strategist':
+        // Ad Strategist - check for specific ad types
+        if (lowerMessage.includes('keyword')) {
+          return { type: 'keyword_planner', topic: extractTopic(message, ['keyword', 'for', 'about']) };
+        }
+        if (lowerMessage.includes('youtube')) {
+          return { type: 'youtube_ad', topic: extractTopic(message, ['youtube', 'ad', 'for', 'about']) };
+        }
+        if (lowerMessage.includes('tiktok') || lowerMessage.includes('reels')) {
+          return { type: 'tiktok_reels_ad', topic: extractTopic(message, ['tiktok', 'reels', 'ad', 'for', 'about']) };
+        }
+        // Default to ad copy
+        return { type: 'ad_copy', adPlatform: detectAdPlatform(lowerMessage), topic: extractTopic(message, ['ad', 'for', 'about']) || message };
+      
+      case 'seo-expert':
+        // SEO Expert - check for specific SEO tasks
+        if (lowerMessage.includes('hashtag')) {
+          return { type: 'hashtags', topic: extractTopic(message, ['hashtag', 'for']) };
+        }
+        if (lowerMessage.includes('keyword')) {
+          return { type: 'keyword_planner', topic: extractTopic(message, ['keyword', 'for', 'about']) };
+        }
+        // Default to trending topics
+        return { type: 'trending_topics' };
+      
+      case 'customer-service':
+        // Customer Service - review responses
+        return { type: 'review_response' };
+      
+      case 'video-producer':
+        // Video Producer - video scripts
+        if (lowerMessage.includes('youtube ad') || (lowerMessage.includes('youtube') && lowerMessage.includes('ad'))) {
+          return { type: 'youtube_ad', topic: extractTopic(message, ['youtube', 'ad', 'for', 'about']) };
+        }
+        return { type: 'video_script', topic: extractTopic(message, ['video', 'script', 'about']) || message };
+    }
+  }
+
+  // FALLBACK: Original intent detection for general assistant or no agent selected
+  
   // Trending topics
   if (lowerMessage.includes('trending') || lowerMessage.includes('trend') || lowerMessage.includes('popular topic') || lowerMessage.includes('what\'s hot')) {
     return { type: 'trending_topics' };
@@ -1097,7 +1163,8 @@ async function handleImage(
   message: string,
   intent: any,
   companyId: string,
-  userId: string
+  userId: string,
+  referenceImage?: string // Brand logo/reference image as base64 data URI
 ): Promise<ChatResponse> {
   const { apiKey, type: apiKeyType } = await getGeminiApiKeyForCompany(companyId);
   
@@ -1109,18 +1176,30 @@ async function handleImage(
     userId
   );
   
+  // Detect platform preset from message
+  const platform = detectImagePlatform(message);
+  
+  // Detect style from message
+  const style = detectImageStyle(message);
+  
+  // Detect aspect ratio from message (fallback if no platform)
+  const aspectRatio = platform ? undefined : detectAspectRatio(message);
+  
   const result = await executeAIOperation({
     companyId,
     userId,
     operationType: 'image_generation',
     model: 'gemini-2.5-flash-image',  // Nano Banana - faster & cheaper
-    feature: 'Image Generation',
+    feature: referenceImage ? 'Branded Image Generation' : 'Image Generation',
     apiKeyType,
     operation: async () => {
       const output = await generateImageWithAiFlow({
         prompt,
-        aspectRatio: '1:1',
-        apiKey
+        aspectRatio: aspectRatio as any,
+        platform,
+        style,
+        apiKey,
+        brandLogo: referenceImage, // Pass reference image for branded generation
       });
 
       if (!output || !output.imageDataUri) {
@@ -1139,16 +1218,214 @@ async function handleImage(
     throw new Error(result.error || 'Failed to generate image');
   }
 
+  // Build response with platform/style info
+  let responseContent = referenceImage 
+    ? `I've created a branded image using your logo/reference based on: "${intent.topic || message}"`
+    : `I've created an image based on: "${intent.topic || message}"`;
+  
+  if (platform && platform in PLATFORM_PRESETS) {
+    const preset = PLATFORM_PRESETS[platform as PlatformPreset];
+    responseContent += `\n\n📐 **Format:** ${preset.name} (${preset.dimensions})`;
+  }
+  
+  if (style && style in IMAGE_STYLES) {
+    responseContent += `\n🎨 **Style:** ${IMAGE_STYLES[style as ImageStyle].name}`;
+  }
+
   return {
-    content: `I've created an image based on: "${intent.topic || message}"`,
+    content: responseContent,
     type: 'image',
     metadata: {
       imageUrl: result.data.imageDataUri,
-      prompt: intent.topic || message
+      prompt: intent.topic || message,
+      isBranded: !!referenceImage,
+      platform,
+      style
     },
     creditsConsumed: result.quotaInfo?.consumed || 0,
     nextSteps: getNextStepSuggestions('image', { prompt: intent.topic || message })
   };
+}
+
+/**
+ * Detect platform preset from user message
+ */
+function detectImagePlatform(message: string): string | undefined {
+  const lowerMessage = message.toLowerCase();
+  
+  // Instagram
+  if (lowerMessage.includes('instagram story') || lowerMessage.includes('ig story') || lowerMessage.includes('insta story')) {
+    return 'instagram-story';
+  }
+  if (lowerMessage.includes('instagram reel') || lowerMessage.includes('ig reel') || lowerMessage.includes('reels')) {
+    return 'instagram-story'; // Same format
+  }
+  if (lowerMessage.includes('instagram portrait') || lowerMessage.includes('ig portrait')) {
+    return 'instagram-portrait';
+  }
+  if (lowerMessage.includes('instagram') || lowerMessage.includes('ig post') || lowerMessage.includes('insta')) {
+    return 'instagram-feed';
+  }
+  
+  // Facebook
+  if (lowerMessage.includes('facebook cover') || lowerMessage.includes('fb cover')) {
+    return 'facebook-cover';
+  }
+  if (lowerMessage.includes('facebook ad') || lowerMessage.includes('fb ad')) {
+    return 'facebook-ad';
+  }
+  if (lowerMessage.includes('facebook') || lowerMessage.includes('fb post')) {
+    return 'facebook-feed';
+  }
+  
+  // LinkedIn
+  if (lowerMessage.includes('linkedin banner')) {
+    return 'linkedin-banner';
+  }
+  if (lowerMessage.includes('linkedin article')) {
+    return 'linkedin-article';
+  }
+  if (lowerMessage.includes('linkedin')) {
+    return 'linkedin-feed';
+  }
+  
+  // YouTube
+  if (lowerMessage.includes('youtube thumbnail') || lowerMessage.includes('yt thumbnail') || lowerMessage.includes('video thumbnail')) {
+    return 'youtube-thumbnail';
+  }
+  if (lowerMessage.includes('youtube banner') || lowerMessage.includes('channel banner')) {
+    return 'youtube-banner';
+  }
+  if (lowerMessage.includes('youtube')) {
+    return 'youtube-thumbnail';
+  }
+  
+  // Pinterest
+  if (lowerMessage.includes('pinterest long') || lowerMessage.includes('infographic')) {
+    return 'pinterest-long';
+  }
+  if (lowerMessage.includes('pinterest') || lowerMessage.includes('pin')) {
+    return 'pinterest-pin';
+  }
+  
+  // TikTok
+  if (lowerMessage.includes('tiktok')) {
+    return 'tiktok-video';
+  }
+  
+  // Google Ads
+  if (lowerMessage.includes('google display') && lowerMessage.includes('portrait')) {
+    return 'google-display-portrait';
+  }
+  if (lowerMessage.includes('google display') && lowerMessage.includes('landscape')) {
+    return 'google-display-landscape';
+  }
+  if (lowerMessage.includes('google ad') || lowerMessage.includes('display ad')) {
+    return 'google-display-square';
+  }
+  
+  // WhatsApp
+  if (lowerMessage.includes('whatsapp') || lowerMessage.includes('wa status')) {
+    return 'whatsapp-status';
+  }
+  
+  // Blog/Website
+  if (lowerMessage.includes('blog') && lowerMessage.includes('featured')) {
+    return 'blog-featured';
+  }
+  if (lowerMessage.includes('hero image') || lowerMessage.includes('website hero')) {
+    return 'website-hero';
+  }
+  if (lowerMessage.includes('blog')) {
+    return 'blog-featured';
+  }
+  
+  // Email
+  if (lowerMessage.includes('email header')) {
+    return 'email-header';
+  }
+  if (lowerMessage.includes('email')) {
+    return 'email-hero';
+  }
+  
+  return undefined;
+}
+
+/**
+ * Detect image style from user message
+ */
+function detectImageStyle(message: string): string | undefined {
+  const lowerMessage = message.toLowerCase();
+  
+  if (lowerMessage.includes('photorealistic') || lowerMessage.includes('realistic') || lowerMessage.includes('photo')) {
+    return 'photorealistic';
+  }
+  if (lowerMessage.includes('illustration') || lowerMessage.includes('illustrated') || lowerMessage.includes('artwork')) {
+    return 'illustration';
+  }
+  if (lowerMessage.includes('minimalist') || lowerMessage.includes('minimal') || lowerMessage.includes('simple')) {
+    return 'minimalist';
+  }
+  if (lowerMessage.includes('vibrant') || lowerMessage.includes('colorful') || lowerMessage.includes('bold')) {
+    return 'vibrant';
+  }
+  if (lowerMessage.includes('professional') || lowerMessage.includes('corporate') || lowerMessage.includes('business')) {
+    return 'professional';
+  }
+  if (lowerMessage.includes('playful') || lowerMessage.includes('fun') || lowerMessage.includes('cheerful')) {
+    return 'playful';
+  }
+  if (lowerMessage.includes('luxury') || lowerMessage.includes('premium') || lowerMessage.includes('elegant')) {
+    return 'luxury';
+  }
+  if (lowerMessage.includes('tech') || lowerMessage.includes('futuristic') || lowerMessage.includes('modern')) {
+    return 'tech';
+  }
+  if (lowerMessage.includes('organic') || lowerMessage.includes('natural') || lowerMessage.includes('eco')) {
+    return 'organic';
+  }
+  if (lowerMessage.includes('retro') || lowerMessage.includes('vintage') || lowerMessage.includes('nostalgic')) {
+    return 'retro';
+  }
+  if (lowerMessage.includes('flat design') || lowerMessage.includes('flat style')) {
+    return 'flat';
+  }
+  if (lowerMessage.includes('3d') || lowerMessage.includes('three dimensional') || lowerMessage.includes('render')) {
+    return '3d';
+  }
+  
+  return undefined;
+}
+
+/**
+ * Detect aspect ratio from user message
+ */
+function detectAspectRatio(message: string): string | undefined {
+  const lowerMessage = message.toLowerCase();
+  
+  if (lowerMessage.includes('16:9') || lowerMessage.includes('widescreen') || lowerMessage.includes('wide')) {
+    return '16:9';
+  }
+  if (lowerMessage.includes('9:16') || lowerMessage.includes('vertical') || lowerMessage.includes('story')) {
+    return '9:16';
+  }
+  if (lowerMessage.includes('4:3') || lowerMessage.includes('landscape')) {
+    return '4:3';
+  }
+  if (lowerMessage.includes('3:4') || lowerMessage.includes('portrait')) {
+    return '3:4';
+  }
+  if (lowerMessage.includes('4:5')) {
+    return '4:5';
+  }
+  if (lowerMessage.includes('2:3')) {
+    return '2:3';
+  }
+  if (lowerMessage.includes('square') || lowerMessage.includes('1:1')) {
+    return '1:1';
+  }
+  
+  return undefined;
 }
 
 async function handleHashtags(

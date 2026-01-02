@@ -550,7 +550,7 @@ export default function SavedEmailTemplatesPage() {
       )}
 
       <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl">
           <DialogHeader>
             <DialogTitle>{previewTemplate?.name}</DialogTitle>
             <DialogDescription>
@@ -584,7 +584,7 @@ export default function SavedEmailTemplatesPage() {
       </Dialog>
 
       <Dialog open={sendDialogOpen} onOpenChange={setSendDialogOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-lg rounded-xl">
           <DialogHeader>
             <DialogTitle>Send Email Template</DialogTitle>
             <DialogDescription>

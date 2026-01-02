@@ -391,3 +391,39 @@ export async function deleteActivity(
     return { success: false, error: 'Failed to delete activity' };
   }
 }
+
+/**
+ * Generic activity logger for quick logging from UI
+ * Used by QuickActivityLogger component
+ */
+export async function logActivity(params: {
+  companyId: string;
+  contactId: string;
+  type: ActivityType;
+  content: string;
+  subject?: string;
+  metadata?: Record<string, any>;
+}): Promise<{ success: boolean; id?: string; error?: string }> {
+  // Get current user from session
+  const { getUserFromServerSession } = await import('@/lib/firebase-admin');
+  const userResult = await getUserFromServerSession();
+  
+  if (!userResult.success) {
+    return { success: false, error: 'Not authenticated' };
+  }
+
+  const author = userResult.user.uid;
+  const authorName = userResult.user.email || 'Unknown';
+
+  return createActivity({
+    companyId: params.companyId,
+    contactId: params.contactId,
+    type: params.type,
+    content: params.content,
+    subject: params.subject,
+    author,
+    authorName,
+    occurredAt: new Date().toISOString(),
+    metadata: params.metadata,
+  });
+}

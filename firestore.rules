@@ -123,6 +123,14 @@ service cloud.firestore {
     
     
     // ==========================================
+    // QUOTES COLLECTION
+    // ==========================================
+    match /quotes/{quoteId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
     // TASKS COLLECTION
     // ==========================================
     match /tasks/{taskId} {

@@ -68,6 +68,15 @@ export async function updateCompanyProfileAction(params: {
     adminEmail?: string;
     phone?: string;
     address?: string;
+    // Company Branding
+    companyBranding?: {
+      logoUrl?: string;
+      logoDarkUrl?: string;
+      logoSquareUrl?: string;
+      primaryColor?: string;
+      accentColor?: string;
+      tagline?: string;
+    };
   };
 }): Promise<{ success: boolean; error?: string }> {
   if (!serverDb) {
@@ -136,6 +145,16 @@ export async function updateCompanyProfileAction(params: {
     if (params.data.adminEmail !== undefined) updateData.adminEmail = params.data.adminEmail || null;
     if (params.data.phone !== undefined) updateData.phone = params.data.phone || null;
     if (params.data.address !== undefined) updateData.address = params.data.address || null;
+    
+    // Handle company branding updates
+    if (params.data.companyBranding) {
+      const existingBranding = companyDoc.data().companyBranding || {};
+      updateData.companyBranding = {
+        ...existingBranding,
+        ...params.data.companyBranding,
+        updatedAt: new Date().toISOString(),
+      };
+    }
 
     await updateDoc(companyRef, updateData);
 

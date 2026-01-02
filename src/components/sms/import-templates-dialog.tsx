@@ -172,7 +172,7 @@ export function ImportTemplatesDialog({ idToken, provider, onTemplatesImported, 
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl">
         <DialogHeader>
           <DialogTitle>Import {providerInfo.name} Templates</DialogTitle>
           <DialogDescription>

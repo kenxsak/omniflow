@@ -74,7 +74,7 @@ export default function TeamManagementPage() {
     <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden max-w-md mx-auto">
       <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full" style={{ background: 'linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%)' }} />
       
-      <div className="p-6 text-center border-b border-stone-200 dark:border-stone-800">
+      <div className="p-3 sm:p-4 md:p-6 text-center border-b border-stone-200 dark:border-stone-800">
         <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)' }}>
           <Icon icon="solar:clock-circle-linear" className="w-6 h-6" style={{ color: '#8b5cf6' }} />
         </div>
@@ -82,7 +82,7 @@ export default function TeamManagementPage() {
         <p className="text-xs text-muted-foreground mt-0.5">Update your work status below</p>
       </div>
       
-      <div className="p-6 space-y-4">
+      <div className="p-3 sm:p-4 md:p-6 space-y-4">
         <div className="p-4 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-100 dark:border-stone-800 text-center">
           <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase mb-2">Your Current Status</p>
           <Badge 

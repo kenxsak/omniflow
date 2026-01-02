@@ -184,61 +184,61 @@ export default function GuidedTrendingTopics({ onContentGenerated, onBack }: Gui
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
+    <div className="max-w-4xl mx-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
       {/* Progress Indicator */}
-      <div className="flex items-center justify-center gap-4 mb-8">
-        <div className={`flex items-center gap-2 ${step >= 1 ? 'text-primary' : 'text-muted-foreground'}`}>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step >= 1 ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground'}`}>
+      <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 sm:mb-8">
+        <div className={`flex items-center gap-1.5 sm:gap-2 ${step >= 1 ? 'text-primary' : 'text-muted-foreground'}`}>
+          <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 text-xs sm:text-sm ${step >= 1 ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground'}`}>
             1
           </div>
-          <span className="text-sm font-medium hidden sm:inline">Content Type</span>
+          <span className="text-xs sm:text-sm font-medium hidden sm:inline">Content Type</span>
         </div>
         
-        <div className={`h-0.5 w-12 ${step >= 2 ? 'bg-primary' : 'bg-muted-foreground'}`}></div>
+        <div className={`h-0.5 w-6 sm:w-12 ${step >= 2 ? 'bg-primary' : 'bg-muted-foreground'}`}></div>
         
-        <div className={`flex items-center gap-2 ${step >= 2 ? 'text-primary' : 'text-muted-foreground'}`}>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step >= 2 ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground'}`}>
+        <div className={`flex items-center gap-1.5 sm:gap-2 ${step >= 2 ? 'text-primary' : 'text-muted-foreground'}`}>
+          <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 text-xs sm:text-sm ${step >= 2 ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground'}`}>
             2
           </div>
-          <span className="text-sm font-medium hidden sm:inline">Your Niche</span>
+          <span className="text-xs sm:text-sm font-medium hidden sm:inline">Your Niche</span>
         </div>
         
-        <div className={`h-0.5 w-12 ${step >= 3 ? 'bg-primary' : 'bg-muted-foreground'}`}></div>
+        <div className={`h-0.5 w-6 sm:w-12 ${step >= 3 ? 'bg-primary' : 'bg-muted-foreground'}`}></div>
         
-        <div className={`flex items-center gap-2 ${step >= 3 ? 'text-primary' : 'text-muted-foreground'}`}>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step >= 3 ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground'}`}>
+        <div className={`flex items-center gap-1.5 sm:gap-2 ${step >= 3 ? 'text-primary' : 'text-muted-foreground'}`}>
+          <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 text-xs sm:text-sm ${step >= 3 ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground'}`}>
             3
           </div>
-          <span className="text-sm font-medium hidden sm:inline">Select Topic</span>
+          <span className="text-xs sm:text-sm font-medium hidden sm:inline">Select Topic</span>
         </div>
       </div>
 
       {/* Step 1: Content Type Selection */}
       {step === 1 && (
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
+          <CardHeader className="p-3 sm:p-4 md:p-6">
+            <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
               Step 1: Choose Content Type
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs sm:text-sm">
               What type of content would you like to create?
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="p-3 sm:p-4 md:p-6 pt-0 space-y-4 sm:space-y-6">
             <RadioGroup value={contentType} onValueChange={(value: 'blog' | 'video') => setContentType(value)}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <Label
                   htmlFor="blog"
-                  className={`flex flex-col items-center gap-4 p-6 border-2 rounded-lg cursor-pointer transition-all ${
+                  className={`flex flex-col items-center gap-2 sm:gap-4 p-4 sm:p-6 border-2 rounded-lg cursor-pointer transition-all ${
                     contentType === 'blog' ? 'border-primary bg-primary/5' : 'border-muted hover:border-primary/50'
                   }`}
                 >
                   <RadioGroupItem value="blog" id="blog" className="sr-only" />
-                  <FileText className={`h-12 w-12 ${contentType === 'blog' ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <FileText className={`h-8 w-8 sm:h-12 sm:w-12 ${contentType === 'blog' ? 'text-primary' : 'text-muted-foreground'}`} />
                   <div className="text-center">
-                    <div className="font-semibold text-lg">Blog Post</div>
-                    <div className="text-sm text-muted-foreground mt-1">
+                    <div className="font-semibold text-sm sm:text-lg">Blog Post</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
                       Full article with SEO optimization
                     </div>
                   </div>
@@ -246,15 +246,15 @@ export default function GuidedTrendingTopics({ onContentGenerated, onBack }: Gui
 
                 <Label
                   htmlFor="video"
-                  className={`flex flex-col items-center gap-4 p-6 border-2 rounded-lg cursor-pointer transition-all ${
+                  className={`flex flex-col items-center gap-2 sm:gap-4 p-4 sm:p-6 border-2 rounded-lg cursor-pointer transition-all ${
                     contentType === 'video' ? 'border-primary bg-primary/5' : 'border-muted hover:border-primary/50'
                   }`}
                 >
                   <RadioGroupItem value="video" id="video" className="sr-only" />
-                  <Video className={`h-12 w-12 ${contentType === 'video' ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <Video className={`h-8 w-8 sm:h-12 sm:w-12 ${contentType === 'video' ? 'text-primary' : 'text-muted-foreground'}`} />
                   <div className="text-center">
-                    <div className="font-semibold text-lg">Video Script</div>
-                    <div className="text-sm text-muted-foreground mt-1">
+                    <div className="font-semibold text-sm sm:text-lg">Video Script</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
                       Complete script for YouTube or TikTok
                     </div>
                   </div>
@@ -262,13 +262,13 @@ export default function GuidedTrendingTopics({ onContentGenerated, onBack }: Gui
               </div>
             </RadioGroup>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
               {onBack && (
-                <Button variant="outline" onClick={onBack}>
+                <Button variant="outline" onClick={onBack} className="w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm">
                   Back
                 </Button>
               )}
-              <Button onClick={handleContentTypeSelect} className="flex-1">
+              <Button onClick={handleContentTypeSelect} className="w-full sm:flex-1 h-9 sm:h-10 text-xs sm:text-sm">
                 Continue
               </Button>
             </div>
@@ -279,21 +279,21 @@ export default function GuidedTrendingTopics({ onContentGenerated, onBack }: Gui
       {/* Step 2: Niche Input */}
       {step === 2 && (
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5" />
+          <CardHeader className="p-3 sm:p-4 md:p-6">
+            <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
               Step 2: Enter Your Niche
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs sm:text-sm">
               What topic or industry should we find trending topics for?
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="niche">Business Niche or Topic</Label>
+          <CardContent className="p-3 sm:p-4 md:p-6 pt-0 space-y-4 sm:space-y-6">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="niche" className="text-xs sm:text-sm">Business Niche or Topic</Label>
               <Input
                 id="niche"
-                placeholder="e.g., fitness coaching, ecommerce tools, digital marketing..."
+                placeholder="e.g., fitness coaching, ecommerce tools..."
                 value={niche}
                 onChange={(e) => setNiche(e.target.value)}
                 onKeyDown={(e) => {
@@ -301,23 +301,23 @@ export default function GuidedTrendingTopics({ onContentGenerated, onBack }: Gui
                     handleNicheSubmit();
                   }
                 }}
-                className="text-base"
+                className="h-9 sm:h-10 text-sm"
                 disabled={isLoading}
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Selected: <span className="font-semibold">{contentType === 'blog' ? 'Blog Post' : 'Video Script'}</span>
               </p>
             </div>
 
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setStep(1)} disabled={isLoading}>
+            <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
+              <Button variant="outline" onClick={() => setStep(1)} disabled={isLoading} className="w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm">
                 Back
               </Button>
-              <Button onClick={handleNicheSubmit} className="flex-1" disabled={isLoading || !niche.trim()}>
+              <Button onClick={handleNicheSubmit} className="w-full sm:flex-1 h-9 sm:h-10 text-xs sm:text-sm" disabled={isLoading || !niche.trim()}>
                 {isLoading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Finding Trending Topics...
+                    <Loader2 className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
+                    <span className="truncate">Finding Topics...</span>
                   </>
                 ) : (
                   'Get Trending Topics'
@@ -331,17 +331,17 @@ export default function GuidedTrendingTopics({ onContentGenerated, onBack }: Gui
       {/* Step 3: Topic Selection */}
       {step === 3 && (
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
+          <CardHeader className="p-3 sm:p-4 md:p-6">
+            <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
               Step 3: Select a Trending Topic
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs sm:text-sm">
               Choose one of these trending topics for your {contentType === 'blog' ? 'blog post' : 'video script'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-3">
+          <CardContent className="p-3 sm:p-4 md:p-6 pt-0 space-y-4 sm:space-y-6">
+            <div className="space-y-2 sm:space-y-3">
               {topics.map((topicItem, index) => (
                 <Card
                   key={index}
@@ -352,26 +352,26 @@ export default function GuidedTrendingTopics({ onContentGenerated, onBack }: Gui
                   }`}
                   onClick={() => handleTopicSelect(topicItem.topic)}
                 >
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <div className={`mt-0.5 sm:mt-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                         selectedTopic === topicItem.topic
                           ? 'border-primary bg-primary'
                           : 'border-muted-foreground'
                       }`}>
                         {selectedTopic === topicItem.topic && (
-                          <div className="w-2.5 h-2.5 rounded-full bg-primary-foreground"></div>
+                          <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-primary-foreground"></div>
                         )}
                       </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-base mb-2">{topicItem.topic}</h4>
-                        <p className="text-sm text-muted-foreground mb-3">{topicItem.reasoning}</p>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-xs sm:text-base mb-1 sm:mb-2">{topicItem.topic}</h4>
+                        <p className="text-[10px] sm:text-sm text-muted-foreground mb-2 sm:mb-3">{topicItem.reasoning}</p>
                         
                         {topicItem.exampleTitles && topicItem.exampleTitles.length > 0 && (
-                          <div className="space-y-1">
-                            <p className="text-xs font-medium text-muted-foreground">Example Titles:</p>
+                          <div className="space-y-0.5 sm:space-y-1">
+                            <p className="text-[9px] sm:text-xs font-medium text-muted-foreground">Example Titles:</p>
                             {topicItem.exampleTitles.slice(0, 2).map((title, idx) => (
-                              <p key={idx} className="text-xs text-muted-foreground pl-3 border-l-2 border-muted">
+                              <p key={idx} className="text-[9px] sm:text-xs text-muted-foreground pl-2 sm:pl-3 border-l-2 border-muted truncate">
                                 {title}
                               </p>
                             ))}
@@ -379,9 +379,9 @@ export default function GuidedTrendingTopics({ onContentGenerated, onBack }: Gui
                         )}
 
                         {topicItem.suggestedKeywords && topicItem.suggestedKeywords.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-3">
+                          <div className="flex flex-wrap gap-1 mt-2 sm:mt-3">
                             {topicItem.suggestedKeywords.slice(0, 4).map((keyword, idx) => (
-                              <span key={idx} className="text-xs bg-muted px-2 py-1 rounded">
+                              <span key={idx} className="text-[9px] sm:text-xs bg-muted px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                                 {keyword}
                               </span>
                             ))}
@@ -394,22 +394,22 @@ export default function GuidedTrendingTopics({ onContentGenerated, onBack }: Gui
               ))}
             </div>
 
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={() => { setStep(2); setSelectedTopic(''); }} disabled={isLoading}>
+            <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
+              <Button variant="outline" onClick={() => { setStep(2); setSelectedTopic(''); }} disabled={isLoading} className="w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm">
                 Back
               </Button>
               <Button 
                 onClick={handleCreateContent} 
-                className="flex-1" 
+                className="w-full sm:flex-1 h-9 sm:h-10 text-xs sm:text-sm" 
                 disabled={!selectedTopic || isLoading}
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating {contentType === 'blog' ? 'Blog Post' : 'Video Script'}...
+                    <Loader2 className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
+                    <span className="truncate">Generating...</span>
                   </>
                 ) : (
-                  `Create ${contentType === 'blog' ? 'Blog Post' : 'Video Script'}`
+                  <span className="truncate">Create {contentType === 'blog' ? 'Blog Post' : 'Video Script'}</span>
                 )}
               </Button>
             </div>

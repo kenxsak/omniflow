@@ -36,12 +36,14 @@ interface ConversationHistorySidebarProps {
   currentSessionId?: string | null;
   onSelectSession: (sessionId: string) => void;
   onNewChat: () => void;
+  compact?: boolean; // Hide header buttons when in compact/expanded sidebar mode
 }
 
 export default function ConversationHistorySidebar({
   currentSessionId,
   onSelectSession,
-  onNewChat
+  onNewChat,
+  compact = false
 }: ConversationHistorySidebarProps) {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -132,42 +134,44 @@ export default function ConversationHistorySidebar({
 
   return (
     <div className="flex flex-col h-full w-full overflow-hidden">
-      {/* Header */}
-      <div className="flex-shrink-0 p-3">
-        <Button 
-          onClick={onNewChat} 
-          variant="outline"
-          className="w-full h-9 text-xs font-medium"
-        >
-          <Icon icon="solar:add-circle-linear" className="h-4 w-4 mr-2" />
-          New Chat
-        </Button>
-      </div>
+      {/* Header - Hidden in compact mode (parent handles new chat button) */}
+      {!compact && (
+        <div className="flex-shrink-0 p-2 sm:p-3">
+          <Button 
+            onClick={onNewChat} 
+            variant="outline"
+            className="w-full h-8 sm:h-9 text-xs font-medium"
+          >
+            <Icon icon="solar:add-circle-linear" className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+            New Chat
+          </Button>
+        </div>
+      )}
 
       {/* Search */}
-      <div className="flex-shrink-0 px-3 pb-3">
+      <div className={cn("flex-shrink-0 px-2 sm:px-3", compact ? "pt-2 pb-2" : "pb-2 sm:pb-3")}>
         <div className="relative">
-          <Icon icon="solar:magnifer-linear" className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
+          <Icon icon="solar:magnifer-linear" className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground/60" />
           <input
             type="text"
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-8 pl-8 pr-3 text-xs bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-stone-300 dark:focus:ring-stone-700 transition-all"
+            className="w-full h-7 sm:h-8 pl-7 sm:pl-8 pr-2 sm:pr-3 text-[10px] sm:text-xs bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-stone-300 dark:focus:ring-stone-700 transition-all"
           />
         </div>
       </div>
 
       {/* Sessions List */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden px-2">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-1.5 sm:px-2">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-8">
+          <div className="flex flex-col items-center justify-center py-6 sm:py-8">
             <Icon icon="solar:refresh-linear" className="h-4 w-4 animate-spin text-muted-foreground/60" />
           </div>
         ) : filteredSessions.length === 0 ? (
-          <div className="text-center py-8 px-3">
-            <Icon icon="solar:chat-round-dots-linear" className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
-            <p className="text-xs text-muted-foreground">
+          <div className="text-center py-6 sm:py-8 px-2 sm:px-3">
+            <Icon icon="solar:chat-round-dots-linear" className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground/40 mx-auto mb-2" />
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
               {searchQuery ? 'No results' : 'No chats yet'}
             </p>
           </div>
@@ -177,22 +181,22 @@ export default function ConversationHistorySidebar({
             if (!groupSessions || groupSessions.length === 0) return null;
             
             return (
-              <div key={group} className="mb-3">
-                <p className="text-[9px] font-semibold tracking-wider text-muted-foreground/60 uppercase px-2 py-1.5">
+              <div key={group} className="mb-2 sm:mb-3">
+                <p className="text-[8px] sm:text-[9px] font-semibold tracking-wider text-muted-foreground/60 uppercase px-1.5 sm:px-2 py-1 sm:py-1.5">
                   {group}
                 </p>
                 <div className="space-y-0.5">
                   {groupSessions.map((session) => {
                     const isActive = session.id === currentSessionId;
                     const displayTitle = session.title 
-                      ? (session.title.length > 28 ? session.title.substring(0, 28) + '...' : session.title)
+                      ? (session.title.length > 24 ? session.title.substring(0, 24) + '...' : session.title)
                       : 'Untitled';
                     
                     return (
                       <div
                         key={session.id}
                         className={cn(
-                          "group flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-colors",
+                          "group flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1.5 rounded-lg cursor-pointer transition-colors",
                           isActive 
                             ? "bg-stone-100 dark:bg-stone-800" 
                             : "hover:bg-stone-100/50 dark:hover:bg-stone-800/50"
@@ -201,19 +205,19 @@ export default function ConversationHistorySidebar({
                       >
                         <Icon 
                           icon={session.agentId ? (agentIcons[session.agentId] || 'solar:chat-round-dots-linear') : 'solar:chat-round-dots-linear'} 
-                          className="h-3.5 w-3.5 text-muted-foreground/60 flex-shrink-0" 
+                          className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground/60 flex-shrink-0" 
                         />
                         
                         <div className="flex-1 min-w-0">
                           <p className={cn(
-                            "text-xs leading-tight truncate",
+                            "text-[10px] sm:text-xs leading-tight truncate",
                             isActive ? "font-medium text-foreground" : "text-muted-foreground"
                           )}>
                             {displayTitle}
                           </p>
                         </div>
 
-                        <span className="text-[9px] text-muted-foreground/50 flex-shrink-0">
+                        <span className="text-[8px] sm:text-[9px] text-muted-foreground/50 flex-shrink-0 hidden sm:inline">
                           {formatTimestamp(session.updatedAt)}
                         </span>
 
@@ -237,26 +241,26 @@ export default function ConversationHistorySidebar({
       </div>
 
       {/* Footer */}
-      <div className="flex-shrink-0 p-3 border-t border-stone-200 dark:border-stone-800">
-        <p className="text-[9px] text-muted-foreground/60 text-center">
-          {sessions.length} conversation{sessions.length !== 1 ? 's' : ''}
+      <div className="flex-shrink-0 p-2 sm:p-3 border-t border-stone-200 dark:border-stone-800">
+        <p className="text-[8px] sm:text-[9px] text-muted-foreground/60 text-center">
+          {sessions.length} chat{sessions.length !== 1 ? 's' : ''}
         </p>
       </div>
 
       {/* Delete Dialog */}
       <AlertDialog open={!!sessionToDelete} onOpenChange={() => setSessionToDelete(null)}>
-        <AlertDialogContent className="sm:max-w-sm">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-base">Delete conversation?</AlertDialogTitle>
-            <AlertDialogDescription className="text-sm">
+        <AlertDialogContent className="w-[calc(100%-2rem)] max-w-[360px] sm:max-w-sm p-4 sm:p-6 rounded-xl">
+          <AlertDialogHeader className="space-y-1 pb-2">
+            <AlertDialogTitle className="text-base sm:text-lg">Delete conversation?</AlertDialogTitle>
+            <AlertDialogDescription className="text-xs sm:text-sm">
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="h-8 text-xs">Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2">
+            <AlertDialogCancel className="w-full sm:w-auto h-9 text-xs sm:text-sm">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteSession}
-              className="h-8 text-xs bg-red-600 text-white hover:bg-red-700"
+              className="w-full sm:w-auto h-9 text-xs sm:text-sm bg-red-600 text-white hover:bg-red-700"
             >
               Delete
             </AlertDialogAction>

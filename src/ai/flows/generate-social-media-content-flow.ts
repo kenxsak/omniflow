@@ -87,104 +87,263 @@ When generating any copyright notice or footer, ALWAYS use the year ${getCurrent
 
     *   **Platform Specifics for 'textContent':**
         *   **If Platform is 'BlogPost':**
-            *   Act as an expert SEO content strategist, technical writer, and web designer. Your task is to generate a complete, SEO-optimized, beautifully designed, mobile-friendly HTML blog post that rivals the quality of top publications like Medium, Substack, or the Vercel blog.
+            *   **ROLE:** You are a world-class content strategist combining the expertise of Neil Patel (SEO), Ann Handley (content marketing), and the design sensibility of Medium's editorial team. Your mission is to create blog content that ranks on Google, engages readers, and drives conversions.
+            
             *   **Analyze the User's Prompt:** Use '{{{topic}}}' as the core subject for the blog post.
             *   **Create or Edit:**
                 *   If '{{{salesPageContent}}}' is provided, treat it as the base HTML. The '{{{topic}}}' is an **editing instruction**. Modify the existing HTML based on this prompt.
                 *   If '{{{salesPageContent}}}' is NOT provided, generate a new blog post from scratch.
+            
             *   **Generate a COMPLETE, single-file HTML document.** The output MUST be valid HTML, including \`<!DOCTYPE html>\`, \`<html lang="en">\`, \`<head>\`, and \`<body>\` tags.
+            
+            *   **=== HEAD SECTION (Critical for SEO) ===**
             *   **In the \`<head>\` section, you MUST include:**
-                *   An SEO-optimized \`<title>\` tag based on the '{{{topic}}}'.
-                *   A compelling \`<meta name="description" content="...">\` that summarizes the article (150-160 characters).
-                *   \`<meta name="viewport" content="width=device-width, initial-scale=1">\` for mobile responsiveness.
-                *   **Open Graph meta tags** for social sharing (\`og:title\`, \`og:description\`, \`og:image\`, \`og:type="article"\`).
-                *   **Twitter Card meta tags** (\`twitter:card="summary_large_image"\`, \`twitter:title\`, \`twitter:description\`).
+                *   **Title Tag (Most Important):**
+                    *   Format: "Primary Keyword - Secondary Keyword | Brand Name" or "How to [Action] [Result] in [Timeframe]"
+                    *   Keep under 60 characters
+                    *   Front-load the main keyword
+                    *   Make it compelling and click-worthy
+                *   **Meta Description:**
+                    *   150-160 characters exactly
+                    *   Include primary keyword naturally
+                    *   Include a call-to-action or value proposition
+                    *   Make it enticing to click
+                *   **Essential Meta Tags:**
+                    *   \`<meta name="viewport" content="width=device-width, initial-scale=1">\`
+                    *   \`<meta name="robots" content="index, follow">\`
+                    *   \`<meta name="author" content="[Author Name]">\`
+                    *   \`<link rel="canonical" href="[URL]">\` (placeholder)
+                *   **Open Graph Tags (for Social Sharing):**
+                    *   \`og:title\` - Same as title or slightly modified for social
+                    *   \`og:description\` - Compelling social description
+                    *   \`og:image\` - Use placeholder: https://placehold.co/1200x630.png
+                    *   \`og:type="article"\`
+                    *   \`og:url\` - Placeholder URL
+                    *   \`article:published_time\` - Current date in ISO format
+                    *   \`article:author\` - Author name
+                *   **Twitter Card Tags:**
+                    *   \`twitter:card="summary_large_image"\`
+                    *   \`twitter:title\`, \`twitter:description\`, \`twitter:image\`
+                *   **Schema.org Structured Data (JSON-LD):**
+                    *   Include Article schema with: headline, description, image, author, datePublished, publisher
+                    *   This is CRITICAL for rich snippets in Google
+                
+                *   **=== CSS STYLING (Professional Design) ===**
                 *   A complete \`<style>\` tag with embedded CSS featuring:
-                    *   **Modern, clean, reader-focused design** inspired by Medium/Substack
-                    *   **Both light and dark modes** using \`@media (prefers-color-scheme: dark)\` query
-                    *   Professional font stack: 'Inter, Georgia, "Times New Roman", serif' for body text (serif for readability), 'Inter, system-ui, sans-serif' for headings
-                    *   **Optimal reading width**: max-width of 680-720px for article content, centered
-                    *   **Generous typography**: line-height of 1.7-1.8, font-size of 18-20px for body text
-                    *   **Proper vertical rhythm**: consistent spacing between elements using multiples of a base unit
-                    *   **Smooth transitions** for hover states and dark mode toggle
-                    *   **Code block styling** with syntax highlighting colors, monospace font, and horizontal scroll
-                    *   **Blockquote styling** with left border accent and italic text
-                    *   **Image styling** with rounded corners, subtle shadow, and full-width on mobile
-                    *   CSS custom properties (variables) for colors and easy theming
+                    *   **CSS Variables for Easy Theming:**
+                        \`\`\`
+                        :root {
+                          --text-primary: #1a1a1a;
+                          --text-secondary: #4a4a4a;
+                          --bg-primary: #ffffff;
+                          --bg-secondary: #f8f9fa;
+                          --bg-accent: #e8f4f8;
+                          --accent-color: #0066cc;
+                          --border-color: #e5e5e5;
+                        }
+                        @media (prefers-color-scheme: dark) {
+                          :root {
+                            --text-primary: #f5f5f5;
+                            --text-secondary: #b0b0b0;
+                            --bg-primary: #1a1a1a;
+                            --bg-secondary: #2d2d2d;
+                            --bg-accent: #1e3a4a;
+                            --border-color: #404040;
+                          }
+                        }
+                        \`\`\`
+                    *   **CRITICAL COLOR RULES:**
+                        *   Body text: var(--text-primary) - ALWAYS dark on light, light on dark
+                        *   Secondary text: var(--text-secondary) - Never lighter than #666 on white
+                        *   All boxes, cards, callouts MUST use these variables
+                        *   NEVER hardcode gray colors like #888, #999, #aaa for text
+                    *   **Typography (Reader-Focused):**
+                        *   Font: 'Georgia, "Times New Roman", serif' for body (proven readability)
+                        *   Font: 'Inter, -apple-system, sans-serif' for headings
+                        *   Body font-size: 19px (optimal for reading)
+                        *   Line-height: 1.75 (generous spacing)
+                        *   Paragraph margin: 1.5em 0
+                    *   **Layout:**
+                        *   Article max-width: 700px (optimal reading width)
+                        *   Centered with auto margins
+                        *   Generous padding: 1rem on mobile, 2rem on tablet, 4rem on desktop
+                        *   **CRITICAL: All elements must use \`position: static\` or \`position: relative\` by default**
+                        *   **NEVER use \`position: fixed\` or \`position: absolute\` for content elements on mobile**
+                        *   Use media queries to add sticky/fixed positioning ONLY on larger screens
+                    *   **Visual Elements:**
+                        *   Blockquotes: Left border 4px solid accent, italic, padding-left 1.5rem
+                        *   Code blocks: Background var(--bg-secondary), border-radius 8px, overflow-x auto
+                        *   Images: border-radius 12px, box-shadow subtle
+                        *   Links: accent color, underline on hover
+                    *   **Special Sections Styling:**
+                        *   Key Takeaways box: background var(--bg-accent), border-left 4px solid accent, padding 1.5rem, color var(--text-primary)
+                        *   CTA box: background gradient or solid accent, color white or var(--text-primary) based on contrast
+                        *   Callout boxes: distinct background, icon, clear text color
+                    *   **MOBILE-FIRST CSS RULES (CRITICAL):**
+                        *   Start with mobile styles as default (no media query)
+                        *   Use \`@media (min-width: 768px)\` for tablet styles
+                        *   Use \`@media (min-width: 1024px)\` for desktop styles
+                        *   All floating/fixed elements must be \`position: static\` on mobile
+                        *   No horizontal overflow - use \`overflow-x: hidden\` on body
+                        *   Images: \`max-width: 100%; height: auto;\`
+                        *   Font sizes: Start smaller, scale up with media queries
+            
+            *   **=== BODY CONTENT STRUCTURE (SEO-Optimized) ===**
             *   **In the \`<body>\` section, generate a well-structured article with ALL of the following elements:**
-                *   **1. Minimal Header/Navigation Bar:**
-                    *   Logo placeholder on the left
-                    *   Optional: "Subscribe" or CTA button on the right
-                    *   Clean, minimal design that doesn't distract from content
-                *   **2. Article Header Section:**
-                    *   **Category/Tag badge** above the title (e.g., "Technology", "Marketing", "Tutorial")
-                    *   A powerful, attention-grabbing \`<h1>\` headline (60 characters or less ideal)
-                    *   **Subtitle/Deck**: A 1-2 sentence summary expanding on the headline
-                    *   **Author byline** with placeholder avatar, author name, and publication date
-                    *   **Estimated reading time** (calculate based on ~200 words per minute)
-                    *   Optional: Social share buttons (placeholder icons for Twitter, LinkedIn, Copy Link)
+            
+                *   **1. Minimal Header:**
+                    *   Logo placeholder (left)
+                    *   Simple navigation or "Subscribe" button (right)
+                    *   Sticky on scroll (optional)
+                
+                *   **2. Article Header (Above the Fold - Critical):**
+                    *   **Category badge** - Clickable tag (e.g., "Marketing", "Technology")
+                    *   **H1 Headline** - The most important SEO element:
+                        *   Include primary keyword near the beginning
+                        *   Use power words (Ultimate, Complete, Proven, Essential)
+                        *   Create curiosity or promise value
+                        *   Keep under 60 characters for SERP display
+                    *   **Subtitle/Deck** - 1-2 sentences expanding on headline, include secondary keyword
+                    *   **Author byline** with:
+                        *   Circular avatar placeholder
+                        *   Author name (linked)
+                        *   Publication date (use format: "January 2, 2026")
+                        *   Reading time (calculate: word count / 200)
+                    *   **Social share buttons** - Twitter, LinkedIn, Facebook, Copy Link
+                
                 *   **3. Hero Image:**
-                    *   Full-width hero image with \`<figure>\` and \`<figcaption>\` for image credit
-                    *   Use placeholder: \`<img src="https://placehold.co/1200x630.png" alt="[descriptive alt text]">\`
-                    *   Rounded corners and subtle shadow
-                *   **4. Article Body Content:**
-                    *   **Engaging introduction** (2-3 paragraphs) that hooks the reader and previews what they'll learn
-                    *   **Table of Contents** (for longer articles): A clickable list of H2 sections with anchor links
-                    *   **Multiple sections** with descriptive \`<h2>\` subheadings (use keywords naturally)
-                    *   **Sub-sections** with \`<h3>\` headings where appropriate
-                    *   **Well-structured paragraphs**: 3-4 sentences each, focused on one idea
-                    *   **Emphasis**: Use \`<strong>\` for key terms, \`<em>\` for emphasis
-                    *   **Lists**: Bulleted (\`<ul>\`) and numbered (\`<ol>\`) lists for scannable content
-                    *   **Blockquotes**: For important quotes or callouts, styled distinctively
-                    *   **Code blocks**: If technical content, use \`<pre><code>\` with proper styling
-                    *   **Inline images**: Additional images within content using \`<figure>\` with captions
-                    *   **Callout boxes**: Highlighted tip/note/warning boxes for important information
-                    *   **Internal links**: 2-3 hyperlinks back to '{{{websiteUrl}}}' woven naturally into content
-                *   **5. Key Takeaways Section:**
-                    *   A visually distinct box summarizing 3-5 main points
-                    *   Use checkmark icons or numbered list
-                    *   Helps readers who skim
-                *   **6. Conclusion:**
-                    *   Summarize the main points
-                    *   Provide actionable next steps
-                    *   End with a thought-provoking question or call-to-action
-                *   **7. Call-to-Action Section:**
-                    *   If '{{{callToAction}}}' is provided, create a visually distinct CTA box
-                    *   Newsletter signup prompt or related content suggestion
-                    *   Styled as a card with background color differentiation
-                *   **8. Author Bio Box:**
-                    *   Placeholder avatar (circular)
-                    *   Author name and short bio (2-3 sentences)
-                    *   Social links placeholders (Twitter, LinkedIn)
-                *   **9. Related Articles Section (Optional):**
-                    *   3 placeholder cards for "You might also like" articles
-                    *   Each with thumbnail, title, and brief excerpt
-                *   **10. Comments Section Placeholder:**
-                    *   A simple "Leave a comment" section or "Join the discussion" prompt
-                *   **11. Footer:**
-                    *   Simple, minimal footer
-                    *   Copyright: © ${getCurrentYear()} [Publication/Company Name]
-                    *   Optional: Links to Privacy Policy, Terms, Contact
-            *   **Design Guidelines for Blog:**
-                *   **Focus on readability**: Large text, ample whitespace, high contrast
-                *   **Minimal distractions**: No sidebars, clean layout
-                *   **Progressive disclosure**: Most important content first
-                *   **Mobile-first**: Content should be perfectly readable on phones
-                *   **Accessibility**: Proper heading hierarchy, alt text for images, sufficient color contrast
-                *   **Print-friendly**: Content should look good if printed (optional print styles)
-            *   **SEO Best Practices:**
-                *   If '{{{keywords}}}' are provided, integrate them naturally in:
-                    *   Title tag and H1
-                    *   First paragraph
-                    *   At least one H2 subheading
-                    *   Image alt text
-                    *   Meta description
-                *   Use semantic HTML5 elements (\`<article>\`, \`<section>\`, \`<header>\`, \`<footer>\`, \`<figure>\`)
-                *   Proper heading hierarchy (H1 → H2 → H3, never skip levels)
-            *   **Optional JavaScript:**
-                *   Smooth scroll for table of contents links
+                    *   \`<figure>\` with \`<img>\` and \`<figcaption>\`
+                    *   Use: \`<img src="https://placehold.co/1200x630.png" alt="[Descriptive alt text with keyword]" loading="lazy">\`
+                    *   Alt text MUST be descriptive and include keyword naturally
+                    *   Caption for image credit
+                
+                *   **4. Table of Contents (For articles 1000+ words):**
+                    *   **MOBILE-FIRST APPROACH - CRITICAL:**
+                        *   On mobile (default): Display as a collapsible/accordion box INLINE with content flow
+                        *   Use \`position: static\` (NOT fixed or absolute) on mobile
+                        *   Style as a bordered card that can be expanded/collapsed
+                        *   Place it AFTER the hero image, BEFORE the introduction
+                    *   **On desktop (min-width: 1024px):**
+                        *   Can optionally become a sticky sidebar using \`position: sticky; top: 100px;\`
+                        *   But ONLY if there's enough viewport width
+                    *   **CSS Requirements:**
+                        \`\`\`css
+                        .toc {
+                          position: static; /* Mobile default - flows with content */
+                          background: var(--bg-secondary);
+                          border-radius: 12px;
+                          padding: 1rem;
+                          margin: 1.5rem 0;
+                        }
+                        @media (min-width: 1024px) {
+                          .toc {
+                            /* Only sticky on large screens with sidebar layout */
+                            /* position: sticky; top: 100px; */
+                          }
+                        }
+                        \`\`\`
+                    *   Links to all H2 sections with anchor IDs
+                    *   Include a "Table of Contents" heading with toggle icon on mobile
+                    *   Helps both users and Google understand structure
+                
+                *   **5. Introduction (First 100 words are CRITICAL for SEO):**
+                    *   **Hook** - Start with a compelling statistic, question, or bold statement
+                    *   **Problem** - Identify the reader's pain point
+                    *   **Promise** - What they'll learn/gain from reading
+                    *   **Include primary keyword** in first paragraph naturally
+                    *   Keep paragraphs short (2-3 sentences max)
+                
+                *   **6. Main Content Sections:**
+                    *   **H2 Subheadings** - Each should:
+                        *   Include relevant keywords naturally
+                        *   Be descriptive and scannable
+                        *   Follow logical progression
+                        *   Use numbers when appropriate ("5 Ways to...", "Step 1:")
+                    *   **H3 Sub-sections** where needed for depth
+                    *   **Content Best Practices:**
+                        *   Short paragraphs (3-4 sentences max)
+                        *   Bullet points and numbered lists for scanability
+                        *   Bold key terms and important phrases
+                        *   Include relevant statistics with sources
+                        *   Add internal links to '{{{websiteUrl}}}' (2-3 naturally placed)
+                        *   Use transition words between sections
+                    *   **Visual Breaks:**
+                        *   Relevant images every 300-400 words
+                        *   Blockquotes for expert quotes or key insights
+                        *   Callout boxes for tips, warnings, or pro tips
+                        *   Code blocks if technical content
+                
+                *   **7. Key Takeaways Box (CRITICAL - Must be visible and readable):**
+                    *   Styled as a distinct card/box with:
+                        *   Background: var(--bg-accent) or light blue/green tint
+                        *   Border-left: 4px solid accent color
+                        *   Padding: 1.5rem
+                        *   **Text color: var(--text-primary) - MUST be dark (#1a1a1a) on light backgrounds**
+                    *   Title: "Key Takeaways" or "TL;DR" with icon
+                    *   3-5 bullet points summarizing main insights
+                    *   Use checkmark icons (✓) for visual appeal
+                
+                *   **8. Conclusion:**
+                    *   Summarize key points briefly
+                    *   Reinforce the main benefit/value
+                    *   Include a clear call-to-action
+                    *   End with a question to encourage comments
+                
+                *   **9. Call-to-Action Section (Lead Generation):**
+                    *   Visually distinct box with:
+                        *   Contrasting background (gradient or solid color)
+                        *   **Text MUST have high contrast - white on dark, or dark on light**
+                        *   Clear headline: "Ready to [Benefit]?" or "Get Started Today"
+                        *   Brief value proposition
+                        *   CTA button (prominent, action-oriented text)
+                        *   Optional: Email signup form placeholder
+                
+                *   **10. Author Bio Box:**
+                    *   Circular avatar placeholder
+                    *   Author name and credentials
+                    *   2-3 sentence bio establishing expertise
+                    *   Social links (Twitter, LinkedIn)
+                    *   Builds E-E-A-T (Experience, Expertise, Authoritativeness, Trust)
+                
+                *   **11. Related Articles (Internal Linking):**
+                    *   3 cards with thumbnail, title, excerpt
+                    *   Improves time on site and internal link structure
+                
+                *   **12. Comments Section:**
+                    *   "Join the Discussion" prompt
+                    *   Placeholder for comment form
+                    *   Encourages engagement signals
+                
+                *   **13. Footer:**
+                    *   Copyright: © ${getCurrentYear()} [Company Name]
+                    *   Links: Privacy Policy, Terms, Contact
+                    *   Social media icons
+            
+            *   **=== SEO CHECKLIST (Must Follow) ===**
+                *   ✓ Primary keyword in: Title, H1, first paragraph, one H2, meta description, image alt
+                *   ✓ Secondary keywords sprinkled naturally throughout
+                *   ✓ Proper heading hierarchy: H1 → H2 → H3 (never skip)
+                *   ✓ Semantic HTML5: \`<article>\`, \`<section>\`, \`<header>\`, \`<footer>\`, \`<figure>\`, \`<figcaption>\`
+                *   ✓ Internal links to '{{{websiteUrl}}}' (2-3 minimum)
+                *   ✓ External links to authoritative sources (1-2, open in new tab)
+                *   ✓ Image alt text descriptive and keyword-rich
+                *   ✓ Schema.org Article structured data
+                *   ✓ Mobile-responsive design
+                *   ✓ Fast-loading (no heavy scripts)
+            
+            *   **=== CONTENT QUALITY STANDARDS ===**
+                *   Write at 8th-grade reading level for accessibility
+                *   Use active voice predominantly
+                *   Include specific examples and actionable advice
+                *   Back claims with data when possible
+                *   Make content comprehensive (aim for 1500+ words for competitive topics)
+                *   Ensure originality - no generic filler content
+            
+            *   **Optional JavaScript (Minimal):**
+                *   Smooth scroll for TOC links
                 *   Copy-to-clipboard for code blocks
-                *   Reading progress bar at top of page
+                *   Reading progress bar
+            
             *   The 'textContent' field in the output must contain this full HTML string.
 
         *   **If Platform is 'SalesLandingPage':**

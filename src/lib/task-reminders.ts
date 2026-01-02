@@ -2,7 +2,6 @@
 
 import 'server-only';
 import { adminDb } from '@/lib/firebase-admin';
-import * as admin from 'firebase-admin';
 import { format, isToday, isTomorrow, isPast } from 'date-fns';
 import { decryptApiKeyServerSide, isEncrypted } from '@/lib/encryption-server';
 import { sendTransactionalEmail } from '@/services/brevo';
@@ -353,11 +352,10 @@ export async function processTaskRemindersForCompany(companyId: string): Promise
   }
 
   try {
-    // Get all tasks for the company
+    // Get all tasks for the company from root tasks collection
     const tasksSnapshot = await adminDb
-      .collection('companies')
-      .doc(companyId)
       .collection('tasks')
+      .where('companyId', '==', companyId)
       .where('status', 'in', ['To Do', 'In Progress'])
       .get();
 
@@ -373,12 +371,9 @@ export async function processTaskRemindersForCompany(companyId: string): Promise
 
     // Get all users for the company
     const usersSnapshot = await adminDb
-      .collection('companies')
-      .doc(companyId)
       .collection('users')
+      .where('companyId', '==', companyId)
       .get();
-
-    const now = new Date();
 
     // For each user, create a task summary
     for (const userDoc of usersSnapshot.docs) {
@@ -509,11 +504,10 @@ export async function sendManagerTaskSummary(companyId: string): Promise<TaskRem
   }
 
   try {
-    // Get company managers (users with admin or manager role)
+    // Get company managers (users with admin or manager role) from root users collection
     const usersSnapshot = await adminDb
-      .collection('companies')
-      .doc(companyId)
       .collection('users')
+      .where('companyId', '==', companyId)
       .where('role', 'in', ['admin', 'manager', 'owner'])
       .get();
 
@@ -521,11 +515,10 @@ export async function sendManagerTaskSummary(companyId: string): Promise<TaskRem
       return { success: true }; // No managers to notify
     }
 
-    // Get all pending tasks
+    // Get all pending tasks from root tasks collection
     const tasksSnapshot = await adminDb
-      .collection('companies')
-      .doc(companyId)
       .collection('tasks')
+      .where('companyId', '==', companyId)
       .where('status', 'in', ['To Do', 'In Progress'])
       .get();
 

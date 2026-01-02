@@ -1,28 +1,62 @@
+/**
+ * ImgBB Image Upload Utility
+ * Free image hosting with CDN - no server load
+ * Uses platform's ImgBB API key (NEXT_PUBLIC_IMGBB_API_KEY)
+ */
 
-'use server';
+export interface ImgBBResponse {
+  success: boolean;
+  data?: {
+    id: string;
+    url: string;
+    display_url: string;
+    delete_url: string;
+    thumb?: {
+      url: string;
+    };
+    medium?: {
+      url: string;
+    };
+  };
+  error?: {
+    message: string;
+    code: number;
+  };
+}
 
-export async function uploadImageToImgBB(base64Data: string): Promise<string> {
-  const apiKey = process.env.IMGBB_API_KEY;
+/**
+ * Upload image to ImgBB
+ * @param file - File object or base64 string
+ * @param name - Optional name for the image
+ * @returns ImgBB response with URLs
+ */
+export async function uploadToImgBB(
+  file: File | string,
+  name?: string
+): Promise<{ success: boolean; url?: string; deleteUrl?: string; error?: string }> {
+  const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
   
   if (!apiKey) {
-    throw new Error('IMGBB_API_KEY environment variable is not set');
-  }
-
-  if (!base64Data || !base64Data.startsWith('data:image')) {
-    throw new Error('Invalid base64 data URI provided');
+    console.error('ImgBB API key not found in NEXT_PUBLIC_IMGBB_API_KEY');
+    return { success: false, error: 'Image upload not configured. Please contact support.' };
   }
 
   try {
-    const base64Match = base64Data.match(/^data:image\/[a-zA-Z]+;base64,(.+)$/);
-    if (!base64Match || !base64Match[1]) {
-      throw new Error('Failed to extract base64 data from data URI');
-    }
-
-    const base64WithoutPrefix = base64Match[1];
-
-    const formData = new URLSearchParams();
+    const formData = new FormData();
     formData.append('key', apiKey);
-    formData.append('image', base64WithoutPrefix);
+    
+    if (typeof file === 'string') {
+      // Base64 string
+      formData.append('image', file);
+    } else {
+      // File object - convert to base64
+      const base64 = await fileToBase64(file);
+      formData.append('image', base64);
+    }
+    
+    if (name) {
+      formData.append('name', name);
+    }
 
     const response = await fetch('https://api.imgbb.com/1/upload', {
       method: 'POST',
@@ -30,22 +64,69 @@ export async function uploadImageToImgBB(base64Data: string): Promise<string> {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`ImgBB API error: ${response.status} - ${errorText}`);
+      console.error('ImgBB response not ok:', response.status, response.statusText);
+      return { success: false, error: `Upload failed: ${response.statusText}` };
     }
 
-    const result = await response.json();
+    const result: ImgBBResponse = await response.json();
 
-    if (!result.data || !result.data.url) {
-      throw new Error('Invalid response from ImgBB API: missing URL');
+    if (result.success && result.data) {
+      return {
+        success: true,
+        url: result.data.display_url,
+        deleteUrl: result.data.delete_url,
+      };
+    } else {
+      console.error('ImgBB upload failed:', result.error);
+      return {
+        success: false,
+        error: result.error?.message || 'Upload failed',
+      };
     }
-
-    return result.data.url;
   } catch (error) {
-    console.error('Error uploading image to ImgBB:', error);
-    if (error instanceof Error) {
-      throw new Error(`Failed to upload image to ImgBB: ${error.message}`);
-    }
-    throw new Error('Failed to upload image to ImgBB: Unknown error');
+    console.error('ImgBB upload error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Upload failed. Please try again.',
+    };
   }
 }
+
+/**
+ * Convert File to base64 string (without data URL prefix)
+ */
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Remove data URL prefix (e.g., "data:image/png;base64,")
+      const base64 = result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = (error) => reject(error);
+  });
+}
+
+/**
+ * Validate image file before upload
+ */
+export function validateImageFile(file: File): { valid: boolean; error?: string } {
+  // Check file type
+  const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+  if (!validTypes.includes(file.type)) {
+    return { valid: false, error: 'Please select a valid image (JPG, PNG, GIF, or WebP)' };
+  }
+
+  // Check file size (max 2MB for logos)
+  const maxSize = 2 * 1024 * 1024; // 2MB
+  if (file.size > maxSize) {
+    return { valid: false, error: 'Image must be less than 2MB' };
+  }
+
+  return { valid: true };
+}
+
+// Alias for backward compatibility
+export const uploadImageToImgBB = uploadToImgBB;

@@ -1486,7 +1486,7 @@ export default function CreateEmailCampaignPage() {
       </CardFooter>
 
       <Dialog open={isTemplateBrowserOpen} onOpenChange={setIsTemplateBrowserOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-6xl max-h-[90vh] overflow-y-auto rounded-xl">
           <DialogHeader>
             <DialogTitle>Email Templates</DialogTitle>
             <DialogDescription>

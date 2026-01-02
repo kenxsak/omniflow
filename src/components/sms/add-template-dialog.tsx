@@ -185,7 +185,7 @@ export function AddTemplateDialog({ idToken, onTemplateAdded, trigger }: AddTemp
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-xl">
         <DialogHeader>
           <DialogTitle>Add MSG91 Template</DialogTitle>
           <DialogDescription>

@@ -135,7 +135,7 @@ export default function TestEmailSendingPage() {
 
   if (!isAdmin && !isSuperAdmin) {
     return (
-      <div className="p-6">
+      <div className="p-3 sm:p-4 md:p-6">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Access Denied</AlertTitle>
@@ -146,7 +146,7 @@ export default function TestEmailSendingPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
       <PageTitle 
         title="Test Email Sending" 
         description="Send a test email using Brevo or Sender.net to verify your configuration" 
@@ -193,7 +193,7 @@ export default function TestEmailSendingPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <Label htmlFor="senderEmail">Sender Email *</Label>
                 <Input
@@ -202,6 +202,7 @@ export default function TestEmailSendingPage() {
                   value={senderEmail}
                   onChange={(e) => setSenderEmail(e.target.value)}
                   placeholder="noreply@yourdomain.com"
+                  className="h-9 sm:h-10"
                 />
               </div>
               <div>
@@ -211,11 +212,12 @@ export default function TestEmailSendingPage() {
                   value={senderName}
                   onChange={(e) => setSenderName(e.target.value)}
                   placeholder="Your Company"
+                  className="h-9 sm:h-10"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <Label htmlFor="recipientEmail">Recipient Email *</Label>
                 <Input
@@ -224,6 +226,7 @@ export default function TestEmailSendingPage() {
                   value={recipientEmail}
                   onChange={(e) => setRecipientEmail(e.target.value)}
                   placeholder="test@example.com"
+                  className="h-9 sm:h-10"
                 />
               </div>
               <div>
@@ -233,6 +236,7 @@ export default function TestEmailSendingPage() {
                   value={recipientName}
                   onChange={(e) => setRecipientName(e.target.value)}
                   placeholder="John Doe"
+                  className="h-9 sm:h-10"
                 />
               </div>
             </div>
@@ -244,6 +248,7 @@ export default function TestEmailSendingPage() {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Test Email Subject"
+                className="h-9 sm:h-10"
               />
             </div>
 

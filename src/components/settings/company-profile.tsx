@@ -281,9 +281,9 @@ export default function CompanyProfile() {
 
           <Separator />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <Label htmlFor="country" className="flex items-center gap-2">
+              <Label htmlFor="country" className="flex items-center gap-2 text-xs sm:text-sm">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 Country *
               </Label>
@@ -355,9 +355,9 @@ export default function CompanyProfile() {
 
           <Separator />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <Label htmlFor="registeredEmail" className="flex items-center gap-2">
+              <Label htmlFor="registeredEmail" className="flex items-center gap-2 text-xs sm:text-sm">
                 <Mail className="h-4 w-4 text-muted-foreground" />
                 Company Registered Email
               </Label>
@@ -393,9 +393,9 @@ export default function CompanyProfile() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <Label htmlFor="phone" className="flex items-center gap-2">
+              <Label htmlFor="phone" className="flex items-center gap-2 text-xs sm:text-sm">
                 <Phone className="h-4 w-4 text-muted-foreground" />
                 Phone Number
               </Label>
@@ -444,9 +444,9 @@ export default function CompanyProfile() {
         )}
 
         {company && (
-          <div className="border-t pt-4 mt-4">
-            <h4 className="text-sm font-medium text-muted-foreground mb-2">Account Information</h4>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="border-t pt-3 sm:pt-4 mt-3 sm:mt-4">
+            <h4 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">Account Information</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
               <div>
                 <span className="text-muted-foreground">Account ID:</span>
                 <p className="font-mono text-xs">{company.id}</p>

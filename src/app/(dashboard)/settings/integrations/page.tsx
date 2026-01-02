@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { useAuth } from '@/hooks/use-auth';
-import { useCompanyApiKeys } from '@/hooks/use-company-api-keys';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +10,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
   DialogFooter
@@ -23,8 +21,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { GeminiIcon, BrevoIcon, TwilioIcon, WhatsAppIcon, ZohoIcon, CalComIcon, Fast2SMSIcon } from '@/components/icons/brand-icons';
-import Image from 'next/image';
+import { GeminiIcon, BrevoIcon, TwilioIcon, WhatsAppIcon, VapiIcon, BlandIcon, PlivoIcon, ExotelIcon } from '@/components/icons/brand-icons';
 import { saveApiKeysAction } from '@/app/actions/api-keys-actions';
 
 // --- Types ---
@@ -42,7 +39,7 @@ interface IntegrationDef {
   name: string;
   description: string;
   icon: React.ReactNode | string;
-  category: 'AI' | 'Voice & Chatbot' | 'Communication' | 'Email' | 'SMS' | 'WhatsApp' | 'CRM' | 'Social Media' | 'Other';
+  category: 'AI' | 'AI Chatbot' | 'AI Calling' | 'Telephony' | 'Email' | 'SMS' | 'WhatsApp' | 'CRM' | 'Social Media' | 'Other';
   docLink: string;
   fields: IntegrationField[];
 }
@@ -95,12 +92,12 @@ const INTEGRATIONS: IntegrationDef[] = [
     ]
   },
 
-  // Voice & Chatbot
+  // AI Chatbot (Website Widget)
   {
     id: 'voiceChat',
     name: 'Voice Chat AI Widget',
     description: 'AI-powered voice chatbot for digital cards and websites',
-    category: 'Voice & Chatbot',
+    category: 'AI Chatbot',
     icon: 'solar:microphone-3-linear',
     docLink: 'https://app.voicechatai.wmart.in/dashboard?tab=embed',
     fields: [
@@ -330,6 +327,61 @@ const INTEGRATIONS: IntegrationDef[] = [
       { key: 'appId', label: 'App ID', placeholder: '123456789012345', type: 'text', help: 'Find in Facebook Developer Console > Your App > Settings > Basic' },
       { key: 'appSecret', label: 'App Secret', placeholder: '...', type: 'password', help: 'Find in Facebook Developer Console > Your App > Settings > Basic' },
       { key: 'pageAccessToken', label: 'Page Access Token', placeholder: 'EAABsbCS1iHgBO...', type: 'password', help: 'Generate via Graph API Explorer with pages_read_engagement, leads_retrieval permissions' }
+    ]
+  },
+
+  // Telephony - Voice Calling (Regular phone calls)
+  {
+    id: 'plivo',
+    name: 'Plivo',
+    description: 'Voice calling with WebRTC - International + India (Free $0.50 credit)',
+    category: 'Telephony',
+    icon: <PlivoIcon />,
+    docLink: 'https://console.plivo.com/dashboard/',
+    fields: [
+      { key: 'authId', label: 'Auth ID', placeholder: 'Your Plivo Auth ID', type: 'text', help: 'Step 1: Go to console.plivo.com and sign in. Step 2: On the Dashboard, find "Auth ID" at the top. Step 3: Copy and paste it here.' },
+      { key: 'authToken', label: 'Auth Token', placeholder: 'Your Plivo Auth Token', type: 'password', help: 'On the same Dashboard page, find "Auth Token" next to Auth ID. Click to reveal and copy it.' },
+      { key: 'phoneNumber', label: 'Phone Number', placeholder: '+1234567890', type: 'text', help: 'Your Plivo phone number for making calls. Buy one from Phone Numbers section if you don\'t have one.' }
+    ]
+  },
+  {
+    id: 'exotel',
+    name: 'Exotel',
+    description: 'India voice calling with native TRAI compliance (15-day free trial)',
+    category: 'Telephony',
+    icon: <ExotelIcon />,
+    docLink: 'https://my.exotel.com/apisettings/site#api-credentials',
+    fields: [
+      { key: 'sid', label: 'Account SID', placeholder: 'Your Exotel SID', type: 'text', help: 'Step 1: Go to my.exotel.com > API Settings. Step 2: Find your Account SID and copy it here.' },
+      { key: 'apiKey', label: 'API Key', placeholder: 'Your API Key', type: 'password', help: 'On the same API Settings page, copy your API Key.' },
+      { key: 'apiToken', label: 'API Token', placeholder: 'Your API Token', type: 'password', help: 'On the same API Settings page, copy your API Token.' },
+      { key: 'subdomain', label: 'Subdomain', placeholder: 'api4', type: 'text', help: 'Usually "api4" for new accounts. Check your Exotel dashboard URL.' },
+      { key: 'callerId', label: 'Caller ID', placeholder: 'Your registered number', type: 'text', help: 'Your TRAI registered phone number. Find it in Exotel > Phone Numbers section.' }
+    ]
+  },
+
+  // AI Calling - Automated AI phone calls
+  {
+    id: 'vapi',
+    name: 'Vapi.ai',
+    description: 'AI Voice Agents - Automated sales & support phone calls (Free $10 credit)',
+    category: 'AI Calling',
+    icon: <VapiIcon />,
+    docLink: 'https://dashboard.vapi.ai/org/api-keys',
+    fields: [
+      { key: 'apiKey', label: 'Private API Key', placeholder: 'Your Vapi Private Key', type: 'password', help: 'Step 1: Go to dashboard.vapi.ai/org/api-keys. Step 2: Under "Private API Keys", click the eye icon to reveal your key. Step 3: Click copy and paste it here.' },
+      { key: 'assistantId', label: 'Assistant ID (Optional)', placeholder: 'asst_...', type: 'text', help: 'If you created an AI assistant in Vapi, paste its ID here. Find it in Vapi Dashboard > Assistants > Click your assistant > Copy the ID.' }
+    ]
+  },
+  {
+    id: 'bland',
+    name: 'Bland.ai',
+    description: 'AI phone calls at scale - Bulk automated outreach (Free 1000 mins)',
+    category: 'AI Calling',
+    icon: <BlandIcon />,
+    docLink: 'https://app.bland.ai/dashboard?page=api-keys',
+    fields: [
+      { key: 'apiKey', label: 'API Key', placeholder: 'org_d0244fff6a...', type: 'password', help: 'Step 1: Go to app.bland.ai and sign in. Step 2: Click "Organization" in the left sidebar. Step 3: Click "API Keys". Step 4: Copy your key (starts with org_) and paste it here.' }
     ]
   }
   // Note: Social Media publishing uses Copy & Paste approach (Settings > Connections > Social Media)
@@ -615,7 +667,7 @@ export default function IntegrationsPage() {
 
   // Group by category
   // Order categories logically
-  const ORDERED_CATEGORIES = ['AI', 'Voice & Chatbot', 'Communication', 'Email', 'SMS', 'WhatsApp', 'CRM', 'Other'];
+  const ORDERED_CATEGORIES = ['AI', 'AI Chatbot', 'AI Calling', 'Telephony', 'Email', 'SMS', 'WhatsApp', 'CRM', 'Other'];
   const availableCategories = Array.from(new Set(INTEGRATIONS.map(i => i.category)));
   const sortedCategories = ORDERED_CATEGORIES.filter(c => availableCategories.includes(c as any));
 
@@ -784,9 +836,17 @@ export default function IntegrationsPage() {
                 selected: 'bg-violet-600 hover:bg-violet-700 text-white border-violet-600', 
                 unselected: 'border-violet-300 dark:border-violet-800 text-violet-700 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/50' 
               },
-              'Voice & Chatbot': { 
+              'AI Chatbot': { 
                 selected: 'bg-cyan-600 hover:bg-cyan-700 text-white border-cyan-600', 
                 unselected: 'border-cyan-300 dark:border-cyan-800 text-cyan-700 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/50' 
+              },
+              'AI Calling': { 
+                selected: 'bg-purple-600 hover:bg-purple-700 text-white border-purple-600', 
+                unselected: 'border-purple-300 dark:border-purple-800 text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/50' 
+              },
+              'Telephony': { 
+                selected: 'bg-indigo-600 hover:bg-indigo-700 text-white border-indigo-600', 
+                unselected: 'border-indigo-300 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50' 
               },
               'Email': { 
                 selected: 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600', 
@@ -870,8 +930,9 @@ export default function IntegrationsPage() {
         // Category color mapping
         const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
           'AI': { bg: 'bg-violet-100 dark:bg-violet-900/40', text: 'text-violet-600 dark:text-violet-400', border: 'border-violet-200 dark:border-violet-800' },
-          'Voice & Chatbot': { bg: 'bg-cyan-100 dark:bg-cyan-900/40', text: 'text-cyan-600 dark:text-cyan-400', border: 'border-cyan-200 dark:border-cyan-800' },
-          'Communication': { bg: 'bg-blue-100 dark:bg-blue-900/40', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-200 dark:border-blue-800' },
+          'AI Chatbot': { bg: 'bg-cyan-100 dark:bg-cyan-900/40', text: 'text-cyan-600 dark:text-cyan-400', border: 'border-cyan-200 dark:border-cyan-800' },
+          'AI Calling': { bg: 'bg-purple-100 dark:bg-purple-900/40', text: 'text-purple-600 dark:text-purple-400', border: 'border-purple-200 dark:border-purple-800' },
+          'Telephony': { bg: 'bg-indigo-100 dark:bg-indigo-900/40', text: 'text-indigo-600 dark:text-indigo-400', border: 'border-indigo-200 dark:border-indigo-800' },
           'Email': { bg: 'bg-blue-100 dark:bg-blue-900/40', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-200 dark:border-blue-800' },
           'SMS': { bg: 'bg-emerald-100 dark:bg-emerald-900/40', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-200 dark:border-emerald-800' },
           'WhatsApp': { bg: 'bg-green-100 dark:bg-green-900/40', text: 'text-green-600 dark:text-green-400', border: 'border-green-200 dark:border-green-800' },
@@ -881,11 +942,24 @@ export default function IntegrationsPage() {
         const colors = categoryColors[cat] || categoryColors['Other'];
         const categoryIntegrations = filteredIntegrations.filter(i => i.category === cat);
         
+        // Category icons mapping
+        const categoryIcons: Record<string, string> = {
+          'AI': 'solar:magic-stick-3-linear',
+          'AI Chatbot': 'solar:chat-square-like-linear',
+          'AI Calling': 'solar:phone-calling-linear',
+          'Telephony': 'solar:phone-linear',
+          'Email': 'solar:letter-linear',
+          'SMS': 'solar:chat-line-linear',
+          'WhatsApp': 'solar:chat-round-dots-linear',
+          'CRM': 'solar:users-group-rounded-linear',
+          'Other': 'solar:widget-4-linear',
+        };
+        
         return (
         <div key={cat} className="space-y-4">
           <div className="flex items-center gap-3 border-b border-stone-200 dark:border-stone-800 pb-3">
             <div className={cn('p-2 rounded-lg', colors.bg)}>
-              <Icon icon={cat === 'AI' ? 'solar:magic-stick-3-linear' : cat === 'Email' ? 'solar:letter-linear' : cat === 'SMS' ? 'solar:chat-line-linear' : cat === 'WhatsApp' ? 'solar:chat-round-dots-linear' : cat === 'CRM' ? 'solar:users-group-rounded-linear' : cat === 'Voice & Chatbot' ? 'solar:microphone-3-linear' : 'solar:widget-4-linear'} className={cn('h-4 w-4', colors.text)} />
+              <Icon icon={categoryIcons[cat] || 'solar:widget-4-linear'} className={cn('h-4 w-4', colors.text)} />
             </div>
             <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100 uppercase tracking-wider">{cat}</h3>
             <span className={cn('text-xs px-2 py-0.5 rounded-full', colors.bg, colors.text)}>

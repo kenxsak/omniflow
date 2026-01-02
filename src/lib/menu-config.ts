@@ -65,6 +65,15 @@ export const MENU_CONFIG: MenuItem[] = [
     featureId: 'feat_core_crm',
     subItems: [
       {
+        id: 'daily-planner',
+        href: '/daily-planner',
+        label: 'Daily Planner',
+        icon: 'solar:calendar-date-linear',
+        tooltip: 'Your daily sales focus',
+        badge: 'NEW',
+        badgeExpiry: '2026-02-15',
+      },
+      {
         id: 'contacts',
         href: '/crm',
         label: 'All Contacts',
@@ -165,15 +174,27 @@ export const MENU_CONFIG: MenuItem[] = [
         minPlan: 'pro',
         badge: 'PRO',
       },
+      {
+        id: 'ai-calling',
+        href: '/campaigns/ai-calling',
+        label: 'AI Calling',
+        icon: 'solar:phone-calling-rounded-linear',
+        tooltip: 'Bulk AI voice call campaigns',
+        featureId: 'feat_ai_calling',
+        showWhenLocked: true,
+        minPlan: 'pro',
+        badge: 'AI',
+      },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════
   // SECTION: AI Studio (AI Features - Grouped)
+  // Ordered by user workflow: Ask → Create → Save → Build → Promote → Monitor
   // ═══════════════════════════════════════════════════════════════
   {
     id: 'ai-studio',
-    href: '/social-media',
+    href: '/ai-chat',
     label: 'AI Studio',
     icon: 'solar:stars-linear',
     tooltip: 'AI-powered content creation',
@@ -181,11 +202,19 @@ export const MENU_CONFIG: MenuItem[] = [
     badge: 'AI',
     subItems: [
       {
+        id: 'ai-assistants',
+        href: '/ai-chat',
+        label: 'AI Assistants',
+        icon: 'solar:chat-round-dots-linear',
+        tooltip: 'Ask anything, create anything',
+        featureId: 'feat_ai_chat',
+      },
+      {
         id: 'content-creator',
         href: '/social-media',
         label: 'Content Creator',
         icon: 'solar:pen-new-square-linear',
-        tooltip: 'Generate content with AI',
+        tooltip: 'Generate social media content',
       },
       {
         id: 'content-hub',
@@ -201,7 +230,7 @@ export const MENU_CONFIG: MenuItem[] = [
         icon: 'solar:window-frame-linear',
         tooltip: 'Build pages with AI',
         badge: 'NEW',
-        badgeExpiry: '2026-02-01', // 30 days from now
+        badgeExpiry: '2026-02-01',
       },
       {
         id: 'ad-manager',
@@ -209,14 +238,15 @@ export const MENU_CONFIG: MenuItem[] = [
         label: 'Ad Manager',
         icon: 'solar:target-linear',
         tooltip: 'AI ad campaigns',
-        featureId: 'feat_ai_content_gen',
+        featureId: 'feat_ai_ads_manager',
         showWhenLocked: true,
         minPlan: 'pro',
+        badge: 'PRO',
       },
       {
         id: 'ai-usage',
         href: '/ai-usage',
-        label: 'AI Usage',
+        label: 'AI Credits',
         icon: 'solar:wallet-linear',
         tooltip: 'View AI usage & credits',
       },
@@ -316,14 +346,29 @@ export const SUPER_ADMIN_MENU: MenuItem[] = [
  * Use these names everywhere: menu, home page, pricing, modals
  */
 export const FEATURE_NAMES: Record<string, string> = {
+  'feat_core_crm': 'Customers & CRM',
+  'feat_ai_content_gen': 'AI Studio',
   'feat_digital_cards': 'Digital Card',
-  'feat_core_crm': 'Customers',
   'feat_email_marketing': 'Email Campaigns',
   'feat_sms_whatsapp': 'SMS & WhatsApp',
-  'feat_ai_content_gen': 'AI Studio',
+  'feat_social_media': 'Social Media',
+  'feat_ai_ads_manager': 'AI Ads Manager',
+  'feat_ai_chat': 'AI Assistants',
+  'feat_landing_pages': 'Landing Pages',
+  'feat_blog': 'Blog & Content',
   'feat_workflow_builder': 'Automations',
-  'feat_advanced_analytics': 'Analytics',
+  'feat_automations': 'Marketing Automations',
+  'feat_ai_calling': 'AI Calling',
+  'feat_telephony': 'Telephony',
+  'feat_ai_voice_widget': 'AI Voice Widget',
+  'feat_facebook_lead_ads': 'Facebook Lead Ads',
+  'feat_webhooks': 'Webhooks & Automation',
+  'feat_agency_mode': 'Agency Mode',
+  'feat_enterprise_team': 'Enterprise Team',
   'feat_team_management': 'Team Management',
+  'feat_advanced_analytics': 'Analytics',
+  'feat_white_label': 'White Label',
+  'feat_api_integrations': 'API & Integrations',
 };
 
 /**
@@ -390,6 +435,36 @@ export const FEATURE_BENEFITS: Record<string, string[]> = {
     'Two-way messaging',
     'Automated responses',
   ],
+  'feat_ai_calling': [
+    'AI-powered voice calls at scale',
+    'Automated sales & support calls',
+    'Real-time call transcription',
+    'Call analytics & sentiment tracking',
+  ],
+  'feat_telephony': [
+    'Click-to-call from CRM',
+    'Call tracking & recordings',
+    'Plivo & Exotel integration',
+    'Call logs & analytics',
+  ],
+  'feat_ai_voice_widget': [
+    'Embed AI voice chat on websites',
+    '24/7 automated customer support',
+    'Lead capture via voice',
+    'Works on digital cards too',
+  ],
+  'feat_facebook_lead_ads': [
+    'Auto-sync Facebook leads to CRM',
+    'Real-time webhook integration',
+    'Lead form mapping',
+    'Instant follow-up triggers',
+  ],
+  'feat_webhooks': [
+    'Connect with Zapier, Make, Pabbly',
+    '5000+ app integrations',
+    'Custom webhook endpoints',
+    'Automate any workflow',
+  ],
   'feat_workflow_builder': [
     'Visual drag-and-drop builder',
     'Trigger-based automations',
@@ -407,6 +482,66 @@ export const FEATURE_BENEFITS: Record<string, string[]> = {
     'Role-based access control',
     'Activity audit logs',
     'Team performance tracking',
+  ],
+  'feat_social_media': [
+    'Multi-platform scheduling',
+    'AI content generation',
+    'Content calendar view',
+    'Social media analytics',
+  ],
+  'feat_ai_ads_manager': [
+    'AI-powered ad creation',
+    'Multi-platform campaigns',
+    'Performance optimization',
+    'A/B testing suggestions',
+  ],
+  'feat_ai_chat': [
+    'Specialized AI agents',
+    'Content Writer, Ad Strategist & more',
+    'Unlimited conversations',
+    'Context-aware assistance',
+  ],
+  'feat_landing_pages': [
+    'AI-powered page builder',
+    'Professional templates',
+    'Lead capture forms',
+    'Analytics & tracking',
+  ],
+  'feat_blog': [
+    'AI-assisted writing',
+    'SEO optimization',
+    'Scheduling & publishing',
+    'Content analytics',
+  ],
+  'feat_automations': [
+    'Email sequences',
+    'Drip campaigns',
+    'Trigger-based actions',
+    'Automated follow-ups',
+  ],
+  'feat_enterprise_team': [
+    'Lead claiming system',
+    'Full audit trail',
+    'Auto lead distribution',
+    'Enterprise compliance',
+  ],
+  'feat_agency_mode': [
+    'Manage multiple client companies',
+    'Switch between accounts instantly',
+    'Centralized dashboard for all clients',
+    'Perfect for agencies & consultants',
+  ],
+  'feat_white_label': [
+    'Custom branding',
+    'Your logo & colors',
+    'Custom domain',
+    'Agency-ready platform',
+  ],
+  'feat_api_integrations': [
+    'REST API access',
+    'Webhook endpoints',
+    'Zapier integration',
+    'Third-party connections',
   ],
 };
 

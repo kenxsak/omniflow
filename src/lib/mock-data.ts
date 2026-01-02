@@ -29,6 +29,33 @@ export interface Lead {
     COMPANY_NAME?: string;
     ROLE?: string;
   };
+  // Lead Scoring (like Freshsales/LeadSquared)
+  leadScore?: number; // 0-100 score
+  scoreFactors?: {
+    hasEmail?: boolean;
+    hasPhone?: boolean;
+    hasCompany?: boolean;
+    emailOpened?: number;
+    emailClicked?: number;
+    websiteVisits?: number;
+    formSubmissions?: number;
+    meetingsBooked?: number;
+    callsReceived?: number;
+    daysInactive?: number;
+  };
+  // Lead Quality (Hot/Warm/Cold)
+  temperature?: 'hot' | 'warm' | 'cold';
+  // Tags for segmentation
+  tags?: string[];
+  // Expected deal value
+  expectedValue?: number;
+  // Lost reason (when status = Lost)
+  lostReason?: string;
+  // Won date (when status = Won)
+  wonDate?: any;
+  // City/Location for territory management
+  city?: string;
+  country?: string;
 }
 
 export interface EmailCampaign {

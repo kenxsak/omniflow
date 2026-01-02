@@ -137,6 +137,9 @@ export interface Company {
     // White-Label Branding Settings (Enterprise feature)
     whiteLabelSettings?: WhiteLabelSettings;
     
+    // Company Branding for Documents (Available to ALL plans)
+    companyBranding?: CompanyBranding;
+    
     // Agency Mode Settings
     isAgency?: boolean; // If true, this company is a digital agency
     agencySettings?: AgencySettings;
@@ -165,6 +168,51 @@ export interface AgencySettings {
     // Metadata
     createdAt?: string;                      // When agency mode was enabled
     updatedAt?: string;                      // Last update timestamp
+}
+
+/**
+ * Company branding configuration for documents (quotes, invoices, emails)
+ * This is separate from white-label and available to ALL plans
+ */
+export interface CompanyBranding {
+    logoUrl?: string;                        // Company logo URL (light mode)
+    logoDarkUrl?: string;                    // Company logo URL (dark mode)
+    logoSquareUrl?: string;                  // Square logo for icons/favicons
+    primaryColor?: string;                   // Primary brand color (hex)
+    accentColor?: string;                    // Accent/secondary color (hex)
+    tagline?: string;                        // Company tagline for documents
+    updatedAt?: string;                      // Last update timestamp
+}
+
+/**
+ * Quote/Invoice document stored in Firestore
+ */
+export interface QuoteDocument {
+    id: string;
+    companyId: string;
+    leadId: string;
+    leadName: string;
+    leadEmail: string;
+    quoteNumber: string;                     // e.g., "Q-123456"
+    status: 'draft' | 'sent' | 'viewed' | 'accepted' | 'rejected' | 'expired';
+    items: {
+        description: string;
+        quantity: number;
+        unitPrice: number;
+    }[];
+    subtotal: number;
+    discountPercent: number;
+    discountAmount: number;
+    total: number;
+    currencyCode: string;
+    validDays: number;
+    validUntil: string;                      // ISO date string
+    notes?: string;
+    createdAt: string;                       // ISO timestamp
+    sentAt?: string;                         // When quote was sent
+    viewedAt?: string;                       // When lead viewed the quote
+    respondedAt?: string;                    // When lead accepted/rejected
+    createdBy: string;                       // User ID who created
 }
 
 /**

@@ -452,18 +452,93 @@ export function LeadQuickActions({ lead, onActivityLogged, compact = false }: Le
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Phone Call */}
-          <Button 
-            variant="outline" 
-            className="w-full justify-start gap-2 h-11 sm:h-10 border-stone-200 dark:border-stone-700 hover:bg-muted/50 hover:border-emerald-300 dark:hover:border-emerald-700" 
-            onClick={handleCall}
-            disabled={!lead.phone}
-          >
-            <Icon icon="solar:phone-linear" className="h-5 w-5 sm:h-4 sm:w-4" style={{ color: '#10b981' }} />
-            <span className="flex-1 text-left text-sm font-medium truncate">
-              Call {lead.phone ? lead.phone : '(No phone)'}
-            </span>
-          </Button>
+          {/* Phone Call Actions */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start gap-2 h-11 sm:h-10 border-stone-200 dark:border-stone-700 hover:bg-muted/50 hover:border-emerald-300 dark:hover:border-emerald-700" 
+                disabled={!lead.phone}
+              >
+                <Icon icon="solar:phone-linear" className="h-5 w-5 sm:h-4 sm:w-4" style={{ color: '#10b981' }} />
+                <span className="flex-1 text-left text-sm font-medium truncate">
+                  Call {lead.phone ? lead.phone : '(No phone)'}
+                </span>
+                <Icon icon="solar:alt-arrow-down-linear" className="h-3 w-3 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuItem onClick={handleCall} className="py-2.5">
+                <Icon icon="solar:phone-linear" className="h-4 w-4 mr-2" />
+                Phone Dialer
+                <span className="ml-auto text-[10px] text-muted-foreground">Native</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={async () => {
+                  if (!lead.phone) return;
+                  try {
+                    const response = await fetch('/api/telephony/call', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        to: lead.phone,
+                        leadId: lead.id,
+                        leadName: lead.name,
+                        companyId: lead.companyId,
+                        type: 'outbound',
+                      }),
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                      toast({ title: 'Call Initiated', description: `Connecting to ${lead.name} via ${data.provider}...` });
+                      logActivity('browser_call_initiated', `Browser call to ${lead.name} via ${data.provider}`);
+                    } else {
+                      toast({ title: 'Call Failed', description: data.error, variant: 'destructive' });
+                    }
+                  } catch (error) {
+                    toast({ title: 'Error', description: 'Failed to initiate call. Check telephony settings.', variant: 'destructive' });
+                  }
+                }} 
+                className="py-2.5"
+              >
+                <Icon icon="solar:phone-calling-linear" className="h-4 w-4 mr-2" />
+                Browser Call
+                <span className="ml-auto text-[10px] text-muted-foreground">WebRTC</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={async () => {
+                  if (!lead.phone) return;
+                  try {
+                    const response = await fetch('/api/telephony/ai-call', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        to: lead.phone,
+                        leadId: lead.id,
+                        leadName: lead.name,
+                        companyId: lead.companyId,
+                      }),
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                      toast({ title: 'AI Call Initiated', description: `AI agent calling ${lead.name} via ${data.provider}...` });
+                      logActivity('ai_call_initiated', `AI voice call to ${lead.name} via ${data.provider}`);
+                    } else {
+                      toast({ title: 'AI Call Failed', description: data.error, variant: 'destructive' });
+                    }
+                  } catch (error) {
+                    toast({ title: 'Error', description: 'Failed to initiate AI call. Check Vapi/Bland settings.', variant: 'destructive' });
+                  }
+                }} 
+                className="py-2.5"
+              >
+                <Icon icon="solar:cpu-bolt-linear" className="h-4 w-4 mr-2 text-purple-600" />
+                AI Voice Agent
+                <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 font-medium">AI</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Set Reminder / Follow-up */}
           <DropdownMenu>

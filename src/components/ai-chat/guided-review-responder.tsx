@@ -115,83 +115,84 @@ export default function GuidedReviewResponder({ onResponseGenerated, onBack }: G
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
+    <div className="max-w-4xl mx-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5 text-indigo-600" />
+        <CardHeader className="p-3 sm:p-4 md:p-6">
+          <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+            <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600" />
             Review Responder
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Generate professional responses to customer reviews
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="p-3 sm:p-4 md:p-6 pt-0 space-y-4 sm:space-y-6">
           {/* Review Input Section */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="review-text">Customer Review Text *</Label>
+          <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="review-text" className="text-xs sm:text-sm">Customer Review Text *</Label>
               <Textarea
                 id="review-text"
                 placeholder="Paste the customer review here..."
                 value={reviewText}
                 onChange={(e) => setReviewText(e.target.value)}
-                rows={5}
+                rows={4}
                 disabled={isLoading}
-                className="resize-none"
+                className="resize-none text-sm min-h-[100px] sm:min-h-[120px]"
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[10px] sm:text-xs text-muted-foreground">
                 Copy and paste the review you received from your customer
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="sentiment">Review Sentiment *</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="sentiment" className="text-xs sm:text-sm">Review Sentiment *</Label>
                 <Select 
                   value={sentiment} 
                   onValueChange={(value: 'positive' | 'negative' | 'neutral') => setSentiment(value)}
                   disabled={isLoading}
                 >
-                  <SelectTrigger id="sentiment">
+                  <SelectTrigger id="sentiment" className="h-9 sm:h-10 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="positive">
                       <div className="flex items-center gap-2">
                         <span className="text-success">😊</span>
-                        <span>Positive</span>
+                        <span className="text-sm">Positive</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="negative">
                       <div className="flex items-center gap-2">
                         <span className="text-destructive">😞</span>
-                        <span>Negative</span>
+                        <span className="text-sm">Negative</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="neutral">
                       <div className="flex items-center gap-2">
                         <span className="text-muted-foreground">😐</span>
-                        <span>Neutral</span>
+                        <span className="text-sm">Neutral</span>
                       </div>
                     </SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
                   How would you classify this review?
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="business-name">Your Business Name *</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="business-name" className="text-xs sm:text-sm">Your Business Name *</Label>
                 <Input
                   id="business-name"
                   placeholder="e.g., My Awesome Cafe"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
                   disabled={isLoading}
+                  className="h-9 sm:h-10 text-sm"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
                   Your business name for the response
                 </p>
               </div>
@@ -199,25 +200,25 @@ export default function GuidedReviewResponder({ onResponseGenerated, onBack }: G
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t">
+          <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4 border-t">
             {onBack && (
-              <Button variant="outline" onClick={onBack} disabled={isLoading}>
+              <Button variant="outline" onClick={onBack} disabled={isLoading} className="w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm">
                 Back
               </Button>
             )}
             <Button 
               onClick={handleGenerate} 
-              className="flex-1"
+              className="w-full sm:flex-1 h-9 sm:h-10 text-xs sm:text-sm"
               disabled={isLoading || !reviewText.trim() || !businessName.trim()}
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating Response...
+                  <Loader2 className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
+                  <span className="truncate">Generating...</span>
                 </>
               ) : (
                 <>
-                  <MessageCircle className="mr-2 h-4 w-4" />
+                  <MessageCircle className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   Generate Response
                 </>
               )}
@@ -226,31 +227,31 @@ export default function GuidedReviewResponder({ onResponseGenerated, onBack }: G
 
           {/* Generated Response Section */}
           {generatedResponse && (
-            <div className="space-y-4 pt-4 border-t">
+            <div className="space-y-3 sm:space-y-4 pt-3 sm:pt-4 border-t">
               <div className="flex items-center gap-2 text-success">
-                <CheckCircle2 className="h-5 w-5" />
-                <span className="font-semibold">Response Generated</span>
+                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="font-semibold text-xs sm:text-sm">Response Generated</span>
               </div>
               
-              <div className="space-y-2">
-                <Label>Suggested Response:</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label className="text-xs sm:text-sm">Suggested Response:</Label>
                 <Textarea
                   value={generatedResponse}
                   readOnly
-                  rows={6}
-                  className="bg-muted/50 resize-none"
+                  rows={5}
+                  className="bg-muted/50 resize-none text-sm min-h-[120px] sm:min-h-[150px]"
                 />
               </div>
 
-              <div className="flex gap-3">
-                <Button variant="outline" onClick={handleCopyResponse}>
-                  <Copy className="mr-2 h-4 w-4" />
-                  Copy Response
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <Button variant="outline" onClick={handleCopyResponse} className="w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm">
+                  <Copy className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  Copy
                 </Button>
-                <Button onClick={handleUseResponse} className="flex-1">
+                <Button onClick={handleUseResponse} className="w-full sm:flex-1 h-9 sm:h-10 text-xs sm:text-sm">
                   Use This Response
                 </Button>
-                <Button variant="outline" onClick={handleReset}>
+                <Button variant="outline" onClick={handleReset} className="w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm">
                   New Review
                 </Button>
               </div>
@@ -261,14 +262,14 @@ export default function GuidedReviewResponder({ onResponseGenerated, onBack }: G
 
       {/* Help Card */}
       <Card className="bg-muted/30">
-        <CardContent className="pt-6">
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p className="font-medium text-foreground">💡 Tips for better responses:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Select the correct sentiment to get an appropriate response tone</li>
-              <li>For positive reviews: Thank the customer and reinforce the positive experience</li>
-              <li>For negative reviews: Apologize sincerely and offer to make things right</li>
-              <li>For neutral reviews: Acknowledge their feedback and invite further engagement</li>
+        <CardContent className="p-3 sm:p-4 md:pt-6">
+          <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-muted-foreground">
+            <p className="font-medium text-foreground text-xs sm:text-sm">💡 Tips for better responses:</p>
+            <ul className="list-disc pl-4 sm:pl-5 space-y-0.5 sm:space-y-1 text-[10px] sm:text-xs">
+              <li>Select the correct sentiment for appropriate tone</li>
+              <li>Positive: Thank customer, reinforce experience</li>
+              <li>Negative: Apologize sincerely, offer to help</li>
+              <li>Neutral: Acknowledge feedback, invite engagement</li>
             </ul>
           </div>
         </CardContent>

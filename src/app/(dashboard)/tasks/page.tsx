@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -40,18 +41,52 @@ const statusDotColors: Record<Task['status'], string> = {
   'Done': 'bg-emerald-300 border-emerald-700',
 };
 
+// Initial task values from URL params
+interface InitialTaskValues {
+  title?: string;
+  leadId?: string;
+  leadName?: string;
+  dueDate?: Date;
+}
+
 export default function TasksPage() {
+  const searchParams = useSearchParams();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [allLeads, setAllLeads] = useState<Lead[]>([]);
   const [allAppointments, setAllAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [initialTaskValues, setInitialTaskValues] = useState<InitialTaskValues | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'calendar'>('table');
   const [appointmentDialogOpen, setAppointmentDialogOpen] = useState(false);
   const [selectedTaskLead, setSelectedTaskLead] = useState<Lead | null>(null);
   const { toast } = useToast();
   const { appUser, idToken } = useAuth();
+
+  // Handle URL parameters for creating new task with pre-filled values
+  useEffect(() => {
+    const newTask = searchParams.get('newTask');
+    const title = searchParams.get('title');
+    const leadId = searchParams.get('leadId');
+    const leadName = searchParams.get('leadName');
+    const dueDate = searchParams.get('dueDate');
+
+    if (newTask === 'true') {
+      const initial: InitialTaskValues = {};
+      if (title) initial.title = decodeURIComponent(title);
+      if (leadId) initial.leadId = leadId;
+      if (leadName) initial.leadName = decodeURIComponent(leadName);
+      if (dueDate) initial.dueDate = new Date(dueDate);
+      
+      setInitialTaskValues(initial);
+      setEditingTask(null);
+      setIsDialogOpen(true);
+      
+      // Clear URL params after opening dialog
+      window.history.replaceState({}, '', '/tasks');
+    }
+  }, [searchParams]);
 
   const loadData = useCallback(async () => {
     if (!appUser?.companyId) {
@@ -91,11 +126,24 @@ export default function TasksPage() {
 
   const handleCreateNew = () => {
     setEditingTask(null);
+    setInitialTaskValues(null);
     setIsDialogOpen(true);
   };
 
   const handleEdit = (task: Task) => {
     setEditingTask(task);
+    setInitialTaskValues(null);
+    setIsDialogOpen(true);
+  };
+
+  const handleMarkComplete = (task: Task) => {
+    // Open edit dialog with task status set to Done, but preserve original status
+    setEditingTask({ 
+      ...task, 
+      status: 'Done',
+      _originalStatus: task.status // Store original status for comparison
+    } as Task & { _originalStatus: string });
+    setInitialTaskValues(null);
     setIsDialogOpen(true);
   };
 
@@ -238,6 +286,11 @@ export default function TasksPage() {
                               <DropdownMenuItem onSelect={() => handleEdit(task)} className="text-xs py-2.5">
                                 <Icon icon="solar:pen-linear" className="mr-2 h-3.5 w-3.5" /> Edit
                               </DropdownMenuItem>
+                              {task.status !== 'Done' && (
+                                <DropdownMenuItem onSelect={() => handleMarkComplete(task)} className="text-xs py-2.5 text-emerald-600">
+                                  <Icon icon="solar:check-circle-linear" className="mr-2 h-3.5 w-3.5" /> Mark Complete
+                                </DropdownMenuItem>
+                              )}
                               {task.leadId && (
                                 <>
                                   <DropdownMenuItem onSelect={() => handleScheduleAppointment(task)} className="text-xs py-2.5">
@@ -356,6 +409,11 @@ export default function TasksPage() {
                                   <DropdownMenuItem onSelect={() => handleEdit(task)} className="text-xs">
                                     <Icon icon="solar:pen-linear" className="mr-2 h-3.5 w-3.5" /> Edit
                                   </DropdownMenuItem>
+                                  {task.status !== 'Done' && (
+                                    <DropdownMenuItem onSelect={() => handleMarkComplete(task)} className="text-xs text-emerald-600">
+                                      <Icon icon="solar:check-circle-linear" className="mr-2 h-3.5 w-3.5" /> Mark Complete
+                                    </DropdownMenuItem>
+                                  )}
                                   {task.leadId && (
                                     <>
                                       <DropdownMenuItem onSelect={() => handleScheduleAppointment(task)} className="text-xs">
@@ -420,11 +478,15 @@ export default function TasksPage() {
 
       <AddTaskDialog
         isOpen={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) setInitialTaskValues(null);
+        }}
         onTaskSaved={loadData}
         taskToEdit={editingTask}
         allLeads={allLeads}
         allAppointments={allAppointments}
+        initialValues={initialTaskValues}
       />
 
       <AppointmentDialog

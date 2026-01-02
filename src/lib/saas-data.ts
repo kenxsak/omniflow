@@ -33,7 +33,17 @@ export const initialFeatures: Feature[] = [
     { id: 'feat_workflow_builder', name: 'Workflow Builder', description: 'Visual automation builder for creating custom workflows, triggers, and actions.', active: true },
     { id: 'feat_automations', name: 'Marketing Automations', description: 'Email sequences, drip campaigns, and automated follow-ups based on triggers.', active: true },
     
-    // Enterprise Features
+    // Calling & Telephony
+    { id: 'feat_ai_calling', name: 'AI Calling', description: 'AI-powered bulk voice call campaigns using Vapi.ai or Bland.ai. Automated sales calls, follow-ups, and customer outreach at scale.', active: true },
+    { id: 'feat_telephony', name: 'Telephony', description: 'Voice calling capabilities using Plivo or Exotel. Click-to-call, call tracking, and call recordings.', active: true },
+    { id: 'feat_ai_voice_widget', name: 'AI Voice Widget', description: 'Embed AI-powered voice chat widget on websites and digital cards. Powered by Voice Chat AI for 24/7 customer engagement.', active: true },
+    
+    // Lead Sources & Integrations
+    { id: 'feat_facebook_lead_ads', name: 'Facebook Lead Ads', description: 'Automatically sync leads from Facebook Lead Ad forms directly into your CRM with real-time webhooks.', active: true },
+    { id: 'feat_webhooks', name: 'Webhooks & Automation', description: 'Connect with Zapier, Make, Pabbly, n8n and 5000+ apps. Incoming and outgoing webhooks for custom automations.', active: true },
+    
+    // Agency & Enterprise Features
+    { id: 'feat_agency_mode', name: 'Agency Mode', description: 'Manage multiple client companies from one account. Create sub-accounts, switch between clients, and manage all businesses from a single dashboard.', active: true },
     { id: 'feat_enterprise_team', name: 'Enterprise Team Collaboration', description: 'Lead Claiming (prevent duplicate work), Full Audit Trail (compliance tracking), Auto Lead Distribution (fair assignment), and Enterprise Settings page.', active: true },
     { id: 'feat_team_management', name: 'Team Management', description: 'Add team members, assign roles, manage permissions, and track team activity.', active: true },
     { id: 'feat_advanced_analytics', name: 'Advanced Analytics & Business Reports', description: 'Access to advanced business intelligence, conversion tracking, ROI calculations, and predictive analytics.', active: true },
@@ -111,7 +121,8 @@ const initialSaasPlans: Plan[] = [
     featureIds: [
       'feat_core_crm', 'feat_ai_content_gen', 'feat_digital_cards', 'feat_email_marketing',
       'feat_social_media', 'feat_landing_pages', 'feat_blog', 'feat_ai_chat',
-      'feat_automations', 'feat_advanced_analytics', 'feat_api_integrations'
+      'feat_automations', 'feat_advanced_analytics', 'feat_api_integrations',
+      'feat_webhooks'
     ],
     maxUsers: 3,
     
@@ -155,7 +166,9 @@ const initialSaasPlans: Plan[] = [
       'feat_core_crm', 'feat_ai_content_gen', 'feat_digital_cards', 'feat_email_marketing',
       'feat_sms_whatsapp', 'feat_social_media', 'feat_ai_ads_manager',
       'feat_landing_pages', 'feat_blog', 'feat_ai_chat', 'feat_workflow_builder',
-      'feat_automations', 'feat_advanced_analytics', 'feat_api_integrations'
+      'feat_automations', 'feat_advanced_analytics', 'feat_api_integrations',
+      'feat_ai_calling', 'feat_telephony', 'feat_ai_voice_widget',
+      'feat_facebook_lead_ads', 'feat_webhooks', 'feat_agency_mode'
     ],
     maxUsers: 10,
     
@@ -199,7 +212,9 @@ const initialSaasPlans: Plan[] = [
       'feat_sms_whatsapp', 'feat_social_media', 'feat_ai_ads_manager',
       'feat_landing_pages', 'feat_blog', 'feat_ai_chat', 'feat_workflow_builder',
       'feat_automations', 'feat_enterprise_team', 'feat_advanced_analytics',
-      'feat_white_label', 'feat_api_integrations', 'feat_team_management'
+      'feat_white_label', 'feat_api_integrations', 'feat_team_management',
+      'feat_ai_calling', 'feat_telephony', 'feat_ai_voice_widget',
+      'feat_facebook_lead_ads', 'feat_webhooks', 'feat_agency_mode'
     ],
     maxUsers: 50,
     

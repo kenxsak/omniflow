@@ -4,6 +4,8 @@
  * 
  * Uses the new @google/genai SDK for native image generation with multimodal support
  * - Supports brand logo input for branded image generation
+ * - Platform-specific image presets for social media advertising
+ * - Multiple style options for different brand aesthetics
  * - Faster and cheaper than Imagen 4 (~$0.02/image vs $0.04)
  * - Optimized for high-volume, low-latency tasks
  *
@@ -14,13 +16,18 @@
 
 import { GoogleGenAI } from "@google/genai";
 import { z } from 'genkit';
+import { PLATFORM_PRESETS, IMAGE_STYLES, type PlatformPreset, type ImageStyle } from '../image-generation-presets';
 
 const GenerateImageWithAiFlowInputSchema = z.object({
   prompt: z.string().min(1).describe('The text prompt to generate an image from.'),
-  aspectRatio: z.enum(['1:1', '3:4', '4:3', '9:16', '16:9']).optional().describe('Aspect ratio for the image'),
+  aspectRatio: z.enum(['1:1', '3:4', '4:3', '9:16', '16:9', '4:5', '2:3', '1:2', '4:1', '3:1']).optional().describe('Aspect ratio for the image'),
+  platform: z.string().optional().describe('Platform preset to use (e.g., instagram-feed, youtube-thumbnail)'),
+  style: z.string().optional().describe('Image style to apply (e.g., photorealistic, minimalist, luxury)'),
   apiKey: z.string().optional().describe('Optional Gemini API key to use instead of platform default'),
   brandLogo: z.string().optional().describe('Brand logo as base64 data URI to incorporate into the generated image'),
   brandName: z.string().optional().describe('Brand/company name to include in the image'),
+  brandColors: z.array(z.string()).optional().describe('Brand colors to incorporate (hex codes)'),
+  textOverlay: z.string().optional().describe('Text to overlay on the image'),
 });
 export type GenerateImageWithAiFlowInput = z.infer<typeof GenerateImageWithAiFlowInputSchema>;
 
@@ -41,16 +48,34 @@ export async function generateImageWithAiFlow(input: GenerateImageWithAiFlowInpu
       };
     }
 
-    const aspectRatio = input.aspectRatio || getAspectRatioFromPrompt(input.prompt);
+    // Determine aspect ratio from platform preset or direct input
+    let aspectRatio = input.aspectRatio || '1:1';
+    let platformTips = '';
+    
+    if (input.platform && input.platform in PLATFORM_PRESETS) {
+      const preset = PLATFORM_PRESETS[input.platform as PlatformPreset];
+      aspectRatio = preset.aspectRatio;
+      platformTips = preset.tips;
+      console.log(`Using platform preset: ${preset.name} (${preset.dimensions})`);
+    } else {
+      aspectRatio = getAspectRatioFromPrompt(input.prompt);
+    }
+    
+    // Get style enhancement if specified
+    let stylePrompt = '';
+    if (input.style && input.style in IMAGE_STYLES) {
+      stylePrompt = IMAGE_STYLES[input.style as ImageStyle].prompt;
+      console.log(`Applying style: ${IMAGE_STYLES[input.style as ImageStyle].name}`);
+    }
     
     // Initialize the Google GenAI client
     const ai = new GoogleGenAI({ apiKey: API_KEY });
 
     // Check if we have a brand logo for multimodal generation
     if (input.brandLogo) {
-      return await generateBrandedImage(ai, input, aspectRatio);
+      return await generateBrandedImage(ai, input, aspectRatio, stylePrompt, platformTips);
     } else {
-      return await generateStandardImage(ai, input, aspectRatio);
+      return await generateStandardImage(ai, input, aspectRatio, stylePrompt, platformTips);
     }
 
   } catch (e: any) {
@@ -89,7 +114,9 @@ export async function generateImageWithAiFlow(input: GenerateImageWithAiFlowInpu
 async function generateBrandedImage(
   ai: GoogleGenAI, 
   input: GenerateImageWithAiFlowInput, 
-  aspectRatio: string
+  aspectRatio: string,
+  stylePrompt: string = '',
+  platformTips: string = ''
 ): Promise<GenerateImageWithAiFlowOutput> {
   console.log(`Generating BRANDED image with Gemini 2.5 Flash...`);
   console.log(`Brand name: ${input.brandName || 'Not specified'}`);
@@ -105,10 +132,10 @@ async function generateBrandedImage(
   const mimeType = base64Match[1];
   const base64Data = base64Match[2];
   
-  // Build the branded prompt
-  const brandedPrompt = buildBrandedPrompt(input.prompt, input.brandName, aspectRatio);
+  // Build the branded prompt with all enhancements
+  const brandedPrompt = buildBrandedPrompt(input.prompt, input.brandName, aspectRatio, stylePrompt, platformTips, input.brandColors, input.textOverlay);
   
-  console.log(`Branded prompt: "${brandedPrompt}"`);
+  console.log(`Branded prompt: "${brandedPrompt.substring(0, 200)}..."`);
 
   // Use multimodal input with the logo image
   const response = await ai.models.generateContent({
@@ -143,13 +170,15 @@ async function generateBrandedImage(
 async function generateStandardImage(
   ai: GoogleGenAI, 
   input: GenerateImageWithAiFlowInput, 
-  aspectRatio: string
+  aspectRatio: string,
+  stylePrompt: string = '',
+  platformTips: string = ''
 ): Promise<GenerateImageWithAiFlowOutput> {
-  // Build prompt with aspect ratio hint
-  const enhancedPrompt = buildPromptWithAspectRatio(input.prompt, aspectRatio);
+  // Build prompt with all enhancements
+  const enhancedPrompt = buildEnhancedPrompt(input.prompt, aspectRatio, stylePrompt, platformTips, input.textOverlay);
 
   console.log(`Generating standard image with Gemini 2.0 Flash...`);
-  console.log(`Prompt: "${enhancedPrompt}"`);
+  console.log(`Prompt: "${enhancedPrompt.substring(0, 200)}..."`);
   console.log(`Aspect ratio: ${aspectRatio}`);
 
   // Generate image using Gemini 2.0 Flash Experimental (supports image generation)
@@ -201,62 +230,128 @@ function extractImageFromResponse(response: any): GenerateImageWithAiFlowOutput 
 /**
  * Build a branded prompt that instructs the AI to incorporate the logo
  */
-function buildBrandedPrompt(prompt: string, brandName: string | undefined, aspectRatio: string): string {
+function buildBrandedPrompt(
+  prompt: string, 
+  brandName: string | undefined, 
+  aspectRatio: string,
+  stylePrompt: string = '',
+  platformTips: string = '',
+  brandColors?: string[],
+  textOverlay?: string
+): string {
   const aspectRatioDescriptions: Record<string, string> = {
-    '1:1': 'square format',
+    '1:1': 'square format (1:1)',
     '3:4': 'portrait format (3:4)',
     '4:3': 'landscape format (4:3)',
     '9:16': 'vertical/story format (9:16)',
     '16:9': 'widescreen format (16:9)',
+    '4:5': 'Instagram portrait format (4:5)',
+    '2:3': 'Pinterest pin format (2:3)',
+    '1:2': 'tall infographic format (1:2)',
+    '4:1': 'wide banner format (4:1)',
+    '3:1': 'email header format (3:1)',
   };
   
   const formatHint = aspectRatioDescriptions[aspectRatio] || 'square format';
   
-  let brandedPrompt = `You are creating a professional branded marketing image. 
+  let brandedPrompt = `You are an expert advertising designer creating a professional branded marketing image.
 
-BRAND LOGO: The image I've provided is the brand's logo. Analyze its colors, style, and design elements.
+BRAND LOGO: The image I've provided is the brand's logo. Analyze its colors, style, and design elements carefully.
 
 TASK: Generate a ${formatHint} marketing image that:
 1. Incorporates the brand logo prominently and naturally into the design
 2. Uses the logo's color palette as the primary colors for the image
 3. Matches the logo's visual style (modern, classic, playful, professional, etc.)
-4. Creates a cohesive branded look
+4. Creates a cohesive branded look that would work for advertising
 
 USER REQUEST: ${prompt}`;
 
   if (brandName) {
     brandedPrompt += `\n\nBRAND NAME: "${brandName}" - Include this text in the image if appropriate for the design.`;
   }
+  
+  if (brandColors && brandColors.length > 0) {
+    brandedPrompt += `\n\nBRAND COLORS: Use these colors prominently: ${brandColors.join(', ')}`;
+  }
+  
+  if (stylePrompt) {
+    brandedPrompt += `\n\nSTYLE: ${stylePrompt}`;
+  }
+  
+  if (platformTips) {
+    brandedPrompt += `\n\nPLATFORM TIPS: ${platformTips}`;
+  }
+  
+  if (textOverlay) {
+    brandedPrompt += `\n\nTEXT TO INCLUDE: "${textOverlay}" - Integrate this text naturally into the design with good readability.`;
+  }
 
-  brandedPrompt += `\n\nIMPORTANT: 
+  brandedPrompt += `\n\nIMPORTANT REQUIREMENTS:
 - The logo should be clearly visible and well-integrated
 - Maintain brand consistency throughout the image
 - Create a professional, high-quality marketing asset
-- Generate in ${formatHint}`;
+- Generate in ${formatHint}
+- Ensure the image is suitable for advertising and social media
+- Make it visually striking and attention-grabbing
+- Use professional composition and lighting`;
 
   return brandedPrompt;
 }
 
 /**
- * Build prompt with aspect ratio guidance (for non-branded images)
+ * Build enhanced prompt with all options (for non-branded images)
  */
-function buildPromptWithAspectRatio(prompt: string, aspectRatio: string): string {
+function buildEnhancedPrompt(
+  prompt: string, 
+  aspectRatio: string,
+  stylePrompt: string = '',
+  platformTips: string = '',
+  textOverlay?: string
+): string {
   const aspectRatioDescriptions: Record<string, string> = {
-    '1:1': 'square format',
+    '1:1': 'square format (1:1)',
     '3:4': 'portrait format (3:4)',
     '4:3': 'landscape format (4:3)',
     '9:16': 'vertical/story format (9:16)',
     '16:9': 'widescreen format (16:9)',
+    '4:5': 'Instagram portrait format (4:5)',
+    '2:3': 'Pinterest pin format (2:3)',
+    '1:2': 'tall infographic format (1:2)',
+    '4:1': 'wide banner format (4:1)',
+    '3:1': 'email header format (3:1)',
   };
   
   const formatHint = aspectRatioDescriptions[aspectRatio] || 'square format';
   
-  // Only add format hint if not already mentioned in prompt
-  if (!prompt.toLowerCase().includes('format') && !prompt.toLowerCase().includes('aspect')) {
-    return `${prompt}. Generate in ${formatHint}.`;
+  let enhancedPrompt = `Create a professional, high-quality image: ${prompt}`;
+  
+  if (stylePrompt) {
+    enhancedPrompt += `. Style: ${stylePrompt}`;
   }
   
-  return prompt;
+  if (platformTips) {
+    enhancedPrompt += `. Design tips: ${platformTips}`;
+  }
+  
+  if (textOverlay) {
+    enhancedPrompt += `. Include this text in the design: "${textOverlay}"`;
+  }
+  
+  // Add format hint if not already mentioned
+  if (!prompt.toLowerCase().includes('format') && !prompt.toLowerCase().includes('aspect')) {
+    enhancedPrompt += `. Generate in ${formatHint}.`;
+  }
+  
+  enhancedPrompt += ' Make it visually striking, professional quality, suitable for advertising and social media.';
+  
+  return enhancedPrompt;
+}
+
+/**
+ * Build prompt with aspect ratio guidance (legacy support)
+ */
+function buildPromptWithAspectRatio(prompt: string, aspectRatio: string): string {
+  return buildEnhancedPrompt(prompt, aspectRatio);
 }
 
 /**

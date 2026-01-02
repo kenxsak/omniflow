@@ -1028,7 +1028,7 @@ export default function BulkSMSCampaigns({ defaultProvider }: BulkSMSCampaignsPr
           )}
 
           <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-2xl max-h-[80vh] overflow-y-auto rounded-xl">
               <DialogHeader>
                 <DialogTitle>{selectedCampaign?.name}</DialogTitle>
                 <DialogDescription>

@@ -20,6 +20,13 @@ interface QuickAction {
 
 const QUICK_ACTIONS: QuickAction[] = [
   {
+    id: "ask-ai",
+    label: "Ask AI",
+    icon: "solar:stars-linear",
+    href: "/ai-chat",
+    featureId: "feat_ai_chat",
+  },
+  {
     id: "add-contact",
     label: "Add Contact",
     icon: "solar:user-plus-linear",
@@ -28,7 +35,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   },
   {
     id: "send-campaign",
-    label: "Send Campaign",
+    label: "Campaign",
     icon: "solar:letter-linear",
     href: "/campaigns?action=new",
     featureId: "feat_email_marketing",
@@ -36,17 +43,10 @@ const QUICK_ACTIONS: QuickAction[] = [
   },
   {
     id: "create-content",
-    label: "Create Content",
+    label: "Content",
     icon: "solar:pen-new-square-linear",
     href: "/social-media",
     featureId: "feat_ai_content_gen",
-  },
-  {
-    id: "schedule",
-    label: "Schedule",
-    icon: "solar:calendar-add-linear",
-    href: "/appointments?action=new",
-    featureId: "feat_core_crm",
   },
 ];
 
@@ -184,9 +184,11 @@ export function QuickActions({ className }: QuickActionsProps) {
                     "flex flex-col items-center justify-center gap-1 p-2 rounded-lg border transition-all duration-150",
                     "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-background",
                     "hover:bg-card hover:border-border hover:shadow-sm",
-                    isLocked
-                      ? "border-dashed border-amber-500/30 bg-amber-500/5 opacity-70"
-                      : "border-transparent bg-muted/30",
+                    action.id === "ask-ai" 
+                      ? "border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 hover:border-purple-500/50"
+                      : isLocked
+                        ? "border-dashed border-amber-500/30 bg-amber-500/5 opacity-70"
+                        : "border-transparent bg-muted/30",
                     !isAccessible && !isLocked && "opacity-50 cursor-not-allowed"
                   )}
                   disabled={!isAccessible && !isLocked}
@@ -196,7 +198,11 @@ export function QuickActions({ className }: QuickActionsProps) {
                       icon={action.icon}
                       className={cn(
                         "w-4 h-4",
-                        isLocked ? "text-amber-500" : "text-primary"
+                        action.id === "ask-ai"
+                          ? "text-purple-600 dark:text-purple-400"
+                          : isLocked 
+                            ? "text-amber-500" 
+                            : "text-primary"
                       )}
                       aria-hidden="true"
                     />
@@ -211,7 +217,11 @@ export function QuickActions({ className }: QuickActionsProps) {
                   <span
                     className={cn(
                       "text-[10px] font-medium leading-tight text-center",
-                      isLocked ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground"
+                      action.id === "ask-ai"
+                        ? "text-purple-600 dark:text-purple-400"
+                        : isLocked 
+                          ? "text-amber-600 dark:text-amber-400" 
+                          : "text-muted-foreground"
                     )}
                   >
                     {action.label}

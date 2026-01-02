@@ -115,7 +115,7 @@ export default function AutomationTestingPage() {
 
   if (!isAdmin && !isSuperAdmin) {
     return (
-      <div className="p-6">
+      <div className="p-3 sm:p-4 md:p-6">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Access Denied</AlertTitle>
@@ -128,7 +128,7 @@ export default function AutomationTestingPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
       <PageTitle title="Email Automation Testing" description="Test and monitor your email automation system" />
 
       <Alert>

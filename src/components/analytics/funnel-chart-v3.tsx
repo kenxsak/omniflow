@@ -134,21 +134,21 @@ export default function ConversionFunnelChart({ funnel }: ConversionFunnelChartP
       )}
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-4 gap-3 pt-4 border-t border-stone-200 dark:border-stone-700">
-        <div className="text-center p-3 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
-          <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{formatNumber(stages.views.count)}</p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-4 border-t border-stone-200 dark:border-stone-700">
+        <div className="text-center p-2.5 sm:p-3 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+          <p className="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400">{formatNumber(stages.views.count)}</p>
           <p className="text-[10px] text-muted-foreground">Views</p>
         </div>
-        <div className="text-center p-3 rounded-xl bg-teal-50 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-800">
-          <p className="text-lg font-bold text-teal-600 dark:text-teal-400">{formatNumber(stages.leads.count)}</p>
+        <div className="text-center p-2.5 sm:p-3 rounded-xl bg-teal-50 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-800">
+          <p className="text-base sm:text-lg font-bold text-teal-600 dark:text-teal-400">{formatNumber(stages.leads.count)}</p>
           <p className="text-[10px] text-muted-foreground">Leads</p>
         </div>
-        <div className="text-center p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
-          <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{formatNumber(stages.engaged.count)}</p>
+        <div className="text-center p-2.5 sm:p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+          <p className="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400">{formatNumber(stages.engaged.count)}</p>
           <p className="text-[10px] text-muted-foreground">Engaged</p>
         </div>
-        <div className="text-center p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
-          <p className="text-lg font-bold text-amber-600 dark:text-amber-400">{formatCurrency(stages.revenue.totalRevenue)}</p>
+        <div className="text-center p-2.5 sm:p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+          <p className="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400">{formatCurrency(stages.revenue.totalRevenue)}</p>
           <p className="text-[10px] text-muted-foreground">Revenue</p>
         </div>
       </div>

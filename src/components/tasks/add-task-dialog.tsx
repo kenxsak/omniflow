@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import type { Task } from '@/types/task';
 import type { Lead } from '@/lib/mock-data';
@@ -18,7 +19,7 @@ import { z } from 'zod';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Calendar } from '../ui/calendar';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { format, addDays, addWeeks } from 'date-fns';
 import { logActivity } from '@/lib/activity-log';
 import { generateTaskSuggestions, type GenerateTaskSuggestionsInput } from '@/ai/flows/generate-task-suggestions-flow';
 import { useAuth } from '@/hooks/use-auth';
@@ -37,6 +38,14 @@ const taskSchema = z.object({
 
 type TaskFormData = z.infer<typeof taskSchema>;
 
+// Initial values for pre-filling the form (e.g., from URL params)
+interface InitialTaskValues {
+  title?: string;
+  leadId?: string;
+  leadName?: string;
+  dueDate?: Date;
+}
+
 interface AddTaskDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -44,9 +53,30 @@ interface AddTaskDialogProps {
   taskToEdit?: Task | null;
   allLeads: Lead[];
   allAppointments?: Appointment[];
+  initialValues?: InitialTaskValues | null;
 }
 
-export default function AddTaskDialog({ isOpen, onOpenChange, onTaskSaved, taskToEdit, allLeads, allAppointments = [] }: AddTaskDialogProps) {
+// Follow-up options for quick selection
+const FOLLOW_UP_OPTIONS = [
+  { label: 'Tomorrow', days: 1 },
+  { label: 'In 3 Days', days: 3 },
+  { label: 'Next Week', days: 7 },
+  { label: 'In 2 Weeks', days: 14 },
+  { label: 'Custom', days: 0 },
+];
+
+// Task completion outcomes (like HubSpot/Pipedrive dispositions)
+const TASK_OUTCOMES = [
+  { value: 'completed', label: 'Completed Successfully', icon: 'solar:check-circle-bold', color: 'text-emerald-600', suggestFollowUp: false },
+  { value: 'contacted', label: 'Contacted - Interested', icon: 'solar:phone-calling-bold', color: 'text-blue-600', suggestFollowUp: true, defaultDays: 3 },
+  { value: 'no_answer', label: 'No Answer', icon: 'solar:phone-bold', color: 'text-amber-600', suggestFollowUp: true, defaultDays: 1 },
+  { value: 'left_message', label: 'Left Voicemail/Message', icon: 'solar:chat-round-dots-bold', color: 'text-purple-600', suggestFollowUp: true, defaultDays: 2 },
+  { value: 'meeting_scheduled', label: 'Meeting Scheduled', icon: 'solar:calendar-bold', color: 'text-indigo-600', suggestFollowUp: false },
+  { value: 'not_interested', label: 'Not Interested', icon: 'solar:close-circle-bold', color: 'text-red-600', suggestFollowUp: false },
+  { value: 'other', label: 'Other', icon: 'solar:document-bold', color: 'text-stone-600', suggestFollowUp: false },
+];
+
+export default function AddTaskDialog({ isOpen, onOpenChange, onTaskSaved, taskToEdit, allLeads, allAppointments = [], initialValues }: AddTaskDialogProps) {
   const { toast } = useToast();
   const { appUser } = useAuth();
   const { control, handleSubmit, reset, formState: { errors, isSubmitting }, setValue, watch } = useForm<TaskFormData>({
@@ -54,12 +84,69 @@ export default function AddTaskDialog({ isOpen, onOpenChange, onTaskSaved, taskT
   });
 
   const selectedLeadId = watch("leadId");
+  const selectedStatus = watch("status");
   const [taskSuggestions, setTaskSuggestions] = useState<string[] | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  
+  // Completion & Follow-up state
+  const [showCompletionOptions, setShowCompletionOptions] = useState(false);
+  const [completionNotes, setCompletionNotes] = useState('');
+  const [selectedOutcome, setSelectedOutcome] = useState<string>('');
+  const [scheduleFollowUp, setScheduleFollowUp] = useState(false);
+  const [followUpOption, setFollowUpOption] = useState<string>('');
+  const [customFollowUpDate, setCustomFollowUpDate] = useState<Date | undefined>(undefined);
+  const [followUpTitle, setFollowUpTitle] = useState('');
+  const [originalTaskStatus, setOriginalTaskStatus] = useState<string | null>(null);
+
+  // Watch for status change to "Done" when editing
+  useEffect(() => {
+    // Show completion options if status is Done and original was not Done
+    if (taskToEdit && selectedStatus === 'Done' && originalTaskStatus && originalTaskStatus !== 'Done') {
+      setShowCompletionOptions(true);
+      // Pre-fill follow-up title based on original task
+      if (!followUpTitle) {
+        setFollowUpTitle(`Follow-up: ${taskToEdit.title}`);
+      }
+    } else if (selectedStatus !== 'Done') {
+      setShowCompletionOptions(false);
+    }
+  }, [selectedStatus, taskToEdit, originalTaskStatus, followUpTitle]);
+
+  // Auto-suggest follow-up based on outcome
+  useEffect(() => {
+    const outcome = TASK_OUTCOMES.find(o => o.value === selectedOutcome);
+    if (outcome) {
+      setScheduleFollowUp(outcome.suggestFollowUp);
+      if (outcome.suggestFollowUp && outcome.defaultDays) {
+        const defaultOption = FOLLOW_UP_OPTIONS.find(o => o.days === outcome.defaultDays);
+        if (defaultOption) {
+          setFollowUpOption(defaultOption.label);
+        } else {
+          setFollowUpOption('Tomorrow');
+        }
+      }
+    }
+  }, [selectedOutcome]);
 
   useEffect(() => {
     if (isOpen && appUser?.companyId) {
+      // Reset completion state
+      setShowCompletionOptions(false);
+      setCompletionNotes('');
+      setSelectedOutcome('');
+      setScheduleFollowUp(false);
+      setFollowUpOption('');
+      setCustomFollowUpDate(undefined);
+      setFollowUpTitle('');
+      setOriginalTaskStatus(null);
+      
       if (taskToEdit) {
+        // Store the REAL original status (before any modifications like from handleMarkComplete)
+        // If taskToEdit.status is 'Done' but we're editing, check if it was passed with status changed
+        const taskWithOriginal = taskToEdit as Task & { _originalStatus?: string };
+        const realOriginalStatus = taskWithOriginal._originalStatus || taskToEdit.status;
+        setOriginalTaskStatus(realOriginalStatus);
+        
         reset({
           title: taskToEdit.title,
           notes: taskToEdit.notes || '',
@@ -69,6 +156,24 @@ export default function AddTaskDialog({ isOpen, onOpenChange, onTaskSaved, taskT
           leadId: taskToEdit.leadId || '_NONE_',
           appointmentId: taskToEdit.appointmentId || '_NONE_',
           companyId: taskToEdit.companyId,
+        });
+        
+        // If status is already Done (from Mark Complete), show completion options immediately
+        if (taskToEdit.status === 'Done' && realOriginalStatus !== 'Done') {
+          setShowCompletionOptions(true);
+          setFollowUpTitle(`Follow-up: ${taskToEdit.title}`);
+        }
+      } else if (initialValues) {
+        // Pre-fill from URL params (e.g., from Set Reminder button)
+        reset({
+          title: initialValues.title || '',
+          notes: initialValues.leadName ? `Follow-up reminder for ${initialValues.leadName}` : '',
+          priority: 'Medium',
+          status: 'To Do',
+          dueDate: initialValues.dueDate || new Date(),
+          leadId: initialValues.leadId || '_NONE_',
+          appointmentId: '_NONE_',
+          companyId: appUser.companyId,
         });
       } else {
         reset({
@@ -84,7 +189,7 @@ export default function AddTaskDialog({ isOpen, onOpenChange, onTaskSaved, taskT
       }
       setTaskSuggestions(null);
     }
-  }, [isOpen, taskToEdit, reset, appUser]);
+  }, [isOpen, taskToEdit, initialValues, reset, appUser]);
 
   const handleGenerateSuggestions = async () => {
     setIsGenerating(true);
@@ -121,17 +226,77 @@ export default function AddTaskDialog({ isOpen, onOpenChange, onTaskSaved, taskT
         return;
     }
 
-    const taskPayload = {
-        ...data,
+    // Build task payload, excluding undefined fields (Firebase doesn't accept undefined)
+    const basePayload = {
+        title: data.title,
+        notes: data.notes || '',
+        priority: data.priority,
+        status: data.status,
         dueDate: data.dueDate.toISOString(),
-        leadId: data.leadId === '_NONE_' ? undefined : data.leadId,
-        appointmentId: data.appointmentId === '_NONE_' ? undefined : data.appointmentId,
+        companyId: data.companyId,
     };
+    
+    // Only include leadId and appointmentId if they have actual values
+    const taskPayload = {
+      ...basePayload,
+      ...(data.leadId && data.leadId !== '_NONE_' ? { leadId: data.leadId } : {}),
+      ...(data.appointmentId && data.appointmentId !== '_NONE_' ? { appointmentId: data.appointmentId } : {}),
+    };
+
+    // If completing a task, append completion notes with timestamp and outcome
+    if (taskToEdit && data.status === 'Done' && originalTaskStatus && originalTaskStatus !== 'Done') {
+      const timestamp = format(new Date(), 'MMM d, yyyy h:mm a');
+      const outcome = TASK_OUTCOMES.find(o => o.value === selectedOutcome);
+      const outcomeLabel = outcome?.label || 'Completed';
+      const existingNotes = taskPayload.notes || '';
+      
+      let completionLog = `--- ${outcomeLabel} on ${timestamp} ---`;
+      if (completionNotes.trim()) {
+        completionLog += `\n${completionNotes.trim()}`;
+      }
+      
+      taskPayload.notes = existingNotes 
+        ? `${existingNotes}\n\n${completionLog}`
+        : completionLog;
+    }
 
     if (taskToEdit) {
       await updateStoredTask({ ...taskToEdit, ...taskPayload });
       toast({ title: 'Task Updated', description: `Task "${data.title}" has been saved.` });
       logActivity({ companyId: appUser.companyId, description: `Task updated: "${data.title.substring(0,30)}..."`, type: 'task' });
+      
+      // If completing and scheduling follow-up, create the follow-up task
+      if (data.status === 'Done' && originalTaskStatus && originalTaskStatus !== 'Done' && scheduleFollowUp && followUpTitle.trim()) {
+        let followUpDate: Date;
+        
+        if (followUpOption === 'Custom' && customFollowUpDate) {
+          followUpDate = customFollowUpDate;
+        } else {
+          const selectedOption = FOLLOW_UP_OPTIONS.find(o => o.label === followUpOption);
+          followUpDate = addDays(new Date(), selectedOption?.days || 1);
+        }
+        
+        const followUpPayload = {
+          title: followUpTitle.trim(),
+          notes: `Follow-up from completed task: "${data.title}"`,
+          priority: data.priority,
+          status: 'To Do' as const,
+          dueDate: followUpDate.toISOString(),
+          companyId: data.companyId,
+          ...(data.leadId && data.leadId !== '_NONE_' ? { leadId: data.leadId } : {}),
+        };
+        
+        await addStoredTask(followUpPayload);
+        toast({ 
+          title: 'Follow-up Scheduled', 
+          description: `New task "${followUpTitle}" scheduled for ${format(followUpDate, 'MMM d, yyyy')}` 
+        });
+        logActivity({ 
+          companyId: appUser.companyId, 
+          description: `Follow-up task created: "${followUpTitle.substring(0,30)}..."`, 
+          type: 'task' 
+        });
+      }
     } else {
       await addStoredTask(taskPayload);
       toast({ title: 'Task Created', description: `New task "${data.title}" has been added.` });
@@ -344,6 +509,149 @@ export default function AddTaskDialog({ isOpen, onOpenChange, onTaskSaved, taskT
                 )} 
               />
             </div>
+
+            {/* Completion Options - Only show when marking task as Done */}
+            {showCompletionOptions && taskToEdit && (
+              <div className="space-y-4 p-3 sm:p-4 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl">
+                <div className="flex items-center gap-2">
+                  <Icon icon="solar:check-circle-bold" className="h-4 w-4 text-emerald-600" />
+                  <span className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Completing Task</span>
+                </div>
+                
+                {/* Outcome Selection - Like HubSpot/Pipedrive Dispositions */}
+                <div className="space-y-2">
+                  <Label className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                    What was the outcome?
+                  </Label>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {TASK_OUTCOMES.map((outcome) => (
+                      <button
+                        key={outcome.value}
+                        type="button"
+                        onClick={() => setSelectedOutcome(outcome.value)}
+                        className={cn(
+                          "flex items-center gap-2 p-2 sm:p-2.5 rounded-lg text-left transition-all text-xs",
+                          selectedOutcome === outcome.value
+                            ? "bg-emerald-600 text-white ring-2 ring-emerald-600 ring-offset-1"
+                            : "bg-white dark:bg-stone-900 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 border border-stone-200 dark:border-stone-700"
+                        )}
+                      >
+                        <Icon 
+                          icon={outcome.icon} 
+                          className={cn(
+                            "h-4 w-4 flex-shrink-0",
+                            selectedOutcome === outcome.value ? "text-white" : outcome.color
+                          )} 
+                        />
+                        <span className="line-clamp-1">{outcome.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Completion Notes */}
+                <div className="space-y-2">
+                  <Label className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                    Notes (Optional)
+                  </Label>
+                  <Textarea
+                    value={completionNotes}
+                    onChange={(e) => setCompletionNotes(e.target.value)}
+                    placeholder="Any important details about this interaction..."
+                    className="bg-white dark:bg-stone-900 border-emerald-200 dark:border-emerald-800 rounded-lg min-h-[60px] resize-none text-sm"
+                  />
+                </div>
+
+                {/* Schedule Follow-up */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="scheduleFollowUp"
+                      checked={scheduleFollowUp}
+                      onCheckedChange={(checked) => setScheduleFollowUp(checked === true)}
+                    />
+                    <Label htmlFor="scheduleFollowUp" className="text-xs font-medium text-emerald-700 dark:text-emerald-300 cursor-pointer">
+                      Schedule a follow-up task
+                      {TASK_OUTCOMES.find(o => o.value === selectedOutcome)?.suggestFollowUp && (
+                        <span className="ml-1.5 text-[10px] text-amber-600 dark:text-amber-400">(Recommended)</span>
+                      )}
+                    </Label>
+                  </div>
+
+                  {scheduleFollowUp && (
+                    <div className="space-y-3 pl-6">
+                      {/* Follow-up Title */}
+                      <div className="space-y-1.5">
+                        <Label className="text-xs text-muted-foreground">Follow-up Title</Label>
+                        <Input
+                          value={followUpTitle}
+                          onChange={(e) => setFollowUpTitle(e.target.value)}
+                          placeholder="Follow-up task title..."
+                          className="h-9 text-sm bg-white dark:bg-stone-900"
+                        />
+                      </div>
+
+                      {/* Quick Date Options */}
+                      <div className="space-y-1.5">
+                        <Label className="text-xs text-muted-foreground">When?</Label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {FOLLOW_UP_OPTIONS.map((option) => (
+                            <button
+                              key={option.label}
+                              type="button"
+                              onClick={() => {
+                                setFollowUpOption(option.label);
+                                if (option.label !== 'Custom') {
+                                  setCustomFollowUpDate(undefined);
+                                }
+                              }}
+                              className={cn(
+                                "px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors",
+                                followUpOption === option.label
+                                  ? "bg-emerald-600 text-white"
+                                  : "bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                              )}
+                            >
+                              {option.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Custom Date Picker */}
+                      {followUpOption === 'Custom' && (
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground">Select Date</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal h-9 text-sm bg-white dark:bg-stone-900",
+                                  !customFollowUpDate && "text-muted-foreground"
+                                )}
+                              >
+                                <Icon icon="solar:calendar-linear" className="mr-2 h-4 w-4" />
+                                {customFollowUpDate ? format(customFollowUpDate, "MMM d, yyyy") : "Pick a date"}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                              <Calendar
+                                mode="single"
+                                selected={customFollowUpDate}
+                                onSelect={setCustomFollowUpDate}
+                                disabled={(date) => date < new Date()}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </DialogBody>
 
           <DialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-0 px-4 sm:px-6 py-4 border-t border-stone-200 dark:border-stone-800 mt-auto">

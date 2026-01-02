@@ -13,13 +13,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { getCompany } from '@/lib/saas-data';
 import { updateCompanyProfileAction } from '@/app/actions/profile-actions';
-import type { Company } from '@/types/saas';
+import type { Company, CompanyBranding } from '@/types/saas';
 import { cn } from '@/lib/utils';
 import { SettingsCard } from '@/components/settings/settings-ui';
 import { EmbedFormGenerator } from '@/components/settings/embed-form-generator';
+import { uploadImageAction } from '@/app/actions/image-upload-actions';
 
 const COUNTRIES = [
   { code: 'IN', name: 'India', currency: 'INR', timezone: 'Asia/Kolkata', flag: '🇮🇳' },
@@ -66,6 +67,11 @@ export default function CompanySettingsPage() {
   const [registeredEmail, setRegisteredEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
+  
+  // Company Branding
+  const [branding, setBranding] = useState<CompanyBranding>({});
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const loadCompanyData = useCallback(async () => {
     if (appUser?.companyId) {
@@ -82,6 +88,7 @@ export default function CompanySettingsPage() {
           setRegisteredEmail(companyData.registeredEmail || '');
           setPhone(companyData.phone || '');
           setAddress(companyData.address || '');
+          setBranding(companyData.companyBranding || {});
         }
       } catch (error) {
         console.error('Error loading company data:', error);
@@ -108,6 +115,51 @@ export default function CompanySettingsPage() {
     if (country) {
       setCurrencyCode(country.currency);
       setTimezone(country.timezone);
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !appUser?.companyId) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast({ title: 'Please select a valid image (JPG, PNG, GIF, or WebP)', variant: 'destructive' });
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: 'Image must be less than 2MB', variant: 'destructive' });
+      return;
+    }
+
+    setIsUploadingLogo(true);
+    try {
+      // Convert file to base64
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+      });
+
+      // Upload via server action
+      const result = await uploadImageAction(base64, `logo-${appUser.companyId}`);
+      
+      if (result.success && result.url) {
+        setBranding(prev => ({ ...prev, logoUrl: result.url }));
+        toast({ title: 'Logo uploaded! Click Save to apply.' });
+      } else {
+        toast({ title: result.error || 'Upload failed', variant: 'destructive' });
+      }
+    } catch (error) {
+      console.error('Logo upload error:', error);
+      toast({ title: 'Failed to upload logo', variant: 'destructive' });
+    } finally {
+      setIsUploadingLogo(false);
+      if (logoInputRef.current) logoInputRef.current.value = '';
     }
   };
 
@@ -140,6 +192,13 @@ export default function CompanySettingsPage() {
           registeredEmail: registeredEmail.trim() || undefined,
           phone: phone.trim() || undefined,
           address: address.trim() || undefined,
+          companyBranding: {
+            logoUrl: branding.logoUrl,
+            logoDarkUrl: branding.logoDarkUrl,
+            primaryColor: branding.primaryColor,
+            accentColor: branding.accentColor,
+            tagline: branding.tagline,
+          },
         },
       });
 
@@ -391,6 +450,161 @@ export default function CompanySettingsPage() {
         <div className="pt-2">
           <EmbedFormGenerator />
         </div>
+      )}
+
+      {/* Company Branding for Documents */}
+      {isAdmin && (
+        <SettingsCard
+          title="Document Branding"
+          description="Logo and colors for quotes, invoices, and emails"
+          icon="solar:palette-linear"
+        >
+          <div className="space-y-4">
+            {/* Logo Upload */}
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Company Logo</Label>
+              <div className="flex items-start gap-3 sm:gap-4">
+                {/* Logo Preview */}
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 border-dashed border-stone-300 dark:border-stone-700 flex items-center justify-center bg-stone-50 dark:bg-stone-900 overflow-hidden shrink-0">
+                  {branding.logoUrl ? (
+                    <img 
+                      src={branding.logoUrl} 
+                      alt="Company logo" 
+                      className="w-full h-full object-contain p-1"
+                    />
+                  ) : (
+                    <Icon icon="solar:gallery-add-linear" className="w-6 h-6 text-muted-foreground/50" />
+                  )}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoUpload}
+                    className="hidden"
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => logoInputRef.current?.click()}
+                      disabled={isUploadingLogo}
+                      className="h-8 text-xs"
+                    >
+                      {isUploadingLogo ? (
+                        <>
+                          <Icon icon="solar:refresh-linear" className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Icon icon="solar:upload-linear" className="w-3.5 h-3.5 mr-1.5" />
+                          Upload
+                        </>
+                      )}
+                    </Button>
+                    {branding.logoUrl && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setBranding(prev => ({ ...prev, logoUrl: undefined }))}
+                        className="h-8 text-xs text-destructive hover:text-destructive"
+                      >
+                        <Icon icon="solar:trash-bin-2-linear" className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">
+                    PNG, JPG up to 2MB. Or paste URL below.
+                  </p>
+                </div>
+              </div>
+              {/* URL Input Option */}
+              <div className="space-y-1.5">
+                <Label className="text-[10px] text-muted-foreground">Or paste logo URL</Label>
+                <Input
+                  value={branding.logoUrl || ''}
+                  onChange={(e) => setBranding(prev => ({ ...prev, logoUrl: e.target.value || undefined }))}
+                  placeholder="https://example.com/logo.png"
+                  className="h-8 text-xs"
+                />
+              </div>
+            </div>
+
+            {/* Brand Colors */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Primary Color</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={branding.primaryColor || '#10b981'}
+                    onChange={(e) => setBranding(prev => ({ ...prev, primaryColor: e.target.value }))}
+                    className="w-9 h-9 rounded-lg border border-stone-200 dark:border-stone-700 cursor-pointer"
+                  />
+                  <Input
+                    value={branding.primaryColor || '#10b981'}
+                    onChange={(e) => setBranding(prev => ({ ...prev, primaryColor: e.target.value }))}
+                    placeholder="#10b981"
+                    className="h-9 text-xs font-mono flex-1"
+                    maxLength={7}
+                  />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Accent Color</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={branding.accentColor || '#3b82f6'}
+                    onChange={(e) => setBranding(prev => ({ ...prev, accentColor: e.target.value }))}
+                    className="w-9 h-9 rounded-lg border border-stone-200 dark:border-stone-700 cursor-pointer"
+                  />
+                  <Input
+                    value={branding.accentColor || '#3b82f6'}
+                    onChange={(e) => setBranding(prev => ({ ...prev, accentColor: e.target.value }))}
+                    placeholder="#3b82f6"
+                    className="h-9 text-xs font-mono flex-1"
+                    maxLength={7}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Tagline */}
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Tagline (optional)</Label>
+              <Input
+                value={branding.tagline || ''}
+                onChange={(e) => setBranding(prev => ({ ...prev, tagline: e.target.value }))}
+                placeholder="Your company tagline for documents"
+                className="h-9 text-sm"
+                maxLength={100}
+              />
+            </div>
+
+            {/* Preview */}
+            {(branding.logoUrl || branding.primaryColor) && (
+              <div className="p-3 rounded-lg bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2">Preview</p>
+                <div className="flex items-center gap-3">
+                  {branding.logoUrl && (
+                    <img src={branding.logoUrl} alt="Logo" className="h-8 w-auto object-contain" />
+                  )}
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: branding.primaryColor || '#10b981' }}>
+                      {companyName || 'Your Company'}
+                    </p>
+                    {branding.tagline && (
+                      <p className="text-[10px] text-muted-foreground">{branding.tagline}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </SettingsCard>
       )}
     </div>
   );

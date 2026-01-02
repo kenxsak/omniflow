@@ -17,6 +17,10 @@ import { ActivityTimeline } from '@/components/crm/activity-timeline';
 import { ContactDeals } from '@/components/crm/contact-deals';
 import { AppointmentDialog } from '@/components/appointments/appointment-dialog';
 import { LeadQuickActions } from '@/components/crm/lead-quick-actions';
+import { AILeadInsights } from '@/components/crm/ai-lead-insights';
+import { AIFollowupGenerator } from '@/components/crm/ai-followup-generator';
+import { QuickQuoteGenerator } from '@/components/crm/quick-quote-generator';
+import { LeadScoreBadge } from '@/components/crm/lead-score-badge';
 import { openWhatsApp } from '@/lib/open-external-link';
 
 const statusColors: Record<Lead['status'], string> = {
@@ -60,6 +64,8 @@ export default function LeadDossierPage() {
     const [appointments, setAppointments] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showAppointmentDialog, setShowAppointmentDialog] = useState(false);
+    const [showFollowupGenerator, setShowFollowupGenerator] = useState(false);
+    const [showQuoteGenerator, setShowQuoteGenerator] = useState(false);
 
     const loadData = useCallback(async () => {
         if (!appUser?.companyId || !appUser?.idToken) {
@@ -488,6 +494,42 @@ export default function LeadDossierPage() {
 
                 {/* Sidebar */}
                 <div className="space-y-4 sm:space-y-6">
+                    {/* Lead Score Badge */}
+                    <LeadScoreBadge lead={lead} showDetails />
+
+                    {/* AI Insights */}
+                    <AILeadInsights 
+                        lead={lead} 
+                        onSuggestedAction={(action) => {
+                            if (action === 'email') setShowFollowupGenerator(true);
+                            else if (action === 'whatsapp') setShowFollowupGenerator(true);
+                            else if (action === 'call') handleQuickCall();
+                            else if (action === 'meeting') setShowAppointmentDialog(true);
+                        }}
+                    />
+
+                    {/* AI Action Buttons */}
+                    <div className="grid grid-cols-2 gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowFollowupGenerator(true)}
+                            className="h-9 text-xs"
+                        >
+                            <Icon icon="solar:magic-stick-3-linear" className="w-3.5 h-3.5 mr-1.5" />
+                            AI Follow-up
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowQuoteGenerator(true)}
+                            className="h-9 text-xs"
+                        >
+                            <Icon icon="solar:document-text-linear" className="w-3.5 h-3.5 mr-1.5" />
+                            Send Quote
+                        </Button>
+                    </div>
+
                     {/* Quick Actions */}
                     <LeadQuickActions 
                         lead={{
@@ -576,6 +618,20 @@ export default function LeadDossierPage() {
                     setShowAppointmentDialog(false);
                     loadData();
                 }}
+            />
+
+            {/* AI Follow-up Generator Dialog */}
+            <AIFollowupGenerator
+                lead={lead}
+                open={showFollowupGenerator}
+                onOpenChange={setShowFollowupGenerator}
+            />
+
+            {/* Quick Quote Generator Dialog */}
+            <QuickQuoteGenerator
+                lead={lead}
+                open={showQuoteGenerator}
+                onOpenChange={setShowQuoteGenerator}
             />
 
             {/* Mobile Sticky Action Bar */}

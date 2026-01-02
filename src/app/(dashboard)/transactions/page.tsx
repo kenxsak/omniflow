@@ -352,7 +352,7 @@ export default function TransactionsPage() {
                           </div>
                           {getStatusBadge(transaction.status)}
                         </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                        <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 text-xs mb-3">
                           <div>
                             <span className="text-muted-foreground">Amount</span>
                             <p className="font-semibold">{formatCurrency(transaction.amount, transaction.currency)}</p>
