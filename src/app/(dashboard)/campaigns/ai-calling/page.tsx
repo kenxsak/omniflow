@@ -63,12 +63,10 @@ export default function AICallingCampaignPage() {
     const fetchLeads = async () => {
       if (!appUser?.companyId) return;
       try {
-        const { getLeadsForCompany } = await import('@/lib/crm/lead-data');
-        const result = await getLeadsForCompany(appUser.companyId);
-        if (result) {
-          // Filter leads with phone numbers
-          const leadsWithPhone = result.filter((l: any) => l.phone);
-          setLeads(leadsWithPhone);
+        const { getLeadsWithPhoneAction } = await import('@/app/actions/pipeline-actions');
+        const result = await getLeadsWithPhoneAction(appUser.companyId);
+        if (result.success && result.leads) {
+          setLeads(result.leads);
         }
       } catch (e) {
         console.error('Failed to fetch leads:', e);

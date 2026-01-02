@@ -33,3 +33,37 @@ export async function getPipelineData(): Promise<Record<Lead['status'], Lead[]> 
     return null;
   }
 }
+
+
+/**
+ * Fetch leads with phone numbers for AI calling campaigns
+ */
+export async function getLeadsWithPhoneAction(companyId: string): Promise<{ 
+  success: boolean; 
+  leads?: Array<{ id: string; name: string; phone?: string; email?: string; status?: string }>; 
+  error?: string 
+}> {
+  try {
+    if (!companyId) {
+      return { success: false, error: 'Company ID required' };
+    }
+
+    const leads = await getLeadsForCompany(companyId);
+    
+    // Filter leads with phone numbers and map to minimal structure
+    const leadsWithPhone = leads
+      .filter(lead => lead.phone)
+      .map(lead => ({
+        id: lead.id,
+        name: lead.name,
+        phone: lead.phone,
+        email: lead.email,
+        status: lead.status
+      }));
+
+    return { success: true, leads: leadsWithPhone };
+  } catch (error) {
+    console.error('Error fetching leads with phone:', error);
+    return { success: false, error: 'Failed to fetch leads' };
+  }
+}
