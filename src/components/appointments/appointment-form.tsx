@@ -270,13 +270,13 @@ export function AppointmentForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
         {/* Client Information Section */}
-        <div className="border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50 p-4">
-          <div className="flex items-center gap-2 mb-4">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50 p-3 sm:p-4">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <Icon icon="solar:user-linear" className="h-4 w-4 text-muted-foreground" />
             <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Client Information</span>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <FormField
               control={form.control}
               name="clientName"
@@ -324,13 +324,13 @@ export function AppointmentForm({
         </div>
 
         {/* Appointment Details Section */}
-        <div className="border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50 p-4">
-          <div className="flex items-center gap-2 mb-4">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50 p-3 sm:p-4">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <Icon icon="solar:document-text-linear" className="h-4 w-4 text-muted-foreground" />
             <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Appointment Details</span>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <FormField
               control={form.control}
               name="title"
@@ -402,13 +402,13 @@ export function AppointmentForm({
         </div>
 
         {/* Schedule Section */}
-        <div className="border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50 p-4">
-          <div className="flex items-center gap-2 mb-4">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50 p-3 sm:p-4">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <Icon icon="solar:calendar-linear" className="h-4 w-4 text-muted-foreground" />
             <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Schedule</span>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <FormField
                 control={form.control}
@@ -564,22 +564,22 @@ export function AppointmentForm({
         </div>
 
         {/* Reminder Settings Section */}
-        <div className="border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50 p-4">
+        <div className="border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50 p-3 sm:p-4">
           <div className="flex items-center gap-2 mb-1">
             <Icon icon="solar:bell-linear" className="h-4 w-4 text-muted-foreground" />
             <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Reminder Settings</span>
           </div>
-          <p className="text-xs text-muted-foreground mb-4">
+          <p className="text-xs text-muted-foreground mb-3 sm:mb-4">
             Choose which channels to use for appointment reminders.
           </p>
 
           <div className="space-y-3">
-            <div className="flex items-center justify-between py-2 border-b border-stone-200 dark:border-stone-700 last:border-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-2 border-b border-stone-200 dark:border-stone-700 last:border-0">
               <div className="flex items-center gap-2">
                 <Icon icon="solar:letter-linear" className="h-4 w-4 text-muted-foreground" />
                 <Label htmlFor="emailReminder" className="text-sm">Email</Label>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 justify-between sm:justify-end">
                 <FormField
                   control={form.control}
                   name="emailReminderHours"
@@ -589,7 +589,7 @@ export function AppointmentForm({
                       value={field.value?.toString()}
                       disabled={!form.watch('emailReminder')}
                     >
-                      <SelectTrigger className="w-[130px] h-8 text-xs">
+                      <SelectTrigger className="w-[120px] sm:w-[130px] h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -612,12 +612,12 @@ export function AppointmentForm({
               </div>
             </div>
 
-            <div className="flex items-center justify-between py-2 border-b border-stone-200 dark:border-stone-700 last:border-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-2 border-b border-stone-200 dark:border-stone-700 last:border-0">
               <div className="flex items-center gap-2">
                 <Icon icon="solar:phone-linear" className="h-4 w-4 text-muted-foreground" />
                 <Label htmlFor="smsReminder" className="text-sm">SMS</Label>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 justify-between sm:justify-end">
                 <FormField
                   control={form.control}
                   name="smsReminderHours"
@@ -627,7 +627,7 @@ export function AppointmentForm({
                       value={field.value?.toString()}
                       disabled={!form.watch('smsReminder')}
                     >
-                      <SelectTrigger className="w-[130px] h-8 text-xs">
+                      <SelectTrigger className="w-[120px] sm:w-[130px] h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -650,12 +650,12 @@ export function AppointmentForm({
               </div>
             </div>
 
-            <div className="flex items-center justify-between py-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-2">
               <div className="flex items-center gap-2">
                 <Icon icon="solar:chat-round-linear" className="h-4 w-4 text-muted-foreground" />
                 <Label htmlFor="whatsappReminder" className="text-sm">WhatsApp</Label>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 justify-between sm:justify-end">
                 <FormField
                   control={form.control}
                   name="whatsappReminderHours"
@@ -665,7 +665,7 @@ export function AppointmentForm({
                       value={field.value?.toString()}
                       disabled={!form.watch('whatsappReminder')}
                     >
-                      <SelectTrigger className="w-[130px] h-8 text-xs">
+                      <SelectTrigger className="w-[120px] sm:w-[130px] h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

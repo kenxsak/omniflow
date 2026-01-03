@@ -124,6 +124,7 @@ export default function AICallingCampaignPage() {
               companyId: appUser.companyId,
               firstMessage: firstMessage || undefined,
               script: script || undefined,
+              provider: provider, // Pass selected provider (vapi or bland)
             }),
           });
 

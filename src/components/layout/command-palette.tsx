@@ -6,7 +6,9 @@ import { Icon } from '@iconify/react';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@/components/ui/dialog";
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { cn } from '@/lib/utils';
 import { MENU_CONFIG } from '@/lib/menu-config';
 
@@ -182,6 +184,9 @@ export default function CommandPalette() {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="w-[calc(100%-2rem)] max-w-[560px] p-0 gap-0 rounded-xl overflow-hidden">
+          <VisuallyHidden>
+            <DialogTitle>Command Palette</DialogTitle>
+          </VisuallyHidden>
           {/* Search Input */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-stone-200 dark:border-stone-800">
             <Icon icon="solar:magnifer-linear" className="w-5 h-5 text-muted-foreground flex-shrink-0" />
@@ -276,7 +281,7 @@ export default function CommandPalette() {
               </span>
             </div>
             <span className="text-[10px] text-muted-foreground">
-              Powered by OmniFlow AI
+              Powered by AI
             </span>
           </div>
         </DialogContent>

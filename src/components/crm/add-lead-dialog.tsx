@@ -160,7 +160,7 @@ export default function AddLeadDialog({ isOpen, onOpenChange, onAddLead }: AddLe
         reset(getResetValues());
       }
     }}>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-[480px] p-4 sm:p-6 rounded-xl">
         <DialogHeader>
           <DialogTitle>Add New Contact</DialogTitle>
           <DialogDescription>

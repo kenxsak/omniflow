@@ -77,7 +77,7 @@ const initialSaasPlans: Plan[] = [
   {
     id: 'plan_free',
     name: 'Free',
-    description: 'Try OmniFlow with 20 AI generations to experience the power.',
+    description: 'Try the platform with 20 AI generations to experience the power.',
     priceMonthlyUSD: 0,
     yearlyDiscountPercentage: 0,
     featureIds: ['feat_core_crm', 'feat_ai_content_gen', 'feat_digital_cards', 'feat_landing_pages', 'feat_ai_chat'],
@@ -496,7 +496,7 @@ export async function addAppUser(firebaseUser: { uid: string, email: string | nu
         const companyDoc = await getDoc(companyDocRef);
         if (!companyDoc.exists()) {
             await setDoc(companyDocRef, {
-                name: 'OmniFlow Platform',
+                name: 'Platform Admin',
                 ownerId: firebaseUser.uid,
                 planId: 'plan_enterprise',
                 billingCycle: 'yearly',

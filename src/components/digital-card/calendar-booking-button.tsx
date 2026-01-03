@@ -62,7 +62,7 @@ export default function CalendarBookingButton({
           {buttonText}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh]">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-2xl max-h-[90vh] p-4 sm:p-6 rounded-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CalendarDays className="h-5 w-5" style={{ color: primaryColor }} />

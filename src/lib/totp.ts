@@ -24,7 +24,7 @@ export function generateTOTPSecret(): string {
 export function generateTOTPUri(
   secret: string,
   email: string,
-  issuer: string = 'OmniFlow'
+  issuer: string = process.env.NEXT_PUBLIC_APP_NAME || 'Platform'
 ): string {
   const encodedIssuer = encodeURIComponent(issuer);
   const encodedEmail = encodeURIComponent(email);

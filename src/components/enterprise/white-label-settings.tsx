@@ -149,7 +149,7 @@ export function WhiteLabelSettingsPanel() {
                 onChange={(e) => setSettings(prev => ({ ...prev, brandName: e.target.value }))}
                 className="h-9 sm:h-10 text-sm"
               />
-              <p className="text-[10px] sm:text-xs text-muted-foreground">Replaces "OmniFlow" throughout the app</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Replaces the default brand name throughout the app</p>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="supportEmail" className="text-xs sm:text-sm">Support Email</Label>

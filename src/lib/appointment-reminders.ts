@@ -265,7 +265,7 @@ function generateReminderEmailHTML(
                 This reminder was sent by <strong>${companyName}</strong>
               </p>
               <p style="margin: 8px 0 0; color: #a0aec0; font-size: 12px; text-align: center;">
-                Powered by OmniFlow
+                Powered by ${companyName}
               </p>
             </td>
           </tr>

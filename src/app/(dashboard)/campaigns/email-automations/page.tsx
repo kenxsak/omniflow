@@ -213,22 +213,22 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-4xl lg:max-w-5xl max-h-[95vh] sm:max-h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-[90vw] md:max-w-4xl lg:max-w-5xl max-h-[95vh] sm:max-h-[90vh] flex flex-col p-0 gap-0 overflow-hidden rounded-xl">
         {/* Header with accent bar */}
-        <div className="relative px-6 pt-6 pb-4 border-b border-stone-200 dark:border-stone-800">
+        <div className="relative px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 border-b border-stone-200 dark:border-stone-800">
           <div className="absolute inset-x-12 top-0 h-0.5 rounded-b-full bg-blue-500 dark:bg-blue-400" />
           <DialogHeader className="space-y-1">
-            <DialogTitle className="text-lg font-semibold pr-8">{config.name}</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">{config.description}</DialogDescription>
+            <DialogTitle className="text-base sm:text-lg font-semibold pr-8">{config.name}</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm text-muted-foreground">{config.description}</DialogDescription>
           </DialogHeader>
         </div>
         
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4 sm:space-y-5">
           {/* Link to Email List Section */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
             <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-teal-500 dark:bg-teal-400" />
-            <div className="p-4 pt-5">
+            <div className="p-3 sm:p-4 pt-4 sm:pt-5">
               <div className="flex items-center gap-2 mb-3">
                 <Icon icon="solar:link-linear" className="h-4 w-4 text-teal-500 dark:text-teal-400" />
                 <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Link to Email List</span>
@@ -260,15 +260,15 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
           {/* Delivery Provider Section */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
             <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-purple-500 dark:bg-purple-400" />
-            <div className="p-4 pt-5">
+            <div className="p-3 sm:p-4 pt-4 sm:pt-5">
               <div className="flex items-center gap-2 mb-1">
                 <Icon icon="solar:server-linear" className="h-4 w-4 text-purple-500 dark:text-purple-400" />
                 <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Delivery Provider</span>
               </div>
-              <p className="text-xs text-muted-foreground mb-4">
+              <p className="text-xs text-muted-foreground mb-3 sm:mb-4">
                 Choose which email service to use for sending.
               </p>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => setDeliveryProvider('brevo')}
@@ -344,8 +344,8 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
           {/* Email Sequence Steps Section */}
           <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
             <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-emerald-500 dark:bg-emerald-400" />
-            <div className="p-4 pt-5">
-              <div className="flex items-center justify-between mb-4">
+            <div className="p-3 sm:p-4 pt-4 sm:pt-5">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <div className="flex items-center gap-2">
                   <Icon icon="solar:list-check-linear" className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
                   <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Email Sequence Steps</span>
@@ -356,8 +356,8 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
               <div className="space-y-3">
                 {config.steps.map((step, index) => (
                   <div key={step.id} className="relative group border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-900/50 overflow-hidden">
-                    <div className="p-4">
-                      <div className="flex items-start gap-3">
+                    <div className="p-3 sm:p-4">
+                      <div className="flex items-start gap-2 sm:gap-3">
                         {/* Step number badge */}
                         <div className={cn(
                           "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold",
@@ -466,21 +466,21 @@ function ConfigureAutomationDialog({ automation, lists, isOpen, onOpenChange, on
         </div>
         
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
-          <div className="flex items-center justify-between">
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => handleAddStep('email')} className="h-8 text-xs">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-2">
+            <div className="flex gap-2 order-2 sm:order-1">
+              <Button variant="outline" size="sm" onClick={() => handleAddStep('email')} className="h-9 sm:h-8 text-xs flex-1 sm:flex-none">
                 <Icon icon="solar:add-circle-linear" className="mr-1.5 h-3.5 w-3.5" /> Add Email
               </Button>
-              <Button variant="outline" size="sm" onClick={() => handleAddStep('delay')} className="h-8 text-xs">
+              <Button variant="outline" size="sm" onClick={() => handleAddStep('delay')} className="h-9 sm:h-8 text-xs flex-1 sm:flex-none">
                 <Icon icon="solar:clock-circle-linear" className="mr-1.5 h-3.5 w-3.5" /> Add Delay
               </Button>
             </div>
-            <div className="flex gap-2">
-              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="h-8 text-xs">
+            <div className="flex gap-2 order-1 sm:order-2">
+              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="h-9 sm:h-8 text-xs flex-1 sm:flex-none">
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleSave} disabled={!selectedListId && matchingLists.length > 0} className="h-8 text-xs">
+              <Button size="sm" onClick={handleSave} disabled={!selectedListId && matchingLists.length > 0} className="h-9 sm:h-8 text-xs flex-1 sm:flex-none">
                 <Icon icon="solar:diskette-linear" className="mr-1.5 h-3.5 w-3.5" />
                 Save Configuration
               </Button>

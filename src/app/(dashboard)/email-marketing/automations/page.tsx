@@ -125,7 +125,7 @@ function ConfigureAutomationDialog({ automation, isOpen, onOpenChange, onSave }:
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-5xl max-h-[90vh] flex flex-col">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-5xl max-h-[90vh] flex flex-col p-4 sm:p-6 rounded-xl">
         <DialogHeader>
           <DialogTitle>Set Up: {automation.name}</DialogTitle>
           <DialogDescription>{automation.description}</DialogDescription>

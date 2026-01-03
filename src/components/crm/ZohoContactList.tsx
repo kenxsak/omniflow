@@ -76,7 +76,7 @@ export default function ZohoContactList() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <CardTitle>Zoho CRM Contacts</CardTitle>
-                        <CardDescription>Migrate your Zoho contacts into OmniFlow (one-time import)</CardDescription>
+                        <CardDescription>Migrate your Zoho contacts (one-time import)</CardDescription>
                     </div>
                      <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}

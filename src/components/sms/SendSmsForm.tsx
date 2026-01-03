@@ -532,7 +532,7 @@ export default function SendSmsForm() {
 
       {/* Template Browser Dialog */}
       <Dialog open={isTemplateBrowserOpen} onOpenChange={setIsTemplateBrowserOpen}>
-        <DialogContent className="sm:max-w-4xl">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-4xl max-h-[90vh] p-4 sm:p-6 rounded-xl">
           <DialogHeader className="relative">
             <DialogTitle>Select an SMS Template</DialogTitle>
             <DialogCloseButton />

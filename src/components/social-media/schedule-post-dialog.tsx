@@ -69,7 +69,7 @@ export default function SchedulePostDialog({ post, isOpen, onOpenChange, onSave 
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-md p-4 sm:p-6 rounded-xl">
         <DialogHeader className="relative">
           <DialogTitle>Schedule Post</DialogTitle>
           <DialogDescription>

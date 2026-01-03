@@ -135,7 +135,7 @@ export function EmbedFormGenerator() {
   </button>
   
   <p style="margin-top:12px;font-size:11px;color:#9ca3af;text-align:center;">
-    Powered by <a href="${appUrl}" target="_blank" style="color:#6366f1;text-decoration:none;">${company?.name || 'OmniFlow'}</a>
+    Powered by <a href="${appUrl}" target="_blank" style="color:#6366f1;text-decoration:none;">${company?.name || ''}</a>
   </p>
 </form>
 

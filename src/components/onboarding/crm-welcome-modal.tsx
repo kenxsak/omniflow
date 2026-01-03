@@ -134,7 +134,7 @@ export function CrmWelcomeModal({ company, onDismiss, onComplete }: CrmWelcomeMo
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="w-[95vw] max-w-[550px] max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-[550px] max-h-[90vh] overflow-y-auto p-0 rounded-xl">
         {/* Header */}
         <div className="relative border-b border-stone-200 dark:border-stone-800 p-6">
           <div className="absolute inset-x-14 top-0 h-0.5 rounded-b-full bg-primary" />

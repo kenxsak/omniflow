@@ -262,8 +262,8 @@ async function executeSendEmail(
   if (apiKeys.brevo?.apiKey) {
     const result = await sendBrevoEmail(
       apiKeys.brevo.apiKey,
-      apiKeys.brevo.senderEmail || 'noreply@omniflow.com',
-      apiKeys.brevo.senderName || 'OmniFlow',
+      apiKeys.brevo.senderEmail || process.env.DEFAULT_SENDER_EMAIL || 'noreply@example.com',
+      apiKeys.brevo.senderName || process.env.DEFAULT_SENDER_NAME || 'Platform',
       entityData.email,
       entityData.name || 'there',
       subject,
@@ -275,8 +275,8 @@ async function executeSendEmail(
   if (apiKeys.sender?.apiKey) {
     const result = await sendSenderEmail(
       apiKeys.sender.apiKey,
-      apiKeys.sender.senderEmail || 'noreply@omniflow.com',
-      apiKeys.sender.senderName || 'OmniFlow',
+      apiKeys.sender.senderEmail || process.env.DEFAULT_SENDER_EMAIL || 'noreply@example.com',
+      apiKeys.sender.senderName || process.env.DEFAULT_SENDER_NAME || 'Platform',
       entityData.email,
       entityData.name || 'there',
       subject,
@@ -292,8 +292,8 @@ async function executeSendEmail(
         port: apiKeys.smtp.port || 587,
         username: apiKeys.smtp.username || apiKeys.smtp.user || '',
         password: apiKeys.smtp.password || '',
-        fromEmail: apiKeys.smtp.fromEmail || 'noreply@omniflow.com',
-        fromName: apiKeys.smtp.fromName || 'OmniFlow',
+        fromEmail: apiKeys.smtp.fromEmail || process.env.DEFAULT_SENDER_EMAIL || 'noreply@example.com',
+        fromName: apiKeys.smtp.fromName || process.env.DEFAULT_SENDER_NAME || 'Platform',
       },
       {
         to: entityData.email,
@@ -739,8 +739,8 @@ function getPlatformAPIKeys(): CompanyAPIKeys {
   if (process.env.BREVO_API_KEY) {
     platformKeys.brevo = {
       apiKey: process.env.BREVO_API_KEY,
-      senderEmail: process.env.BREVO_SENDER_EMAIL || 'noreply@omniflow.com',
-      senderName: process.env.BREVO_SENDER_NAME || 'OmniFlow',
+      senderEmail: process.env.BREVO_SENDER_EMAIL || process.env.DEFAULT_SENDER_EMAIL || 'noreply@example.com',
+      senderName: process.env.BREVO_SENDER_NAME || process.env.DEFAULT_SENDER_NAME || 'Platform',
     };
   }
   
@@ -748,8 +748,8 @@ function getPlatformAPIKeys(): CompanyAPIKeys {
   if (process.env.SENDER_API_KEY) {
     platformKeys.sender = {
       apiKey: process.env.SENDER_API_KEY,
-      senderEmail: process.env.SENDER_EMAIL || 'noreply@omniflow.com',
-      senderName: process.env.SENDER_NAME || 'OmniFlow',
+      senderEmail: process.env.SENDER_EMAIL || process.env.DEFAULT_SENDER_EMAIL || 'noreply@example.com',
+      senderName: process.env.SENDER_NAME || process.env.DEFAULT_SENDER_NAME || 'Platform',
     };
   }
   

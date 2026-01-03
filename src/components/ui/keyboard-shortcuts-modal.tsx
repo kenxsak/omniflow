@@ -84,7 +84,7 @@ export function KeyboardShortcutsModal({ open, onOpenChange }: KeyboardShortcuts
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-md p-4 sm:p-6 rounded-xl">
         <DialogHeader className="relative">
           <DialogTitle className="flex items-center gap-2">
             {isMac ? (

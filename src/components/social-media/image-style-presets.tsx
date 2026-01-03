@@ -83,7 +83,7 @@ export function ImageStylePresets({
             )}
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-lg max-h-[85vh] p-0">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-lg max-h-[85vh] p-0 rounded-xl">
           <DialogHeader className="p-4 pb-2">
             <DialogTitle className="flex items-center gap-2 text-base">
               <Icon icon="solar:pallete-2-bold" className="h-5 w-5" />

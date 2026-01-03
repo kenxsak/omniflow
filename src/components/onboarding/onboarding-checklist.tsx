@@ -383,7 +383,7 @@ export default function OnboardingChecklist() {
 
       {/* Dismiss confirmation dialog */}
       <Dialog open={showDismissDialog} onOpenChange={setShowDismissDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-md p-4 sm:p-6 rounded-xl">
           <DialogHeader>
             <DialogTitle>Hide Setup Guide?</DialogTitle>
             <DialogDescription>

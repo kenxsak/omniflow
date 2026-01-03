@@ -188,7 +188,7 @@ export default function ContactForm({
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="w-[95vw] max-w-[420px] p-0 gap-0 overflow-hidden">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] p-0 gap-0 overflow-hidden rounded-xl">
         {/* Header */}
         <DialogHeader className="px-4 pt-4 pb-3 sm:px-6 sm:pt-6 sm:pb-4 border-b border-stone-200 dark:border-stone-800">
           <DialogTitle className="text-lg sm:text-xl">{formTitle}</DialogTitle>

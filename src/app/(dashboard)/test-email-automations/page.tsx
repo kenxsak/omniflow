@@ -173,7 +173,7 @@ export default function TestEmailAutomationsPage() {
             </Badge>
 
             {result.summary && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                 <div className="p-3 bg-muted rounded-lg text-center">
                   <p className="text-2xl font-bold">{result.summary.companiesProcessed || 0}</p>
                   <p className="text-xs text-muted-foreground">Companies</p>

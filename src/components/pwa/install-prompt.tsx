@@ -89,7 +89,7 @@ export function PWAInstallPrompt() {
           
           <div className="flex-1 min-w-0">
             <h3 className="text-sm sm:text-base font-semibold text-foreground">
-              Install OmniFlow App
+              Install App
             </h3>
             <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
               {isIOS 

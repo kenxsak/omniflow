@@ -56,7 +56,7 @@ export function PlanFeaturesModal({ plan, allPlans, trigger, className }: PlanFe
           </button>
         )}
       </DialogTrigger>
-      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] sm:max-h-[85vh] p-0 overflow-hidden">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-2xl max-h-[90vh] sm:max-h-[85vh] p-0 overflow-hidden rounded-xl">
         <DialogHeader className="p-4 sm:p-6 pb-0 sm:pb-0">
           <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
             <Icon icon="solar:checklist-bold" className="h-5 w-5 text-primary shrink-0" />

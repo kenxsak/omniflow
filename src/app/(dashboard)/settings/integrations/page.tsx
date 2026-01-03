@@ -21,7 +21,24 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { GeminiIcon, BrevoIcon, TwilioIcon, WhatsAppIcon, VapiIcon, BlandIcon, PlivoIcon, ExotelIcon } from '@/components/icons/brand-icons';
+import { 
+  GeminiIcon, BrevoIcon, TwilioIcon, WhatsAppIcon, VapiIcon, BlandIcon, PlivoIcon, ExotelIcon, 
+  IndiaMartIcon, JustDialIcon, Bitrix24Icon, HubSpotIcon,
+  // Coming Soon Lead Sources
+  TradeIndiaIcon, NinetyNineAcresIcon, MagicBricksIcon, HousingIcon, SulekhaIcon,
+  GoogleAdsIcon, LinkedInIcon, InstagramIcon, TypeformIcon, GoogleFormsIcon,
+  CommonFloorIcon, NoBrokerIcon, QuikrIcon, OLXIcon, PractoIcon,
+  CarDekhoIcon, CarWaleIcon, ShikshaIcon, ZomatoIcon, SwiggyIcon,
+  UrbanCompanyIcon, JotformIcon, TallyIcon,
+  // Additional Coming Soon
+  TikTokIcon, BingAdsIcon, ZoomIcon, EventbriteIcon, IntercomIcon, DriftIcon, CrispIcon,
+  NaukriIcon, MatrimonyIcon,
+  TwitterIcon, PinterestIcon, YouTubeIcon, SalesforceIcon, PipedriveIcon, FreshsalesIcon,
+  ZapierIcon, MakeIcon, PabblyIcon, WebhookIcon,
+  UnbounceIcon, LeadpagesIcon, ClickFunnelsIcon, MailchimpIcon, ActiveCampaignIcon, ConvertKitIcon,
+  StripeIcon, RazorpayIcon, PayUIcon, CashfreeIcon, SlackIcon, TeamsIcon, DiscordIcon, TelegramIcon,
+  AirtableIcon, NotionIcon, GoogleSheetsIcon, ExcelIcon
+} from '@/components/icons/brand-icons';
 import { saveApiKeysAction } from '@/app/actions/api-keys-actions';
 
 // --- Types ---
@@ -39,9 +56,10 @@ interface IntegrationDef {
   name: string;
   description: string;
   icon: React.ReactNode | string;
-  category: 'AI' | 'AI Chatbot' | 'AI Calling' | 'Telephony' | 'Email' | 'SMS' | 'WhatsApp' | 'CRM' | 'Social Media' | 'Other';
+  category: 'AI' | 'AI Chatbot' | 'AI Calling' | 'Telephony' | 'Email' | 'SMS' | 'WhatsApp' | 'CRM' | 'Lead Sources' | 'Automation' | 'Communication' | 'Email Marketing' | 'Payments' | 'Productivity' | 'Other';
   docLink: string;
   fields: IntegrationField[];
+  comingSoon?: boolean;
 }
 
 // --- Icons Helper ---
@@ -265,12 +283,12 @@ const INTEGRATIONS: IntegrationDef[] = [
     ]
   },
 
-  // Other Tools
+  // Scheduling/Booking - Lead Source
   {
     id: 'calcom',
     name: 'Cal.com',
-    description: 'Automated appointment booking with calendar sync',
-    category: 'Other',
+    description: 'Sync appointment bookings as leads with full API integration',
+    category: 'Lead Sources',
     icon: 'simple-icons:caldotcom',
     docLink: 'https://app.cal.com/settings/developer/api-keys',
     fields: [
@@ -282,7 +300,7 @@ const INTEGRATIONS: IntegrationDef[] = [
     name: 'HubSpot',
     description: 'Sync contacts and deals from HubSpot CRM',
     category: 'CRM',
-    icon: 'simple-icons:hubspot',
+    icon: <HubSpotIcon />,
     docLink: 'https://app.hubspot.com/private-apps',
     fields: [
       { key: 'apiKey', label: 'Access Token', placeholder: '...', type: 'password', help: 'Private Apps > Create > Copy Access Token' },
@@ -308,19 +326,50 @@ const INTEGRATIONS: IntegrationDef[] = [
     name: 'Bitrix24',
     description: 'Social enterprise platform workspace',
     category: 'CRM',
-    icon: 'https://www.linxys.de/wp-content/uploads/2019/02/bitrix24-Social-Intranet-L%C3%B6sung-LINXYS.png',
+    icon: <Bitrix24Icon />,
     docLink: 'https://helpdesk.bitrix24.com/open/12357770/',
     fields: [
       { key: 'webhookUrl', label: 'Webhook URL', placeholder: 'https://b24-....bitrix24.com/rest/...', type: 'text' },
       { key: 'userId', label: 'User ID (Optional)', placeholder: '...', type: 'text' }
     ]
   },
+  // Coming Soon CRMs
+  {
+    id: 'salesforce',
+    name: 'Salesforce',
+    description: 'World\'s #1 CRM platform integration',
+    category: 'CRM',
+    icon: <SalesforceIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'pipedrive',
+    name: 'Pipedrive',
+    description: 'Sales-focused CRM for small teams',
+    category: 'CRM',
+    icon: <PipedriveIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'freshsales',
+    name: 'Freshsales',
+    description: 'AI-powered CRM by Freshworks',
+    category: 'CRM',
+    icon: <FreshsalesIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
   // Lead Generation
   {
     id: 'facebookLeads',
     name: 'Facebook Lead Ads',
     description: 'Auto-sync leads from Facebook Lead Ad forms to your CRM',
-    category: 'CRM',
+    category: 'Lead Sources',
     icon: 'logos:facebook',
     docLink: 'https://developers.facebook.com/docs/marketing-api/guides/lead-ads/',
     fields: [
@@ -334,8 +383,8 @@ const INTEGRATIONS: IntegrationDef[] = [
     id: 'indiamart',
     name: 'IndiaMART',
     description: 'Auto-sync buyer inquiries from IndiaMART to your CRM',
-    category: 'CRM',
-    icon: 'simple-icons:indiamart',
+    category: 'Lead Sources',
+    icon: <IndiaMartIcon />,
     docLink: '/settings/indiamart',
     fields: []
   },
@@ -343,10 +392,605 @@ const INTEGRATIONS: IntegrationDef[] = [
     id: 'justdial',
     name: 'JustDial',
     description: 'Auto-sync leads from JustDial business listing',
-    category: 'CRM',
-    icon: 'mdi:phone-search',
+    category: 'Lead Sources',
+    icon: <JustDialIcon />,
     docLink: '/settings/justdial',
     fields: []
+  },
+  // Coming Soon Lead Sources - India B2B Marketplaces
+  {
+    id: 'tradeindia',
+    name: 'TradeIndia',
+    description: 'B2B marketplace for Indian manufacturers and exporters',
+    category: 'Lead Sources',
+    icon: <TradeIndiaIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  // Coming Soon - Real Estate Portals (India)
+  {
+    id: '99acres',
+    name: '99acres',
+    description: 'India\'s leading real estate portal for property leads',
+    category: 'Lead Sources',
+    icon: <NinetyNineAcresIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'magicbricks',
+    name: 'MagicBricks',
+    description: 'Real estate property portal for buyers and sellers',
+    category: 'Lead Sources',
+    icon: <MagicBricksIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'housing',
+    name: 'Housing.com',
+    description: 'Real estate platform for property listings and leads',
+    category: 'Lead Sources',
+    icon: <HousingIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'commonfloor',
+    name: 'CommonFloor',
+    description: 'Real estate marketplace for property leads',
+    category: 'Lead Sources',
+    icon: <CommonFloorIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'nobroker',
+    name: 'NoBroker',
+    description: 'Direct property owner leads without brokerage',
+    category: 'Lead Sources',
+    icon: <NoBrokerIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  // Coming Soon - Local Services (India)
+  {
+    id: 'sulekha',
+    name: 'Sulekha',
+    description: 'Local services marketplace for service provider leads',
+    category: 'Lead Sources',
+    icon: <SulekhaIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'urbancompany',
+    name: 'Urban Company',
+    description: 'Home services platform leads (formerly UrbanClap)',
+    category: 'Lead Sources',
+    icon: <UrbanCompanyIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  // Coming Soon - Classifieds (India)
+  {
+    id: 'quikr',
+    name: 'Quikr',
+    description: 'Classifieds marketplace for various business leads',
+    category: 'Lead Sources',
+    icon: <QuikrIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'olx',
+    name: 'OLX',
+    description: 'Buy & sell classifieds platform leads',
+    category: 'Lead Sources',
+    icon: <OLXIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  // Coming Soon - Industry Specific (India)
+  {
+    id: 'practo',
+    name: 'Practo',
+    description: 'Healthcare platform for doctor and clinic leads',
+    category: 'Lead Sources',
+    icon: <PractoIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'cardekho',
+    name: 'CarDekho',
+    description: 'Auto portal for car buyer and seller leads',
+    category: 'Lead Sources',
+    icon: <CarDekhoIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'carwale',
+    name: 'CarWale',
+    description: 'Automobile marketplace for vehicle leads',
+    category: 'Lead Sources',
+    icon: <CarWaleIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'shiksha',
+    name: 'Shiksha',
+    description: 'Education portal for student inquiry leads',
+    category: 'Lead Sources',
+    icon: <ShikshaIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'zomato',
+    name: 'Zomato',
+    description: 'Restaurant and food business leads',
+    category: 'Lead Sources',
+    icon: <ZomatoIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'swiggy',
+    name: 'Swiggy',
+    description: 'Food delivery partner and restaurant leads',
+    category: 'Lead Sources',
+    icon: <SwiggyIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  // Coming Soon - Global Ad Platforms
+  {
+    id: 'googleAdsLeads',
+    name: 'Google Ads Lead Forms',
+    description: 'Capture leads directly from Google search and display ads',
+    category: 'Lead Sources',
+    icon: <GoogleAdsIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'linkedinLeads',
+    name: 'LinkedIn Lead Gen Forms',
+    description: 'B2B lead generation from LinkedIn advertising',
+    category: 'Lead Sources',
+    icon: <LinkedInIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'instagramLeads',
+    name: 'Instagram Lead Ads',
+    description: 'Capture leads from Instagram advertising campaigns',
+    category: 'Lead Sources',
+    icon: <InstagramIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  // Coming Soon - Form Builders
+  {
+    id: 'typeform',
+    name: 'Typeform',
+    description: 'Beautiful conversational forms for lead capture',
+    category: 'Lead Sources',
+    icon: <TypeformIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'googleForms',
+    name: 'Google Forms',
+    description: 'Free form builder for lead collection',
+    category: 'Lead Sources',
+    icon: <GoogleFormsIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'jotform',
+    name: 'Jotform',
+    description: 'Powerful online form builder for lead capture',
+    category: 'Lead Sources',
+    icon: <JotformIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'tally',
+    name: 'Tally',
+    description: 'Simple and free form builder for lead generation',
+    category: 'Lead Sources',
+    icon: <TallyIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  // Coming Soon - Global Ad Platforms (Additional)
+  {
+    id: 'tiktokLeads',
+    name: 'TikTok Lead Gen',
+    description: 'Capture leads from TikTok advertising campaigns',
+    category: 'Lead Sources',
+    icon: <TikTokIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'bingAds',
+    name: 'Microsoft/Bing Ads',
+    description: 'Lead forms from Microsoft Advertising network',
+    category: 'Lead Sources',
+    icon: <BingAdsIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'twitterLeads',
+    name: 'Twitter/X Lead Gen',
+    description: 'Capture leads from Twitter advertising',
+    category: 'Lead Sources',
+    icon: <TwitterIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'pinterestLeads',
+    name: 'Pinterest Lead Ads',
+    description: 'Lead generation from Pinterest advertising',
+    category: 'Lead Sources',
+    icon: <PinterestIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'youtubeLeads',
+    name: 'YouTube Lead Forms',
+    description: 'Capture leads from YouTube video ads',
+    category: 'Lead Sources',
+    icon: <YouTubeIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  // Coming Soon - Webinar & Events
+  {
+    id: 'zoomWebinar',
+    name: 'Zoom Webinar',
+    description: 'Sync webinar registrants as leads',
+    category: 'Lead Sources',
+    icon: <ZoomIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'eventbrite',
+    name: 'Eventbrite',
+    description: 'Event registration leads sync',
+    category: 'Lead Sources',
+    icon: <EventbriteIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  // Coming Soon - Chat Widgets (These have APIs for full integration)
+  {
+    id: 'intercom',
+    name: 'Intercom',
+    description: 'Full CRM sync with Intercom conversations and contacts',
+    category: 'Lead Sources',
+    icon: <IntercomIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'drift',
+    name: 'Drift',
+    description: 'B2B conversational marketing with full contact sync',
+    category: 'Lead Sources',
+    icon: <DriftIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'crisp',
+    name: 'Crisp',
+    description: 'Live chat with contact and conversation sync',
+    category: 'Lead Sources',
+    icon: <CrispIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  // Note: Shopify, WooCommerce, Calendly removed - use Webhooks page for simple lead capture
+  // Coming Soon - India Specific (Additional)
+  {
+    id: 'naukri',
+    name: 'Naukri.com',
+    description: 'Recruitment and HR leads via API',
+    category: 'Lead Sources',
+    icon: <NaukriIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'matrimony',
+    name: 'Matrimony.com',
+    description: 'Wedding vendor and service leads',
+    category: 'Lead Sources',
+    icon: <MatrimonyIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  // Note: WordPress form builders (Gravity Forms, WPForms) removed - use Webhooks page
+  // Coming Soon - Landing Page Builders (These have APIs)
+  {
+    id: 'unbounce',
+    name: 'Unbounce',
+    description: 'Native API integration for landing page leads',
+    category: 'Lead Sources',
+    icon: <UnbounceIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'leadpages',
+    name: 'Leadpages',
+    description: 'Landing page lead capture via API',
+    category: 'Lead Sources',
+    icon: <LeadpagesIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'clickfunnels',
+    name: 'ClickFunnels',
+    description: 'Sales funnel leads with full sync',
+    category: 'Lead Sources',
+    icon: <ClickFunnelsIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  // Coming Soon - Generic Webhook kept for custom integrations
+  {
+    id: 'customWebhook',
+    name: 'Custom Webhook',
+    description: 'Connect any app via webhook URL',
+    category: 'Lead Sources',
+    icon: <WebhookIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+
+  // ============ AUTOMATION CATEGORY ============
+  {
+    id: 'zapier',
+    name: 'Zapier',
+    description: 'Connect 5000+ apps with automated workflows',
+    category: 'Automation',
+    icon: <ZapierIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'make',
+    name: 'Make (Integromat)',
+    description: 'Visual automation platform for complex workflows',
+    category: 'Automation',
+    icon: <MakeIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'pabbly',
+    name: 'Pabbly Connect',
+    description: 'Affordable automation with lifetime deals',
+    category: 'Automation',
+    icon: <PabblyIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+
+  // ============ COMMUNICATION CATEGORY ============
+  {
+    id: 'slack',
+    name: 'Slack',
+    description: 'Get lead notifications in Slack channels',
+    category: 'Communication',
+    icon: <SlackIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'teams',
+    name: 'Microsoft Teams',
+    description: 'Lead alerts and updates in Teams',
+    category: 'Communication',
+    icon: <TeamsIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'discord',
+    name: 'Discord',
+    description: 'Lead notifications in Discord servers',
+    category: 'Communication',
+    icon: <DiscordIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'telegram',
+    name: 'Telegram',
+    description: 'Instant lead alerts via Telegram bot',
+    category: 'Communication',
+    icon: <TelegramIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+
+  // ============ EMAIL MARKETING CATEGORY ============
+  {
+    id: 'mailchimp',
+    name: 'Mailchimp',
+    description: 'Sync leads to Mailchimp audiences',
+    category: 'Email Marketing',
+    icon: <MailchimpIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'activecampaign',
+    name: 'ActiveCampaign',
+    description: 'Marketing automation and email platform',
+    category: 'Email Marketing',
+    icon: <ActiveCampaignIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'convertkit',
+    name: 'ConvertKit',
+    description: 'Email marketing for creators',
+    category: 'Email Marketing',
+    icon: <ConvertKitIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+
+  // ============ PAYMENTS CATEGORY ============
+  {
+    id: 'stripe',
+    name: 'Stripe',
+    description: 'Payment processing and invoicing',
+    category: 'Payments',
+    icon: <StripeIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'razorpay',
+    name: 'Razorpay',
+    description: 'India\'s leading payment gateway',
+    category: 'Payments',
+    icon: <RazorpayIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'payu',
+    name: 'PayU',
+    description: 'Payment solutions for India',
+    category: 'Payments',
+    icon: <PayUIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'cashfree',
+    name: 'Cashfree',
+    description: 'Payment gateway and payouts',
+    category: 'Payments',
+    icon: <CashfreeIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+
+  // ============ PRODUCTIVITY CATEGORY ============
+  {
+    id: 'airtable',
+    name: 'Airtable',
+    description: 'Sync leads to Airtable bases',
+    category: 'Productivity',
+    icon: <AirtableIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'notion',
+    name: 'Notion',
+    description: 'Send leads to Notion databases',
+    category: 'Productivity',
+    icon: <NotionIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'googleSheets',
+    name: 'Google Sheets',
+    description: 'Auto-export leads to spreadsheets',
+    category: 'Productivity',
+    icon: <GoogleSheetsIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
+  },
+  {
+    id: 'excel',
+    name: 'Microsoft Excel',
+    description: 'Export leads to Excel Online',
+    category: 'Productivity',
+    icon: <ExcelIcon />,
+    docLink: '#',
+    fields: [],
+    comingSoon: true
   },
 
   // Telephony - Voice Calling (Regular phone calls)
@@ -462,6 +1106,35 @@ function IntegrationCard({
     }
   };
 
+  // Coming Soon card - non-interactive
+  if (integration.comingSoon) {
+    return (
+      <Card 
+        className="group relative overflow-hidden border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950/50 h-full flex flex-col opacity-75"
+      >
+        <CardHeader className="p-5 flex-1">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-stone-100 dark:bg-stone-900 shadow-sm border border-stone-100 dark:border-stone-800 text-stone-900 dark:text-stone-100 p-1.5 grayscale">
+              <IntegrationIcon icon={integration.icon} className="w-full h-full" />
+            </div>
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full text-stone-500 dark:text-stone-400 text-[10px] font-medium border border-stone-300 dark:border-stone-600 bg-stone-100 dark:bg-stone-800">
+              <Icon icon="solar:clock-circle-linear" className="w-3 h-3" />
+              <span>Coming Soon</span>
+            </div>
+          </div>
+          <div className="mt-4 space-y-1">
+            <CardTitle className="text-base font-semibold text-stone-900 dark:text-stone-100">
+              {integration.name}
+            </CardTitle>
+            <CardDescription className="text-xs text-stone-500 line-clamp-2">
+              {integration.description}
+            </CardDescription>
+          </div>
+        </CardHeader>
+      </Card>
+    );
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -506,7 +1179,7 @@ function IntegrationCard({
         </Card>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-xl p-0 overflow-hidden border-stone-200 dark:border-stone-800 shadow-2xl max-h-[90vh] sm:max-h-[85vh]">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-xl p-0 overflow-hidden border-stone-200 dark:border-stone-800 shadow-2xl max-h-[90vh] sm:max-h-[85vh] rounded-xl">
         <div className="px-4 sm:px-6 py-4 sm:py-6 border-b border-stone-100 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/30">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white dark:bg-stone-950 shadow-sm border border-stone-100 dark:border-stone-800 text-stone-900 dark:text-stone-100 p-2 sm:p-2.5 shrink-0">
@@ -755,7 +1428,7 @@ export default function IntegrationsPage() {
 
   // Group by category
   // Order categories logically
-  const ORDERED_CATEGORIES = ['AI', 'AI Chatbot', 'AI Calling', 'Telephony', 'Email', 'SMS', 'WhatsApp', 'CRM', 'Other'];
+  const ORDERED_CATEGORIES = ['AI', 'AI Chatbot', 'AI Calling', 'Telephony', 'Email', 'SMS', 'WhatsApp', 'CRM', 'Lead Sources', 'Automation', 'Communication', 'Email Marketing', 'Payments', 'Productivity', 'Other'];
   const availableCategories = Array.from(new Set(INTEGRATIONS.map(i => i.category)));
   const sortedCategories = ORDERED_CATEGORIES.filter(c => availableCategories.includes(c as any));
 
@@ -952,6 +1625,30 @@ export default function IntegrationsPage() {
                 selected: 'bg-orange-600 hover:bg-orange-700 text-white border-orange-600', 
                 unselected: 'border-orange-300 dark:border-orange-800 text-orange-700 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950/50' 
               },
+              'Lead Sources': { 
+                selected: 'bg-pink-600 hover:bg-pink-700 text-white border-pink-600', 
+                unselected: 'border-pink-300 dark:border-pink-800 text-pink-700 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/50' 
+              },
+              'Automation': { 
+                selected: 'bg-amber-600 hover:bg-amber-700 text-white border-amber-600', 
+                unselected: 'border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/50' 
+              },
+              'Communication': { 
+                selected: 'bg-sky-600 hover:bg-sky-700 text-white border-sky-600', 
+                unselected: 'border-sky-300 dark:border-sky-800 text-sky-700 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-950/50' 
+              },
+              'Email Marketing': { 
+                selected: 'bg-rose-600 hover:bg-rose-700 text-white border-rose-600', 
+                unselected: 'border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50' 
+              },
+              'Payments': { 
+                selected: 'bg-teal-600 hover:bg-teal-700 text-white border-teal-600', 
+                unselected: 'border-teal-300 dark:border-teal-800 text-teal-700 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/50' 
+              },
+              'Productivity': { 
+                selected: 'bg-lime-600 hover:bg-lime-700 text-white border-lime-600', 
+                unselected: 'border-lime-300 dark:border-lime-800 text-lime-700 dark:text-lime-400 hover:bg-lime-50 dark:hover:bg-lime-950/50' 
+              },
               'Other': { 
                 selected: 'bg-stone-600 hover:bg-stone-700 text-white border-stone-600', 
                 unselected: 'border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-900' 
@@ -1025,6 +1722,12 @@ export default function IntegrationsPage() {
           'SMS': { bg: 'bg-emerald-100 dark:bg-emerald-900/40', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-200 dark:border-emerald-800' },
           'WhatsApp': { bg: 'bg-green-100 dark:bg-green-900/40', text: 'text-green-600 dark:text-green-400', border: 'border-green-200 dark:border-green-800' },
           'CRM': { bg: 'bg-orange-100 dark:bg-orange-900/40', text: 'text-orange-600 dark:text-orange-400', border: 'border-orange-200 dark:border-orange-800' },
+          'Lead Sources': { bg: 'bg-pink-100 dark:bg-pink-900/40', text: 'text-pink-600 dark:text-pink-400', border: 'border-pink-200 dark:border-pink-800' },
+          'Automation': { bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-600 dark:text-amber-400', border: 'border-amber-200 dark:border-amber-800' },
+          'Communication': { bg: 'bg-sky-100 dark:bg-sky-900/40', text: 'text-sky-600 dark:text-sky-400', border: 'border-sky-200 dark:border-sky-800' },
+          'Email Marketing': { bg: 'bg-rose-100 dark:bg-rose-900/40', text: 'text-rose-600 dark:text-rose-400', border: 'border-rose-200 dark:border-rose-800' },
+          'Payments': { bg: 'bg-teal-100 dark:bg-teal-900/40', text: 'text-teal-600 dark:text-teal-400', border: 'border-teal-200 dark:border-teal-800' },
+          'Productivity': { bg: 'bg-lime-100 dark:bg-lime-900/40', text: 'text-lime-600 dark:text-lime-400', border: 'border-lime-200 dark:border-lime-800' },
           'Other': { bg: 'bg-stone-100 dark:bg-stone-800', text: 'text-stone-600 dark:text-stone-400', border: 'border-stone-200 dark:border-stone-700' },
         };
         const colors = categoryColors[cat] || categoryColors['Other'];
@@ -1040,6 +1743,12 @@ export default function IntegrationsPage() {
           'SMS': 'solar:chat-line-linear',
           'WhatsApp': 'solar:chat-round-dots-linear',
           'CRM': 'solar:users-group-rounded-linear',
+          'Lead Sources': 'solar:magnet-linear',
+          'Automation': 'solar:bolt-linear',
+          'Communication': 'solar:chat-dots-linear',
+          'Email Marketing': 'solar:mailbox-linear',
+          'Payments': 'solar:card-linear',
+          'Productivity': 'solar:clipboard-list-linear',
           'Other': 'solar:widget-4-linear',
         };
         

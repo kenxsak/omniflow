@@ -127,7 +127,7 @@ export default function QRCodeGenerator({
           {!iconOnly && <span className="sm:hidden">QR</span>}
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[95vw] max-w-[400px] p-0 gap-0">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[400px] p-0 gap-0 rounded-xl">
         <DialogCloseButton />
         
         <DialogHeader className="px-4 pt-4 pb-3 sm:px-6 sm:pt-6 sm:pb-4">

@@ -127,9 +127,11 @@ export const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// Zoho Logo - Red with Z shape
 export const ZohoIcon = ({ className }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className} fill="currentColor">
-    <path d="M8.66 6.897a1.3 1.3 0 0 0-1.205.765l-.642 1.44l-.062-.385A1.29 1.29 0 0 0 5.27 7.648l-4.185.678A1.29 1.29 0 0 0 .016 9.807l.678 4.18a1.29 1.29 0 0 0 1.27 1.087c.074 0 .143-.01.216-.017l4.18-.678c.436-.07.784-.351.96-.723l2.933 1.307a1.3 1.3 0 0 0 .988.026c.321-.12.575-.365.716-.678l.28-.629l.038.276a1.297 1.297 0 0 0 1.455 1.103l3.712-.501a1.29 1.29 0 0 0 1.03.514h4.236c.713 0 1.29-.58 1.291-1.291V9.545c0-.712-.58-1.291-1.291-1.291h-4.236q-.118 0-.23.022a1.3 1.3 0 0 0-.275-.288a1.28 1.28 0 0 0-.958-.253l-4.197.571q-.233.033-.432.14L9.159 7.01a1.3 1.3 0 0 0-.499-.113m-.025.705c.077 0 .159.013.24.052l2.971 1.324c-.128.238-.18.508-.142.782l.357 2.596h.002l-.745 1.672a.59.59 0 0 1-.777.296l-3.107-1.385l-.004-.041l-.41-2.526L8.1 7.95a.59.59 0 0 1 .536-.348zm-3.159.733c.125 0 .245.039.343.112c.13.09.21.227.237.382l.234 1.446l-.56 1.259a1.27 1.27 0 0 0-.026.987c.12.322.364.575.678.717l.295.131a.59.59 0 0 1-.428.314l-4.185.678a.59.59 0 0 1-.674-.485l-.678-4.18a.59.59 0 0 1 .485-.674l4.185-.678c.03-.004.064-.01.094-.01zm11.705.09a.6.6 0 0 1 .415.173a1.3 1.3 0 0 0-.416.947v4.237q.001.05.005.097l-3.55.482a.586.586 0 0 1-.66-.502l-.191-1.403l.899-2.017a1.29 1.29 0 0 0-.333-1.5l3.754-.51q.038-.005.077-.004m1.3.532h4.227c.326 0 .588.266.588.588v4.237a.59.59 0 0 1-.588.588h-4.237a.6.6 0 0 1-.12-.013c.47-.246.758-.765.684-1.318zm-5.988.309l.254.113c.296.133.43.48.296.777l-.432.97l-.207-1.465a.58.58 0 0 1 .09-.395zm5.39.538l.453 3.325a.583.583 0 0 1-.453.65zM6.496 11.545l.17 1.052a.59.59 0 0 1-.293-.776zm3.985 4.344a.59.59 0 0 0-.612.603c0 .358.244.61.601.61a.58.58 0 0 0 .607-.608c0-.35-.242-.605-.596-.605m5.545 0a.59.59 0 0 0-.612.603c0 .358.245.61.602.61a.58.58 0 0 0 .606-.608c0-.35-.24-.605-.596-.605m-8.537.018a.047.047 0 0 0-.048.047v.085c0 .026.021.047.048.047h.52l-.623.9a.1.1 0 0 0-.009.027v.027c0 .026.021.047.048.047h.815a.047.047 0 0 0 .047-.047v-.085a.047.047 0 0 0-.047-.047h-.55l.606-.9l.008-.026v-.028a.047.047 0 0 0-.047-.047zm5.303 0a.047.047 0 0 0-.047.047v1.086c0 .026.02.047.047.047h.135a.047.047 0 0 0 .047-.047v-.454h.545v.454c0 .026.02.047.047.047h.134a.047.047 0 0 0 .047-.047v-1.086a.047.047 0 0 0-.047-.047h-.134a.047.047 0 0 0-.047.047v.453h-.545v-.453a.047.047 0 0 0-.047-.047zm-2.324.164c.25 0 .372.194.372.425c0 .219-.109.425-.358.426c-.242 0-.375-.197-.375-.419c0-.235.108-.432.36-.432zm5.545 0c.25 0 .372.194.372.425c0 .219-.108.425-.358.426c-.242 0-.374-.197-.374-.419c0-.235.108-.432.36-.432" />
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="5" fill="#D32F2F" />
+    <path d="M6 8h10l-8 8h10" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
   </svg>
 );
 
@@ -160,6 +162,38 @@ export const brandLogoUrls = {
   plivo: 'https://www.plivo.com/static/images/plivo-logo.svg',
   exotel: 'https://exotel.com/wp-content/uploads/2023/05/exotel-logo.svg',
 };
+
+// IndiaMART Logo - Using reliable CDN
+export const IndiaMartIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#0066B3"/>
+    <text x="12" y="10" textAnchor="middle" fill="white" fontSize="5" fontWeight="bold" fontFamily="Arial">india</text>
+    <text x="12" y="17" textAnchor="middle" fill="#FF9933" fontSize="6" fontWeight="bold" fontFamily="Arial">MART</text>
+  </svg>
+);
+
+// JustDial Logo - Red JD icon
+export const JustDialIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#C41230"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">JD</text>
+  </svg>
+);
+
+// Bitrix24 Logo - Cyan with B24
+export const Bitrix24Icon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#2FC6F6"/>
+    <text x="12" y="15" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold" fontFamily="Arial">B24</text>
+  </svg>
+);
+
+// HubSpot Logo - Official sprocket SVG path
+export const HubSpotIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className} fill="#FF7A59">
+    <path d="M18.164 7.93V5.084a2.198 2.198 0 001.267-1.984 2.21 2.21 0 00-2.209-2.21 2.21 2.21 0 00-2.21 2.21c0 .895.534 1.665 1.3 2.01v2.818a5.663 5.663 0 00-2.465 1.27l-6.535-5.086a2.668 2.668 0 00.079-.63 2.662 2.662 0 00-2.663-2.663A2.662 2.662 0 002.065 3.48a2.662 2.662 0 002.663 2.664c.463 0 .896-.12 1.274-.328l6.432 5.004a5.683 5.683 0 00-.63 2.592c0 .96.238 1.864.658 2.658l-2.007 2.007a2.136 2.136 0 00-.64-.1 2.144 2.144 0 00-2.144 2.143 2.144 2.144 0 002.143 2.144 2.144 2.144 0 002.144-2.144c0-.232-.038-.455-.106-.664l1.972-1.972a5.695 5.695 0 003.397 1.123 5.713 5.713 0 005.713-5.713 5.713 5.713 0 00-4.78-5.635zm-1.004 8.823a3.165 3.165 0 01-3.161-3.161 3.165 3.165 0 013.161-3.162 3.165 3.165 0 013.162 3.162 3.165 3.165 0 01-3.162 3.161z"/>
+  </svg>
+);
 
 // Vapi.ai Logo - AI Voice Agents (Green gradient V shape)
 export const VapiIcon = ({ className }: { className?: string }) => (
@@ -219,6 +253,560 @@ export const ExotelIcon = ({ className }: { className?: string }) => (
     <text x="12" y="16" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold" fontFamily="Arial, sans-serif">Ex</text>
     <circle cx="18" cy="6" r="3" fill="#FCD34D" />
     <path d="M17 5.5l1 1 1.5-1.5" stroke="url(#exotelGrad)" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+  </svg>
+);
+
+// TradeIndia Logo - B2B Marketplace (Blue TI)
+export const TradeIndiaIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#0052CC"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="9" fontWeight="bold" fontFamily="Arial">TI</text>
+  </svg>
+);
+
+// 99acres Logo - Real Estate (Green with house)
+export const NinetyNineAcresIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#009933"/>
+    <text x="12" y="15" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold" fontFamily="Arial">99</text>
+    <path d="M12 5L6 10v8h12v-8L12 5z" stroke="white" strokeWidth="1" fill="none" opacity="0.5"/>
+  </svg>
+);
+
+// MagicBricks Logo - Real Estate (Red MB)
+export const MagicBricksIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#E53935"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">MB</text>
+  </svg>
+);
+
+// Housing.com Logo - Real Estate (Orange H)
+export const HousingIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#FF6B00"/>
+    <path d="M8 7v10M16 7v10M8 12h8" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+  </svg>
+);
+
+// Sulekha Logo - Local Services (Yellow S)
+export const SulekhaIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#FFB300"/>
+    <text x="12" y="17" textAnchor="middle" fill="#333" fontSize="14" fontWeight="bold" fontFamily="Arial">S</text>
+  </svg>
+);
+
+// Google Ads Logo - Ads icon
+export const GoogleAdsIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#4285F4"/>
+    <circle cx="12" cy="12" r="4" fill="#FBBC04"/>
+    <path d="M12 8v8M8 12h8" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+);
+
+// LinkedIn Logo - Professional blue
+export const LinkedInIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#0A66C2"/>
+    <path d="M8 10v6M8 7v.01M11 10v6m0-3.5c0-1.5 1-2.5 2.5-2.5s2.5 1 2.5 2.5V16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </svg>
+);
+
+// Instagram Logo - Gradient
+export const InstagramIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <defs>
+      <linearGradient id="igGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#FFDC80"/>
+        <stop offset="25%" stopColor="#F77737"/>
+        <stop offset="50%" stopColor="#E1306C"/>
+        <stop offset="75%" stopColor="#C13584"/>
+        <stop offset="100%" stopColor="#833AB4"/>
+      </linearGradient>
+    </defs>
+    <rect width="24" height="24" rx="6" fill="url(#igGrad)"/>
+    <rect x="6" y="6" width="12" height="12" rx="3" stroke="white" strokeWidth="1.5" fill="none"/>
+    <circle cx="12" cy="12" r="3" stroke="white" strokeWidth="1.5" fill="none"/>
+    <circle cx="16" cy="8" r="1" fill="white"/>
+  </svg>
+);
+
+// Typeform Logo - Purple
+export const TypeformIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#262627"/>
+    <path d="M7 8h10M12 8v9" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+  </svg>
+);
+
+// Google Forms Logo - Purple form
+export const GoogleFormsIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#7248B9"/>
+    <rect x="6" y="6" width="12" height="12" rx="1" stroke="white" strokeWidth="1.5" fill="none"/>
+    <path d="M9 10h6M9 13h6M9 16h4" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+  </svg>
+);
+
+// CommonFloor Logo - Real Estate (Blue CF)
+export const CommonFloorIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#1E88E5"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">CF</text>
+  </svg>
+);
+
+// NoBroker Logo - Real Estate (Green NB)
+export const NoBrokerIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#E53935"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">NB</text>
+  </svg>
+);
+
+// Quikr Logo - Classifieds (Blue Q)
+export const QuikrIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#00BCD4"/>
+    <text x="12" y="17" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="Arial">Q</text>
+  </svg>
+);
+
+// OLX Logo - Classifieds (Green OLX)
+export const OLXIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#002F34"/>
+    <text x="12" y="15" textAnchor="middle" fill="#23E5DB" fontSize="7" fontWeight="bold" fontFamily="Arial">OLX</text>
+  </svg>
+);
+
+// Practo Logo - Healthcare (Blue P)
+export const PractoIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#14BEF0"/>
+    <text x="12" y="17" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="Arial">P</text>
+  </svg>
+);
+
+// CarDekho Logo - Auto (Orange CD)
+export const CarDekhoIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#FF6600"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">CD</text>
+  </svg>
+);
+
+// CarWale Logo - Auto (Blue CW)
+export const CarWaleIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#0066CC"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">CW</text>
+  </svg>
+);
+
+// Shiksha Logo - Education (Blue S)
+export const ShikshaIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#1565C0"/>
+    <text x="12" y="17" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="Arial">S</text>
+  </svg>
+);
+
+// Zomato Logo - Food (Red Z)
+export const ZomatoIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#E23744"/>
+    <text x="12" y="17" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="Arial">Z</text>
+  </svg>
+);
+
+// Swiggy Logo - Food (Orange S)
+export const SwiggyIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#FC8019"/>
+    <text x="12" y="17" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="Arial">S</text>
+  </svg>
+);
+
+// UrbanClap/Urban Company Logo - Services (Purple UC)
+export const UrbanCompanyIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#6B46C1"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">UC</text>
+  </svg>
+);
+
+// Jotform Logo - Form Builder (Orange)
+export const JotformIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#FF6100"/>
+    <text x="12" y="17" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="Arial">J</text>
+  </svg>
+);
+
+// Tally Logo - Forms (Blue)
+export const TallyIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#1E1E1E"/>
+    <text x="12" y="17" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="Arial">T</text>
+  </svg>
+);
+
+// TikTok Logo - Social
+export const TikTokIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#000000"/>
+    <path d="M16.5 6.5c-.8-.5-1.3-1.4-1.5-2.5h-2.5v11c0 1.4-1.1 2.5-2.5 2.5s-2.5-1.1-2.5-2.5 1.1-2.5 2.5-2.5c.3 0 .5 0 .8.1V10c-.3 0-.5-.1-.8-.1-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5V9.5c1 .7 2.2 1 3.5 1V8c-1 0-1.8-.5-2.5-1.5z" fill="white"/>
+  </svg>
+);
+
+// Microsoft/Bing Ads Logo
+export const BingAdsIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#00A4EF"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">B</text>
+  </svg>
+);
+
+// Zoom Logo - Video/Webinar
+export const ZoomIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#2D8CFF"/>
+    <rect x="6" y="8" width="12" height="8" rx="2" fill="white"/>
+    <path d="M15 10l3-2v8l-3-2" fill="white"/>
+  </svg>
+);
+
+// Eventbrite Logo - Events
+export const EventbriteIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#F05537"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">EB</text>
+  </svg>
+);
+
+// Intercom Logo - Chat
+export const IntercomIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#1F8DED"/>
+    <path d="M7 9v6M10 7v10M13 7v10M16 9v6" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+);
+
+// Drift Logo - Chat
+export const DriftIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#0176FF"/>
+    <path d="M12 6c-3.3 0-6 2.7-6 6v6l3-3h3c3.3 0 6-2.7 6-6s-2.7-6-6-6z" fill="white"/>
+  </svg>
+);
+
+// Crisp Logo - Chat
+export const CrispIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#4B5CFA"/>
+    <circle cx="9" cy="12" r="2" fill="white"/>
+    <circle cx="15" cy="12" r="2" fill="white"/>
+  </svg>
+);
+
+// Shopify Logo - E-commerce
+export const ShopifyIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#96BF48"/>
+    <path d="M15 6l-1 4h-3l-1-4M10 10v8l5-2v-6" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+// WooCommerce Logo - E-commerce
+export const WooCommerceIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#96588A"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">Woo</text>
+  </svg>
+);
+
+// Calendly Logo - Booking
+export const CalendlyIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#006BFF"/>
+    <rect x="6" y="8" width="12" height="10" rx="1" stroke="white" strokeWidth="1.5" fill="none"/>
+    <path d="M6 11h12M9 6v4M15 6v4" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+  </svg>
+);
+
+// Naukri Logo - Jobs (Blue)
+export const NaukriIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#4A90D9"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">N</text>
+  </svg>
+);
+
+// Matrimony Logo - Wedding (Red)
+export const MatrimonyIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#E91E63"/>
+    <path d="M12 7l2.5 3.5L12 17l-2.5-6.5L12 7z" fill="white"/>
+    <circle cx="12" cy="10" r="2" fill="white"/>
+  </svg>
+);
+
+// Twitter/X Logo
+export const TwitterIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#000000"/>
+    <path d="M13.5 10.5L18 6h-1.5l-3.5 3.5L10 6H6l5 7-5 5h1.5l4-4L15 18h4l-5.5-7.5z" fill="white"/>
+  </svg>
+);
+
+// Pinterest Logo
+export const PinterestIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#E60023"/>
+    <circle cx="12" cy="12" r="6" stroke="white" strokeWidth="1.5" fill="none"/>
+    <path d="M12 8v8M10 18l2-4" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+  </svg>
+);
+
+// YouTube Logo
+export const YouTubeIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#FF0000"/>
+    <rect x="5" y="7" width="14" height="10" rx="2" fill="white"/>
+    <path d="M10 9v6l5-3-5-3z" fill="#FF0000"/>
+  </svg>
+);
+
+// Salesforce Logo - CRM
+export const SalesforceIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#00A1E0"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">SF</text>
+  </svg>
+);
+
+// Pipedrive Logo - CRM
+export const PipedriveIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#1A1A1A"/>
+    <circle cx="12" cy="12" r="5" stroke="#28B446" strokeWidth="2" fill="none"/>
+    <circle cx="12" cy="12" r="2" fill="#28B446"/>
+  </svg>
+);
+
+// Freshsales Logo - CRM
+export const FreshsalesIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#F26522"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">FS</text>
+  </svg>
+);
+
+// Zapier Logo - Automation
+export const ZapierIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#FF4A00"/>
+    <path d="M12 6v12M6 12h12M8 8l8 8M16 8l-8 8" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+);
+
+// Make (Integromat) Logo - Automation
+export const MakeIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#6D00CC"/>
+    <circle cx="8" cy="12" r="2" fill="white"/>
+    <circle cx="16" cy="12" r="2" fill="white"/>
+    <path d="M10 12h4" stroke="white" strokeWidth="2"/>
+  </svg>
+);
+
+// Pabbly Logo - Automation
+export const PabblyIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#2196F3"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">P</text>
+  </svg>
+);
+
+// Webhook Logo - Generic
+export const WebhookIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#525252"/>
+    <circle cx="8" cy="8" r="2" fill="white"/>
+    <circle cx="16" cy="8" r="2" fill="white"/>
+    <circle cx="12" cy="16" r="2" fill="white"/>
+    <path d="M8 10v2l4 4M16 10v2l-4 4" stroke="white" strokeWidth="1.5" fill="none"/>
+  </svg>
+);
+
+// Gravity Forms Logo
+export const GravityFormsIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#0C6AB0"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">GF</text>
+  </svg>
+);
+
+// WPForms Logo
+export const WPFormsIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#E27730"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">WP</text>
+  </svg>
+);
+
+// Unbounce Logo - Landing Pages
+export const UnbounceIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#2B41E8"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">U</text>
+  </svg>
+);
+
+// Leadpages Logo - Landing Pages
+export const LeadpagesIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#7B68EE"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">LP</text>
+  </svg>
+);
+
+// ClickFunnels Logo
+export const ClickFunnelsIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#1E73BE"/>
+    <path d="M8 8h8l-2 4h-4l-2 4h8" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+// Mailchimp Logo
+export const MailchimpIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#FFE01B"/>
+    <text x="12" y="16" textAnchor="middle" fill="#241C15" fontSize="8" fontWeight="bold" fontFamily="Arial">MC</text>
+  </svg>
+);
+
+// ActiveCampaign Logo
+export const ActiveCampaignIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#356AE6"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">AC</text>
+  </svg>
+);
+
+// ConvertKit Logo
+export const ConvertKitIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#FB6970"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">CK</text>
+  </svg>
+);
+
+// Stripe Logo - Payments
+export const StripeIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#635BFF"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">S</text>
+  </svg>
+);
+
+// Razorpay Logo - Payments
+export const RazorpayIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#072654"/>
+    <path d="M8 8l8 8M8 16l4-8h4" stroke="#3395FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </svg>
+);
+
+// PayU Logo - Payments
+export const PayUIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#54D400"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">PayU</text>
+  </svg>
+);
+
+// Cashfree Logo - Payments
+export const CashfreeIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#7B3FE4"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">CF</text>
+  </svg>
+);
+
+// Slack Logo - Communication
+export const SlackIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#4A154B"/>
+    <circle cx="9" cy="9" r="2" fill="#E01E5A"/>
+    <circle cx="15" cy="9" r="2" fill="#36C5F0"/>
+    <circle cx="9" cy="15" r="2" fill="#2EB67D"/>
+    <circle cx="15" cy="15" r="2" fill="#ECB22E"/>
+  </svg>
+);
+
+// Microsoft Teams Logo
+export const TeamsIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#5059C9"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">T</text>
+  </svg>
+);
+
+// Discord Logo
+export const DiscordIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#5865F2"/>
+    <circle cx="9" cy="13" r="1.5" fill="white"/>
+    <circle cx="15" cy="13" r="1.5" fill="white"/>
+    <path d="M8 8c2-1 6-1 8 0M8 16c2 1 6 1 8 0" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+  </svg>
+);
+
+// Telegram Logo
+export const TelegramIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#0088CC"/>
+    <path d="M6 12l12-5-3 11-4-3-3 2v-4l8-6" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+// Airtable Logo
+export const AirtableIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#18BFFF"/>
+    <rect x="6" y="8" width="5" height="8" rx="1" fill="white"/>
+    <rect x="13" y="8" width="5" height="8" rx="1" fill="#FCB400"/>
+  </svg>
+);
+
+// Notion Logo
+export const NotionIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#000000"/>
+    <rect x="7" y="6" width="10" height="12" rx="1" stroke="white" strokeWidth="1.5" fill="none"/>
+    <path d="M10 9h4M10 12h4M10 15h2" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+  </svg>
+);
+
+// Google Sheets Logo
+export const GoogleSheetsIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#0F9D58"/>
+    <rect x="6" y="6" width="12" height="12" rx="1" fill="white"/>
+    <path d="M6 10h12M6 14h12M10 6v12M14 6v12" stroke="#0F9D58" strokeWidth="1"/>
+  </svg>
+);
+
+// Excel Logo
+export const ExcelIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+    <rect width="24" height="24" rx="4" fill="#217346"/>
+    <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">X</text>
   </svg>
 );
 

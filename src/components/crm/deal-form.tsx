@@ -133,7 +133,7 @@ export function DealForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-[425px] p-4 sm:p-6 rounded-xl">
         <DialogHeader>
           <DialogTitle>
             {existingDeal ? 'Edit Deal' : 'Create New Deal'}

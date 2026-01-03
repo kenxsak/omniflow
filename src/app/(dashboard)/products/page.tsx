@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -524,14 +524,14 @@ function ProductDialog({
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium">Tax Rate (%)</Label>
                 <Select
-                  value={formData.taxRate?.toString() || ''}
-                  onValueChange={(v) => setFormData({ ...formData, taxRate: v ? parseFloat(v) : undefined })}
+                  value={formData.taxRate?.toString() || 'none'}
+                  onValueChange={(v) => setFormData({ ...formData, taxRate: v === 'none' ? undefined : parseFloat(v) })}
                 >
                   <SelectTrigger className="h-9 sm:h-10 text-sm">
                     <SelectValue placeholder="No tax" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No tax</SelectItem>
+                    <SelectItem value="none">No tax</SelectItem>
                     <SelectItem value="5">5% GST</SelectItem>
                     <SelectItem value="12">12% GST</SelectItem>
                     <SelectItem value="18">18% GST</SelectItem>
@@ -542,13 +542,33 @@ function ProductDialog({
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">HSN/SAC Code</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-medium">HSN/SAC Code</Label>
+                <a
+                  href={currency === 'INR' 
+                    ? 'https://services.gst.gov.in/services/searchhsnsac'
+                    : 'https://www.foreign-trade.com/reference/hscode.htm'
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-primary hover:underline flex items-center gap-1"
+                >
+                  <Icon icon="solar:question-circle-linear" className="w-3 h-3" />
+                  {currency === 'INR' ? 'Find HSN/SAC' : 'Find HS Code'}
+                </a>
+              </div>
               <Input
                 value={formData.hsnCode}
                 onChange={(e) => setFormData({ ...formData, hsnCode: e.target.value })}
-                placeholder="e.g., 998314 for IT services"
+                placeholder={currency === 'INR' ? 'e.g., 998314 for IT services' : 'e.g., 8471.60 for computer peripherals'}
                 className="h-9 sm:h-10 text-sm"
               />
+              <p className="text-[10px] text-muted-foreground">
+                {currency === 'INR' 
+                  ? 'HSN for products, SAC for services (required for GST invoices)'
+                  : 'Harmonized System code for international trade'
+                }
+              </p>
             </div>
 
             <div className="flex items-center justify-between">

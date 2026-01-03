@@ -174,7 +174,7 @@ export default function HubspotContactList() {
     <Card>
       <CardHeader>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div><CardTitle>HubSpot Contacts</CardTitle><CardDescription>Migrate your HubSpot contacts into OmniFlow (one-time import)</CardDescription></div>
+          <div><CardTitle>HubSpot Contacts</CardTitle><CardDescription>Migrate your HubSpot contacts (one-time import)</CardDescription></div>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <div className="relative w-full sm:w-64"><Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" /><Input type="search" placeholder="Search loaded contacts..." className="pl-8 w-full" value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} /></div>
             <Button onClick={handleImportSelected} disabled={isImporting || selectedContactIds.size === 0}>{isImporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}Import ({selectedContactIds.size})</Button>

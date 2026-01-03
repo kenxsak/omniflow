@@ -258,7 +258,7 @@ export function AutomationPlatforms() {
         <div>
           <h2 className="text-lg sm:text-xl font-semibold">Automation Platforms</h2>
           <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Connect OmniFlow with 5000+ apps via Zapier, Make, Pabbly, and more
+            Connect with 5000+ apps via Zapier, Make, Pabbly, and more
           </p>
         </div>
         <Badge className="w-fit bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
@@ -370,7 +370,7 @@ export function AutomationPlatforms() {
 
         <TabsContent value="triggers" className="mt-4 space-y-3">
           <p className="text-xs text-muted-foreground mb-3">
-            These webhooks send data FROM OmniFlow TO your automation platform when events occur.
+            These webhooks send data FROM this platform TO your automation platform when events occur.
           </p>
           {outgoingEndpoints.map((endpoint) => (
             <WebhookEndpointCard
@@ -387,7 +387,7 @@ export function AutomationPlatforms() {
 
         <TabsContent value="actions" className="mt-4 space-y-3">
           <p className="text-xs text-muted-foreground mb-3">
-            These webhooks receive data FROM your automation platform TO OmniFlow to perform actions.
+            These webhooks receive data FROM your automation platform TO this platform to perform actions.
           </p>
           {incomingEndpoints.map((endpoint) => (
             <WebhookEndpointCard

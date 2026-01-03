@@ -61,7 +61,7 @@ interface HelpContent {
 export const helpContent: Record<PageId, HelpContent> = {
   dashboard: {
     pageTitle: 'Dashboard',
-    overview: 'Your command center - see everything happening in your business at a glance. OmniFlow replaces 10+ tools, and this is where you see it all working together.',
+    overview: 'Your command center - see everything happening in your business at a glance. This platform replaces 10+ tools, and this is where you see it all working together.',
     capabilities: [
       'See your total contacts and recent activity',
       'Track emails, texts, and WhatsApp messages sent',
@@ -117,7 +117,7 @@ export const helpContent: Record<PageId, HelpContent> = {
     faqs: [
       {
         question: 'How far back can I view my reports?',
-        answer: 'You can view reports from the day you started using OmniFlow. Use the date filter to select any time period you want to analyze.'
+        answer: 'You can view reports from the day you started using the platform. Use the date filter to select any time period you want to analyze.'
       },
       {
         question: 'Can I download these reports?',
@@ -128,7 +128,7 @@ export const helpContent: Record<PageId, HelpContent> = {
 
   crm: {
     pageTitle: 'My Contacts',
-    overview: 'Everyone who might buy from you - all in one place. Add people manually, import from Excel, or organize them into groups. This is your customer database that connects to everything else in OmniFlow.',
+    overview: 'Everyone who might buy from you - all in one place. Add people manually, import from Excel, or organize them into groups. This is your customer database that connects to everything else.',
     capabilities: [
       'Add and manage all your contacts',
       'Import contacts from Excel or CSV files',
@@ -167,7 +167,7 @@ export const helpContent: Record<PageId, HelpContent> = {
       },
       {
         question: 'What\'s the difference between Sync and Add to List?',
-        answer: 'Sync pushes contacts to external tools (Brevo/HubSpot). "Add to WhatsApp/SMS List" prepares contacts for bulk messaging campaigns within OmniFlow.'
+        answer: 'Sync pushes contacts to external tools (Brevo/HubSpot). "Add to WhatsApp/SMS List" prepares contacts for bulk messaging campaigns.'
       },
       {
         question: 'Can I message contacts without phone numbers?',
@@ -184,7 +184,7 @@ export const helpContent: Record<PageId, HelpContent> = {
     pageTitle: 'Connect Other Tools',
     overview: 'Connect your existing tools like Brevo, HubSpot, or Zoho so all your contacts stay synced automatically. No more copying and pasting between different apps.',
     capabilities: [
-      'Link your other contact management tools to OmniFlow',
+      'Link your other contact management tools',
       'Automatically sync contacts from other services',
       'Keep all your contacts in one place'
     ],
@@ -196,11 +196,11 @@ export const helpContent: Record<PageId, HelpContent> = {
     faqs: [
       {
         question: 'Where do I find my API key for Brevo or HubSpot?',
-        answer: 'Log into Brevo/HubSpot, go to Settings → API Keys, and copy the key. Then paste it into OmniFlow\'s connection settings.'
+        answer: 'Log into Brevo/HubSpot, go to Settings → API Keys, and copy the key. Then paste it into the connection settings here.'
       },
       {
         question: 'Will my contacts sync both ways?',
-        answer: 'It depends on the integration. Most sync FROM OmniFlow TO the other tool. Check the specific integration\'s description to see how it works.'
+        answer: 'It depends on the integration. Most sync FROM this platform TO the other tool. Check the specific integration\'s description to see how it works.'
       }
     ]
   },
@@ -525,12 +525,12 @@ export const helpContent: Record<PageId, HelpContent> = {
 
   'digital-cards': {
     pageTitle: 'Digital Business Cards',
-    overview: 'Your online business card - share it with anyone via link or QR code. No website needed! OmniFlow is the only platform with AI Voice Chatbot on digital cards.',
+    overview: 'Your online business card - share it with anyone via link or QR code. No website needed! This platform is the only one with AI Voice Chatbot on digital cards.',
     capabilities: [
       'Create beautiful digital business cards',
       'Share via link or QR code',
       'Capture leads with built-in contact forms',
-      'Add AI Voice Chatbot (only OmniFlow has this!)',
+      'Add AI Voice Chatbot (exclusive feature!)',
       'Track who views your card'
     ],
     quickActions: [
@@ -556,7 +556,7 @@ export const helpContent: Record<PageId, HelpContent> = {
         answer: 'Click Copy Link to share via email or text. Download the QR code to print on business cards, flyers, or store windows. Anyone who scans or clicks sees your card.'
       },
       {
-        question: 'What makes OmniFlow\'s digital cards special?',
+        question: 'What makes these digital cards special?',
         answer: 'We\'re the only platform with AI Voice Chatbot! Your card can answer questions, capture leads, and book appointments 24/7 - no other digital card service offers this.'
       },
       {
@@ -585,7 +585,7 @@ export const helpContent: Record<PageId, HelpContent> = {
     faqs: [
       {
         question: 'What should I put in the username field?',
-        answer: 'Choose something simple and memorable like "yourname" or "yourbusiness". This becomes your card URL: omniflow.app/card/yourname. Use only lowercase letters, numbers, and hyphens.'
+        answer: 'Choose something simple and memorable like "yourname" or "yourbusiness". This becomes your card URL. Use only lowercase letters, numbers, and hyphens.'
       },
       {
         question: 'What action links should I add?',
@@ -602,7 +602,7 @@ export const helpContent: Record<PageId, HelpContent> = {
     pageTitle: 'Smart Chat Helper',
     capabilities: [
       'Chat with our smart assistant for help',
-      'Ask questions about using OmniFlow',
+      'Ask questions about using the platform',
       'Get suggestions for growing your business'
     ],
     tips: [
@@ -716,7 +716,7 @@ export const helpContent: Record<PageId, HelpContent> = {
 
   onboarding: {
     pageTitle: 'Getting Started',
-    overview: 'Welcome to OmniFlow! Follow these simple steps to set up your all-in-one marketing platform. Everything you need is built-in - no external tools required.',
+    overview: 'Welcome! Follow these simple steps to set up your all-in-one marketing platform. Everything you need is built-in - no external tools required.',
     capabilities: [
       'Add your first contacts',
       'Send your first email campaign',
@@ -734,15 +734,15 @@ export const helpContent: Record<PageId, HelpContent> = {
     faqs: [
       {
         question: 'Do I need to connect external tools first?',
-        answer: 'No! OmniFlow has everything built-in. You can add contacts, send emails, create digital cards, and use AI without connecting anything else.'
+        answer: 'No! This platform has everything built-in. You can add contacts, send emails, create digital cards, and use AI without connecting anything else.'
       },
       {
         question: 'What happens when I complete all steps?',
         answer: 'You\'ll have a fully working marketing system! Contacts in your CRM, campaigns sent, leads captured, AI content created, and automation running.'
       },
       {
-        question: 'How is OmniFlow different from other tools?',
-        answer: 'OmniFlow replaces 10+ tools (CRM, email, SMS, WhatsApp, AI content, digital cards, and more) at 1/3rd the cost. Everything works together in one place.'
+        question: 'How is this different from other tools?',
+        answer: 'This platform replaces 10+ tools (CRM, email, SMS, WhatsApp, AI content, digital cards, and more) at 1/3rd the cost. Everything works together in one place.'
       }
     ]
   },
@@ -762,7 +762,7 @@ export const helpContent: Record<PageId, HelpContent> = {
 
   settings: {
     pageTitle: 'Settings',
-    overview: 'Your control center - connect your tools, manage your subscription, and customize how OmniFlow works for you.',
+    overview: 'Your control center - connect your tools, manage your subscription, and customize how the platform works for you.',
     capabilities: [
       'Connect email services (Brevo, Gmail, SMTP)',
       'Connect messaging (WhatsApp, SMS providers)',
@@ -787,7 +787,7 @@ export const helpContent: Record<PageId, HelpContent> = {
       },
       {
         question: 'How do I add team members?',
-        answer: 'Go to Users tab, click Invite User, enter their email. They\'ll get an invitation to join your OmniFlow account.'
+        answer: 'Go to Users tab, click Invite User, enter their email. They\'ll get an invitation to join your account.'
       },
       {
         question: 'Can I change my plan?',
@@ -827,7 +827,7 @@ export const helpContent: Record<PageId, HelpContent> = {
       },
       {
         question: 'Can I use my own domain?',
-        answer: 'Pages are published at omniflow.app/p/your-page-name. Custom domains are available on higher plans.'
+        answer: 'Pages are published with a shareable link. Custom domains are available on higher plans.'
       }
     ]
   },

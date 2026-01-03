@@ -175,7 +175,7 @@ export function QuickPublishButtons({ content, hashtags = [], compact = false }:
 
       {/* Instructions Dialog */}
       <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-md p-4 sm:p-6 rounded-xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {selectedPlatform && <Icon icon={selectedPlatform.icon} className="h-5 w-5" />}

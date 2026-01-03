@@ -195,7 +195,7 @@ export default function CreateTemplateDialog() {
           Create Custom Template
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-2xl max-h-[90vh] p-4 sm:p-6 rounded-xl">
         <DialogHeader className="relative">
           <DialogTitle className="flex items-center gap-2">
             <Icon icon="solar:magic-stick-3-linear" className="h-5 w-5 text-muted-foreground" />

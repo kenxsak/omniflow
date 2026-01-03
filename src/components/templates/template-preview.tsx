@@ -118,7 +118,7 @@ export default function TemplatePreview({ template, isOpen, onOpenChange, onAppl
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-2xl max-h-[90vh] p-4 sm:p-6 rounded-xl">
         <DialogHeader className="relative">
           <DialogTitle>{template.name}</DialogTitle>
           <DialogDescription>{template.description}</DialogDescription>

@@ -138,7 +138,7 @@ ${defaultSenderName}`
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-lg p-4 sm:p-6 rounded-xl">
         <DialogHeader>
           <DialogTitle>Send Email to {lead.name}</DialogTitle>
           <DialogDescription>Compose and send an email via Brevo using your company's API key from Settings.</DialogDescription>

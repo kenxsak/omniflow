@@ -494,10 +494,10 @@ export default function AppointmentsPage() {
       </div>
 
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl">
-          <DialogHeader>
-            <DialogTitle>Schedule New Appointment</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-[560px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-xl">
+          <DialogHeader className="space-y-1 pb-2">
+            <DialogTitle className="text-base sm:text-lg">Schedule New Appointment</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
               Create a new appointment with reminder settings
             </DialogDescription>
           </DialogHeader>
@@ -509,10 +509,10 @@ export default function AppointmentsPage() {
       </Dialog>
 
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl">
-          <DialogHeader>
-            <DialogTitle>Edit Appointment</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-[560px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-xl">
+          <DialogHeader className="space-y-1 pb-2">
+            <DialogTitle className="text-base sm:text-lg">Edit Appointment</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
               Update appointment details and reminders
             </DialogDescription>
           </DialogHeader>

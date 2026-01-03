@@ -412,7 +412,7 @@ Jane Smith,jane@example.com,"919123456789",Sample Corp`;
                   Create New List
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
+              <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-md p-4 sm:p-6 rounded-xl">
                 <DialogHeader>
                   <DialogTitle>Create New Email List</DialogTitle>
                   <DialogDescription>Create a list to organize your email contacts by segment.</DialogDescription>
@@ -527,7 +527,7 @@ Jane Smith,jane@example.com,"919123456789",Sample Corp`;
                     <DialogTrigger asChild>
                       <Button size="sm" className="h-7 text-xs"><Icon icon="solar:add-circle-linear" className="mr-1 h-3 w-3" />Add</Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
+                    <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-md p-4 sm:p-6 rounded-xl">
                       <DialogHeader><DialogTitle>Add Contact to "{selectedList?.name}"</DialogTitle></DialogHeader>
                       <form onSubmit={(e) => { e.preventDefault(); handleAddContactToList(); }}>
                         <div className="space-y-3 py-3">
@@ -571,35 +571,36 @@ Jane Smith,jane@example.com,"919123456789",Sample Corp`;
                 ) : (
                   <>
                     <div className="rounded-xl bg-stone-50 dark:bg-stone-900/50 p-1">
-                      <div className="rounded-lg border border-stone-200 dark:border-stone-800 overflow-hidden">
-                        <table className="w-full text-sm table-fixed">
+                      <div className="rounded-lg border border-stone-200 dark:border-stone-800 overflow-x-auto">
+                        <table className="w-full text-sm min-w-[400px]">
                           <thead>
                             <tr className="bg-stone-100/50 dark:bg-stone-800/50">
-                              <th className="w-[35%] text-left py-3 px-3 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase align-middle">Name</th>
-                              <th className="w-[35%] text-left py-3 px-3 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase align-middle">Email</th>
-                              <th className="w-[15%] text-center py-3 px-3 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase align-middle">Status</th>
-                              <th className="w-[15%] text-right py-3 px-3 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase align-middle">Actions</th>
+                              <th className="text-left py-2.5 sm:py-3 px-2 sm:px-3 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase align-middle">Name</th>
+                              <th className="hidden sm:table-cell text-left py-2.5 sm:py-3 px-2 sm:px-3 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase align-middle">Email</th>
+                              <th className="text-center py-2.5 sm:py-3 px-2 sm:px-3 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase align-middle">Status</th>
+                              <th className="text-right py-2.5 sm:py-3 px-2 sm:px-3 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase align-middle">Actions</th>
                             </tr>
                           </thead>
                           <tbody className="bg-white dark:bg-stone-950">
                             {currentContacts.map(contact => (
                               <tr key={contact.id} className="border-t border-stone-200 dark:border-stone-800 hover:bg-muted/30 transition-colors">
-                                <td className="py-3 px-3 align-middle">
+                                <td className="py-2.5 sm:py-3 px-2 sm:px-3 align-middle">
                                   <div>
-                                    <p className="font-medium text-sm truncate">{contact.name}</p>
-                                    {contact.company && <p className="text-xs text-muted-foreground truncate">{contact.company}</p>}
+                                    <p className="font-medium text-xs sm:text-sm truncate max-w-[120px] sm:max-w-none">{contact.name}</p>
+                                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate max-w-[120px] sm:hidden">{contact.email}</p>
+                                    {contact.company && <p className="text-[10px] sm:text-xs text-muted-foreground truncate hidden sm:block">{contact.company}</p>}
                                   </div>
                                 </td>
-                                <td className="py-3 px-3 align-middle text-xs text-muted-foreground truncate">{contact.email}</td>
-                                <td className="text-center py-3 px-3 align-middle">{getStatusText(contact.status)}</td>
-                                <td className="text-right py-3 px-3 align-middle">
+                                <td className="hidden sm:table-cell py-2.5 sm:py-3 px-2 sm:px-3 align-middle text-xs text-muted-foreground truncate max-w-[150px]">{contact.email}</td>
+                                <td className="text-center py-2.5 sm:py-3 px-2 sm:px-3 align-middle">{getStatusText(contact.status)}</td>
+                                <td className="text-right py-2.5 sm:py-3 px-2 sm:px-3 align-middle">
                                   <AlertDialog>
                                     <AlertDialogTrigger asChild>
                                       <Button variant="ghost" size="icon" className="h-7 w-7"><Icon icon="solar:trash-bin-minimalistic-linear" className="h-3.5 w-3.5 text-red-500" /></Button>
                                     </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                      <AlertDialogHeader><AlertDialogTitle>Delete Contact?</AlertDialogTitle><AlertDialogDescription>Remove {contact.name} from this list?</AlertDialogDescription></AlertDialogHeader>
-                                      <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleDeleteContact(contact.id)} className={buttonVariants({ variant: "destructive" })}>Delete</AlertDialogAction></AlertDialogFooter>
+                                    <AlertDialogContent className="w-[calc(100%-2rem)] max-w-[420px] rounded-xl">
+                                      <AlertDialogHeader><AlertDialogTitle className="text-base sm:text-lg">Delete Contact?</AlertDialogTitle><AlertDialogDescription className="text-xs sm:text-sm">Remove {contact.name} from this list?</AlertDialogDescription></AlertDialogHeader>
+                                      <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2"><AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleDeleteContact(contact.id)} className={cn(buttonVariants({ variant: "destructive" }), "w-full sm:w-auto")}>Delete</AlertDialogAction></AlertDialogFooter>
                                     </AlertDialogContent>
                                   </AlertDialog>
                                 </td>
@@ -628,7 +629,7 @@ Jane Smith,jane@example.com,"919123456789",Sample Corp`;
 
       {/* Sync Dialog */}
       <Dialog open={isSyncDialogOpen} onOpenChange={setIsSyncDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-md p-4 sm:p-6 rounded-xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Icon icon="solar:cloud-upload-linear" className="h-5 w-5" />

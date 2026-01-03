@@ -194,7 +194,7 @@ export default function TransactionsPage() {
       </Animated>
 
       {stats && (
-        <div ref={statsRef} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div ref={statsRef} className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           <Card className="stat-card group hover:shadow-lg transition-all duration-300 hover:border-blue-500/50">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">

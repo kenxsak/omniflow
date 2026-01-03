@@ -386,12 +386,12 @@ export async function createSenderEmailCampaign(
   // Use the sender name (company name) for display - this is what shows in recipient's inbox
   // IMPORTANT: Must be the actual business/company name, NOT the email address
   // If sender.name looks like an email address, use a fallback
-  let senderDisplayName = campaignDetails.sender.name || 'OmniFlow';
+  let senderDisplayName = campaignDetails.sender.name || process.env.DEFAULT_SENDER_NAME || 'Platform';
   
   // Check if the name is actually an email address (common mistake)
   if (senderDisplayName.includes('@') && senderDisplayName.includes('.')) {
     console.warn(`[Sender.net] WARNING: sender.name appears to be an email address: "${senderDisplayName}". Using default.`);
-    senderDisplayName = 'OmniFlow';
+    senderDisplayName = process.env.DEFAULT_SENDER_NAME || 'Platform';
   }
   
   console.log(`[Sender.net] Using sender display name: "${senderDisplayName}" (from: ${campaignDetails.sender.email})`);

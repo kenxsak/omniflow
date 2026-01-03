@@ -65,7 +65,7 @@ export function ContentTemplatesSelector({
           <span className="sm:hidden">Template</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] p-0 gap-0">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-2xl max-h-[90vh] p-0 gap-0 rounded-xl">
         <DialogHeader className="p-4 pb-3 border-b border-stone-200 dark:border-stone-800">
           <DialogTitle className="flex items-center gap-2 text-base">
             <Icon icon="solar:document-text-bold" className="h-5 w-5" />

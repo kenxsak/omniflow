@@ -7,11 +7,13 @@ export interface InvitationEmailData {
   inviterName?: string;
   inviterEmail: string;
   signupUrl: string;
+  platformName?: string;
 }
 
 export function generateInvitationEmailHTML(data: InvitationEmailData): string {
   const roleDisplay = data.role.charAt(0).toUpperCase() + data.role.slice(1);
   const typeDisplay = data.type === 'office' ? 'Office Staff' : 'Field Staff';
+  const platformName = data.platformName || process.env.NEXT_PUBLIC_APP_NAME || 'Platform';
   
   return `
 <!DOCTYPE html>
@@ -29,7 +31,7 @@ export function generateInvitationEmailHTML(data: InvitationEmailData): string {
           <!-- Header -->
           <tr>
             <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px 8px 0 0;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">OmniFlow</h1>
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">${platformName}</h1>
             </td>
           </tr>
           
@@ -39,7 +41,7 @@ export function generateInvitationEmailHTML(data: InvitationEmailData): string {
               <h2 style="margin: 0 0 20px; color: #1a1a1a; font-size: 24px; font-weight: 600;">You've Been Invited!</h2>
               
               <p style="margin: 0 0 16px; color: #4a5568; font-size: 16px; line-height: 1.6;">
-                ${data.inviterName || data.inviterEmail} has invited you to join <strong>${data.companyName}</strong> on OmniFlow.
+                ${data.inviterName || data.inviterEmail} has invited you to join <strong>${data.companyName}</strong>.
               </p>
               
               <div style="background-color: #f7fafc; border-left: 4px solid #667eea; padding: 16px; margin: 24px 0; border-radius: 4px;">
@@ -86,7 +88,7 @@ export function generateInvitationEmailHTML(data: InvitationEmailData): string {
                 This invitation was sent by ${data.inviterEmail}
               </p>
               <p style="margin: 0; color: #a0aec0; font-size: 12px; text-align: center;">
-                © ${new Date().getFullYear()} OmniFlow. All rights reserved.
+                © ${new Date().getFullYear()} ${platformName}. All rights reserved.
               </p>
             </td>
           </tr>
@@ -105,5 +107,5 @@ export function generateInvitationEmailHTML(data: InvitationEmailData): string {
 }
 
 export function generateInvitationEmailSubject(companyName: string): string {
-  return `You've been invited to join ${companyName} on OmniFlow`;
+  return `You've been invited to join ${companyName}`;
 }

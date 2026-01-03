@@ -97,8 +97,8 @@ export async function checkAndSendCreditNotifications(
 
       await sendTransactionalEmail(
         brevoApiKey,
-        'noreply@omniflow.ai', // Replace with your sender email
-        'OmniFlow AI Credits',
+        process.env.DEFAULT_SENDER_EMAIL || 'noreply@example.com',
+        process.env.DEFAULT_SENDER_NAME || 'AI Credits',
         owner.email,
         owner.name || 'User',
         subject,
@@ -201,7 +201,7 @@ function generateCreditNotificationEmail(
   <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
   
   <p style="color: #6b7280; font-size: 12px;">
-    This is an automated notification from OmniFlow AI. Credits reset on the 1st of each month.
+    This is an automated notification. Credits reset on the 1st of each month.
   </p>
 </body>
 </html>

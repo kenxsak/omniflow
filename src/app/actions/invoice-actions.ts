@@ -59,19 +59,38 @@ async function getRazorpayInstance() {
   return new Razorpay({ key_id: keyId, key_secret: keySecret });
 }
 
-// Get Razorpay instance using company-specific credentials
-async function getCompanyRazorpayInstance(companyId: string) {
+// Check if user is super admin
+async function isSuperAdmin(userId: string): Promise<boolean> {
+  if (!adminDb) return false;
+  const userDoc = await adminDb.collection('users').doc(userId).get();
+  return userDoc.exists && userDoc.data()?.role === 'superadmin';
+}
+
+// Get Razorpay instance using company-specific credentials OR fallback to platform credentials (super admin only)
+async function getCompanyRazorpayInstance(companyId: string, userId?: string) {
   if (!adminDb) return null;
   
+  // First try company-specific credentials
   const settingsDoc = await adminDb.collection('invoiceSettings').doc(companyId).get();
-  if (!settingsDoc.exists) return null;
+  if (settingsDoc.exists) {
+    const settings = settingsDoc.data();
+    const razorpay = settings?.paymentGateway?.razorpay;
+    
+    if (razorpay?.enabled && razorpay?.keyId && razorpay?.keySecret) {
+      return new Razorpay({ key_id: razorpay.keyId, key_secret: razorpay.keySecret });
+    }
+  }
   
-  const settings = settingsDoc.data();
-  const razorpay = settings?.paymentGateway?.razorpay;
+  // Fallback to platform-level credentials from .env (ONLY for super admins)
+  if (userId && await isSuperAdmin(userId)) {
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    if (keyId && keySecret) {
+      return new Razorpay({ key_id: keyId, key_secret: keySecret });
+    }
+  }
   
-  if (!razorpay?.enabled || !razorpay?.keyId || !razorpay?.keySecret) return null;
-  
-  return new Razorpay({ key_id: razorpay.keyId, key_secret: razorpay.keySecret });
+  return null;
 }
 
 import Stripe from 'stripe';
@@ -82,43 +101,64 @@ function getStripeInstance() {
   return new Stripe(secretKey, { apiVersion: '2025-10-29.clover' });
 }
 
-// Get Stripe instance using company-specific credentials
-async function getCompanyStripeInstance(companyId: string) {
+// Get Stripe instance using company-specific credentials OR fallback to platform credentials (super admin only)
+async function getCompanyStripeInstance(companyId: string, userId?: string) {
   if (!adminDb) return null;
   
+  // First try company-specific credentials
   const settingsDoc = await adminDb.collection('invoiceSettings').doc(companyId).get();
-  if (!settingsDoc.exists) return null;
+  if (settingsDoc.exists) {
+    const settings = settingsDoc.data();
+    const stripe = settings?.paymentGateway?.stripe;
+    
+    if (stripe?.enabled && stripe?.secretKey) {
+      return new Stripe(stripe.secretKey, { apiVersion: '2025-10-29.clover' });
+    }
+  }
   
-  const settings = settingsDoc.data();
-  const stripe = settings?.paymentGateway?.stripe;
+  // Fallback to platform-level credentials from .env (ONLY for super admins)
+  if (userId && await isSuperAdmin(userId)) {
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+    if (secretKey) {
+      return new Stripe(secretKey, { apiVersion: '2025-10-29.clover' });
+    }
+  }
   
-  if (!stripe?.enabled || !stripe?.secretKey) return null;
-  
-  return new Stripe(stripe.secretKey, { apiVersion: '2025-10-29.clover' });
+  return null;
 }
 
-// Get preferred gateway for a company
-async function getPreferredGateway(companyId: string, currency: string): Promise<'razorpay' | 'stripe' | null> {
+// Get preferred gateway for a company (with platform fallback for super admins only)
+async function getPreferredGateway(companyId: string, currency: string, userId?: string): Promise<'razorpay' | 'stripe' | null> {
   if (!adminDb) return null;
   
   const settingsDoc = await adminDb.collection('invoiceSettings').doc(companyId).get();
-  if (!settingsDoc.exists) return null;
-  
-  const settings = settingsDoc.data();
+  const settings = settingsDoc.exists ? settingsDoc.data() : null;
   const pg = settings?.paymentGateway;
   
-  if (!pg) return null;
+  // Check company-specific settings first
+  if (pg) {
+    const preferred = pg.preferredGateway || 'auto';
+    
+    if (preferred === 'razorpay' && pg.razorpay?.enabled) return 'razorpay';
+    if (preferred === 'stripe' && pg.stripe?.enabled) return 'stripe';
+    
+    // Auto mode with company credentials
+    if (preferred === 'auto') {
+      if (currency === 'INR' && pg.razorpay?.enabled) return 'razorpay';
+      if (pg.stripe?.enabled) return 'stripe';
+      if (pg.razorpay?.enabled) return 'razorpay';
+    }
+  }
   
-  const preferred = pg.preferredGateway || 'auto';
-  
-  if (preferred === 'razorpay' && pg.razorpay?.enabled) return 'razorpay';
-  if (preferred === 'stripe' && pg.stripe?.enabled) return 'stripe';
-  
-  // Auto mode: INR -> Razorpay, others -> Stripe
-  if (preferred === 'auto') {
-    if (currency === 'INR' && pg.razorpay?.enabled) return 'razorpay';
-    if (pg.stripe?.enabled) return 'stripe';
-    if (pg.razorpay?.enabled) return 'razorpay'; // Fallback to Razorpay if Stripe not available
+  // Fallback to platform-level credentials from .env (ONLY for super admins)
+  if (userId && await isSuperAdmin(userId)) {
+    const hasRazorpay = !!(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET);
+    const hasStripe = !!process.env.STRIPE_SECRET_KEY;
+    
+    // Auto-select based on currency and available platform gateways
+    if (currency === 'INR' && hasRazorpay) return 'razorpay';
+    if (hasStripe) return 'stripe';
+    if (hasRazorpay) return 'razorpay';
   }
   
   return null;
@@ -528,8 +568,8 @@ export async function createPaymentLinkAction(params: {
       return { success: true, paymentLink: invoice.paymentLink, gateway: invoice.paymentLinkId?.startsWith('plink_') ? 'razorpay' : 'stripe' };
     }
     
-    // Get preferred gateway from company settings
-    const gateway = params.gateway || await getPreferredGateway(invoice.companyId, invoice.currency);
+    // Get preferred gateway from company settings (pass userId for super admin fallback)
+    const gateway = params.gateway || await getPreferredGateway(invoice.companyId, invoice.currency, verification.uid);
     
     if (!gateway) {
       return { success: false, error: 'No payment gateway configured. Go to Settings → Invoices to add Razorpay or Stripe credentials.' };
@@ -543,7 +583,7 @@ export async function createPaymentLinkAction(params: {
     let paymentLinkId: string;
     
     if (gateway === 'razorpay') {
-      const razorpay = await getCompanyRazorpayInstance(invoice.companyId);
+      const razorpay = await getCompanyRazorpayInstance(invoice.companyId, verification.uid);
       if (!razorpay) {
         return { success: false, error: 'Razorpay not configured. Go to Settings → Invoices to add your Razorpay API keys.' };
       }
@@ -578,7 +618,7 @@ export async function createPaymentLinkAction(params: {
       paymentLinkId = link.id;
     } else {
       // Stripe
-      const stripe = await getCompanyStripeInstance(invoice.companyId);
+      const stripe = await getCompanyStripeInstance(invoice.companyId, verification.uid);
       if (!stripe) {
         return { success: false, error: 'Stripe not configured. Go to Settings → Invoices to add your Stripe API keys.' };
       }
@@ -642,10 +682,10 @@ export async function testPaymentGatewayAction(params: {
     const companyId = userDoc.data()?.companyId;
     
     if (params.gateway === 'razorpay') {
-      const razorpay = await getCompanyRazorpayInstance(companyId);
+      const razorpay = await getCompanyRazorpayInstance(companyId, verification.uid);
       return { success: true, configured: !!razorpay };
     } else {
-      const stripe = await getCompanyStripeInstance(companyId);
+      const stripe = await getCompanyStripeInstance(companyId, verification.uid);
       return { success: true, configured: !!stripe };
     }
   } catch (error: any) {

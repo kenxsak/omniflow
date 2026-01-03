@@ -37,7 +37,7 @@ export default function WebsiteEmbedCodes({
     ? `https://cal.com/${calcomUsername}/${calcomEventSlug}`
     : `https://cal.com/${calcomUsername}`;
 
-  const digitalCardEmbedCode = `<!-- OmniFlow Digital Card Embed -->
+  const digitalCardEmbedCode = `<!-- Digital Card Embed -->
 <iframe 
   src="${digitalCardUrl}" 
   width="100%" 
@@ -175,7 +175,7 @@ The widget provides:
                 <div className="p-3 bg-muted/50 border border-border rounded-lg">
                   <p className="text-sm text-muted-foreground flex items-center gap-2">
                     <Icon icon="solar:check-circle-linear" className="h-4 w-4 text-primary shrink-0" />
-                    Cal.com is configured! Bookings will sync to OmniFlow CRM automatically.
+                    Cal.com is configured! Bookings will sync to your CRM automatically.
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -207,7 +207,7 @@ The widget provides:
             <div className="p-3 bg-muted/50 border border-border rounded-lg">
               <p className="text-sm text-muted-foreground flex items-center gap-2">
                 <Icon icon="solar:info-circle-linear" className="h-4 w-4 text-primary shrink-0" />
-                Leads submitted through your Digital Card go directly to your OmniFlow CRM.
+                Leads submitted through your Digital Card go directly to your CRM.
               </p>
             </div>
             <div className="space-y-2">
@@ -260,7 +260,7 @@ The widget provides:
         </Tabs>
 
         <div className="mt-6 p-4 bg-muted/50 border border-border rounded-lg">
-          <h4 className="font-medium text-sm text-foreground mb-2">How Leads Flow to OmniFlow:</h4>
+          <h4 className="font-medium text-sm text-foreground mb-2">How Leads Flow to Your CRM:</h4>
           <ul className="text-xs text-muted-foreground space-y-1.5">
             <li className="flex items-center gap-2">
               <Icon icon="solar:calendar-linear" className="h-3.5 w-3.5 text-primary" />

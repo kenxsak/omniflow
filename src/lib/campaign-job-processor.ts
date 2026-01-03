@@ -370,7 +370,7 @@ async function processEmailCampaignWithCampaignAPI(
     
     // Add unique timestamp to prevent "tag already exists" errors in Sender.net
     const uniqueSuffix = `${new Date().toISOString().split('T')[0]}-${Date.now().toString().slice(-6)}`;
-    const listName = `OmniFlow: ${job.campaignName} (${uniqueSuffix})`;
+    const listName = `Campaign: ${job.campaignName} (${uniqueSuffix})`;
     
     if (provider === 'brevo') {
       const listResult = await createBrevoList(apiKey, listName);

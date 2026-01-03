@@ -92,7 +92,7 @@ export function FirstRunModal({ company, onDismiss, onComplete }: FirstRunModalP
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-[600px] max-h-[90vh] p-4 sm:p-6 rounded-xl">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

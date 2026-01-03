@@ -30,12 +30,15 @@ export async function getProductsAction(params: {
     const userData = userDoc.data();
     const companyId = userData?.companyId;
 
-    let query = adminDb.collection('products')
+    // Simple query without orderBy to avoid index requirement
+    const snapshot = await adminDb.collection('products')
       .where('companyId', '==', companyId)
-      .orderBy('createdAt', 'desc');
-
-    const snapshot = await query.get();
+      .get();
+    
     let products = snapshot.docs.map(doc => doc.data() as Product);
+
+    // Sort in memory
+    products.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     // Apply filters
     if (params.category) {
@@ -130,35 +133,37 @@ export async function createProductAction(params: {
     const productId = `prod_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     const now = new Date().toISOString();
 
-    const productData: Product = {
+    const productData: Record<string, any> = {
       id: productId,
       companyId,
       name: params.product.name,
-      description: params.product.description,
-      sku: params.product.sku,
       unitPrice: params.product.unitPrice,
       currency: params.product.currency || 'INR',
-      hsnCode: params.product.hsnCode,
-      taxRate: params.product.taxRate,
       taxInclusive: params.product.taxInclusive || false,
-      category: params.product.category,
       tags: params.product.tags || [],
-      imageUrl: params.product.imageUrl,
       trackInventory: params.product.trackInventory || false,
-      stockQuantity: params.product.stockQuantity,
-      lowStockThreshold: params.product.lowStockThreshold,
       isActive: params.product.isActive !== false,
       createdBy: verification.uid,
       createdAt: now,
       updatedAt: now,
     };
 
+    // Only add optional fields if they have values (Firestore doesn't accept undefined)
+    if (params.product.description) productData.description = params.product.description;
+    if (params.product.sku) productData.sku = params.product.sku;
+    if (params.product.hsnCode) productData.hsnCode = params.product.hsnCode;
+    if (params.product.taxRate !== undefined) productData.taxRate = params.product.taxRate;
+    if (params.product.category) productData.category = params.product.category;
+    if (params.product.imageUrl) productData.imageUrl = params.product.imageUrl;
+    if (params.product.stockQuantity !== undefined) productData.stockQuantity = params.product.stockQuantity;
+    if (params.product.lowStockThreshold !== undefined) productData.lowStockThreshold = params.product.lowStockThreshold;
+
     await adminDb.collection('products').doc(productId).set(productData);
 
     return { success: true, productId };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating product:', error);
-    return { success: false, error: 'Failed to create product' };
+    return { success: false, error: error?.message || 'Failed to create product' };
   }
 }
 
@@ -276,12 +281,15 @@ export async function getProductCategoriesAction(params: {
     const userData = userDoc.data();
     const companyId = userData?.companyId;
 
+    // Simple query without orderBy to avoid index requirement
     const snapshot = await adminDb.collection('productCategories')
       .where('companyId', '==', companyId)
-      .orderBy('name', 'asc')
       .get();
 
-    const categories = snapshot.docs.map(doc => doc.data() as ProductCategory);
+    let categories = snapshot.docs.map(doc => doc.data() as ProductCategory);
+    
+    // Sort in memory
+    categories.sort((a, b) => a.name.localeCompare(b.name));
 
     return { success: true, categories };
   } catch (error) {
@@ -375,28 +383,30 @@ export async function bulkImportProductsAction(params: {
       }
 
       const productId = `prod_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-      const productData: Product = {
+      const productData: Record<string, any> = {
         id: productId,
         companyId,
         name: product.name,
-        description: product.description,
-        sku: product.sku,
         unitPrice: product.unitPrice,
         currency: product.currency || 'INR',
-        hsnCode: product.hsnCode,
-        taxRate: product.taxRate,
         taxInclusive: product.taxInclusive || false,
-        category: product.category,
         tags: product.tags || [],
-        imageUrl: product.imageUrl,
         trackInventory: product.trackInventory || false,
-        stockQuantity: product.stockQuantity,
-        lowStockThreshold: product.lowStockThreshold,
         isActive: product.isActive !== false,
         createdBy: verification.uid,
         createdAt: now,
         updatedAt: now,
       };
+
+      // Only add optional fields if they have values
+      if (product.description) productData.description = product.description;
+      if (product.sku) productData.sku = product.sku;
+      if (product.hsnCode) productData.hsnCode = product.hsnCode;
+      if (product.taxRate !== undefined) productData.taxRate = product.taxRate;
+      if (product.category) productData.category = product.category;
+      if (product.imageUrl) productData.imageUrl = product.imageUrl;
+      if (product.stockQuantity !== undefined) productData.stockQuantity = product.stockQuantity;
+      if (product.lowStockThreshold !== undefined) productData.lowStockThreshold = product.lowStockThreshold;
 
       batch.set(adminDb.collection('products').doc(productId), productData);
       imported++;

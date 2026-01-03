@@ -911,7 +911,7 @@ export default function WhatsAppBulkCampaignsPage() {
 
       {/* Campaign Details Dialog */}
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-        <DialogContent className="sm:max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-3xl max-h-[80vh] overflow-y-auto p-4 sm:p-6 rounded-xl">
           <DialogHeader className="relative">
             <DialogTitle>{selectedCampaign?.name}</DialogTitle>
             <DialogDescription>Campaign details and delivery status</DialogDescription>

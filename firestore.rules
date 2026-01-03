@@ -92,6 +92,30 @@ service cloud.firestore {
       
       
       // ==========================================
+      // EMAIL LISTS SUBCOLLECTION
+      // ==========================================
+      match /emailLists/{listId} {
+        allow read, write: if isAuthenticated();
+      }
+      
+      
+      // ==========================================
+      // EMAIL CONTACTS SUBCOLLECTION
+      // ==========================================
+      match /emailContacts/{contactId} {
+        allow read, write: if isAuthenticated();
+      }
+      
+      
+      // ==========================================
+      // EMAIL AUTOMATION SEQUENCES SUBCOLLECTION
+      // ==========================================
+      match /emailAutomationSequences/{sequenceId} {
+        allow read, write: if isAuthenticated();
+      }
+      
+      
+      // ==========================================
       // USERS SUBCOLLECTION (Chat Sessions)
       // ==========================================
       match /users/{userId} {
@@ -391,6 +415,92 @@ service cloud.firestore {
     // ==========================================
     match /cronState/{stateId} {
       allow read, write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
+    // PRODUCTS COLLECTION
+    // ==========================================
+    match /products/{productId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
+    // PRODUCT CATEGORIES COLLECTION
+    // ==========================================
+    match /productCategories/{categoryId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
+    // INDIAMART SETTINGS COLLECTION
+    // ==========================================
+    match /indiamartSettings/{settingsId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
+    // JUSTDIAL SETTINGS COLLECTION
+    // ==========================================
+    match /justdialSettings/{settingsId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
+    // REPUTATION SETTINGS COLLECTION
+    // ==========================================
+    match /reputationSettings/{settingsId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
+    // REVIEWS COLLECTION
+    // ==========================================
+    match /reviews/{reviewId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
+    // REVIEW REQUESTS COLLECTION
+    // ==========================================
+    match /reviewRequests/{requestId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
+    // WEBHOOK LOGS COLLECTION
+    // ==========================================
+    match /webhookLogs/{logId} {
+      allow read: if isAuthenticated();
+      // Write via Admin SDK (webhook handlers)
+      allow write: if false;
+    }
+    
+    
+    // ==========================================
+    // NOTIFICATION QUEUE COLLECTION
+    // ==========================================
+    match /notificationQueue/{notificationId} {
+      allow read: if isAuthenticated();
+      // Write via Admin SDK
+      allow write: if false;
+    }
+    
+    
+    // ==========================================
+    // MESSAGE QUEUE COLLECTION
+    // ==========================================
+    match /messageQueue/{messageId} {
+      allow read: if isAuthenticated();
+      // Write via Admin SDK
+      allow write: if false;
     }
     
     

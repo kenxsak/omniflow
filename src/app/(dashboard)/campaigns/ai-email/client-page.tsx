@@ -985,7 +985,7 @@ export default function AICampaignStudioPage() {
 
       {/* Save Template Dialog */}
       <Dialog open={saveTemplateDialogOpen} onOpenChange={setSaveTemplateDialogOpen}>
-        <DialogContent className="sm:max-w-xl">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-xl p-4 sm:p-6 rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-lg">Save as Reusable Template</DialogTitle>
             <DialogDescription className="text-sm">Save this email design as a template to reuse later without AI credits.</DialogDescription>

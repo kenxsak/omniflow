@@ -354,7 +354,7 @@ export function CloneFromReferenceModal({ isOpen, onClose, onPageCreated }: Clon
                 <Input
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
-                  placeholder="e.g., OmniFlow"
+                  placeholder="e.g., Your Product"
                   className="mt-1.5"
                 />
               </div>

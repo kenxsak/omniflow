@@ -70,7 +70,7 @@ export function LockedFeatureModal({
   if (!isLoading && hasRequiredPlan) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="w-[95vw] max-w-[420px] p-0 overflow-hidden">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] p-0 overflow-hidden rounded-xl">
           <VisuallyHidden>
             <DialogTitle>Feature Available - {featureName}</DialogTitle>
           </VisuallyHidden>
@@ -148,7 +148,7 @@ export function LockedFeatureModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-[420px] p-0 overflow-hidden">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] p-0 overflow-hidden rounded-xl">
         <VisuallyHidden>
           <DialogTitle>Unlock {featureName}</DialogTitle>
         </VisuallyHidden>

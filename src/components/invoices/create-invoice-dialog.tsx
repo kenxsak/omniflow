@@ -20,12 +20,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu';
 import { Icon } from '@iconify/react';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrency } from '@/contexts/currency-context';
 import { useAuth } from '@/hooks/use-auth';
 import { createInvoiceAction, getInvoiceSettingsAction } from '@/app/actions/invoice-actions';
+import { getProductsAction } from '@/app/actions/product-actions';
 import type { InvoiceSettings } from '@/types/invoice';
+import type { Product } from '@/types/product';
 
 interface CreateInvoiceDialogProps {
   open: boolean;
@@ -45,6 +55,8 @@ interface LineItem {
   quantity: number;
   unitPrice: number;
   taxRate: number;
+  productId?: string;
+  hsnCode?: string;
 }
 
 const INDIAN_STATES = [
@@ -69,6 +81,7 @@ const INDIAN_STATES = [
 
 export function CreateInvoiceDialog({ open, onOpenChange, onSuccess, prefillClient }: CreateInvoiceDialogProps) {
   const [settings, setSettings] = useState<InvoiceSettings | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   
@@ -95,6 +108,7 @@ export function CreateInvoiceDialog({ open, onOpenChange, onSuccess, prefillClie
   useEffect(() => {
     if (open && appUser?.idToken) {
       loadSettings();
+      loadProducts();
     }
   }, [open, appUser?.idToken]);
 
@@ -128,6 +142,18 @@ export function CreateInvoiceDialog({ open, onOpenChange, onSuccess, prefillClie
     }
   };
 
+  const loadProducts = async () => {
+    if (!appUser?.idToken) return;
+    try {
+      const result = await getProductsAction({ idToken: appUser.idToken, isActive: true });
+      if (result.success && result.products) {
+        setProducts(result.products);
+      }
+    } catch (error) {
+      console.error('Error loading products:', error);
+    }
+  };
+
   const addItem = () => {
     setItems([...items, {
       id: `item_${Date.now()}`,
@@ -136,6 +162,31 @@ export function CreateInvoiceDialog({ open, onOpenChange, onSuccess, prefillClie
       unitPrice: 0,
       taxRate: settings?.defaultTaxRate || 18,
     }]);
+  };
+
+  const addProductAsItem = (product: Product) => {
+    setItems([...items, {
+      id: `item_${Date.now()}`,
+      description: product.name,
+      quantity: 1,
+      unitPrice: product.unitPrice,
+      taxRate: product.taxRate || settings?.defaultTaxRate || 18,
+      productId: product.id,
+      hsnCode: product.hsnCode,
+    }]);
+  };
+
+  const selectProductForItem = (itemId: string, product: Product) => {
+    setItems(items.map(item => 
+      item.id === itemId ? {
+        ...item,
+        description: product.name,
+        unitPrice: product.unitPrice,
+        taxRate: product.taxRate || item.taxRate,
+        productId: product.id,
+        hsnCode: product.hsnCode,
+      } : item
+    ));
   };
 
   const updateItem = (id: string, field: keyof LineItem, value: string | number) => {
@@ -327,27 +378,143 @@ export function CreateInvoiceDialog({ open, onOpenChange, onSuccess, prefillClie
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs font-medium text-foreground">Line Items</Label>
-                  <Button variant="outline" size="sm" onClick={addItem} className="h-7 text-xs">
-                    <Icon icon="solar:add-circle-linear" className="w-3 h-3 mr-1" />
-                    Add Item
-                  </Button>
+                  <div className="flex gap-1.5">
+                    {products.length > 0 && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm" className="h-7 text-xs">
+                            <Icon icon="solar:box-linear" className="w-3 h-3 mr-1" />
+                            From Catalog
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[260px] max-h-[300px] overflow-y-auto">
+                          <DropdownMenuLabel className="text-xs">Select Product</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          {products.map((product) => (
+                            <DropdownMenuItem
+                              key={product.id}
+                              onClick={() => addProductAsItem(product)}
+                              className="text-xs cursor-pointer"
+                            >
+                              <div className="flex items-center justify-between w-full gap-2">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <Icon icon="solar:box-bold" className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                                  <span className="truncate">{product.name}</span>
+                                </div>
+                                <span className="text-emerald-600 font-medium flex-shrink-0">
+                                  {formatCurrency(product.unitPrice)}
+                                </span>
+                              </div>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                    <Button variant="outline" size="sm" onClick={addItem} className="h-7 text-xs">
+                      <Icon icon="solar:add-circle-linear" className="w-3 h-3 mr-1" />
+                      Custom
+                    </Button>
+                  </div>
                 </div>
 
                 {items.length === 0 ? (
                   <div className="text-center py-6 border border-dashed border-border rounded-lg bg-muted/30">
                     <Icon icon="solar:box-linear" className="w-8 h-8 mx-auto text-muted-foreground/50 mb-2" />
-                    <p className="text-xs text-muted-foreground">No items yet. Click "Add Item" to start.</p>
+                    <p className="text-xs text-muted-foreground mb-2">No items yet</p>
+                    <div className="flex justify-center gap-2">
+                      {products.length > 0 && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-7 text-xs">
+                              <Icon icon="solar:box-linear" className="w-3 h-3 mr-1" />
+                              From Catalog
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="center" className="w-[260px] max-h-[300px] overflow-y-auto">
+                            <DropdownMenuLabel className="text-xs">Select Product</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {products.map((product) => (
+                              <DropdownMenuItem
+                                key={product.id}
+                                onClick={() => addProductAsItem(product)}
+                                className="text-xs cursor-pointer"
+                              >
+                                <div className="flex items-center justify-between w-full gap-2">
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <Icon icon="solar:box-bold" className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                                    <span className="truncate">{product.name}</span>
+                                  </div>
+                                  <span className="text-emerald-600 font-medium flex-shrink-0">
+                                    {formatCurrency(product.unitPrice)}
+                                  </span>
+                                </div>
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                      <Button variant="outline" size="sm" onClick={addItem} className="h-7 text-xs">
+                        <Icon icon="solar:add-circle-linear" className="w-3 h-3 mr-1" />
+                        Add Custom Item
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     {items.map((item) => (
                       <div key={item.id} className="p-2.5 bg-muted/50 dark:bg-muted/30 rounded-lg space-y-2 border border-border/50">
-                        <Input
-                          value={item.description}
-                          onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                          placeholder="Item description"
-                          className="h-8 text-xs bg-background"
-                        />
+                        <div className="flex gap-2">
+                          <div className="flex-1 relative">
+                            <Input
+                              value={item.description}
+                              onChange={(e) => updateItem(item.id, 'description', e.target.value)}
+                              placeholder="Item description"
+                              className="h-8 text-xs bg-background pr-8"
+                            />
+                            {products.length > 0 && (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="absolute right-0 top-0 h-8 w-8 p-0"
+                                  >
+                                    <Icon icon="solar:box-linear" className="w-3.5 h-3.5 text-muted-foreground" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-[260px] max-h-[300px] overflow-y-auto">
+                                  <DropdownMenuLabel className="text-xs">Replace with Product</DropdownMenuLabel>
+                                  <DropdownMenuSeparator />
+                                  {products.map((product) => (
+                                    <DropdownMenuItem
+                                      key={product.id}
+                                      onClick={() => selectProductForItem(item.id, product)}
+                                      className="text-xs cursor-pointer"
+                                    >
+                                      <div className="flex items-center justify-between w-full gap-2">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                          <Icon icon="solar:box-bold" className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                                          <span className="truncate">{product.name}</span>
+                                        </div>
+                                        <span className="text-emerald-600 font-medium flex-shrink-0">
+                                          {formatCurrency(product.unitPrice)}
+                                        </span>
+                                      </div>
+                                    </DropdownMenuItem>
+                                  ))}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            )}
+                          </div>
+                          {item.productId && (
+                            <div className="flex items-center">
+                              <span className="text-[10px] text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded">
+                                Catalog
+                              </span>
+                            </div>
+                          )}
+                        </div>
                         <div className="flex gap-2 items-center">
                           <div className="w-16">
                             <Input
@@ -400,6 +567,11 @@ export function CreateInvoiceDialog({ open, onOpenChange, onSuccess, prefillClie
                             <Icon icon="solar:trash-bin-2-linear" className="w-4 h-4" />
                           </Button>
                         </div>
+                        {item.hsnCode && gstEnabled && (
+                          <p className="text-[10px] text-muted-foreground">
+                            HSN/SAC: {item.hsnCode}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </div>

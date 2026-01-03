@@ -308,7 +308,7 @@ export default function AddTaskDialog({ isOpen, onOpenChange, onTaskSaved, taskT
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] sm:max-w-lg max-h-[90vh] flex flex-col p-4 sm:p-6 rounded-xl">
         <DialogHeader className="relative">
           <DialogTitle className="text-base sm:text-lg">{taskToEdit ? 'Edit Task' : 'New Task'}</DialogTitle>
           <DialogDescription className="text-xs sm:text-sm">Fill in the details for your task. Click save when you're done.</DialogDescription>
