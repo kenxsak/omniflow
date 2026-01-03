@@ -21,6 +21,7 @@ import { AILeadInsights } from '@/components/crm/ai-lead-insights';
 import { AIFollowupGenerator } from '@/components/crm/ai-followup-generator';
 import { QuickQuoteGenerator } from '@/components/crm/quick-quote-generator';
 import { LeadScoreBadge } from '@/components/crm/lead-score-badge';
+import { LeadQuotesList } from '@/components/crm/lead-quotes-list';
 import { openWhatsApp } from '@/lib/open-external-link';
 
 const statusColors: Record<Lead['status'], string> = {
@@ -336,7 +337,7 @@ export default function LeadDossierPage() {
                     {/* Tabs Section */}
                     <Tabs defaultValue="activity" className="w-full">
                         <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
-                            <TabsList className="w-full h-auto p-0 bg-transparent border-b border-stone-200 dark:border-stone-800 rounded-none grid grid-cols-4">
+                            <TabsList className="w-full h-auto p-0 bg-transparent border-b border-stone-200 dark:border-stone-800 rounded-none grid grid-cols-5">
                                 <TabsTrigger 
                                     value="activity" 
                                     className="flex flex-col items-center gap-1 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-500 data-[state=active]:bg-indigo-50/50 dark:data-[state=active]:bg-indigo-950/30 text-[10px] sm:text-sm data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400"
@@ -348,8 +349,15 @@ export default function LeadDossierPage() {
                                     value="deals" 
                                     className="flex flex-col items-center gap-1 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:bg-emerald-50/50 dark:data-[state=active]:bg-emerald-950/30 text-[10px] sm:text-sm data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400"
                                 >
-                                    <Icon icon="solar:dollar-linear" className="h-5 w-5 sm:h-4 sm:w-4" />
+                                    <Icon icon="solar:hand-money-linear" className="h-5 w-5 sm:h-4 sm:w-4" />
                                     <span className="font-medium">Deals</span>
+                                </TabsTrigger>
+                                <TabsTrigger 
+                                    value="quotes" 
+                                    className="flex flex-col items-center gap-1 py-3 sm:py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-teal-500 data-[state=active]:bg-teal-50/50 dark:data-[state=active]:bg-teal-950/30 text-[10px] sm:text-sm data-[state=active]:text-teal-600 dark:data-[state=active]:text-teal-400"
+                                >
+                                    <Icon icon="solar:document-text-linear" className="h-5 w-5 sm:h-4 sm:w-4" />
+                                    <span className="font-medium">Quotes</span>
                                 </TabsTrigger>
                                 <TabsTrigger 
                                     value="tasks" 
@@ -380,6 +388,23 @@ export default function LeadDossierPage() {
                                 contactName={lead.name}
                                 companyId={lead.companyId} 
                             />
+                        </TabsContent>
+                        <TabsContent value="quotes" className="mt-4">
+                            <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">
+                                <div className="absolute inset-x-10 sm:inset-x-14 top-0 h-0.5 rounded-b-full bg-teal-500" />
+                                <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+                                    <span className="text-[10px] sm:text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                        Quotes & Proposals
+                                    </span>
+                                    <Button size="sm" onClick={() => setShowQuoteGenerator(true)} className="h-7 text-xs">
+                                        <Plus className="mr-1 h-3 w-3" />
+                                        New Quote
+                                    </Button>
+                                </div>
+                                <div className="p-4 sm:p-5">
+                                    <LeadQuotesList leadId={lead.id} leadName={lead.name} />
+                                </div>
+                            </div>
                         </TabsContent>
                         <TabsContent value="tasks" className="mt-4">
                             <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">

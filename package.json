@@ -56,6 +56,7 @@
     "clsx": "^2.1.1",
     "colorthief": "^2.6.0",
     "date-fns": "^3.6.0",
+    "date-fns-tz": "^3.2.0",
     "firebase": "^11.3.0",
     "firebase-admin": "^11.11.1",
     "firebase-tools": "^14.20.0",

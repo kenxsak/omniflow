@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Icon } from '@iconify/react';
+import { useCurrency } from '@/contexts/currency-context';
 import { 
   AreaChart, 
   Area, 
@@ -22,17 +23,19 @@ interface SalesTrendChartProps {
   chartType?: 'area' | 'bar';
 }
 
-function formatCurrency(value: number): string {
-  if (value >= 1000000) {
-    return `$${(value / 1000000).toFixed(1)}M`;
-  }
-  if (value >= 1000) {
-    return `$${(value / 1000).toFixed(0)}K`;
-  }
-  return `$${value}`;
-}
-
 export function SalesTrendChart({ data, loading, chartType = 'area' }: SalesTrendChartProps) {
+  const { formatCurrency: formatCurrencyFull, getCurrencyCode } = useCurrency();
+
+  // Compact currency formatter
+  const formatCurrency = (value: number): string => {
+    const symbol = getCurrencyCode() === 'INR' ? '₹' : 
+                   getCurrencyCode() === 'EUR' ? '€' : 
+                   getCurrencyCode() === 'GBP' ? '£' : 
+                   getCurrencyCode() === 'JPY' ? '¥' : '$';
+    if (value >= 1000000) return `${symbol}${(value / 1000000).toFixed(1)}M`;
+    if (value >= 1000) return `${symbol}${(value / 1000).toFixed(0)}K`;
+    return `${symbol}${value}`;
+  };
   if (loading) {
     return (
       <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">

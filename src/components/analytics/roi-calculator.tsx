@@ -11,16 +11,22 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/react';
+import { useCurrency } from '@/contexts/currency-context';
 import {
   calculateROI,
   calculateROAS,
   calculateCostPerLead,
   calculateCAC,
-  formatCurrency,
   formatPercentage,
 } from '@/lib/analytics-service';
 
 export default function ROICalculator() {
+  const { formatCurrency, getCurrencyCode } = useCurrency();
+  const currencySymbol = getCurrencyCode() === 'INR' ? '₹' : 
+                         getCurrencyCode() === 'EUR' ? '€' : 
+                         getCurrencyCode() === 'GBP' ? '£' : 
+                         getCurrencyCode() === 'JPY' ? '¥' : '$';
+
   const [revenue, setRevenue] = useState<string>('1000');
   const [spend, setSpend] = useState<string>('500');
   const [leads, setLeads] = useState<string>('50');
@@ -69,7 +75,7 @@ export default function ROICalculator() {
         {/* Input Fields */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="revenue" className="text-[11px] text-muted-foreground">Total Revenue ($)</Label>
+            <Label htmlFor="revenue" className="text-[11px] text-muted-foreground">Total Revenue ({currencySymbol})</Label>
             <Input
               id="revenue"
               type="number"
@@ -83,7 +89,7 @@ export default function ROICalculator() {
           </div>
           
           <div className="space-y-1.5">
-            <Label htmlFor="spend" className="text-[11px] text-muted-foreground">Marketing Spend ($)</Label>
+            <Label htmlFor="spend" className="text-[11px] text-muted-foreground">Marketing Spend ({currencySymbol})</Label>
             <Input
               id="spend"
               type="number"
@@ -108,7 +114,7 @@ export default function ROICalculator() {
               className="h-9 text-sm bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-800"
             />
           </div>
-          
+
           <div className="space-y-1.5">
             <Label htmlFor="customers" className="text-[11px] text-muted-foreground">Customers Acquired</Label>
             <Input
@@ -124,7 +130,7 @@ export default function ROICalculator() {
         </div>
         
         {/* Results Grid */}
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {metrics.map((metric) => (
             <div 
               key={metric.label} 
@@ -152,7 +158,7 @@ export default function ROICalculator() {
           </div>
           <div className="flex items-start gap-2">
             <span className="text-[11px] font-medium text-foreground min-w-[180px]">ROAS (Return on Ad Spend)</span>
-            <span className="text-[11px] text-muted-foreground">For every $1 spent, you earn ${roas.toFixed(2)}</span>
+            <span className="text-[11px] text-muted-foreground">For every {currencySymbol}1 spent, you earn {currencySymbol}{roas.toFixed(2)}</span>
           </div>
           <div className="flex items-start gap-2">
             <span className="text-[11px] font-medium text-foreground min-w-[180px]">CPL (Cost Per Lead)</span>

@@ -14,6 +14,7 @@ import { PLATFORM_PRESETS, IMAGE_STYLES, type PlatformPreset, type ImageStyle } 
 import { getTrendingTopicSuggestions } from '@/ai/flows/get-trending-topic-suggestions-flow';
 import { generateEnhancedPrompt } from '@/ai/flows/generate-enhanced-prompt-flow';
 import { aiReviewResponder } from '@/ai/flows/ai-review-responder';
+import { detectIntent as aiDetectIntent, getGeminiResponse, analyzeImageWithGemini } from '@/ai/flows/unified-ai-chat-flow';
 import { executeAIOperation } from '@/lib/ai-wrapper';
 import { getGeminiApiKeyForCompany } from './ai-api-key-actions';
 import { estimateTokenCount } from '@/lib/ai-cost-calculator';
@@ -33,6 +34,9 @@ interface ChatResponse {
   creditsConsumed?: number;
   nextSteps?: NextStepSuggestion[];
 }
+
+// Use AI-powered intent detection for better accuracy
+const USE_AI_INTENT_DETECTION = true;
 
 const AUTO_ENHANCE_PROMPTS = true;
 
@@ -167,210 +171,11 @@ function htmlToPlainText(html: string): string {
 }
 
 // Get next step suggestions based on what was just created
+// DISABLED: Next steps were causing confusion as follow-ups didn't work properly
+// Users should just type their next request naturally
 function getNextStepSuggestions(intentType: string, metadata?: any): NextStepSuggestion[] {
-  const suggestions: NextStepSuggestion[] = [];
-  
-  switch (intentType) {
-    case 'blog':
-      // Ensure image prompt is clean and explicit for image generation
-      const blogImagePrompt = metadata?.imagePrompt || 
-        `Professional featured image for blog post about ${metadata?.topic || 'this topic'}, vibrant and engaging, high quality`;
-      
-      suggestions.push(
-        { 
-          label: 'Create Featured Image', 
-          prompt: `Generate image: ${blogImagePrompt}`,
-          icon: '🎨'
-        },
-        { 
-          label: 'Generate Social Media Post', 
-          prompt: `Create an Instagram post to promote this blog about ${metadata?.topic || 'the topic'}`,
-          icon: '📱'
-        },
-        {
-          label: 'Create Sales Page',
-          prompt: `Create a sales page for ${metadata?.topic || 'this topic'}`,
-          icon: '💰'
-        },
-        {
-          label: 'Enhance Image Prompt',
-          prompt: `Enhance this prompt for image generation: ${metadata?.imagePrompt || `featured image for blog about ${metadata?.topic || 'this topic'}`}`,
-          icon: '✨'
-        }
-      );
-      break;
-      
-    case 'social_post':
-      const socialImagePrompt = metadata?.imagePrompt || 
-        `Engaging ${metadata?.platform || 'social media'} image about ${metadata?.topic || 'this topic'}, eye-catching and vibrant`;
-      
-      suggestions.push(
-        { 
-          label: 'Create Post Image', 
-          prompt: `Generate image: ${socialImagePrompt}`,
-          icon: '🎨'
-        },
-        { 
-          label: 'Generate Hashtags', 
-          prompt: `Generate hashtags for ${metadata?.topic || 'this post'}`,
-          icon: '#️⃣'
-        }
-      );
-      break;
-      
-    case 'ad_copy':
-      if (metadata?.platform?.includes('Facebook') || metadata?.platform?.includes('Instagram')) {
-        suggestions.push(
-          { 
-            label: 'Create Ad Image', 
-            prompt: metadata?.adVariation?.suggestedImagePrompt || 'Create an ad image',
-            icon: '🎨'
-          },
-          { 
-            label: 'Create Video Concept', 
-            prompt: `Create a video concept: ${metadata?.adVariation?.suggestedVideoConcept || 'ad video'}`,
-            icon: '🎬'
-          }
-        );
-      } else if (metadata?.platform?.includes('LinkedIn')) {
-        suggestions.push(
-          { 
-            label: 'Create Professional Image', 
-            prompt: metadata?.adVariation?.suggestedImagePrompt || 'Create a professional LinkedIn ad image',
-            icon: '🎨'
-          }
-        );
-      }
-      break;
-      
-    case 'email':
-      suggestions.push(
-        { 
-          label: 'Create Email Banner', 
-          prompt: `Create an email header image for ${metadata?.topic || 'this campaign'}`,
-          icon: '🎨'
-        }
-      );
-      break;
-      
-    case 'image':
-      suggestions.push(
-        { 
-          label: 'Create Variations', 
-          prompt: `Create another variation of: ${metadata?.prompt || 'this image'}`,
-          icon: '🎨'
-        },
-        { 
-          label: 'Write Social Post', 
-          prompt: `Create a social media post featuring an image about ${metadata?.prompt || 'this'}`,
-          icon: '📱'
-        }
-      );
-      break;
-      
-    case 'trending_topics':
-      suggestions.push(
-        {
-          label: 'Generate Blog Post',
-          prompt: `Write a blog post about ${metadata?.firstTopic || 'this trending topic'}`,
-          icon: '✍️'
-        },
-        {
-          label: 'Create Video Script',
-          prompt: `Create a YouTube video script about ${metadata?.firstTopic || 'this trending topic'}`,
-          icon: '🎬'
-        },
-        {
-          label: 'Enhance This Prompt',
-          prompt: `Enhance this prompt for content creation: ${metadata?.firstTopic || 'trending topic'}`,
-          icon: '✨'
-        }
-      );
-      break;
-      
-    case 'prompt_enhance':
-      if (metadata?.promptGoal === 'ImageGeneration') {
-        suggestions.push(
-          {
-            label: 'Generate Image',
-            prompt: metadata?.enhancedPrompt || 'Create an image with enhanced prompt',
-            icon: '🎨'
-          }
-        );
-      } else if (metadata?.promptGoal === 'TextContent') {
-        suggestions.push(
-          {
-            label: 'Create Content',
-            prompt: metadata?.enhancedPrompt || 'Create content with enhanced prompt',
-            icon: '✍️'
-          }
-        );
-      } else if (metadata?.promptGoal === 'SalesPageBrief') {
-        suggestions.push(
-          {
-            label: 'Create Sales Page',
-            prompt: metadata?.enhancedPrompt || 'Create a sales page',
-            icon: '💰'
-          }
-        );
-      }
-      suggestions.push(
-        {
-          label: 'Refine Further',
-          prompt: `Enhance this prompt even more: ${metadata?.originalPrompt || 'my idea'}`,
-          icon: '✨'
-        }
-      );
-      break;
-      
-    case 'sales_page':
-      const salesImagePrompt = metadata?.imagePrompt || 
-        `Professional hero image for sales page about ${metadata?.topic || 'this product'}, modern and compelling, high quality`;
-      
-      suggestions.push(
-        {
-          label: 'Create Hero Image',
-          prompt: `Generate image: ${salesImagePrompt}`,
-          icon: '🎨'
-        },
-        {
-          label: 'Enhance Sales Copy',
-          prompt: `Enhance this sales page prompt: make the sales copy more compelling for ${metadata?.topic || 'this product'}`,
-          icon: '✨'
-        },
-        {
-          label: 'Generate Ad Campaign',
-          prompt: `Create Facebook ad copy for ${metadata?.topic || 'this product'}`,
-          icon: '📢'
-        }
-      );
-      break;
-      
-    case 'video_script':
-      const videoImagePrompt = metadata?.imagePrompt || 
-        `YouTube thumbnail for video about ${metadata?.topic || 'this topic'}, eye-catching and professional, vibrant colors`;
-      
-      suggestions.push(
-        {
-          label: 'Create Thumbnail',
-          prompt: `Generate image: ${videoImagePrompt}`,
-          icon: '🎨'
-        },
-        {
-          label: 'Generate Social Post',
-          prompt: `Create an Instagram post to promote this YouTube video about ${metadata?.topic || 'the topic'}`,
-          icon: '📱'
-        },
-        {
-          label: 'Create Blog Post',
-          prompt: `Write a blog post based on this video script about ${metadata?.topic || 'the topic'}`,
-          icon: '✍️'
-        }
-      );
-      break;
-  }
-  
-  return suggestions;
+  // Return empty array - no more misleading suggestions
+  return [];
 }
 
 export async function handleAIChatMessage(
@@ -379,9 +184,16 @@ export async function handleAIChatMessage(
   userId: string,
   conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>,
   referenceImage?: string, // Brand logo/reference image as base64 data URI
-  agentId?: string // Selected AI agent ID to influence intent detection
+  agentId?: string, // Selected AI agent ID to influence intent detection
+  analyzeImage?: string // Image to analyze (base64) - NOT stored on server
 ): Promise<ChatResponse> {
   try {
+    // If user uploaded an image for analysis, handle it directly
+    // This is cost-efficient: image goes directly to Gemini, no server storage
+    if (analyzeImage) {
+      return await handleImageAnalysis(userMessage, analyzeImage, companyId, userId, agentId);
+    }
+
     // Limit conversation history to last 10 messages or ~2000 tokens
     let limitedHistory: Array<{ role: 'user' | 'assistant'; content: string }> = [];
     if (conversationHistory && conversationHistory.length > 0) {
@@ -400,8 +212,25 @@ export async function handleAIChatMessage(
       }
     }
 
-    // Parse intent from user message, considering the selected agent
-    const intent = detectIntent(userMessage, agentId);
+    // Use AI-powered intent detection for better context understanding
+    let intent: { type: string; platform?: string; topic?: string; adPlatform?: string };
+    
+    if (USE_AI_INTENT_DETECTION) {
+      try {
+        const aiIntent = await aiDetectIntent(userMessage, limitedHistory, agentId);
+        console.log('[AI Intent Detection] Result:', aiIntent);
+        
+        // Map AI intent to handler intent format
+        intent = mapAIIntentToHandler(aiIntent);
+      } catch (aiError) {
+        console.error('[AI Intent Detection] Falling back to regex:', aiError);
+        intent = detectIntent(userMessage, agentId);
+      }
+    } else {
+      intent = detectIntent(userMessage, agentId);
+    }
+    
+    console.log('[Chat Handler] Final intent:', intent);
 
     switch (intent.type) {
       case 'social_post':
@@ -447,12 +276,52 @@ export async function handleAIChatMessage(
         return await handleKeywordPlanner(userMessage, intent, companyId, userId);
 
       default:
-        return await handleGeneral(userMessage, companyId, limitedHistory);
+        // Gemini-like general response using Gemini's built-in knowledge
+        return await handleGeneral(
+          userMessage, 
+          companyId, 
+          limitedHistory,
+          agentId
+        );
     }
   } catch (error) {
     console.error('AI Chat Handler Error:', error);
     throw new Error('Failed to process your request. Please try again.');
   }
+}
+
+// Map AI-detected intent to handler format
+function mapAIIntentToHandler(aiIntent: { intent: string; topic: string; platform?: string; confidence: number }): { type: string; platform?: string; topic?: string; adPlatform?: string } {
+  const intentMap: Record<string, string> = {
+    'general_response': 'general',
+    'google_ad': 'ad_copy',
+    'facebook_ad': 'ad_copy',
+    'linkedin_ad': 'ad_copy',
+    'youtube_ad': 'youtube_ad',
+    'tiktok_ad': 'tiktok_reels_ad',
+    'social_post': 'social_post',
+    'blog_post': 'blog',
+    'email': 'email',
+    'video_script': 'video_script',
+    'image': 'image',
+    'keywords': 'keyword_planner',
+    'hashtags': 'hashtags',
+    'sales_page': 'sales_page',
+    'review_response': 'review_response',
+  };
+
+  const adPlatformMap: Record<string, string> = {
+    'google_ad': 'google',
+    'facebook_ad': 'facebook',
+    'linkedin_ad': 'linkedin',
+  };
+
+  return {
+    type: intentMap[aiIntent.intent] || 'general',
+    topic: aiIntent.topic,
+    platform: aiIntent.platform,
+    adPlatform: adPlatformMap[aiIntent.intent],
+  };
 }
 
 function detectIntent(message: string, agentId?: string): { type: string; platform?: string; topic?: string; adPlatform?: string } {
@@ -464,44 +333,55 @@ function detectIntent(message: string, agentId?: string): { type: string; platfo
     switch (agentId) {
       case 'visual-designer':
         // Visual Designer should ALWAYS generate images unless explicitly asking for something else
-        const topic = extractTopic(message, ['image', 'picture', 'photo', 'visual', 'of', 'for', 'about', 'create', 'generate', 'make']);
-        return { type: 'image', topic: topic || message };
+        const imageTopic = extractTopic(message, ['image', 'picture', 'photo', 'visual', 'of', 'for', 'about', 'create', 'generate', 'make']);
+        return { type: 'image', topic: imageTopic || message };
       
       case 'content-writer':
         // Content Writer - check for specific content types, default to blog
+        const contentTopic = extractTopic(message, ['blog', 'email', 'sales page', 'landing page', 'post', 'article', 'content', 'for', 'about']);
+        
         if (lowerMessage.includes('email')) {
-          return { type: 'email', topic: extractTopic(message, ['email', 'about', 'to']) };
+          return { type: 'email', topic: contentTopic || message };
         }
         if (lowerMessage.includes('sales page') || lowerMessage.includes('landing page')) {
-          return { type: 'sales_page', topic: extractTopic(message, ['sales page', 'landing page', 'for', 'about']) };
+          return { type: 'sales_page', topic: contentTopic || message };
         }
         if (lowerMessage.includes('instagram') || lowerMessage.includes('facebook') || lowerMessage.includes('linkedin') || lowerMessage.includes('twitter') || lowerMessage.includes('social')) {
-          return { type: 'social_post', platform: detectPlatform(lowerMessage), topic: extractTopic(message, ['post', 'about', 'for']) };
+          return { type: 'social_post', platform: detectPlatform(lowerMessage), topic: contentTopic || message };
         }
         // Default to blog for content writer
-        return { type: 'blog', topic: extractTopic(message, ['blog', 'about', 'write']) || message };
+        return { type: 'blog', topic: contentTopic || message };
       
       case 'ad-strategist':
         // Ad Strategist - check for specific ad types
+        // Extract topic first using improved extraction
+        const adTopic = extractTopic(message, ['google ad', 'facebook ad', 'linkedin ad', 'ad', 'advertisement', 'for', 'about']);
+        
         if (lowerMessage.includes('keyword')) {
-          return { type: 'keyword_planner', topic: extractTopic(message, ['keyword', 'for', 'about']) };
+          return { type: 'keyword_planner', topic: adTopic || message };
         }
         if (lowerMessage.includes('youtube')) {
-          return { type: 'youtube_ad', topic: extractTopic(message, ['youtube', 'ad', 'for', 'about']) };
+          return { type: 'youtube_ad', topic: adTopic || message };
         }
         if (lowerMessage.includes('tiktok') || lowerMessage.includes('reels')) {
-          return { type: 'tiktok_reels_ad', topic: extractTopic(message, ['tiktok', 'reels', 'ad', 'for', 'about']) };
+          return { type: 'tiktok_reels_ad', topic: adTopic || message };
         }
-        // Default to ad copy
-        return { type: 'ad_copy', adPlatform: detectAdPlatform(lowerMessage), topic: extractTopic(message, ['ad', 'for', 'about']) || message };
+        // Default to ad copy - use extracted topic or full message
+        return { 
+          type: 'ad_copy', 
+          adPlatform: detectAdPlatform(lowerMessage), 
+          topic: adTopic || message 
+        };
       
       case 'seo-expert':
         // SEO Expert - check for specific SEO tasks
+        const seoTopic = extractTopic(message, ['keyword', 'hashtag', 'seo', 'for', 'about']);
+        
         if (lowerMessage.includes('hashtag')) {
-          return { type: 'hashtags', topic: extractTopic(message, ['hashtag', 'for']) };
+          return { type: 'hashtags', topic: seoTopic || message };
         }
         if (lowerMessage.includes('keyword')) {
-          return { type: 'keyword_planner', topic: extractTopic(message, ['keyword', 'for', 'about']) };
+          return { type: 'keyword_planner', topic: seoTopic || message };
         }
         // Default to trending topics
         return { type: 'trending_topics' };
@@ -512,10 +392,12 @@ function detectIntent(message: string, agentId?: string): { type: string; platfo
       
       case 'video-producer':
         // Video Producer - video scripts
+        const videoTopic = extractTopic(message, ['video', 'youtube', 'script', 'ad', 'for', 'about']);
+        
         if (lowerMessage.includes('youtube ad') || (lowerMessage.includes('youtube') && lowerMessage.includes('ad'))) {
-          return { type: 'youtube_ad', topic: extractTopic(message, ['youtube', 'ad', 'for', 'about']) };
+          return { type: 'youtube_ad', topic: videoTopic || message };
         }
-        return { type: 'video_script', topic: extractTopic(message, ['video', 'script', 'about']) || message };
+        return { type: 'video_script', topic: videoTopic || message };
     }
   }
 
@@ -680,16 +562,71 @@ function detectAdPlatform(message: string): string {
 }
 
 function extractTopic(message: string, keywords: string[]): string {
-  // Simple extraction - find text after keywords
-  for (const keyword of keywords) {
-    const index = message.toLowerCase().indexOf(keyword);
-    if (index !== -1) {
-      const afterKeyword = message.substring(index + keyword.length).trim();
-      // Remove common prepositions
-      return afterKeyword.replace(/^(about|for|on|regarding|to)\s+/i, '').trim();
+  const lowerMessage = message.toLowerCase();
+  
+  // Strategy 1: Look for "for [topic]" or "about [topic]" patterns first (most reliable)
+  const forAboutMatch = message.match(/(?:for|about)\s+([^,.\n]+?)(?:\s+(?:using|with|and|to|that|which|,|\.|\n|$))/i);
+  if (forAboutMatch && forAboutMatch[1]) {
+    const extracted = forAboutMatch[1].trim();
+    // Make sure we got something meaningful (at least 3 chars)
+    if (extracted.length >= 3) {
+      return extracted;
     }
   }
-  return message;
+  
+  // Strategy 2: Look for quoted text (user explicitly specified the topic)
+  const quotedMatch = message.match(/["']([^"']+)["']/);
+  if (quotedMatch && quotedMatch[1]) {
+    return quotedMatch[1].trim();
+  }
+  
+  // Strategy 3: Look for text after specific action keywords
+  const actionPatterns = [
+    /(?:create|generate|write|make|draft)\s+(?:a\s+)?(?:google\s+)?(?:ad|advertisement|ads)\s+(?:for|about)\s+(.+?)(?:\s+using|\s+with|$)/i,
+    /(?:keyword|keywords)\s+(?:for|about)\s+(.+?)(?:\s+using|\s+with|$)/i,
+    /(?:blog|post|article|email|content)\s+(?:for|about|on)\s+(.+?)(?:\s+using|\s+with|$)/i,
+  ];
+  
+  for (const pattern of actionPatterns) {
+    const match = message.match(pattern);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+  }
+  
+  // Strategy 4: Fallback - find text after keywords (original logic, improved)
+  // Sort keywords by length (longer first) to match more specific phrases first
+  const sortedKeywords = [...keywords].sort((a, b) => b.length - a.length);
+  
+  for (const keyword of sortedKeywords) {
+    const index = lowerMessage.indexOf(keyword);
+    if (index !== -1) {
+      const afterKeyword = message.substring(index + keyword.length).trim();
+      // Remove common prepositions and clean up
+      let cleaned = afterKeyword
+        .replace(/^(about|for|on|regarding|to|a|an|the)\s+/i, '')
+        .trim();
+      
+      // Remove trailing phrases like "using these keywords", "with these", etc.
+      cleaned = cleaned
+        .replace(/\s+(using|with|and|that|which)\s+.*/i, '')
+        .trim();
+      
+      if (cleaned.length >= 3) {
+        return cleaned;
+      }
+    }
+  }
+  
+  // Strategy 5: Last resort - return the whole message cleaned up
+  // Remove common action words and return what's left
+  let fallback = message
+    .replace(/^(create|generate|write|make|draft|suggest|give me|i need|i want)\s+(a\s+)?/i, '')
+    .replace(/\s+(ad|advertisement|ads|post|blog|email|content|keywords?)\s*/i, ' ')
+    .replace(/\s+(for|about|on|using|with)\s+/gi, ' ')
+    .trim();
+  
+  return fallback || message;
 }
 
 async function handleSocialPost(
@@ -1009,6 +946,12 @@ async function handleAdCopy(
 ): Promise<ChatResponse> {
   const platform = intent.adPlatform || 'google';
   const { apiKey, type: apiKeyType } = await getGeminiApiKeyForCompany(companyId);
+  
+  // Extract the topic - this is critical for getting relevant results
+  const productOrService = intent.topic || message;
+  console.log('[Ad Copy] Input message:', message);
+  console.log('[Ad Copy] Platform:', platform);
+  console.log('[Ad Copy] Extracted topic:', productOrService);
 
   if (platform === 'google') {
     const result = await executeAIOperation({
@@ -1020,8 +963,8 @@ async function handleAdCopy(
       apiKeyType,
       operation: async () => {
         const output = await generateGoogleSearchAdCopy({
-          productOrService: intent.topic || message,
-          keywords: intent.topic || message,
+          productOrService,
+          keywords: productOrService,
           uniqueSellingPoints: 'Quality, Service, Value',
           numVariations: 1,
           targetLanguage: 'English'
@@ -1034,7 +977,7 @@ async function handleAdCopy(
         return {
           success: true,
           data: output,
-          inputTokens: estimateTokenCount(JSON.stringify({ productOrService: intent.topic || message })),
+          inputTokens: estimateTokenCount(JSON.stringify({ productOrService })),
           outputTokens: estimateTokenCount(JSON.stringify(output))
         };
       }
@@ -1904,21 +1847,11 @@ async function handleYouTubeAd(
     type: 'text',
     metadata: {
       platform: 'YouTube',
+      topic: intent.topic || message,
       adVariation: variation
     },
     creditsConsumed: result.quotaInfo?.consumed || 0,
-    nextSteps: [
-      {
-        label: 'Generate Thumbnail',
-        prompt: `Generate image: ${variation.thumbnailPrompt}`,
-        icon: '🎨'
-      },
-      {
-        label: 'Create Different Format',
-        prompt: `Create a bumper ad (6s) for ${intent.topic || 'this product'}`,
-        icon: '🎬'
-      }
-    ]
+    nextSteps: getNextStepSuggestions('youtube_ad', { topic: intent.topic || message })
   };
 }
 
@@ -1973,16 +1906,11 @@ async function handleTikTokReelsAd(
     type: 'text',
     metadata: {
       platform: 'TikTok/Reels',
+      topic: intent.topic || message,
       adVariation: variation
     },
     creditsConsumed: result.quotaInfo?.consumed || 0,
-    nextSteps: [
-      {
-        label: 'Try Different Vibe',
-        prompt: `Create a TikTok ad for ${intent.topic || 'this'} with educational style`,
-        icon: '🎬'
-      }
-    ]
+    nextSteps: getNextStepSuggestions('tiktok_reels_ad', { topic: intent.topic || message })
   };
 }
 
@@ -1994,6 +1922,11 @@ async function handleKeywordPlanner(
 ): Promise<ChatResponse> {
   const { apiKey, type: apiKeyType } = await getGeminiApiKeyForCompany(companyId);
   
+  // Extract the topic - this is critical for getting relevant results
+  const productOrService = intent.topic || message;
+  console.log('[Keyword Planner] Input message:', message);
+  console.log('[Keyword Planner] Extracted topic:', productOrService);
+  
   const result = await executeAIOperation({
     companyId,
     userId,
@@ -2003,7 +1936,7 @@ async function handleKeywordPlanner(
     apiKeyType,
     operation: async () => {
       const output = await generateGoogleAdsKeywords({
-        productOrService: intent.topic || message,
+        productOrService,
         targetAudience: 'Your target customers',
         campaignGoals: 'Drive traffic and conversions',
         numSuggestionsPerCategory: 7,
@@ -2018,7 +1951,7 @@ async function handleKeywordPlanner(
       return {
         success: true,
         data: output,
-        inputTokens: estimateTokenCount(JSON.stringify({ productOrService: intent.topic || message })),
+        inputTokens: estimateTokenCount(JSON.stringify({ productOrService })),
         outputTokens: estimateTokenCount(JSON.stringify(output))
       };
     }
@@ -2051,45 +1984,136 @@ async function handleKeywordPlanner(
     content: formattedContent,
     type: 'text',
     metadata: {
-      keywords: keywords
+      keywords: keywords,
+      topic: productOrService
     },
     creditsConsumed: result.quotaInfo?.consumed || 0,
-    nextSteps: [
-      {
-        label: 'Create Google Ad',
-        prompt: `Create a Google ad for ${intent.topic || 'this product'} using these keywords`,
-        icon: '📢'
-      }
-    ]
+    nextSteps: getNextStepSuggestions('keyword_planner', { topic: productOrService })
+  };
+}
+
+/**
+ * Handle image analysis using Gemini Vision
+ * 
+ * COST-EFFICIENT DESIGN:
+ * - Image is sent directly to Gemini API as base64
+ * - NO server storage - zero storage costs
+ * - Max 1MB enforced on client side
+ * - Only costs Gemini API tokens
+ */
+async function handleImageAnalysis(
+  userQuestion: string,
+  imageBase64: string,
+  companyId: string,
+  userId: string,
+  agentContext?: string
+): Promise<ChatResponse> {
+  const { apiKey, type: apiKeyType } = await getGeminiApiKeyForCompany(companyId);
+
+  const result = await executeAIOperation({
+    companyId,
+    userId,
+    operationType: 'text_generation', // Vision uses same pricing as text
+    model: 'gemini-2.0-flash',
+    feature: 'Image Analysis',
+    apiKeyType,
+    operation: async () => {
+      const response = await analyzeImageWithGemini(
+        imageBase64,
+        userQuestion,
+        agentContext
+      );
+
+      return {
+        success: true,
+        data: response,
+        inputTokens: estimateTokenCount(userQuestion) + 500, // ~500 tokens for image
+        outputTokens: estimateTokenCount(response.response)
+      };
+    }
+  });
+
+  if (!result.success || !result.data) {
+    return {
+      content: "I couldn't analyze this image. Please make sure it's a valid image file under 1MB and try again.",
+      type: 'text',
+      creditsConsumed: 0,
+      metadata: {}
+    };
+  }
+
+  return {
+    content: result.data.response,
+    type: 'text',
+    creditsConsumed: result.quotaInfo?.consumed || 0,
+    metadata: {
+      imageAnalyzed: true
+    },
+    nextSteps: []
   };
 }
 
 async function handleGeneral(
   message: string,
   companyId: string,
-  conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>
+  conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>,
+  agentContext?: string
 ): Promise<ChatResponse> {
+  const { apiKey, type: apiKeyType } = await getGeminiApiKeyForCompany(companyId);
+
+  const result = await executeAIOperation({
+    companyId,
+    userId: '', // Will be filled by caller
+    operationType: 'text_generation',
+    model: 'gemini-2.0-flash',
+    feature: 'AI Assistant',
+    apiKeyType,
+    operation: async () => {
+      const response = await getGeminiResponse(
+        message,
+        conversationHistory,
+        agentContext
+      );
+
+      return {
+        success: true,
+        data: response,
+        inputTokens: estimateTokenCount(message),
+        outputTokens: estimateTokenCount(response.response)
+      };
+    }
+  });
+
+  if (!result.success || !result.data) {
+    // Fallback response
+    return {
+      content: `I'm here to help! I can assist you with:
+
+🔍 **Research & Information** - Ask me anything about business, technology, trends
+📊 **Analysis & Advice** - Get insights, comparisons, recommendations
+📱 **Content Creation** - Say "Create a [post/ad/blog/email] about [topic]"
+🎨 **Image Generation** - Say "Create an image of [description]"
+💡 **Brainstorming** - Get ideas for marketing, products, strategies
+
+What would you like to know or create?`,
+      type: 'text',
+      creditsConsumed: 0,
+      metadata: {}
+    };
+  }
+
+  // Format suggested follow-ups as next steps
+  const nextSteps: NextStepSuggestion[] = result.data.suggestedFollowUps?.map((q: string) => ({
+    label: q.length > 40 ? q.substring(0, 37) + '...' : q,
+    prompt: q,
+    icon: '💡'
+  })) || [];
+
   return {
-    content: `I can help you with:
-
-📱 **Social Media Posts** - Just say "Create an Instagram post about [topic]"
-✉️ **Email Campaigns** - Try "Write an email about [topic]"
-📢 **Ad Copy** - Ask "Generate a Google ad for [product]"
-🎨 **Images** - Say "Create an image of [description]"
-✍️ **Blog Posts** - Request "Write a blog post about [topic]"
-🎬 **Video Scripts** - Ask "Write a video script about [topic]"
-📺 **YouTube Ads** - Try "Create a YouTube ad for [product]"
-🎵 **TikTok/Reels Ads** - Ask "Generate a TikTok ad for [product]"
-🔑 **Keyword Research** - Say "Suggest keywords for [product/service]"
-#️⃣ **Hashtags** - Ask "Generate hashtags for [topic]"
-💬 **Review Responses** - Say "Respond to this review: [review text]"
-🔥 **Trending Topics** - Try "Suggest trending topics for my [niche]"
-✨ **Enhance Prompts** - Say "Enhance this prompt: [your idea]"
-💰 **Sales Pages** - Request "Create a sales page for [product/service]"
-
-What would you like to create?`,
+    content: result.data.response,
     type: 'text',
-    creditsConsumed: 0,
-    metadata: {}
+    creditsConsumed: result.quotaInfo?.consumed || 0,
+    metadata: {},
+    nextSteps
   };
 }

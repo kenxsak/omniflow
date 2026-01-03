@@ -2,6 +2,7 @@
 import type { Metadata } from 'next';
 import { Toaster } from "@/components/ui/toaster";
 import { CurrencyProvider } from "@/contexts/currency-context";
+import { LocaleProvider } from "@/contexts/locale-context";
 import { AuthProvider } from "@/contexts/auth-context";
 
 export const metadata: Metadata = {
@@ -36,8 +37,10 @@ export default function PublicLayout({
     // Public pages still need access to providers for currency display and auth state.
     <AuthProvider>
       <CurrencyProvider>
+        <LocaleProvider>
           {children}
-        <Toaster />
+          <Toaster />
+        </LocaleProvider>
       </CurrencyProvider>
     </AuthProvider>
   );

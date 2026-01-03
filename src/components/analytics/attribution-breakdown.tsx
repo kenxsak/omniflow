@@ -8,7 +8,8 @@
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from 'recharts';
 import type { RevenueAttribution } from '@/types/analytics';
-import { formatCurrency, formatPercentage } from '@/lib/analytics-service';
+import { formatPercentage } from '@/lib/analytics-service';
+import { useCurrency } from '@/contexts/currency-context';
 import { Icon } from '@iconify/react';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -41,6 +42,7 @@ const capitalizeWords = (str: string) => {
 };
 
 export default function AttributionBreakdown({ attribution }: AttributionBreakdownProps) {
+  const { formatCurrency } = useCurrency();
   const { channels, totalRevenue, overallROI, topChannel, insights, recommendations } = attribution;
   
   // Check if there's actual data

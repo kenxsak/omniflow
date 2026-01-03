@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { format, formatDistanceToNow } from 'date-fns';
 import { Icon } from '@iconify/react';
 import { Loader2, Plus } from 'lucide-react';
 import type { Activity, ActivityType } from '@/types/crm';
@@ -13,6 +12,7 @@ import { ACTIVITY_TYPE_LABELS } from '@/types/crm';
 import { getActivitiesForContact, logNoteActivity } from '@/app/actions/activity-actions';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
+import { useLocale } from '@/contexts/locale-context';
 
 const activityIcons: Record<ActivityType, string> = {
   email: 'solar:letter-linear',
@@ -22,7 +22,7 @@ const activityIcons: Record<ActivityType, string> = {
   meeting: 'solar:calendar-linear',
   note: 'solar:document-text-linear',
   task: 'solar:checklist-linear',
-  deal_created: 'solar:dollar-linear',
+  deal_created: 'solar:hand-money-linear',
   deal_updated: 'solar:graph-up-linear',
   status_change: 'solar:refresh-linear',
 };
@@ -48,6 +48,7 @@ interface ActivityTimelineProps {
 export function ActivityTimeline({ contactId, companyId }: ActivityTimelineProps) {
   const { appUser } = useAuth();
   const { toast } = useToast();
+  const { formatDateTime, formatRelative } = useLocale();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAddingNote, setIsAddingNote] = useState(false);
@@ -102,11 +103,9 @@ export function ActivityTimeline({ contactId, companyId }: ActivityTimelineProps
     const diffDays = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
     
     if (diffDays < 1) {
-      return formatDistanceToNow(d, { addSuffix: true });
-    } else if (diffDays < 7) {
-      return format(d, 'EEEE \'at\' h:mm a');
+      return formatRelative(d);
     } else {
-      return format(d, 'MMM d, yyyy \'at\' h:mm a');
+      return formatDateTime(d, 'medium');
     }
   };
 

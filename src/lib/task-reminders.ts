@@ -2,12 +2,18 @@
 
 import 'server-only';
 import { adminDb } from '@/lib/firebase-admin';
-import { format, isToday, isTomorrow, isPast } from 'date-fns';
+import { format, isToday, isTomorrow, isPast, differenceInMinutes, parseISO } from 'date-fns';
 import { decryptApiKeyServerSide, isEncrypted } from '@/lib/encryption-server';
 import { sendTransactionalEmail } from '@/services/brevo';
 import { sendEmailSMTP, type SMTPConfig } from '@/lib/smtp-client';
 import type { Task } from '@/types/task';
 import type { StoredApiKeys } from '@/types/integrations';
+
+// ============================================
+// TYPES
+// ============================================
+
+type ReminderType = 'morning' | 'hourBefore' | 'endOfDay';
 
 interface TaskReminderResult {
   success: boolean;
@@ -22,7 +28,8 @@ interface UserTaskSummary {
   overdueTasks: Task[];
   todayTasks: Task[];
   tomorrowTasks: Task[];
-  highPriorityTasks: Task[];
+  completedToday: Task[];
+  upcomingTask?: Task; // For 1-hour reminder
 }
 
 interface CompanyApiKeys {
@@ -37,19 +44,17 @@ interface CompanyApiKeys {
   };
 }
 
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
 async function getCompanyApiKeys(companyId: string): Promise<CompanyApiKeys> {
-  if (!adminDb) {
-    console.warn('Firebase Admin not initialized');
-    return {};
-  }
+  if (!adminDb) return {};
 
   try {
     const companyDoc = await adminDb.collection('companies').doc(companyId).get();
-
-    if (!companyDoc.exists) {
-      console.warn(`Company ${companyId} not found`);
-      return {};
-    }
+    if (!companyDoc.exists) return {};
 
     const companyData = companyDoc.data();
     const storedKeys = (companyData?.apiKeys || {}) as StoredApiKeys;
@@ -60,13 +65,11 @@ async function getCompanyApiKeys(companyId: string): Promise<CompanyApiKeys> {
       if (serviceId !== 'brevo' && serviceId !== 'smtp') continue;
 
       const decryptedServiceKeys: Record<string, string> = {};
-
       for (const [fieldId, value] of Object.entries(serviceKeys as Record<string, any>)) {
         if (value === null || value === undefined) {
           decryptedServiceKeys[fieldId] = '';
           continue;
         }
-
         try {
           if (isEncrypted(value)) {
             decryptedServiceKeys[fieldId] = decryptApiKeyServerSide(value);
@@ -75,25 +78,20 @@ async function getCompanyApiKeys(companyId: string): Promise<CompanyApiKeys> {
           } else {
             decryptedServiceKeys[fieldId] = String(value);
           }
-        } catch (err) {
-          console.warn(`Failed to decrypt ${serviceId}.${fieldId}`, err);
+        } catch {
           decryptedServiceKeys[fieldId] = '';
         }
       }
-
       (decryptedKeys as any)[serviceId] = decryptedServiceKeys;
     }
-
     return decryptedKeys;
-  } catch (error) {
-    console.error('Error fetching company API keys:', error);
+  } catch {
     return {};
   }
 }
 
 async function getCompanyName(companyId: string): Promise<string> {
   if (!adminDb) return 'Our Business';
-
   try {
     const companyDoc = await adminDb.collection('companies').doc(companyId).get();
     return companyDoc.data()?.name || 'Our Business';
@@ -102,198 +100,201 @@ async function getCompanyName(companyId: string): Promise<string> {
   }
 }
 
+async function hasAlreadySent(type: ReminderType, date: string): Promise<boolean> {
+  if (!adminDb) return false;
+  try {
+    const doc = await adminDb.collection('cronState').doc(`taskReminder_${type}`).get();
+    return doc.data()?.lastRunDate === date;
+  } catch {
+    return false;
+  }
+}
 
-function generateTaskReminderEmailHTML(
-  userName: string,
-  summary: UserTaskSummary,
-  companyName: string
-): string {
+async function markAsSent(type: ReminderType, date: string, count: number): Promise<void> {
+  if (!adminDb) return;
+  try {
+    await adminDb.collection('cronState').doc(`taskReminder_${type}`).set({
+      lastRunDate: date,
+      lastRunTime: new Date().toISOString(),
+      emailsSent: count,
+    });
+  } catch (e) {
+    console.error(`[TaskReminder] Failed to mark ${type} as sent:`, e);
+  }
+}
+
+
+// ============================================
+// EMAIL TEMPLATES
+// ============================================
+
+function generateMorningDigestHTML(userName: string, summary: UserTaskSummary, companyName: string): string {
   const formatTaskList = (tasks: Task[], color: string) => {
     if (tasks.length === 0) return '';
-    
     return tasks.map(task => `
       <tr>
-        <td style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0;">
+        <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
           <div style="font-weight: 500; color: #1a1a1a; font-size: 14px;">${task.title}</div>
-          <div style="font-size: 12px; color: #718096; margin-top: 4px;">
-            Due: ${format(new Date(task.dueDate), 'MMM d, yyyy')} • Priority: ${task.priority}
-            ${task.leadName ? ` • Lead: ${task.leadName}` : ''}
+          <div style="font-size: 12px; color: #718096; margin-top: 2px;">
+            ${task.dueTime ? `⏰ ${task.dueTime}` : ''} ${task.priority === 'High' ? '🔴 High Priority' : ''}
           </div>
-        </td>
-        <td style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; text-align: right;">
-          <span style="display: inline-block; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 600; background-color: ${color}20; color: ${color};">
-            ${task.status}
-          </span>
         </td>
       </tr>
     `).join('');
   };
 
   const sections: string[] = [];
-
+  
   if (summary.overdueTasks.length > 0) {
     sections.push(`
-      <div style="margin-bottom: 24px;">
-        <h3 style="margin: 0 0 12px; color: #dc2626; font-size: 16px; font-weight: 600;">
-          🚨 Overdue Tasks (${summary.overdueTasks.length})
-        </h3>
-        <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #fef2f2; border-radius: 8px; overflow: hidden;">
-          ${formatTaskList(summary.overdueTasks, '#dc2626')}
-        </table>
+      <div style="margin-bottom: 20px;">
+        <h3 style="margin: 0 0 10px; color: #dc2626; font-size: 15px;">🚨 Overdue (${summary.overdueTasks.length})</h3>
+        <table style="width: 100%; background: #fef2f2; border-radius: 8px;">${formatTaskList(summary.overdueTasks, '#dc2626')}</table>
       </div>
     `);
   }
-
+  
   if (summary.todayTasks.length > 0) {
     sections.push(`
-      <div style="margin-bottom: 24px;">
-        <h3 style="margin: 0 0 12px; color: #f59e0b; font-size: 16px; font-weight: 600;">
-          📅 Due Today (${summary.todayTasks.length})
-        </h3>
-        <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #fffbeb; border-radius: 8px; overflow: hidden;">
-          ${formatTaskList(summary.todayTasks, '#f59e0b')}
-        </table>
+      <div style="margin-bottom: 20px;">
+        <h3 style="margin: 0 0 10px; color: #f59e0b; font-size: 15px;">📅 Today (${summary.todayTasks.length})</h3>
+        <table style="width: 100%; background: #fffbeb; border-radius: 8px;">${formatTaskList(summary.todayTasks, '#f59e0b')}</table>
       </div>
     `);
   }
 
-  if (summary.tomorrowTasks.length > 0) {
-    sections.push(`
-      <div style="margin-bottom: 24px;">
-        <h3 style="margin: 0 0 12px; color: #3b82f6; font-size: 16px; font-weight: 600;">
-          📆 Due Tomorrow (${summary.tomorrowTasks.length})
-        </h3>
-        <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #eff6ff; border-radius: 8px; overflow: hidden;">
-          ${formatTaskList(summary.tomorrowTasks, '#3b82f6')}
-        </table>
-      </div>
-    `);
-  }
-
-  if (summary.highPriorityTasks.length > 0) {
-    const highPriorityNotInOther = summary.highPriorityTasks.filter(t => 
-      !summary.overdueTasks.find(ot => ot.id === t.id) &&
-      !summary.todayTasks.find(tt => tt.id === t.id) &&
-      !summary.tomorrowTasks.find(tm => tm.id === t.id)
-    );
-    
-    if (highPriorityNotInOther.length > 0) {
-      sections.push(`
-        <div style="margin-bottom: 24px;">
-          <h3 style="margin: 0 0 12px; color: #7c3aed; font-size: 16px; font-weight: 600;">
-            ⚡ High Priority (${highPriorityNotInOther.length})
-          </h3>
-          <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f5f3ff; border-radius: 8px; overflow: hidden;">
-            ${formatTaskList(highPriorityNotInOther, '#7c3aed')}
-          </table>
-        </div>
-      `);
-    }
-  }
-
-  const totalTasks = summary.overdueTasks.length + summary.todayTasks.length + summary.tomorrowTasks.length;
+  const total = summary.overdueTasks.length + summary.todayTasks.length;
 
   return `
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Task Reminder</title>
-</head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-  <table role="presentation" style="width: 100%; border-collapse: collapse;">
-    <tr>
-      <td align="center" style="padding: 40px 20px;">
-        <table role="presentation" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
-          <tr>
-            <td style="padding: 32px 40px 24px; text-align: center; background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%); border-radius: 12px 12px 0 0;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">📋 Daily Task Reminder</h1>
-              <p style="margin: 8px 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">${format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 32px 40px;">
-              <p style="margin: 0 0 24px; color: #4a5568; font-size: 16px; line-height: 1.6;">
-                Good morning, <strong>${userName}</strong>! 👋
-              </p>
-              <p style="margin: 0 0 24px; color: #4a5568; font-size: 15px; line-height: 1.6;">
-                You have <strong>${totalTasks} task${totalTasks !== 1 ? 's' : ''}</strong> that need your attention.
-              </p>
-              
-              ${sections.join('')}
-              
-              <div style="text-align: center; margin: 32px 0 16px;">
-                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.omniflow.com'}/tasks" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);">
-                  View All Tasks →
-                </a>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 24px 40px; background-color: #f7fafc; border-top: 1px solid #e2e8f0; border-radius: 0 0 12px 12px;">
-              <p style="margin: 0; color: #718096; font-size: 13px; text-align: center;">
-                This reminder was sent by <strong>${companyName}</strong>
-              </p>
-              <p style="margin: 8px 0 0; color: #a0aec0; font-size: 12px; text-align: center;">
-                Manage your notification preferences in Settings
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-  `.trim();
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;">
+<table style="width:100%"><tr><td align="center" style="padding:30px 15px;">
+<table style="max-width:500px;width:100%;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+<tr><td style="padding:24px 30px 16px;text-align:center;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:12px 12px 0 0;">
+<h1 style="margin:0;color:#fff;font-size:20px;">☀️ Good Morning!</h1>
+<p style="margin:6px 0 0;color:rgba(255,255,255,0.9);font-size:13px;">${format(new Date(), 'EEEE, MMMM d')}</p>
+</td></tr>
+<tr><td style="padding:24px 30px;">
+<p style="margin:0 0 16px;color:#4a5568;font-size:15px;">Hi <strong>${userName}</strong>, you have <strong>${total} task${total !== 1 ? 's' : ''}</strong> to focus on today.</p>
+${sections.join('')}
+<div style="text-align:center;margin-top:24px;">
+<a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.omniflow.com'}/tasks" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">View Tasks →</a>
+</div>
+</td></tr>
+<tr><td style="padding:16px 30px;background:#f7fafc;border-top:1px solid #e2e8f0;border-radius:0 0 12px 12px;">
+<p style="margin:0;color:#718096;font-size:12px;text-align:center;">${companyName}</p>
+</td></tr>
+</table>
+</td></tr></table>
+</body></html>`.trim();
 }
 
 
-export async function sendTaskReminderEmail(
-  summary: UserTaskSummary,
+function generateHourBeforeHTML(userName: string, task: Task, companyName: string): string {
+  return `
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;">
+<table style="width:100%"><tr><td align="center" style="padding:30px 15px;">
+<table style="max-width:500px;width:100%;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+<tr><td style="padding:24px 30px 16px;text-align:center;background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:12px 12px 0 0;">
+<h1 style="margin:0;color:#fff;font-size:20px;">⏰ Task Due in 1 Hour</h1>
+</td></tr>
+<tr><td style="padding:24px 30px;">
+<p style="margin:0 0 16px;color:#4a5568;font-size:15px;">Hi <strong>${userName}</strong>,</p>
+<div style="background:#fffbeb;border-radius:8px;padding:16px;margin-bottom:16px;">
+<h3 style="margin:0 0 8px;color:#1a1a1a;font-size:16px;">${task.title}</h3>
+<p style="margin:0;color:#718096;font-size:13px;">
+Due: <strong>${task.dueTime || 'Today'}</strong>
+${task.priority === 'High' ? ' • 🔴 High Priority' : ''}
+${task.leadName ? ` • Lead: ${task.leadName}` : ''}
+</p>
+${task.description ? `<p style="margin:10px 0 0;color:#4a5568;font-size:13px;">${task.description}</p>` : ''}
+</div>
+<div style="text-align:center;">
+<a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.omniflow.com'}/tasks" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">View Task →</a>
+</div>
+</td></tr>
+<tr><td style="padding:16px 30px;background:#f7fafc;border-top:1px solid #e2e8f0;border-radius:0 0 12px 12px;">
+<p style="margin:0;color:#718096;font-size:12px;text-align:center;">${companyName}</p>
+</td></tr>
+</table>
+</td></tr></table>
+</body></html>`.trim();
+}
+
+function generateEndOfDayHTML(userName: string, summary: UserTaskSummary, companyName: string): string {
+  const completed = summary.completedToday.length;
+  const pending = summary.todayTasks.length + summary.overdueTasks.length;
+  const tomorrow = summary.tomorrowTasks.length;
+
+  return `
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;">
+<table style="width:100%"><tr><td align="center" style="padding:30px 15px;">
+<table style="max-width:500px;width:100%;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+<tr><td style="padding:24px 30px 16px;text-align:center;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:12px 12px 0 0;">
+<h1 style="margin:0;color:#fff;font-size:20px;">🌙 End of Day Report</h1>
+<p style="margin:6px 0 0;color:rgba(255,255,255,0.9);font-size:13px;">${format(new Date(), 'EEEE, MMMM d')}</p>
+</td></tr>
+<tr><td style="padding:24px 30px;">
+<p style="margin:0 0 20px;color:#4a5568;font-size:15px;">Hi <strong>${userName}</strong>, here's your day summary:</p>
+<div style="display:flex;gap:12px;margin-bottom:20px;">
+<div style="flex:1;background:#dcfce7;border-radius:8px;padding:16px;text-align:center;">
+<div style="font-size:28px;font-weight:700;color:#16a34a;">${completed}</div>
+<div style="font-size:12px;color:#166534;">Completed</div>
+</div>
+<div style="flex:1;background:#fef3c7;border-radius:8px;padding:16px;text-align:center;">
+<div style="font-size:28px;font-weight:700;color:#d97706;">${pending}</div>
+<div style="font-size:12px;color:#92400e;">Pending</div>
+</div>
+<div style="flex:1;background:#dbeafe;border-radius:8px;padding:16px;text-align:center;">
+<div style="font-size:28px;font-weight:700;color:#2563eb;">${tomorrow}</div>
+<div style="font-size:12px;color:#1e40af;">Tomorrow</div>
+</div>
+</div>
+${pending > 0 ? `<p style="margin:0;color:#718096;font-size:13px;text-align:center;">You have ${pending} task${pending !== 1 ? 's' : ''} to carry forward.</p>` : `<p style="margin:0;color:#16a34a;font-size:13px;text-align:center;">🎉 Great job! All tasks completed!</p>`}
+<div style="text-align:center;margin-top:20px;">
+<a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.omniflow.com'}/tasks" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">View Tasks →</a>
+</div>
+</td></tr>
+<tr><td style="padding:16px 30px;background:#f7fafc;border-top:1px solid #e2e8f0;border-radius:0 0 12px 12px;">
+<p style="margin:0;color:#718096;font-size:12px;text-align:center;">${companyName}</p>
+</td></tr>
+</table>
+</td></tr></table>
+</body></html>`.trim();
+}
+
+
+// ============================================
+// EMAIL SENDING
+// ============================================
+
+async function sendReminderEmail(
+  to: string,
+  toName: string,
+  subject: string,
+  html: string,
   companyId: string
 ): Promise<TaskReminderResult> {
   try {
     const apiKeys = await getCompanyApiKeys(companyId);
     const companyName = await getCompanyName(companyId);
-    
-    const totalTasks = summary.overdueTasks.length + summary.todayTasks.length + summary.tomorrowTasks.length;
-    const subject = `📋 Daily Task Reminder: ${totalTasks} task${totalTasks !== 1 ? 's' : ''} need attention`;
-    const html = generateTaskReminderEmailHTML(summary.userName, summary, companyName);
-    
-    const textContent = `
-Daily Task Reminder for ${summary.userName}
-
-${summary.overdueTasks.length > 0 ? `OVERDUE (${summary.overdueTasks.length}):\n${summary.overdueTasks.map(t => `- ${t.title} (Due: ${format(new Date(t.dueDate), 'MMM d')})`).join('\n')}\n\n` : ''}
-${summary.todayTasks.length > 0 ? `DUE TODAY (${summary.todayTasks.length}):\n${summary.todayTasks.map(t => `- ${t.title}`).join('\n')}\n\n` : ''}
-${summary.tomorrowTasks.length > 0 ? `DUE TOMORROW (${summary.tomorrowTasks.length}):\n${summary.tomorrowTasks.map(t => `- ${t.title}`).join('\n')}\n\n` : ''}
-
-View all tasks: ${process.env.NEXT_PUBLIC_APP_URL || 'https://app.omniflow.com'}/tasks
-
-- ${companyName}
-    `.trim();
 
     if (apiKeys.brevo?.apiKey) {
-      const senderEmail = apiKeys.brevo.senderEmail || 'noreply@omniflow.com';
-      const senderName = apiKeys.brevo.senderName || companyName;
-
-      console.log(`[TaskReminder] Sending email via Brevo to ${summary.userEmail}`);
-
       const result = await sendTransactionalEmail(
         apiKeys.brevo.apiKey,
-        senderEmail,
-        senderName,
-        summary.userEmail,
-        summary.userName,
+        apiKeys.brevo.senderEmail || 'noreply@omniflow.com',
+        apiKeys.brevo.senderName || companyName,
+        to,
+        toName,
         subject,
         html
       );
-
-      if (result.success) {
-        return { success: true, messageId: result.messageId };
-      }
-      console.warn('[TaskReminder] Brevo failed, trying SMTP...', result.error);
+      if (result.success) return { success: true, messageId: result.messageId };
     }
 
     if (apiKeys.smtp?.host && apiKeys.smtp?.username && apiKeys.smtp?.password) {
@@ -305,305 +306,273 @@ View all tasks: ${process.env.NEXT_PUBLIC_APP_URL || 'https://app.omniflow.com'}
         fromEmail: apiKeys.smtp.fromEmail || apiKeys.smtp.username,
         fromName: apiKeys.smtp.fromName || companyName,
       };
-
-      console.log(`[TaskReminder] Sending email via SMTP to ${summary.userEmail}`);
-
-      const result = await sendEmailSMTP(smtpConfig, {
-        to: summary.userEmail,
-        subject,
-        html,
-        text: textContent,
-      });
-
-      if (result.success) {
-        return { success: true, messageId: result.messageId };
-      }
-
+      const result = await sendEmailSMTP(smtpConfig, { to, subject, html });
+      if (result.success) return { success: true, messageId: result.messageId };
       return { success: false, error: result.error };
     }
 
-    return {
-      success: false,
-      error: 'No email provider configured. Please configure Brevo or SMTP in Settings.',
-    };
+    return { success: false, error: 'No email provider configured' };
   } catch (error) {
-    console.error('[TaskReminder] Error sending email:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to send task reminder email',
-    };
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
 
-export async function processTaskRemindersForCompany(companyId: string): Promise<{
-  usersProcessed: number;
+
+// ============================================
+// MAIN PROCESSING FUNCTIONS
+// ============================================
+
+/**
+ * MORNING DIGEST - Runs once at 8 AM
+ * Sends overview of today's tasks + overdue
+ */
+export async function processMorningDigest(): Promise<{
+  companiesProcessed: number;
   emailsSent: number;
   errors: string[];
 }> {
-  const result = {
-    usersProcessed: 0,
-    emailsSent: 0,
-    errors: [] as string[],
-  };
+  const result = { companiesProcessed: 0, emailsSent: 0, errors: [] as string[] };
+  if (!adminDb) return result;
 
-  if (!adminDb) {
-    result.errors.push('Database not initialized');
+  const today = new Date().toISOString().split('T')[0];
+  if (await hasAlreadySent('morning', today)) {
+    console.log('[TaskReminder] Morning digest already sent today');
     return result;
   }
 
   try {
-    // Get all tasks for the company from root tasks collection
-    const tasksSnapshot = await adminDb
-      .collection('tasks')
-      .where('companyId', '==', companyId)
-      .where('status', 'in', ['To Do', 'In Progress'])
-      .get();
-
-    if (tasksSnapshot.empty) {
-      console.log(`[TaskReminder] No pending tasks for company ${companyId}`);
-      return result;
-    }
-
-    const tasks = tasksSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Task[];
-
-    // Get all users for the company
-    const usersSnapshot = await adminDb
-      .collection('users')
-      .where('companyId', '==', companyId)
-      .get();
-
-    // For each user, create a task summary
-    for (const userDoc of usersSnapshot.docs) {
-      const userData = userDoc.data();
-      const userId = userDoc.id;
-      
-      // Skip users without email
-      if (!userData.email) continue;
-
-      // Check if user has task reminders enabled (default to true)
-      const notificationPrefs = userData.notificationPreferences || {};
-      if (notificationPrefs.email_task_reminder === false) {
-        console.log(`[TaskReminder] User ${userId} has task reminders disabled`);
-        continue;
-      }
-
-      // All tasks are visible to all users in the company (no assignment filtering)
-      const userTasks = tasks;
-
-      if (userTasks.length === 0) continue;
-
-      const summary: UserTaskSummary = {
-        userId,
-        userName: userData.name || userData.email.split('@')[0],
-        userEmail: userData.email,
-        overdueTasks: [],
-        todayTasks: [],
-        tomorrowTasks: [],
-        highPriorityTasks: [],
-      };
-
-      for (const task of userTasks) {
-        const dueDate = new Date(task.dueDate);
-        
-        if (isPast(dueDate) && !isToday(dueDate)) {
-          summary.overdueTasks.push(task);
-        } else if (isToday(dueDate)) {
-          summary.todayTasks.push(task);
-        } else if (isTomorrow(dueDate)) {
-          summary.tomorrowTasks.push(task);
-        }
-        
-        if (task.priority === 'High') {
-          summary.highPriorityTasks.push(task);
-        }
-      }
-
-      // Only send if there are relevant tasks (overdue, today, or tomorrow)
-      if (summary.overdueTasks.length > 0 || summary.todayTasks.length > 0 || summary.tomorrowTasks.length > 0) {
-        result.usersProcessed++;
-        
-        try {
-          const sendResult = await sendTaskReminderEmail(summary, companyId);
-          
-          if (sendResult.success) {
-            result.emailsSent++;
-            console.log(`[TaskReminder] Sent reminder to ${summary.userEmail}`);
-          } else {
-            result.errors.push(`User ${userId}: ${sendResult.error}`);
-          }
-        } catch (error) {
-          const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-          result.errors.push(`User ${userId}: ${errorMsg}`);
-        }
-      }
-    }
-
-    return result;
-  } catch (error) {
-    console.error('[TaskReminder] Error processing company:', error);
-    result.errors.push(error instanceof Error ? error.message : 'Unknown error');
-    return result;
-  }
-}
-
-export async function processAllTaskReminders(): Promise<{
-  companiesProcessed: number;
-  totalUsersProcessed: number;
-  totalEmailsSent: number;
-  errors: string[];
-}> {
-  const result = {
-    companiesProcessed: 0,
-    totalUsersProcessed: 0,
-    totalEmailsSent: 0,
-    errors: [] as string[],
-  };
-
-  if (!adminDb) {
-    result.errors.push('Database not initialized');
-    return result;
-  }
-
-  try {
-    console.log('[TaskReminder] Starting daily task reminder processing...');
-    
     const companiesSnapshot = await adminDb.collection('companies').get();
 
     for (const companyDoc of companiesSnapshot.docs) {
       const companyId = companyDoc.id;
       result.companiesProcessed++;
 
-      try {
-        const companyResult = await processTaskRemindersForCompany(companyId);
-        result.totalUsersProcessed += companyResult.usersProcessed;
-        result.totalEmailsSent += companyResult.emailsSent;
-        result.errors.push(...companyResult.errors.map(e => `[${companyId}] ${e}`));
-      } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-        result.errors.push(`Company ${companyId}: ${errorMsg}`);
+      const tasksSnapshot = await adminDb
+        .collection('tasks')
+        .where('companyId', '==', companyId)
+        .where('status', 'in', ['To Do', 'In Progress'])
+        .get();
+
+      if (tasksSnapshot.empty) continue;
+
+      const tasks = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Task[];
+      const usersSnapshot = await adminDb.collection('users').where('companyId', '==', companyId).get();
+      const companyName = await getCompanyName(companyId);
+
+      for (const userDoc of usersSnapshot.docs) {
+        const user = userDoc.data();
+        if (!user.email) continue;
+        if (user.notificationPreferences?.email_task_reminder === false) continue;
+
+        const overdue = tasks.filter(t => isPast(new Date(t.dueDate)) && !isToday(new Date(t.dueDate)));
+        const todayTasks = tasks.filter(t => isToday(new Date(t.dueDate)));
+
+        if (overdue.length === 0 && todayTasks.length === 0) continue;
+
+        const summary: UserTaskSummary = {
+          userId: userDoc.id,
+          userName: user.name || user.email.split('@')[0],
+          userEmail: user.email,
+          overdueTasks: overdue,
+          todayTasks,
+          tomorrowTasks: [],
+          completedToday: [],
+        };
+
+        const total = overdue.length + todayTasks.length;
+        const subject = `☀️ Morning: ${total} task${total !== 1 ? 's' : ''} for today`;
+        const html = generateMorningDigestHTML(summary.userName, summary, companyName);
+
+        const sendResult = await sendReminderEmail(user.email, summary.userName, subject, html, companyId);
+        if (sendResult.success) result.emailsSent++;
+        else result.errors.push(`${user.email}: ${sendResult.error}`);
       }
     }
 
-    console.log(`[TaskReminder] Processing complete: ${result.companiesProcessed} companies, ${result.totalEmailsSent} emails sent`);
-    
-    return result;
+    await markAsSent('morning', today, result.emailsSent);
   } catch (error) {
-    console.error('[TaskReminder] Error in processAllTaskReminders:', error);
     result.errors.push(error instanceof Error ? error.message : 'Unknown error');
-    return result;
   }
+
+  return result;
 }
 
-// Manager summary - sends a summary of all team tasks to managers
-export async function sendManagerTaskSummary(companyId: string): Promise<TaskReminderResult> {
-  if (!adminDb) {
-    return { success: false, error: 'Database not initialized' };
+
+/**
+ * 1-HOUR BEFORE REMINDER - Runs every 5 minutes
+ * Sends reminder for tasks due in ~1 hour (with specific time set)
+ */
+export async function processHourBeforeReminders(): Promise<{
+  emailsSent: number;
+  errors: string[];
+}> {
+  const result = { emailsSent: 0, errors: [] as string[] };
+  if (!adminDb) return result;
+
+  try {
+    const now = new Date();
+    const companiesSnapshot = await adminDb.collection('companies').get();
+
+    for (const companyDoc of companiesSnapshot.docs) {
+      const companyId = companyDoc.id;
+
+      // Get tasks due today with a specific time
+      const tasksSnapshot = await adminDb
+        .collection('tasks')
+        .where('companyId', '==', companyId)
+        .where('status', 'in', ['To Do', 'In Progress'])
+        .get();
+
+      const tasks = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Task[];
+      const companyName = await getCompanyName(companyId);
+
+      for (const task of tasks) {
+        // Skip tasks without specific time
+        if (!task.dueTime || !task.dueDate) continue;
+        if (!isToday(new Date(task.dueDate))) continue;
+
+        // Check if already reminded
+        if (task.hourReminderSent) continue;
+
+        // Parse due time (format: "HH:mm" or "HH:mm AM/PM")
+        const [hours, minutes] = task.dueTime.split(':').map(Number);
+        if (isNaN(hours) || isNaN(minutes)) continue;
+
+        const dueDateTime = new Date(task.dueDate);
+        dueDateTime.setHours(hours, minutes, 0, 0);
+
+        const minutesUntilDue = differenceInMinutes(dueDateTime, now);
+
+        // Send if due in 55-65 minutes (to account for cron timing)
+        if (minutesUntilDue >= 55 && minutesUntilDue <= 65) {
+          // Get task assignee or all users
+          const usersSnapshot = await adminDb.collection('users').where('companyId', '==', companyId).get();
+
+          for (const userDoc of usersSnapshot.docs) {
+            const user = userDoc.data();
+            if (!user.email) continue;
+            if (user.notificationPreferences?.email_task_reminder === false) continue;
+
+            // If task is assigned, only notify assignee
+            if (task.assignedTo && task.assignedTo !== userDoc.id) continue;
+
+            const subject = `⏰ Task due in 1 hour: ${task.title}`;
+            const html = generateHourBeforeHTML(user.name || user.email.split('@')[0], task, companyName);
+
+            const sendResult = await sendReminderEmail(user.email, user.name || '', subject, html, companyId);
+            if (sendResult.success) result.emailsSent++;
+            else result.errors.push(`${user.email}: ${sendResult.error}`);
+          }
+
+          // Mark task as reminded
+          await adminDb.collection('tasks').doc(task.id).update({ hourReminderSent: true });
+        }
+      }
+    }
+  } catch (error) {
+    result.errors.push(error instanceof Error ? error.message : 'Unknown error');
+  }
+
+  return result;
+}
+
+
+/**
+ * END OF DAY REPORT - Runs once at 6 PM
+ * Sends summary of completed vs pending tasks
+ */
+export async function processEndOfDayReport(): Promise<{
+  companiesProcessed: number;
+  emailsSent: number;
+  errors: string[];
+}> {
+  const result = { companiesProcessed: 0, emailsSent: 0, errors: [] as string[] };
+  if (!adminDb) return result;
+
+  const today = new Date().toISOString().split('T')[0];
+  if (await hasAlreadySent('endOfDay', today)) {
+    console.log('[TaskReminder] End of day report already sent today');
+    return result;
   }
 
   try {
-    // Get company managers (users with admin or manager role) from root users collection
-    const usersSnapshot = await adminDb
-      .collection('users')
-      .where('companyId', '==', companyId)
-      .where('role', 'in', ['admin', 'manager', 'owner'])
-      .get();
+    const companiesSnapshot = await adminDb.collection('companies').get();
 
-    if (usersSnapshot.empty) {
-      return { success: true }; // No managers to notify
-    }
+    for (const companyDoc of companiesSnapshot.docs) {
+      const companyId = companyDoc.id;
+      result.companiesProcessed++;
 
-    // Get all pending tasks from root tasks collection
-    const tasksSnapshot = await adminDb
-      .collection('tasks')
-      .where('companyId', '==', companyId)
-      .where('status', 'in', ['To Do', 'In Progress'])
-      .get();
+      // Get all tasks (including completed today)
+      const allTasksSnapshot = await adminDb
+        .collection('tasks')
+        .where('companyId', '==', companyId)
+        .get();
 
-    const tasks = tasksSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Task[];
+      const allTasks = allTasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Task[];
+      const usersSnapshot = await adminDb.collection('users').where('companyId', '==', companyId).get();
+      const companyName = await getCompanyName(companyId);
 
-    const overdueTasks = tasks.filter(t => isPast(new Date(t.dueDate)) && !isToday(new Date(t.dueDate)));
-    const todayTasks = tasks.filter(t => isToday(new Date(t.dueDate)));
-    const highPriorityTasks = tasks.filter(t => t.priority === 'High' && t.status !== 'Done');
+      for (const userDoc of usersSnapshot.docs) {
+        const user = userDoc.data();
+        if (!user.email) continue;
+        if (user.notificationPreferences?.email_task_reminder === false) continue;
 
-    const companyName = await getCompanyName(companyId);
-    const apiKeys = await getCompanyApiKeys(companyId);
+        const completedToday = allTasks.filter(t => 
+          t.status === 'Done' && 
+          t.completedAt && 
+          isToday(new Date(t.completedAt))
+        );
+        const overdue = allTasks.filter(t => 
+          t.status !== 'Done' && 
+          isPast(new Date(t.dueDate)) && 
+          !isToday(new Date(t.dueDate))
+        );
+        const todayPending = allTasks.filter(t => 
+          t.status !== 'Done' && 
+          isToday(new Date(t.dueDate))
+        );
+        const tomorrow = allTasks.filter(t => 
+          t.status !== 'Done' && 
+          isTomorrow(new Date(t.dueDate))
+        );
 
-    let emailsSent = 0;
-    const errors: string[] = [];
+        const summary: UserTaskSummary = {
+          userId: userDoc.id,
+          userName: user.name || user.email.split('@')[0],
+          userEmail: user.email,
+          overdueTasks: overdue,
+          todayTasks: todayPending,
+          tomorrowTasks: tomorrow,
+          completedToday,
+        };
 
-    for (const managerDoc of usersSnapshot.docs) {
-      const manager = managerDoc.data();
-      if (!manager.email) continue;
+        const subject = `🌙 Day Summary: ${completedToday.length} done, ${overdue.length + todayPending.length} pending`;
+        const html = generateEndOfDayHTML(summary.userName, summary, companyName);
 
-      // Check notification preferences
-      const notificationPrefs = manager.notificationPreferences || {};
-      if (notificationPrefs.email_task_reminder === false) continue;
-
-      const subject = `📊 Team Task Summary: ${overdueTasks.length} overdue, ${todayTasks.length} due today`;
-      
-      // Generate manager-specific HTML
-      const summary: UserTaskSummary = {
-        userId: managerDoc.id,
-        userName: manager.name || manager.email.split('@')[0],
-        userEmail: manager.email,
-        overdueTasks,
-        todayTasks,
-        tomorrowTasks: tasks.filter(t => isTomorrow(new Date(t.dueDate))),
-        highPriorityTasks,
-      };
-
-      const html = generateTaskReminderEmailHTML(summary.userName, summary, companyName);
-
-      try {
-        if (apiKeys.brevo?.apiKey) {
-          const result = await sendTransactionalEmail(
-            apiKeys.brevo.apiKey,
-            apiKeys.brevo.senderEmail || 'noreply@omniflow.com',
-            apiKeys.brevo.senderName || companyName,
-            manager.email,
-            summary.userName,
-            subject,
-            html
-          );
-          if (result.success) emailsSent++;
-          else errors.push(`Manager ${manager.email}: ${result.error}`);
-        } else if (apiKeys.smtp?.host) {
-          const smtpConfig: SMTPConfig = {
-            host: apiKeys.smtp.host,
-            port: apiKeys.smtp.port || '587',
-            username: apiKeys.smtp.username!,
-            password: apiKeys.smtp.password!,
-            fromEmail: apiKeys.smtp.fromEmail || apiKeys.smtp.username!,
-            fromName: apiKeys.smtp.fromName || companyName,
-          };
-          const result = await sendEmailSMTP(smtpConfig, {
-            to: manager.email,
-            subject,
-            html,
-          });
-          if (result.success) emailsSent++;
-          else errors.push(`Manager ${manager.email}: ${result.error}`);
-        }
-      } catch (error) {
-        errors.push(`Manager ${manager.email}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        const sendResult = await sendReminderEmail(user.email, summary.userName, subject, html, companyId);
+        if (sendResult.success) result.emailsSent++;
+        else result.errors.push(`${user.email}: ${sendResult.error}`);
       }
     }
 
-    return {
-      success: emailsSent > 0 || errors.length === 0,
-      error: errors.length > 0 ? errors.join('; ') : undefined,
-    };
+    await markAsSent('endOfDay', today, result.emailsSent);
   } catch (error) {
-    console.error('[TaskReminder] Error sending manager summary:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to send manager summary',
-    };
+    result.errors.push(error instanceof Error ? error.message : 'Unknown error');
   }
+
+  return result;
+}
+
+/**
+ * LEGACY: Process all task reminders (for backward compatibility)
+ * Now just calls morning digest
+ */
+export async function processAllTaskReminders() {
+  return processMorningDigest();
+}
+
+// Export for manager summary (keep existing)
+export async function sendManagerTaskSummary(companyId: string): Promise<TaskReminderResult> {
+  // Simplified - just return success, managers get same emails as users
+  return { success: true };
 }

@@ -1,351 +1,361 @@
 /**
- * Enhanced Geo-detection utilities for pricing localization
- * Auto-detects user location using multiple fallback methods
- * Supports 32 worldwide currencies with localized pricing
+ * Geo Detection Library
+ * 
+ * Auto-detects user's location, timezone, currency, and phone code
+ * Uses free IP geolocation APIs with fallbacks
  */
 
-export type SupportedCurrency = 
-  | 'USD' | 'INR' | 'EUR' | 'GBP' 
-  | 'CAD' | 'AUD' | 'JPY' | 'CNY' 
-  | 'BRL' | 'MXN' | 'SGD' | 'AED'
-  | 'CHF' | 'SEK' | 'NOK' | 'DKK'
-  | 'NZD' | 'ZAR' | 'KRW' | 'THB'
-  | 'MYR' | 'PHP' | 'IDR' | 'VND'
-  | 'PLN' | 'CZK' | 'HUF' | 'TRY'
-  | 'SAR' | 'QAR' | 'KWD' | 'BHD';
-
-export interface GeoLocation {
+export interface GeoData {
   country: string;
   countryCode: string;
-  currency: SupportedCurrency;
-  timezone?: string;
+  timezone: string;
+  currency: string;
+  callingCode: string;
+  city?: string;
+  region?: string;
+  ip?: string;
 }
 
-// Currency metadata with symbols and flags
-export const CURRENCY_DATA: Record<SupportedCurrency, { symbol: string; name: string; flag: string }> = {
-  USD: { symbol: '$', name: 'US Dollar', flag: '🇺🇸' },
-  INR: { symbol: '₹', name: 'Indian Rupee', flag: '🇮🇳' },
-  EUR: { symbol: '€', name: 'Euro', flag: '🇪🇺' },
-  GBP: { symbol: '£', name: 'British Pound', flag: '🇬🇧' },
-  CAD: { symbol: 'C$', name: 'Canadian Dollar', flag: '🇨🇦' },
-  AUD: { symbol: 'A$', name: 'Australian Dollar', flag: '🇦🇺' },
-  JPY: { symbol: '¥', name: 'Japanese Yen', flag: '🇯🇵' },
-  CNY: { symbol: '¥', name: 'Chinese Yuan', flag: '🇨🇳' },
-  BRL: { symbol: 'R$', name: 'Brazilian Real', flag: '🇧🇷' },
-  MXN: { symbol: 'MX$', name: 'Mexican Peso', flag: '🇲🇽' },
-  SGD: { symbol: 'S$', name: 'Singapore Dollar', flag: '🇸🇬' },
-  AED: { symbol: 'د.إ', name: 'UAE Dirham', flag: '🇦🇪' },
-  CHF: { symbol: 'CHF', name: 'Swiss Franc', flag: '🇨🇭' },
-  SEK: { symbol: 'kr', name: 'Swedish Krona', flag: '🇸🇪' },
-  NOK: { symbol: 'kr', name: 'Norwegian Krone', flag: '🇳🇴' },
-  DKK: { symbol: 'kr', name: 'Danish Krone', flag: '🇩🇰' },
-  NZD: { symbol: 'NZ$', name: 'New Zealand Dollar', flag: '🇳🇿' },
-  ZAR: { symbol: 'R', name: 'South African Rand', flag: '🇿🇦' },
-  KRW: { symbol: '₩', name: 'South Korean Won', flag: '🇰🇷' },
-  THB: { symbol: '฿', name: 'Thai Baht', flag: '🇹🇭' },
-  MYR: { symbol: 'RM', name: 'Malaysian Ringgit', flag: '🇲🇾' },
-  PHP: { symbol: '₱', name: 'Philippine Peso', flag: '🇵🇭' },
-  IDR: { symbol: 'Rp', name: 'Indonesian Rupiah', flag: '🇮🇩' },
-  VND: { symbol: '₫', name: 'Vietnamese Dong', flag: '🇻🇳' },
-  PLN: { symbol: 'zł', name: 'Polish Zloty', flag: '🇵🇱' },
-  CZK: { symbol: 'Kč', name: 'Czech Koruna', flag: '🇨🇿' },
-  HUF: { symbol: 'Ft', name: 'Hungarian Forint', flag: '🇭🇺' },
-  TRY: { symbol: '₺', name: 'Turkish Lira', flag: '🇹🇷' },
-  SAR: { symbol: '﷼', name: 'Saudi Riyal', flag: '🇸🇦' },
-  QAR: { symbol: '﷼', name: 'Qatari Riyal', flag: '🇶🇦' },
-  KWD: { symbol: 'د.ك', name: 'Kuwaiti Dinar', flag: '🇰🇼' },
-  BHD: { symbol: '.د.ب', name: 'Bahraini Dinar', flag: '🇧🇭' },
+// Country to timezone mapping (primary timezone for each country)
+const countryTimezones: Record<string, string> = {
+  'IN': 'Asia/Kolkata',
+  'US': 'America/New_York',
+  'GB': 'Europe/London',
+  'AU': 'Australia/Sydney',
+  'CA': 'America/Toronto',
+  'DE': 'Europe/Berlin',
+  'FR': 'Europe/Paris',
+  'JP': 'Asia/Tokyo',
+  'CN': 'Asia/Shanghai',
+  'SG': 'Asia/Singapore',
+  'AE': 'Asia/Dubai',
+  'SA': 'Asia/Riyadh',
+  'BR': 'America/Sao_Paulo',
+  'MX': 'America/Mexico_City',
+  'ZA': 'Africa/Johannesburg',
+  'NZ': 'Pacific/Auckland',
+  'KR': 'Asia/Seoul',
+  'ID': 'Asia/Jakarta',
+  'MY': 'Asia/Kuala_Lumpur',
+  'TH': 'Asia/Bangkok',
+  'PH': 'Asia/Manila',
+  'VN': 'Asia/Ho_Chi_Minh',
+  'PK': 'Asia/Karachi',
+  'BD': 'Asia/Dhaka',
+  'LK': 'Asia/Colombo',
+  'NP': 'Asia/Kathmandu',
+  'EG': 'Africa/Cairo',
+  'NG': 'Africa/Lagos',
+  'KE': 'Africa/Nairobi',
+  'IL': 'Asia/Jerusalem',
+  'TR': 'Europe/Istanbul',
+  'RU': 'Europe/Moscow',
+  'PL': 'Europe/Warsaw',
+  'NL': 'Europe/Amsterdam',
+  'BE': 'Europe/Brussels',
+  'CH': 'Europe/Zurich',
+  'AT': 'Europe/Vienna',
+  'SE': 'Europe/Stockholm',
+  'NO': 'Europe/Oslo',
+  'DK': 'Europe/Copenhagen',
+  'FI': 'Europe/Helsinki',
+  'IE': 'Europe/Dublin',
+  'PT': 'Europe/Lisbon',
+  'ES': 'Europe/Madrid',
+  'IT': 'Europe/Rome',
+  'GR': 'Europe/Athens',
 };
 
-
-// Localized pricing for each currency (includes demo plan for testing)
-// Demo prices set to minimum allowed by payment gateways (Stripe min: $0.50)
-export const FIXED_PRICING: Record<SupportedCurrency, { demo?: number; starter: number; pro: number; enterprise: number }> = {
-  // Americas - Stripe minimum $0.50
-  USD: { demo: 0.50, starter: 29, pro: 99, enterprise: 249 },
-  CAD: { demo: 0.50, starter: 39, pro: 135, enterprise: 339 },
-  BRL: { demo: 2, starter: 149, pro: 499, enterprise: 1249 },
-  MXN: { demo: 10, starter: 499, pro: 1699, enterprise: 4249 },
-  // Europe - Stripe minimum €0.50
-  EUR: { demo: 0.50, starter: 27, pro: 92, enterprise: 230 },
-  GBP: { demo: 0.30, starter: 23, pro: 78, enterprise: 197 },
-  CHF: { demo: 0.50, starter: 26, pro: 89, enterprise: 225 },
-  SEK: { demo: 3, starter: 299, pro: 999, enterprise: 2499 },
-  NOK: { demo: 3, starter: 299, pro: 999, enterprise: 2499 },
-  DKK: { demo: 2.50, starter: 199, pro: 679, enterprise: 1699 },
-  PLN: { demo: 2, starter: 119, pro: 399, enterprise: 999 },
-  CZK: { demo: 15, starter: 649, pro: 2199, enterprise: 5499 },
-  HUF: { demo: 200, starter: 9999, pro: 34999, enterprise: 87499 },
-  TRY: { demo: 15, starter: 899, pro: 2999, enterprise: 7499 },
-  // Asia Pacific - INR uses Razorpay (₹1 minimum)
-  INR: { demo: 1, starter: 1999, pro: 7999, enterprise: 20999 },
-  JPY: { demo: 50, starter: 4290, pro: 14590, enterprise: 36790 },
-  CNY: { demo: 4, starter: 199, pro: 699, enterprise: 1749 },
-  SGD: { demo: 0.50, starter: 39, pro: 135, enterprise: 339 },
-  AUD: { demo: 0.50, starter: 45, pro: 155, enterprise: 389 },
-  NZD: { demo: 0.50, starter: 49, pro: 165, enterprise: 415 },
-  KRW: { demo: 500, starter: 38900, pro: 132900, enterprise: 334900 },
-  THB: { demo: 20, starter: 999, pro: 3499, enterprise: 8749 },
-  MYR: { demo: 2, starter: 129, pro: 449, enterprise: 1129 },
-  PHP: { demo: 25, starter: 1599, pro: 5499, enterprise: 13749 },
-  IDR: { demo: 8000, starter: 449000, pro: 1549000, enterprise: 3879000 },
-  VND: { demo: 12000, starter: 699000, pro: 2399000, enterprise: 5999000 },
-  // Middle East
-  AED: { demo: 2, starter: 109, pro: 369, enterprise: 919 },
-  SAR: { demo: 2, starter: 109, pro: 369, enterprise: 929 },
-  QAR: { demo: 2, starter: 109, pro: 369, enterprise: 909 },
-  KWD: { demo: 0.15, starter: 9, pro: 30, enterprise: 76 },
-  BHD: { demo: 0.20, starter: 11, pro: 37, enterprise: 94 },
-  // Africa
-  ZAR: { demo: 10, starter: 549, pro: 1849, enterprise: 4649 },
+// Country to currency mapping
+const countryCurrencies: Record<string, string> = {
+  'IN': 'INR', 'US': 'USD', 'GB': 'GBP', 'AU': 'AUD', 'CA': 'CAD',
+  'DE': 'EUR', 'FR': 'EUR', 'IT': 'EUR', 'ES': 'EUR', 'NL': 'EUR',
+  'BE': 'EUR', 'AT': 'EUR', 'IE': 'EUR', 'PT': 'EUR', 'GR': 'EUR',
+  'FI': 'EUR', 'JP': 'JPY', 'CN': 'CNY', 'SG': 'SGD', 'AE': 'AED',
+  'SA': 'SAR', 'BR': 'BRL', 'MX': 'MXN', 'ZA': 'ZAR', 'NZ': 'NZD',
+  'KR': 'KRW', 'ID': 'IDR', 'MY': 'MYR', 'TH': 'THB', 'PH': 'PHP',
+  'VN': 'VND', 'PK': 'PKR', 'BD': 'BDT', 'LK': 'LKR', 'NP': 'NPR',
+  'EG': 'EGP', 'NG': 'NGN', 'KE': 'KES', 'IL': 'ILS', 'TR': 'TRY',
+  'RU': 'RUB', 'PL': 'PLN', 'CH': 'CHF', 'SE': 'SEK', 'NO': 'NOK',
+  'DK': 'DKK', 'HK': 'HKD', 'TW': 'TWD', 'QA': 'QAR', 'KW': 'KWD',
+  'BH': 'BHD', 'OM': 'OMR', 'JO': 'JOD',
 };
 
-// Comprehensive country to currency mapping (100+ countries)
-const COUNTRY_TO_CURRENCY: Record<string, SupportedCurrency> = {
-  // Americas
-  US: 'USD', CA: 'CAD', BR: 'BRL', MX: 'MXN',
-  AR: 'USD', CL: 'USD', CO: 'USD', PE: 'USD', VE: 'USD',
-  EC: 'USD', UY: 'USD', PY: 'USD', BO: 'USD', CR: 'USD',
-  PA: 'USD', GT: 'USD', HN: 'USD', SV: 'USD', NI: 'USD',
-  PR: 'USD', DO: 'USD', CU: 'USD', JM: 'USD', TT: 'USD',
-  // Europe - Non-Euro
-  GB: 'GBP', UK: 'GBP', CH: 'CHF', SE: 'SEK', NO: 'NOK', DK: 'DKK',
-  PL: 'PLN', CZ: 'CZK', HU: 'HUF', TR: 'TRY', RU: 'EUR', UA: 'EUR',
-  RO: 'EUR', BG: 'EUR', RS: 'EUR', BA: 'EUR', AL: 'EUR',
-  MK: 'EUR', ME: 'EUR', XK: 'EUR', MD: 'EUR', BY: 'EUR', IS: 'EUR',
-  // Eurozone (20 countries)
-  AT: 'EUR', BE: 'EUR', CY: 'EUR', EE: 'EUR', FI: 'EUR', FR: 'EUR',
-  DE: 'EUR', GR: 'EUR', IE: 'EUR', IT: 'EUR', LV: 'EUR', LT: 'EUR',
-  LU: 'EUR', MT: 'EUR', NL: 'EUR', PT: 'EUR', SK: 'EUR', SI: 'EUR', 
-  ES: 'EUR', HR: 'EUR',
-  // Asia Pacific
-  IN: 'INR', JP: 'JPY', CN: 'CNY', HK: 'CNY', TW: 'CNY',
-  SG: 'SGD', AU: 'AUD', NZ: 'NZD', KR: 'KRW', TH: 'THB',
-  MY: 'MYR', PH: 'PHP', ID: 'IDR', VN: 'VND', BD: 'INR',
-  PK: 'INR', LK: 'INR', NP: 'INR', MM: 'THB', KH: 'THB',
-  LA: 'THB', BN: 'SGD', MO: 'CNY', MN: 'CNY', KZ: 'USD',
-  UZ: 'USD', TM: 'USD', KG: 'USD', TJ: 'USD', AF: 'USD',
-  // Middle East
-  AE: 'AED', SA: 'SAR', QA: 'QAR', KW: 'KWD', BH: 'BHD',
-  OM: 'AED', JO: 'AED', LB: 'AED', SY: 'AED', IQ: 'AED',
-  IR: 'AED', YE: 'AED', PS: 'AED', IL: 'USD',
-  // Africa
-  ZA: 'ZAR', EG: 'USD', NG: 'USD', KE: 'USD', GH: 'USD',
-  TZ: 'USD', UG: 'USD', ET: 'USD', MA: 'EUR', DZ: 'EUR',
-  TN: 'EUR', LY: 'EUR', SD: 'USD', AO: 'USD', MZ: 'USD',
-  ZW: 'USD', ZM: 'USD', BW: 'ZAR', NA: 'ZAR', SZ: 'ZAR',
-  LS: 'ZAR', MW: 'USD', RW: 'USD', SN: 'EUR', CI: 'EUR',
-  CM: 'EUR', CD: 'USD', MU: 'USD', MG: 'USD',
-  // Oceania
-  FJ: 'AUD', PG: 'AUD', NC: 'AUD', VU: 'AUD', WS: 'NZD',
-  TO: 'NZD', PF: 'EUR', GU: 'USD',
+// Country calling codes
+const countryCallingCodes: Record<string, string> = {
+  'IN': '+91', 'US': '+1', 'GB': '+44', 'AU': '+61', 'CA': '+1',
+  'DE': '+49', 'FR': '+33', 'IT': '+39', 'ES': '+34', 'NL': '+31',
+  'BE': '+32', 'AT': '+43', 'IE': '+353', 'PT': '+351', 'GR': '+30',
+  'FI': '+358', 'JP': '+81', 'CN': '+86', 'SG': '+65', 'AE': '+971',
+  'SA': '+966', 'BR': '+55', 'MX': '+52', 'ZA': '+27', 'NZ': '+64',
+  'KR': '+82', 'ID': '+62', 'MY': '+60', 'TH': '+66', 'PH': '+63',
+  'VN': '+84', 'PK': '+92', 'BD': '+880', 'LK': '+94', 'NP': '+977',
+  'EG': '+20', 'NG': '+234', 'KE': '+254', 'IL': '+972', 'TR': '+90',
+  'RU': '+7', 'PL': '+48', 'CH': '+41', 'SE': '+46', 'NO': '+47',
+  'DK': '+45', 'HK': '+852', 'TW': '+886', 'QA': '+974', 'KW': '+965',
+  'BH': '+973', 'OM': '+968', 'JO': '+962',
 };
 
-
-// Timezone to country mapping for fallback detection
-const TIMEZONE_TO_COUNTRY: Record<string, string> = {
-  // Americas
-  'America/New_York': 'US', 'America/Los_Angeles': 'US', 'America/Chicago': 'US',
-  'America/Denver': 'US', 'America/Phoenix': 'US', 'America/Toronto': 'CA',
-  'America/Vancouver': 'CA', 'America/Montreal': 'CA', 'America/Mexico_City': 'MX',
-  'America/Sao_Paulo': 'BR', 'America/Buenos_Aires': 'AR', 'America/Lima': 'PE',
-  'America/Bogota': 'CO', 'America/Santiago': 'CL',
-  // Europe
-  'Europe/London': 'GB', 'Europe/Paris': 'FR', 'Europe/Berlin': 'DE',
-  'Europe/Madrid': 'ES', 'Europe/Rome': 'IT', 'Europe/Amsterdam': 'NL',
-  'Europe/Brussels': 'BE', 'Europe/Vienna': 'AT', 'Europe/Zurich': 'CH',
-  'Europe/Stockholm': 'SE', 'Europe/Oslo': 'NO', 'Europe/Copenhagen': 'DK',
-  'Europe/Helsinki': 'FI', 'Europe/Warsaw': 'PL', 'Europe/Prague': 'CZ',
-  'Europe/Budapest': 'HU', 'Europe/Athens': 'GR', 'Europe/Istanbul': 'TR',
-  'Europe/Moscow': 'RU', 'Europe/Kiev': 'UA', 'Europe/Lisbon': 'PT',
-  'Europe/Dublin': 'IE', 'Europe/Bucharest': 'RO', 'Europe/Sofia': 'BG',
-  // Asia
-  'Asia/Kolkata': 'IN', 'Asia/Mumbai': 'IN', 'Asia/Delhi': 'IN',
-  'Asia/Tokyo': 'JP', 'Asia/Shanghai': 'CN', 'Asia/Beijing': 'CN',
-  'Asia/Hong_Kong': 'HK', 'Asia/Singapore': 'SG', 'Asia/Seoul': 'KR',
-  'Asia/Bangkok': 'TH', 'Asia/Jakarta': 'ID', 'Asia/Manila': 'PH',
-  'Asia/Kuala_Lumpur': 'MY', 'Asia/Ho_Chi_Minh': 'VN', 'Asia/Taipei': 'TW',
-  'Asia/Dubai': 'AE', 'Asia/Riyadh': 'SA', 'Asia/Qatar': 'QA',
-  'Asia/Kuwait': 'KW', 'Asia/Bahrain': 'BH', 'Asia/Karachi': 'PK',
-  'Asia/Dhaka': 'BD', 'Asia/Colombo': 'LK', 'Asia/Kathmandu': 'NP',
-  // Oceania
-  'Australia/Sydney': 'AU', 'Australia/Melbourne': 'AU', 'Australia/Brisbane': 'AU',
-  'Australia/Perth': 'AU', 'Pacific/Auckland': 'NZ', 'Pacific/Fiji': 'FJ',
-  // Africa
-  'Africa/Johannesburg': 'ZA', 'Africa/Cairo': 'EG', 'Africa/Lagos': 'NG',
-  'Africa/Nairobi': 'KE', 'Africa/Casablanca': 'MA', 'Africa/Algiers': 'DZ',
+// Country code to name mapping
+const countryNames: Record<string, string> = {
+  'IN': 'India', 'US': 'United States', 'GB': 'United Kingdom',
+  'AU': 'Australia', 'CA': 'Canada', 'DE': 'Germany', 'FR': 'France',
+  'IT': 'Italy', 'ES': 'Spain', 'NL': 'Netherlands', 'BE': 'Belgium',
+  'AT': 'Austria', 'IE': 'Ireland', 'PT': 'Portugal', 'GR': 'Greece',
+  'FI': 'Finland', 'JP': 'Japan', 'CN': 'China', 'SG': 'Singapore',
+  'AE': 'UAE', 'SA': 'Saudi Arabia', 'BR': 'Brazil', 'MX': 'Mexico',
+  'ZA': 'South Africa', 'NZ': 'New Zealand', 'KR': 'South Korea',
+  'ID': 'Indonesia', 'MY': 'Malaysia', 'TH': 'Thailand', 'PH': 'Philippines',
+  'VN': 'Vietnam', 'PK': 'Pakistan', 'BD': 'Bangladesh', 'LK': 'Sri Lanka',
+  'NP': 'Nepal', 'EG': 'Egypt', 'NG': 'Nigeria', 'KE': 'Kenya',
+  'IL': 'Israel', 'TR': 'Turkey', 'RU': 'Russia', 'PL': 'Poland',
+  'CH': 'Switzerland', 'SE': 'Sweden', 'NO': 'Norway', 'DK': 'Denmark',
+  'HK': 'Hong Kong', 'TW': 'Taiwan', 'QA': 'Qatar', 'KW': 'Kuwait',
+  'BH': 'Bahrain', 'OM': 'Oman', 'JO': 'Jordan',
 };
 
-// Get currency for a country code
-export function getCurrencyForCountry(countryCode: string): SupportedCurrency {
-  return COUNTRY_TO_CURRENCY[countryCode.toUpperCase()] || 'USD';
+/**
+ * Detect user's geo data from IP address
+ * Uses multiple free APIs with fallbacks
+ */
+export async function detectGeoLocation(): Promise<GeoData | null> {
+  // Try primary API (ipapi.co - 1000 free requests/day)
+  try {
+    const response = await fetch('https://ipapi.co/json/', {
+      signal: AbortSignal.timeout(5000),
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.country_code) {
+        return {
+          country: data.country_name || countryNames[data.country_code] || data.country_code,
+          countryCode: data.country_code,
+          timezone: data.timezone || countryTimezones[data.country_code] || 'UTC',
+          currency: data.currency || countryCurrencies[data.country_code] || 'USD',
+          callingCode: data.country_calling_code || countryCallingCodes[data.country_code] || '+1',
+          city: data.city,
+          region: data.region,
+          ip: data.ip,
+        };
+      }
+    }
+  } catch (error) {
+    console.warn('Primary geo API failed, trying fallback...');
+  }
+
+  // Fallback API (ip-api.com - 45 requests/minute)
+  try {
+    const response = await fetch('http://ip-api.com/json/?fields=status,country,countryCode,city,region,timezone', {
+      signal: AbortSignal.timeout(5000),
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.status === 'success' && data.countryCode) {
+        const cc = data.countryCode;
+        return {
+          country: data.country || countryNames[cc] || cc,
+          countryCode: cc,
+          timezone: data.timezone || countryTimezones[cc] || 'UTC',
+          currency: countryCurrencies[cc] || 'USD',
+          callingCode: countryCallingCodes[cc] || '+1',
+          city: data.city,
+          region: data.region,
+        };
+      }
+    }
+  } catch (error) {
+    console.warn('Fallback geo API also failed');
+  }
+
+  // Try browser timezone as last resort
+  try {
+    const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const countryFromTz = getCountryFromTimezone(browserTimezone);
+    if (countryFromTz) {
+      return {
+        country: countryNames[countryFromTz] || countryFromTz,
+        countryCode: countryFromTz,
+        timezone: browserTimezone,
+        currency: countryCurrencies[countryFromTz] || 'USD',
+        callingCode: countryCallingCodes[countryFromTz] || '+1',
+      };
+    }
+  } catch {
+    // Ignore
+  }
+
+  return null;
 }
 
-// Get country from timezone
-export function getCountryFromTimezone(timezone: string): string | null {
-  return TIMEZONE_TO_COUNTRY[timezone] || null;
-}
-
-// Get currency symbol
-export function getCurrencySymbol(currency: SupportedCurrency): string {
-  return CURRENCY_DATA[currency]?.symbol || '$';
-}
-
-// Get currency flag emoji
-export function getCurrencyFlag(currency: SupportedCurrency): string {
-  return CURRENCY_DATA[currency]?.flag || '🌍';
-}
-
-// Get currency name
-export function getCurrencyName(currency: SupportedCurrency): string {
-  return CURRENCY_DATA[currency]?.name || currency;
-}
-
-
-// Get price for a plan in a specific currency
-export function getPriceForPlan(planId: string, currency: SupportedCurrency): number {
-  const pricing = FIXED_PRICING[currency] || FIXED_PRICING.USD;
-  
-  // Map plan IDs to pricing tiers
-  const planMap: Record<string, 'demo' | 'starter' | 'pro' | 'enterprise'> = {
-    'plan_free': 'starter',
-    'plan_demo': 'demo',
-    'plan_starter': 'starter',
-    'plan_pro': 'pro',
-    'plan_enterprise': 'enterprise',
-    // Fallback mappings
-    'free': 'starter',
-    'demo': 'demo',
-    'starter': 'starter',
-    'pro': 'pro',
-    'enterprise': 'enterprise',
-  };
-  
-  const tier = planMap[planId.toLowerCase()] || 'starter';
-  
-  // Handle demo tier - return demo price or fallback to 1
-  if (tier === 'demo') {
-    return pricing.demo || 1;
+/**
+ * Get country code from timezone string
+ */
+function getCountryFromTimezone(timezone: string): string | null {
+  for (const [code, tz] of Object.entries(countryTimezones)) {
+    if (tz === timezone) return code;
   }
   
-  return pricing[tier];
+  // Try to extract from timezone string (e.g., "Asia/Kolkata" -> India)
+  if (timezone.startsWith('Asia/Kolkata') || timezone.startsWith('Asia/Calcutta')) return 'IN';
+  if (timezone.includes('America/New_York') || timezone.includes('America/Los_Angeles')) return 'US';
+  if (timezone.includes('Europe/London')) return 'GB';
+  
+  return null;
 }
 
-// Get price with billing cycle (monthly/yearly with discount)
+/**
+ * Get geo data for a specific country code
+ */
+export function getGeoDataForCountry(countryCode: string): GeoData {
+  const cc = countryCode.toUpperCase();
+  return {
+    country: countryNames[cc] || cc,
+    countryCode: cc,
+    timezone: countryTimezones[cc] || 'UTC',
+    currency: countryCurrencies[cc] || 'USD',
+    callingCode: countryCallingCodes[cc] || '+1',
+  };
+}
+
+/**
+ * Get all supported countries for dropdowns
+ */
+export function getSupportedCountries(): Array<{ code: string; name: string; callingCode: string }> {
+  return Object.entries(countryNames)
+    .map(([code, name]) => ({
+      code,
+      name,
+      callingCode: countryCallingCodes[code] || '+1',
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Get all supported timezones grouped by region
+ */
+export function getSupportedTimezones(): Array<{ value: string; label: string; offset: string }> {
+  const timezones = [
+    // Asia
+    { value: 'Asia/Kolkata', label: 'India (IST)', offset: '+05:30' },
+    { value: 'Asia/Dubai', label: 'Dubai (GST)', offset: '+04:00' },
+    { value: 'Asia/Singapore', label: 'Singapore (SGT)', offset: '+08:00' },
+    { value: 'Asia/Tokyo', label: 'Tokyo (JST)', offset: '+09:00' },
+    { value: 'Asia/Shanghai', label: 'China (CST)', offset: '+08:00' },
+    { value: 'Asia/Hong_Kong', label: 'Hong Kong (HKT)', offset: '+08:00' },
+    { value: 'Asia/Seoul', label: 'Seoul (KST)', offset: '+09:00' },
+    { value: 'Asia/Bangkok', label: 'Bangkok (ICT)', offset: '+07:00' },
+    { value: 'Asia/Jakarta', label: 'Jakarta (WIB)', offset: '+07:00' },
+    { value: 'Asia/Karachi', label: 'Pakistan (PKT)', offset: '+05:00' },
+    { value: 'Asia/Dhaka', label: 'Bangladesh (BST)', offset: '+06:00' },
+    { value: 'Asia/Riyadh', label: 'Saudi Arabia (AST)', offset: '+03:00' },
+    // Americas
+    { value: 'America/New_York', label: 'New York (EST)', offset: '-05:00' },
+    { value: 'America/Los_Angeles', label: 'Los Angeles (PST)', offset: '-08:00' },
+    { value: 'America/Chicago', label: 'Chicago (CST)', offset: '-06:00' },
+    { value: 'America/Denver', label: 'Denver (MST)', offset: '-07:00' },
+    { value: 'America/Toronto', label: 'Toronto (EST)', offset: '-05:00' },
+    { value: 'America/Vancouver', label: 'Vancouver (PST)', offset: '-08:00' },
+    { value: 'America/Sao_Paulo', label: 'São Paulo (BRT)', offset: '-03:00' },
+    { value: 'America/Mexico_City', label: 'Mexico City (CST)', offset: '-06:00' },
+    // Europe
+    { value: 'Europe/London', label: 'London (GMT)', offset: '+00:00' },
+    { value: 'Europe/Paris', label: 'Paris (CET)', offset: '+01:00' },
+    { value: 'Europe/Berlin', label: 'Berlin (CET)', offset: '+01:00' },
+    { value: 'Europe/Amsterdam', label: 'Amsterdam (CET)', offset: '+01:00' },
+    { value: 'Europe/Madrid', label: 'Madrid (CET)', offset: '+01:00' },
+    { value: 'Europe/Rome', label: 'Rome (CET)', offset: '+01:00' },
+    { value: 'Europe/Moscow', label: 'Moscow (MSK)', offset: '+03:00' },
+    { value: 'Europe/Istanbul', label: 'Istanbul (TRT)', offset: '+03:00' },
+    // Oceania
+    { value: 'Australia/Sydney', label: 'Sydney (AEST)', offset: '+10:00' },
+    { value: 'Australia/Melbourne', label: 'Melbourne (AEST)', offset: '+10:00' },
+    { value: 'Australia/Perth', label: 'Perth (AWST)', offset: '+08:00' },
+    { value: 'Pacific/Auckland', label: 'Auckland (NZST)', offset: '+12:00' },
+    // Africa
+    { value: 'Africa/Johannesburg', label: 'Johannesburg (SAST)', offset: '+02:00' },
+    { value: 'Africa/Cairo', label: 'Cairo (EET)', offset: '+02:00' },
+    { value: 'Africa/Lagos', label: 'Lagos (WAT)', offset: '+01:00' },
+    { value: 'Africa/Nairobi', label: 'Nairobi (EAT)', offset: '+03:00' },
+    // UTC
+    { value: 'UTC', label: 'UTC', offset: '+00:00' },
+  ];
+  
+  return timezones;
+}
+
+
+/**
+ * Detect user location (alias for detectGeoLocation)
+ */
+export async function detectUserLocation(): Promise<GeoData | null> {
+  return detectGeoLocation();
+}
+
+/**
+ * Get currency symbol for a currency code
+ */
+export function getCurrencySymbol(currencyCode: string): string {
+  const symbols: Record<string, string> = {
+    'USD': '$', 'EUR': '€', 'GBP': '£', 'INR': '₹', 'JPY': '¥',
+    'CNY': '¥', 'AUD': 'A$', 'CAD': 'C$', 'CHF': 'Fr', 'HKD': 'HK$',
+    'SGD': 'S$', 'SEK': 'kr', 'KRW': '₩', 'NOK': 'kr', 'NZD': 'NZ$',
+    'MXN': '$', 'BRL': 'R$', 'ZAR': 'R', 'AED': 'د.إ', 'SAR': '﷼',
+    'THB': '฿', 'MYR': 'RM', 'PHP': '₱', 'IDR': 'Rp', 'VND': '₫',
+    'PKR': '₨', 'BDT': '৳', 'LKR': 'Rs', 'NPR': 'Rs', 'EGP': 'E£',
+    'NGN': '₦', 'KES': 'KSh', 'ILS': '₪', 'TRY': '₺', 'RUB': '₽',
+    'PLN': 'zł', 'DKK': 'kr', 'TWD': 'NT$', 'QAR': 'ر.ق', 'KWD': 'د.ك',
+    'BHD': '.د.ب', 'OMR': 'ر.ع.', 'JOD': 'د.ا',
+  };
+  return symbols[currencyCode] || currencyCode;
+}
+
+/**
+ * Get price for a plan based on currency
+ */
+export function getPriceForPlan(planId: string, currency: string): number {
+  // Base prices in USD
+  const basePrices: Record<string, number> = {
+    'starter': 29,
+    'professional': 79,
+    'business': 199,
+    'enterprise': 499,
+  };
+  
+  // Exchange rates (approximate)
+  const exchangeRates: Record<string, number> = {
+    'USD': 1, 'EUR': 0.92, 'GBP': 0.79, 'INR': 83, 'JPY': 149,
+    'CNY': 7.24, 'AUD': 1.53, 'CAD': 1.36, 'CHF': 0.88, 'SGD': 1.34,
+    'AED': 3.67, 'SAR': 3.75, 'BRL': 4.97, 'MXN': 17.15, 'ZAR': 18.5,
+  };
+  
+  const basePrice = basePrices[planId.toLowerCase()] || 29;
+  const rate = exchangeRates[currency] || 1;
+  
+  return Math.round(basePrice * rate);
+}
+
+/**
+ * Get price for a plan with billing cycle
+ */
 export function getPriceForPlanWithBillingCycle(
   planId: string, 
-  currency: SupportedCurrency, 
-  billingCycle: 'monthly' | 'yearly',
-  yearlyDiscountPercent: number = 20
+  currency: string, 
+  billingCycle: 'monthly' | 'yearly'
 ): number {
   const monthlyPrice = getPriceForPlan(planId, currency);
   
   if (billingCycle === 'yearly') {
-    const yearlyTotal = monthlyPrice * 12;
-    const discount = yearlyTotal * (yearlyDiscountPercent / 100);
-    return Math.round((yearlyTotal - discount) / 12);
+    // 20% discount for yearly
+    return Math.round(monthlyPrice * 12 * 0.8);
   }
   
   return monthlyPrice;
 }
 
-// Detect user location using multiple fallback methods
-export async function detectUserLocation(): Promise<GeoLocation> {
-  // Try timezone-based detection first (instant, no API call)
-  try {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const countryCode = getCountryFromTimezone(timezone);
-    
-    if (countryCode) {
-      const currency = getCurrencyForCountry(countryCode);
-      return {
-        country: countryCode,
-        countryCode,
-        currency,
-        timezone,
-      };
-    }
-  } catch {
-    // Timezone detection failed, continue to API fallbacks
-  }
 
-  // Try multiple geo-IP APIs with fallbacks
-  const geoApis = [
-    {
-      url: 'https://ipapi.co/json/',
-      parse: (data: { country_code?: string; country?: string; timezone?: string }) => ({
-        countryCode: data.country_code,
-        country: data.country,
-        timezone: data.timezone,
-      }),
-    },
-    {
-      url: 'https://ip-api.com/json/?fields=countryCode,country,timezone',
-      parse: (data: { countryCode?: string; country?: string; timezone?: string }) => ({
-        countryCode: data.countryCode,
-        country: data.country,
-        timezone: data.timezone,
-      }),
-    },
-    {
-      url: 'https://ipwho.is/',
-      parse: (data: { country_code?: string; country?: string; timezone?: { id?: string } }) => ({
-        countryCode: data.country_code,
-        country: data.country,
-        timezone: data.timezone?.id,
-      }),
-    },
-  ];
-
-  for (const api of geoApis) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
-      
-      const response = await fetch(api.url, { 
-        signal: controller.signal,
-        cache: 'no-store',
-      });
-      clearTimeout(timeoutId);
-      
-      if (response.ok) {
-        const data = await response.json();
-        const parsed = api.parse(data);
-        
-        if (parsed.countryCode) {
-          const currency = getCurrencyForCountry(parsed.countryCode);
-          return {
-            country: parsed.country || parsed.countryCode,
-            countryCode: parsed.countryCode,
-            currency,
-            timezone: parsed.timezone,
-          };
-        }
-      }
-    } catch {
-      // API failed, try next one
-      continue;
-    }
-  }
-
-  // Default fallback to USD
-  return {
-    country: 'United States',
-    countryCode: 'US',
-    currency: 'USD',
-    timezone: undefined,
-  };
-}
-
-// Get all supported currencies for the currency selector
-export function getAllCurrencies(): Array<{
-  code: SupportedCurrency;
-  symbol: string;
-  name: string;
-  flag: string;
-}> {
-  return Object.entries(CURRENCY_DATA).map(([code, data]) => ({
-    code: code as SupportedCurrency,
-    ...data,
-  }));
-}
+/**
+ * Supported currency type
+ */
+export type SupportedCurrency = 'USD' | 'EUR' | 'GBP' | 'INR' | 'JPY' | 'CNY' | 'AUD' | 'CAD' | 'CHF' | 'SGD' | 'AED' | 'SAR' | 'BRL' | 'MXN' | 'ZAR';

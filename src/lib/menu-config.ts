@@ -88,6 +88,24 @@ export const MENU_CONFIG: MenuItem[] = [
         tooltip: 'Track your deals',
       },
       {
+        id: 'invoices',
+        href: '/invoices',
+        label: 'Invoices',
+        icon: 'solar:bill-list-linear',
+        tooltip: 'Create & track invoices',
+        badge: 'NEW',
+        badgeExpiry: '2026-03-01',
+      },
+      {
+        id: 'products',
+        href: '/products',
+        label: 'Products',
+        icon: 'solar:box-linear',
+        tooltip: 'Product catalog for quotes & invoices',
+        badge: 'NEW',
+        badgeExpiry: '2026-03-01',
+      },
+      {
         id: 'appointments',
         href: '/appointments',
         label: 'Appointments',
@@ -283,6 +301,19 @@ export const MENU_CONFIG: MenuItem[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════
+  // SECTION: Reputation Management
+  // ═══════════════════════════════════════════════════════════════
+  {
+    id: 'reputation',
+    href: '/reputation',
+    label: 'Reviews',
+    icon: 'solar:star-shine-linear',
+    tooltip: 'Manage reviews & reputation',
+    badge: 'NEW',
+    badgeExpiry: '2026-03-01',
+  },
+
+  // ═══════════════════════════════════════════════════════════════
   // SECTION: Team (Admin Only)
   // ═══════════════════════════════════════════════════════════════
   {
@@ -347,6 +378,7 @@ export const SUPER_ADMIN_MENU: MenuItem[] = [
  */
 export const FEATURE_NAMES: Record<string, string> = {
   'feat_core_crm': 'Customers & CRM',
+  'feat_invoicing': 'Invoicing & Payments',
   'feat_ai_content_gen': 'AI Studio',
   'feat_digital_cards': 'Digital Card',
   'feat_email_marketing': 'Email Campaigns',
@@ -423,6 +455,12 @@ export const BADGE_STYLES: Record<BadgeType, { bg: string; text: string; label: 
  * Shown when user clicks a locked feature
  */
 export const FEATURE_BENEFITS: Record<string, string[]> = {
+  'feat_invoicing': [
+    'Create professional GST invoices',
+    'Collect payments via Razorpay',
+    'Track payments & outstanding',
+    'Send via Email or WhatsApp',
+  ],
   'feat_email_marketing': [
     'Send unlimited email campaigns',
     'Beautiful email templates',

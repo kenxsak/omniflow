@@ -7,7 +7,8 @@
 
 import { Icon } from '@iconify/react';
 import type { ConversionFunnel } from '@/types/analytics';
-import { formatNumber, formatCurrency, formatPercentage } from '@/lib/analytics-service';
+import { formatNumber, formatPercentage } from '@/lib/analytics-service';
+import { useCurrency } from '@/contexts/currency-context';
 import { cn } from '@/lib/utils';
 
 interface ConversionFunnelChartProps {
@@ -15,6 +16,7 @@ interface ConversionFunnelChartProps {
 }
 
 export default function ConversionFunnelChart({ funnel }: ConversionFunnelChartProps) {
+  const { formatCurrency } = useCurrency();
   const { stages, overallConversionRate, dropOffPoints } = funnel;
   
   const maxCount = stages.views.count || 1;

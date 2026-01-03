@@ -716,7 +716,7 @@ export async function syncCalComBookingsAction({
               name: attendeeName,
               email: attendeeEmail,
               phone: booking.attendees?.[0]?.email ? '' : '',
-              status: 'new',
+              status: 'New',
               source: 'calendar_booking',
               notes: `From Cal.com booking: ${booking.title}`,
               assignedTo: '',
@@ -1007,5 +1007,337 @@ export async function updateCalendarAccessSettingsAction({
   } catch (error: any) {
     console.error('Error updating calendar access settings:', error);
     return { success: false, error: error.message || 'Failed to update calendar access settings' };
+  }
+}
+
+
+// ============================================
+// APPOINTMENT PAYMENT INTEGRATION
+// ============================================
+
+import Razorpay from 'razorpay';
+import Stripe from 'stripe';
+
+// Get Razorpay instance using company-specific credentials
+async function getCompanyRazorpayInstance(companyId: string) {
+  if (!adminDb) return null;
+  
+  const settingsDoc = await adminDb.collection('invoiceSettings').doc(companyId).get();
+  if (!settingsDoc.exists) return null;
+  
+  const settings = settingsDoc.data();
+  const razorpay = settings?.paymentGateway?.razorpay;
+  
+  if (!razorpay?.enabled || !razorpay?.keyId || !razorpay?.keySecret) return null;
+  
+  return new Razorpay({ key_id: razorpay.keyId, key_secret: razorpay.keySecret });
+}
+
+// Get Stripe instance using company-specific credentials
+async function getCompanyStripeInstance(companyId: string) {
+  if (!adminDb) return null;
+  
+  const settingsDoc = await adminDb.collection('invoiceSettings').doc(companyId).get();
+  if (!settingsDoc.exists) return null;
+  
+  const settings = settingsDoc.data();
+  const stripe = settings?.paymentGateway?.stripe;
+  
+  if (!stripe?.enabled || !stripe?.secretKey) return null;
+  
+  return new Stripe(stripe.secretKey, { apiVersion: '2025-10-29.clover' });
+}
+
+// Get preferred gateway for a company
+async function getPreferredGateway(companyId: string, currency: string): Promise<'razorpay' | 'stripe' | null> {
+  if (!adminDb) return null;
+  
+  const settingsDoc = await adminDb.collection('invoiceSettings').doc(companyId).get();
+  if (!settingsDoc.exists) return null;
+  
+  const settings = settingsDoc.data();
+  const pg = settings?.paymentGateway;
+  
+  if (!pg) return null;
+  
+  const preferred = pg.preferredGateway || 'auto';
+  
+  if (preferred === 'razorpay' && pg.razorpay?.enabled) return 'razorpay';
+  if (preferred === 'stripe' && pg.stripe?.enabled) return 'stripe';
+  
+  // Auto mode: INR -> Razorpay, others -> Stripe
+  if (preferred === 'auto') {
+    if (currency === 'INR' && pg.razorpay?.enabled) return 'razorpay';
+    if (pg.stripe?.enabled) return 'stripe';
+    if (pg.razorpay?.enabled) return 'razorpay';
+  }
+  
+  return null;
+}
+
+/**
+ * Create a payment link for an appointment
+ */
+export async function createAppointmentPaymentLinkAction({
+  idToken,
+  appointmentId,
+  gateway,
+}: {
+  idToken: string;
+  appointmentId: string;
+  gateway?: 'razorpay' | 'stripe';
+}): Promise<{ success: boolean; paymentLink?: string; gateway?: string; error?: string }> {
+  try {
+    const authResult = await getAuthenticatedUserFromToken(idToken);
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
+    }
+    
+    const { user } = authResult;
+    if (!user.companyId) {
+      return { success: false, error: 'User does not have a company assigned' };
+    }
+    
+    if (!adminDb) {
+      return { success: false, error: 'Database not initialized' };
+    }
+    
+    // Get the appointment
+    const appointment = await getAppointment(appointmentId);
+    if (!appointment) {
+      return { success: false, error: 'Appointment not found' };
+    }
+    
+    if (appointment.companyId !== user.companyId) {
+      return { success: false, error: 'Unauthorized' };
+    }
+    
+    if (!appointment.price || appointment.price <= 0) {
+      return { success: false, error: 'Appointment has no price set' };
+    }
+    
+    // If already has payment link, return it
+    if (appointment.paymentLink) {
+      return { success: true, paymentLink: appointment.paymentLink, gateway: appointment.paymentId?.startsWith('plink_') ? 'razorpay' : 'stripe' };
+    }
+    
+    const currency = appointment.currency || 'INR';
+    const selectedGateway = gateway || await getPreferredGateway(user.companyId, currency);
+    
+    if (!selectedGateway) {
+      return { success: false, error: 'No payment gateway configured. Go to Settings → Invoices to add Razorpay or Stripe credentials.' };
+    }
+    
+    // Get company name
+    const companyDoc = await adminDb.collection('companies').doc(user.companyId).get();
+    const companyName = companyDoc.exists ? companyDoc.data()?.name : 'Business';
+    
+    let paymentLink: string;
+    let paymentLinkId: string;
+    
+    if (selectedGateway === 'razorpay') {
+      const razorpay = await getCompanyRazorpayInstance(user.companyId);
+      if (!razorpay) {
+        return { success: false, error: 'Razorpay not configured. Go to Settings → Invoices to add your Razorpay API keys.' };
+      }
+      
+      const link = await razorpay.paymentLink.create({
+        amount: Math.round(appointment.price * 100), // Convert to paise
+        currency: 'INR',
+        accept_partial: false,
+        description: `Appointment: ${appointment.title} with ${companyName}`,
+        customer: {
+          name: appointment.clientName,
+          email: appointment.clientEmail,
+          contact: appointment.clientPhone || undefined,
+        },
+        notify: {
+          sms: !!appointment.clientPhone,
+          email: true,
+        },
+        reminder_enable: true,
+        notes: {
+          appointmentId: appointment.id,
+          companyId: appointment.companyId,
+          type: 'appointment_payment',
+        },
+        callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/appointment-payment?appointmentId=${appointment.id}&gateway=razorpay`,
+        callback_method: 'get',
+      });
+      
+      paymentLink = link.short_url;
+      paymentLinkId = link.id;
+    } else {
+      // Stripe
+      const stripe = await getCompanyStripeInstance(user.companyId);
+      if (!stripe) {
+        return { success: false, error: 'Stripe not configured. Go to Settings → Invoices to add your Stripe API keys.' };
+      }
+      
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [{
+          price_data: {
+            currency: currency.toLowerCase(),
+            product_data: {
+              name: `Appointment: ${appointment.title}`,
+              description: `Booking with ${companyName} on ${format(new Date(appointment.startTime), 'PPP \'at\' p')}`,
+            },
+            unit_amount: Math.round(appointment.price * 100),
+          },
+          quantity: 1,
+        }],
+        customer_email: appointment.clientEmail,
+        metadata: {
+          appointmentId: appointment.id,
+          companyId: appointment.companyId,
+          type: 'appointment_payment',
+        },
+        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/appointment-payment?appointmentId=${appointment.id}&gateway=stripe&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/appointments?payment=cancelled`,
+      });
+      
+      paymentLink = session.url || '';
+      paymentLinkId = session.id;
+    }
+    
+    // Save payment link to appointment
+    await updateAppointment(appointmentId, {
+      paymentLink,
+      paymentId: paymentLinkId,
+    } as any);
+    
+    revalidatePath('/appointments');
+    
+    return { success: true, paymentLink, gateway: selectedGateway };
+  } catch (error: any) {
+    console.error('Error creating appointment payment link:', error);
+    return { success: false, error: error?.message || 'Failed to create payment link' };
+  }
+}
+
+/**
+ * Update appointment payment status (called by webhook)
+ */
+export async function updateAppointmentPaymentStatusAction({
+  appointmentId,
+  paymentStatus,
+  paymentId,
+  paidAt,
+}: {
+  appointmentId: string;
+  paymentStatus: 'pending' | 'paid' | 'refunded' | 'waived';
+  paymentId?: string;
+  paidAt?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    if (!adminDb) {
+      return { success: false, error: 'Database not initialized' };
+    }
+    
+    const appointment = await getAppointment(appointmentId);
+    if (!appointment) {
+      return { success: false, error: 'Appointment not found' };
+    }
+    
+    const updates: Record<string, any> = {
+      paymentStatus,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    if (paymentId) updates.paymentId = paymentId;
+    if (paidAt) updates.paidAt = paidAt;
+    
+    await adminDb.collection('appointments').doc(appointmentId).update(updates);
+    
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error updating appointment payment status:', error);
+    return { success: false, error: error?.message || 'Failed to update payment status' };
+  }
+}
+
+/**
+ * Get appointment event types with payment settings
+ */
+export async function getAppointmentEventTypesAction({
+  idToken,
+}: {
+  idToken: string;
+}): Promise<{ success: boolean; eventTypes?: import('@/types/appointments').AppointmentEventType[]; error?: string }> {
+  try {
+    const authResult = await getAuthenticatedUserFromToken(idToken);
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
+    }
+    
+    const { user } = authResult;
+    if (!user.companyId) {
+      return { success: false, error: 'User does not have a company assigned' };
+    }
+    
+    if (!adminDb) {
+      return { success: false, error: 'Database not initialized' };
+    }
+    
+    const snapshot = await adminDb.collection('appointmentEventTypes')
+      .where('companyId', '==', user.companyId)
+      .get();
+    
+    const eventTypes = snapshot.docs.map(doc => doc.data() as import('@/types/appointments').AppointmentEventType);
+    
+    return { success: true, eventTypes };
+  } catch (error: any) {
+    console.error('Error fetching appointment event types:', error);
+    return { success: false, error: error?.message || 'Failed to fetch event types' };
+  }
+}
+
+/**
+ * Create or update appointment event type with payment settings
+ */
+export async function saveAppointmentEventTypeAction({
+  idToken,
+  eventType,
+}: {
+  idToken: string;
+  eventType: Partial<import('@/types/appointments').AppointmentEventType> & { name: string; duration: number };
+}): Promise<{ success: boolean; eventTypeId?: string; error?: string }> {
+  try {
+    const authResult = await getAuthenticatedUserFromToken(idToken);
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
+    }
+    
+    const { user } = authResult;
+    if (!user.companyId) {
+      return { success: false, error: 'User does not have a company assigned' };
+    }
+    
+    if (!adminDb) {
+      return { success: false, error: 'Database not initialized' };
+    }
+    
+    const now = new Date().toISOString();
+    const eventTypeId = eventType.id || `evt_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+    
+    const data = {
+      ...eventType,
+      id: eventTypeId,
+      companyId: user.companyId,
+      slug: eventType.slug || eventType.name.toLowerCase().replace(/\s+/g, '-'),
+      updatedAt: now,
+      createdAt: eventType.createdAt || now,
+    };
+    
+    await adminDb.collection('appointmentEventTypes').doc(eventTypeId).set(data, { merge: true });
+    
+    revalidatePath('/appointments');
+    revalidatePath('/settings');
+    
+    return { success: true, eventTypeId };
+  } catch (error: any) {
+    console.error('Error saving appointment event type:', error);
+    return { success: false, error: error?.message || 'Failed to save event type' };
   }
 }

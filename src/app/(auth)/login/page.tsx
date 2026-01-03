@@ -26,6 +26,10 @@ export default function LoginPage() {
       toast({ title: 'Login Successful', description: 'Welcome back!' });
       await new Promise((resolve) => setTimeout(resolve, 300));
       window.location.href = '/dashboard';
+    } else if (result.requires2FA) {
+      // 2FA redirect already happening in lightweightLogin, no toast needed
+      // Keep loading state while redirecting
+      return;
     } else {
       toast({
         title: 'Login Failed',

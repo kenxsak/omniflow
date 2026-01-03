@@ -28,7 +28,8 @@ import {
   getHistoricalLeadCounts,
 } from '@/app/actions/advanced-analytics-actions';
 import { Badge } from '@/components/ui/badge';
-import { formatCurrency, formatPercentage } from '@/lib/analytics-service';
+import { formatPercentage } from '@/lib/analytics-service';
+import { useCurrency } from '@/contexts/currency-context';
 import { ContextualHelpButton } from '@/components/help/contextual-help-button';
 
 // Dynamic imports for heavy components
@@ -69,6 +70,7 @@ const navTabs = [
 export default function AdvancedAnalyticsPage() {
   const { appUser, company } = useAuth();
   const { toast } = useToast();
+  const { formatCurrency } = useCurrency();
   
   const [activeTab, setActiveTab] = useState('overview');
   const [period, setPeriod] = useState<AnalyticsPeriod>('30days');

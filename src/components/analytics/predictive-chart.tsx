@@ -12,6 +12,7 @@ import { Icon } from '@iconify/react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { formatNumber } from '@/lib/analytics-service';
+import { useCurrency } from '@/contexts/currency-context';
 
 interface PredictiveChartProps {
   analytics: PredictiveAnalytics;
@@ -19,6 +20,7 @@ interface PredictiveChartProps {
 }
 
 export default function PredictiveChart({ analytics, historicalLeads }: PredictiveChartProps) {
+  const { formatCurrency } = useCurrency();
   const { leadForecast, revenueForecast, trends, recommendations, accuracy } = analytics;
   
   // Check if we have any actual data
@@ -185,11 +187,11 @@ export default function PredictiveChart({ analytics, historicalLeads }: Predicti
             </div>
             <div className="space-y-1.5">
               <p className="text-xs text-muted-foreground">
-                Next Month: <span className="font-semibold text-emerald-600 dark:text-emerald-400">${formatNumber(revenueForecast.nextMonth.predicted)}</span>
-                <span className="text-[10px] ml-1.5">(${revenueForecast.nextMonth.range.min}-${revenueForecast.nextMonth.range.max})</span>
+                Next Month: <span className="font-semibold text-emerald-600 dark:text-emerald-400">{formatCurrency(revenueForecast.nextMonth.predicted)}</span>
+                <span className="text-[10px] ml-1.5">({formatCurrency(revenueForecast.nextMonth.range.min)}-{formatCurrency(revenueForecast.nextMonth.range.max)})</span>
               </p>
               <p className="text-xs text-muted-foreground">
-                Next 3 Months: <span className="font-semibold text-emerald-600 dark:text-emerald-400">${formatNumber(revenueForecast.next3Months.predicted)}</span>
+                Next 3 Months: <span className="font-semibold text-emerald-600 dark:text-emerald-400">{formatCurrency(revenueForecast.next3Months.predicted)}</span>
               </p>
               <Badge variant="outline" className="mt-2 text-[10px]">{revenueForecast.nextMonth.confidence} confidence</Badge>
             </div>

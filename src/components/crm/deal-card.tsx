@@ -35,7 +35,7 @@ export function DealCard({ deal, onEdit, onDelete, compact = false }: DealCardPr
       <div className="flex items-center justify-between p-3 border border-stone-200 dark:border-stone-700 rounded-lg bg-white dark:bg-stone-900 hover:bg-muted/50 transition-colors">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-full bg-success-muted">
-            <Icon icon="solar:dollar-linear" className="h-4 w-4 text-success-muted-foreground" />
+            <Icon icon="solar:hand-money-linear" className="h-4 w-4 text-success-muted-foreground" />
           </div>
           <div>
             <p className="font-medium text-sm">{deal.name}</p>

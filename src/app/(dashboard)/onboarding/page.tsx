@@ -16,13 +16,16 @@ import {
   completeOnboardingAction,
   updateChecklistItemAction,
   getOnboardingProgressAction,
+  setupCompanyLocaleAction,
 } from '@/app/actions/onboarding-client-actions';
 import type { OnboardingProgress, ChecklistItem } from '@/app/actions/onboarding-actions';
 import { addStoredLead } from '@/lib/mock-data';
 import { ContextualHelpButton } from '@/components/help/contextual-help-button';
+import { useGeoDetection } from '@/hooks/use-geo-detection';
+import { getSupportedCountries } from '@/lib/geo-detection';
 
 export default function OnboardingPage() {
-  const { appUser, company } = useAuth();
+  const { appUser, company, refreshAuthContext } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
@@ -33,6 +36,76 @@ export default function OnboardingPage() {
     dashboardViewed: false,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [localeSetupDone, setLocaleSetupDone] = useState(false);
+  const { geoData, isLoading: geoLoading } = useGeoDetection();
+
+  // Auto-setup company locale from geo-detection or signup data
+  useEffect(() => {
+    const setupLocale = async () => {
+      if (!appUser?.companyId || localeSetupDone || geoLoading) return;
+      
+      // Check if company already has locale settings
+      if (company?.countryCode && company?.timezone && company?.currencyCode) {
+        setLocaleSetupDone(true);
+        return;
+      }
+
+      // Try to get signup geo data first (stored during signup)
+      let localeData: {
+        country?: string;
+        countryCode?: string;
+        timezone?: string;
+        currencyCode?: string;
+        callingCode?: string;
+      } | null = null;
+
+      try {
+        const signupGeoData = sessionStorage.getItem('signup_geo_data');
+        if (signupGeoData) {
+          const parsed = JSON.parse(signupGeoData);
+          localeData = {
+            country: parsed.countryName,
+            countryCode: parsed.countryCode,
+            timezone: parsed.timezone,
+            currencyCode: parsed.currency,
+            callingCode: parsed.callingCode,
+          };
+          // Clear the signup data after use
+          sessionStorage.removeItem('signup_geo_data');
+        }
+      } catch {
+        // Ignore parsing errors
+      }
+
+      // Fall back to geo-detection if no signup data
+      if (!localeData && geoData) {
+        localeData = {
+          country: geoData.country,
+          countryCode: geoData.countryCode,
+          timezone: geoData.timezone,
+          currencyCode: geoData.currency,
+          callingCode: geoData.callingCode,
+        };
+      }
+
+      // Set up locale if we have data
+      if (localeData && localeData.countryCode) {
+        try {
+          const result = await setupCompanyLocaleAction(appUser.companyId, localeData);
+          if (result.success) {
+            // Refresh auth context to get updated company data
+            refreshAuthContext();
+          }
+        } catch (error) {
+          console.error('Failed to setup company locale:', error);
+        }
+      }
+
+      setLocaleSetupDone(true);
+    };
+
+    setupLocale();
+  }, [appUser?.companyId, company, geoData, geoLoading, localeSetupDone, refreshAuthContext]);
 
   useEffect(() => {
     const loadProgress = async () => {

@@ -57,6 +57,14 @@ export interface Appointment {
   // Status
   status: AppointmentStatus;
   
+  // Payment (optional - for paid appointments)
+  price?: number;                    // Appointment price
+  currency?: string;                 // INR, USD, etc.
+  paymentStatus?: 'pending' | 'paid' | 'refunded' | 'waived';
+  paymentId?: string;                // Razorpay/Stripe payment ID
+  paymentLink?: string;              // Payment link URL
+  paidAt?: string;                   // When payment was received
+  
   // Reminder settings
   reminderPreferences: ReminderPreference[];
   reminders?: AppointmentReminder[];
@@ -116,6 +124,12 @@ export interface AppointmentEventType {
   // Location
   locationType: 'in_person' | 'video' | 'phone' | 'custom';
   locationDetails?: string;          // Address or meeting link template
+  
+  // Payment settings (for paid appointments)
+  requirePayment?: boolean;          // Whether payment is required before booking
+  price?: number;                    // Default price for this event type
+  currency?: string;                 // INR, USD, etc.
+  collectPaymentOnBooking?: boolean; // Collect payment during booking flow
   
   // External integration
   calcomEventTypeId?: string;

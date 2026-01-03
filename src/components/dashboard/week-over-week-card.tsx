@@ -4,17 +4,12 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AppIcon } from '@/components/ui/app-icon';
+import { useCurrency } from '@/contexts/currency-context';
 import type { WeekOverWeekStats } from '@/app/actions/analytics-dashboard-actions';
 
 interface WeekOverWeekCardProps {
   stats: WeekOverWeekStats | null;
   loading?: boolean;
-}
-
-function formatCurrency(amount: number): string {
-  if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`;
-  if (amount >= 1000) return `$${(amount / 1000).toFixed(1)}K`;
-  return `$${amount.toLocaleString()}`;
 }
 
 function ChangeIndicator({ change, label }: { change: number; label: string }) {
@@ -37,6 +32,15 @@ function ChangeIndicator({ change, label }: { change: number; label: string }) {
 }
 
 export function WeekOverWeekCard({ stats, loading }: WeekOverWeekCardProps) {
+  const { formatCurrency: formatCurrencyFull } = useCurrency();
+
+  // Compact currency formatter using the user's currency
+  const formatCompactCurrency = (amount: number): string => {
+    if (amount >= 1000000) return formatCurrencyFull(amount / 1000000).replace(/\.00$/, '') + 'M';
+    if (amount >= 1000) return formatCurrencyFull(amount / 1000).replace(/\.00$/, '') + 'K';
+    return formatCurrencyFull(amount);
+  };
+
   if (loading) {
     return (
       <Card>
@@ -112,7 +116,7 @@ export function WeekOverWeekCard({ stats, loading }: WeekOverWeekCardProps) {
       current: stats.currentWeek.revenueWon,
       previous: stats.previousWeek.revenueWon,
       change: stats.changes.revenueWon,
-      format: formatCurrency,
+      format: formatCompactCurrency,
     },
   ];
 

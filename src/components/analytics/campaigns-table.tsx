@@ -10,7 +10,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { formatCurrency, formatPercentage } from '@/lib/analytics-service';
+import { formatPercentage } from '@/lib/analytics-service';
+import { useCurrency } from '@/contexts/currency-context';
 import type { CampaignROI } from '@/types/analytics';
 
 interface CampaignsTableProps {
@@ -18,6 +19,8 @@ interface CampaignsTableProps {
 }
 
 export default function CampaignsTable({ campaigns }: CampaignsTableProps) {
+  const { formatCurrency } = useCurrency();
+  
   return (
     <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl bg-white dark:bg-stone-950 overflow-hidden">
       <div className="absolute inset-x-10 top-0 h-0.5 rounded-b-full bg-purple-500 dark:bg-purple-400" />

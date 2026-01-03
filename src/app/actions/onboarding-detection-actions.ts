@@ -1,7 +1,6 @@
 'use server';
 
-import { serverDb as db } from '@/lib/firebase-server';
-import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase-admin';
 import { updateChecklistItem, type ChecklistItem } from './onboarding-actions';
 
 export interface OnboardingDetectionResult {
@@ -19,7 +18,7 @@ export interface OnboardingDetectionResult {
  * This provides accurate onboarding status based on what the user has actually done
  */
 export async function detectOnboardingProgress(companyId: string): Promise<OnboardingDetectionResult | null> {
-  if (!db || !companyId) return null;
+  if (!adminDb || !companyId) return null;
 
   try {
     const result: OnboardingDetectionResult = {
@@ -33,42 +32,41 @@ export async function detectOnboardingProgress(companyId: string): Promise<Onboa
     };
 
     // Check contacts (leads) - need 10+ to be considered complete
-    const leadsRef = collection(db, 'leads');
-    const leadsQuery = query(leadsRef, where('companyId', '==', companyId), limit(15));
-    const leadsSnap = await getDocs(leadsQuery);
+    const leadsSnap = await adminDb.collection('leads')
+      .where('companyId', '==', companyId)
+      .limit(15)
+      .get();
     result.addedContacts.count = leadsSnap.size;
     result.addedContacts.completed = leadsSnap.size >= 10;
 
     // Check email campaigns sent
-    const campaignsRef = collection(db, 'campaigns');
-    const campaignsQuery = query(
-      campaignsRef, 
-      where('companyId', '==', companyId),
-      where('status', '==', 'sent'),
-      limit(5)
-    );
-    const campaignsSnap = await getDocs(campaignsQuery);
+    const campaignsSnap = await adminDb.collection('campaigns')
+      .where('companyId', '==', companyId)
+      .where('status', '==', 'sent')
+      .limit(5)
+      .get();
     result.sentFirstCampaign.count = campaignsSnap.size;
     result.sentFirstCampaign.completed = campaignsSnap.size >= 1;
 
     // Check digital cards created
-    const cardsRef = collection(db, 'digitalCards');
-    const cardsQuery = query(cardsRef, where('companyId', '==', companyId), limit(5));
-    const cardsSnap = await getDocs(cardsQuery);
+    const cardsSnap = await adminDb.collection('digitalCards')
+      .where('companyId', '==', companyId)
+      .limit(5)
+      .get();
     result.createdDigitalCard.count = cardsSnap.size;
     result.createdDigitalCard.completed = cardsSnap.size >= 1;
 
     // Check team members (users in company excluding the owner)
-    const usersRef = collection(db, 'users');
-    const usersQuery = query(usersRef, where('companyId', '==', companyId), limit(10));
-    const usersSnap = await getDocs(usersQuery);
+    const usersSnap = await adminDb.collection('users')
+      .where('companyId', '==', companyId)
+      .limit(10)
+      .get();
     result.invitedTeamMember.count = Math.max(0, usersSnap.size - 1); // Exclude owner
     result.invitedTeamMember.completed = usersSnap.size > 1;
 
     // Check AI usage (check company's AI analytics or content generation history)
-    const companyRef = doc(db, 'companies', companyId);
-    const companySnap = await getDoc(companyRef);
-    if (companySnap.exists()) {
+    const companySnap = await adminDb.collection('companies').doc(companyId).get();
+    if (companySnap.exists) {
       const companyData = companySnap.data();
       const aiCreditsUsed = companyData?.aiAnalytics?.currentMonth?.creditsUsed || 0;
       result.triedAI.count = aiCreditsUsed;
@@ -76,21 +74,20 @@ export async function detectOnboardingProgress(companyId: string): Promise<Onboa
     }
 
     // Check automations setup
-    const automationsRef = collection(db, 'automations');
-    const automationsQuery = query(automationsRef, where('companyId', '==', companyId), limit(5));
-    const automationsSnap = await getDocs(automationsQuery);
+    const automationsSnap = await adminDb.collection('automations')
+      .where('companyId', '==', companyId)
+      .limit(5)
+      .get();
     result.setupAutomation.count = automationsSnap.size;
     result.setupAutomation.completed = automationsSnap.size >= 1;
 
     // Check multi-channel campaigns (campaigns with multiple channels)
-    const multiChannelQuery = query(
-      campaignsRef,
-      where('companyId', '==', companyId),
-      where('channels', 'array-contains-any', ['sms', 'whatsapp']),
-      limit(5)
-    );
     try {
-      const multiChannelSnap = await getDocs(multiChannelQuery);
+      const multiChannelSnap = await adminDb.collection('campaigns')
+        .where('companyId', '==', companyId)
+        .where('channels', 'array-contains-any', ['sms', 'whatsapp'])
+        .limit(5)
+        .get();
       result.launchedMultiChannel.count = multiChannelSnap.size;
       result.launchedMultiChannel.completed = multiChannelSnap.size >= 1;
     } catch {

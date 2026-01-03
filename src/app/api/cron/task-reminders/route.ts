@@ -1,21 +1,18 @@
 /**
- * Task Reminders Cron Job
+ * Task Reminders Cron Job - DEPRECATED
  * 
- * This API endpoint processes daily task reminders for all users.
- * It should be called by a cron job once daily (e.g., 8:00 AM).
- * 
- * Features:
- * - Sends email reminders for overdue tasks
- * - Sends reminders for tasks due today and tomorrow
- * - Highlights high-priority tasks
- * - Respects user notification preferences
- * - Sends manager summaries for team oversight
+ * This endpoint is deprecated. Use /api/cron/run-all instead.
+ * It now redirects to the unified daily digest system which:
+ * - Sends ONE morning email (8 AM) with tasks + appointments
+ * - Sends ONE end-of-day email (6 PM) with summary
+ * - Sends 1-hour before reminders to staff AND clients
+ * - Has duplicate prevention (won't spam)
  * 
  * Security: Protected by CRON_SECRET environment variable
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { processAllTaskReminders } from '@/lib/task-reminders';
+import { processMorningDigest, processEndOfDayDigest, processHourBeforeReminders } from '@/lib/daily-digest';
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
@@ -32,25 +29,57 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    console.log('[CRON] Starting daily task reminder processing...');
+    console.log('[CRON] Task reminders endpoint called - using unified daily digest');
     
-    const result = await processAllTaskReminders();
+    const currentHour = new Date().getHours();
+    const results: any = {
+      morning: { skipped: true },
+      hourBefore: { skipped: true },
+      endOfDay: { skipped: true },
+    };
     
-    console.log('[CRON] Task reminder processing complete:', result);
+    // Morning Digest - 8 AM window (7-9 AM)
+    // Has built-in duplicate prevention - won't send twice in same day
+    if (currentHour >= 7 && currentHour <= 9) {
+      const morningResult = await processMorningDigest();
+      results.morning = {
+        emailsSent: morningResult.emailsSent,
+        companies: morningResult.companiesProcessed,
+        errors: morningResult.errors.length,
+      };
+    }
+    
+    // 1-Hour Before Reminders - always runs
+    // Has built-in duplicate prevention per task/appointment
+    const hourBeforeResult = await processHourBeforeReminders();
+    results.hourBefore = {
+      staffEmailsSent: hourBeforeResult.staffEmailsSent,
+      clientEmailsSent: hourBeforeResult.clientEmailsSent,
+      errors: hourBeforeResult.errors.length,
+    };
+    
+    // End of Day Report - 6 PM window (5-7 PM)
+    // Has built-in duplicate prevention - won't send twice in same day
+    if (currentHour >= 17 && currentHour <= 19) {
+      const endOfDayResult = await processEndOfDayDigest();
+      results.endOfDay = {
+        emailsSent: endOfDayResult.emailsSent,
+        companies: endOfDayResult.companiesProcessed,
+        errors: endOfDayResult.errors.length,
+      };
+    }
+    
+    console.log('[CRON] Daily digest processing complete:', results);
     
     return NextResponse.json({
       success: true,
-      message: 'Task reminders processed',
-      stats: {
-        companiesProcessed: result.companiesProcessed,
-        usersNotified: result.totalUsersProcessed,
-        emailsSent: result.totalEmailsSent,
-        errors: result.errors.length,
-      },
+      message: 'Daily digest processed (this endpoint is deprecated, use /api/cron/run-all)',
+      deprecated: true,
+      stats: results,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('[CRON] Error processing task reminders:', error);
+    console.error('[CRON] Error processing daily digest:', error);
     return NextResponse.json(
       { 
         success: false, 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Icon } from '@iconify/react';
@@ -112,10 +112,189 @@ export default function ChatInterface({
   const [expandedImageId, setExpandedImageId] = useState<string | null>(null);
   const [referenceImage, setReferenceImage] = useState<string | null>(null);
   const [referenceImageName, setReferenceImageName] = useState<string>('');
+  const [analyzeImage, setAnalyzeImage] = useState<string | null>(null);
+  const [analyzeImageName, setAnalyzeImageName] = useState<string>('');
+  const [isListening, setIsListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [ttsSupported, setTtsSupported] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const analyzeImageInputRef = useRef<HTMLInputElement>(null);
   const { appUser } = useAuth();
   const { toast } = useToast();
+
+  // Check for speech recognition and TTS support
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const isSecureContext = window.isSecureContext || window.location.hostname === 'localhost';
+      setSpeechSupported(!!SpeechRecognition && isSecureContext);
+      
+      // Check for Text-to-Speech support (available in all modern browsers)
+      setTtsSupported('speechSynthesis' in window);
+    }
+  }, []);
+
+  // Initialize speech recognition
+  const startListening = useCallback(() => {
+    if (!speechSupported) {
+      toast({
+        title: 'Voice not supported',
+        description: 'Your browser does not support voice input. Try Chrome or Edge on HTTPS.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      // Configure for multilingual support
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+      
+      // Auto-detect language - supports all major languages including Indian languages
+      // The browser will auto-detect based on user's system settings
+      // Users can speak in: English, Hindi, Tamil, Telugu, Kannada, Malayalam, 
+      // Marathi, Bengali, Gujarati, Punjabi, and 100+ other languages
+      
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        let finalTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+          }
+        }
+        
+        // Update input with transcript
+        if (finalTranscript) {
+          setInput(prev => prev + finalTranscript);
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        setIsListening(false);
+        
+        // Handle specific errors with user-friendly messages
+        switch (event.error) {
+          case 'network':
+            toast({
+              title: 'Network error',
+              description: 'Voice input requires HTTPS. Please use the deployed version or type your message.',
+            });
+            break;
+          case 'no-speech':
+            toast({
+              title: 'No speech detected',
+              description: 'Please try speaking again',
+            });
+            break;
+          case 'not-allowed':
+            toast({
+              title: 'Microphone access denied',
+              description: 'Please allow microphone access in your browser settings',
+              variant: 'destructive'
+            });
+            break;
+          case 'aborted':
+            // User cancelled, no need to show error
+            break;
+          default:
+            toast({
+              title: 'Voice input error',
+              description: 'Please try again or type your message',
+            });
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (error) {
+      setIsListening(false);
+      toast({
+        title: 'Voice input unavailable',
+        description: 'Please type your message instead',
+      });
+    }
+  }, [speechSupported, toast]);
+
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  }, []);
+
+  const toggleVoiceInput = useCallback(() => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  }, [isListening, startListening, stopListening]);
+
+  // Text-to-Speech: Read AI responses aloud (FREE - uses browser's built-in speech synthesis)
+  const speakText = useCallback((text: string) => {
+    if (!ttsSupported) {
+      toast({
+        title: 'Text-to-speech not supported',
+        description: 'Your browser does not support reading aloud',
+      });
+      return;
+    }
+
+    // Stop any ongoing speech
+    window.speechSynthesis.cancel();
+
+    // Clean the text - remove markdown formatting
+    const cleanText = text
+      .replace(/\*\*([^*]+)\*\*/g, '$1') // Bold
+      .replace(/\*([^*]+)\*/g, '$1') // Italic
+      .replace(/#{1,6}\s/g, '') // Headers
+      .replace(/```[\s\S]*?```/g, '') // Code blocks
+      .replace(/`([^`]+)`/g, '$1') // Inline code
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Links
+      .replace(/[-*+]\s/g, '') // List items
+      .replace(/\n{2,}/g, '. ') // Multiple newlines to pause
+      .replace(/\n/g, ' ') // Single newlines to space
+      .trim();
+
+    if (!cleanText) return;
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    
+    // Try to detect language from text for better pronunciation
+    // Default to user's browser language
+    utterance.lang = navigator.language || 'en-US';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    window.speechSynthesis.speak(utterance);
+  }, [ttsSupported, toast]);
+
+  const stopSpeaking = useCallback(() => {
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -253,13 +432,20 @@ export default function ChatInterface({
         appUser.uid,
         conversationHistory,
         referenceImage || undefined, // Pass reference image for branded image generation
-        selectedAgent?.id // Pass selected agent ID for intent detection
+        selectedAgent?.id, // Pass selected agent ID for intent detection
+        analyzeImage || undefined // Pass image for analysis (not stored on server)
       );
 
       // Clear reference image after use
       if (referenceImage) {
         setReferenceImage(null);
         setReferenceImageName('');
+      }
+
+      // Clear analyze image after use
+      if (analyzeImage) {
+        setAnalyzeImage(null);
+        setAnalyzeImageName('');
       }
 
       const aiMessage: Message = {
@@ -371,6 +557,57 @@ export default function ChatInterface({
   const handleRemoveReferenceImage = () => {
     setReferenceImage(null);
     setReferenceImageName('');
+  };
+
+  // Handle image upload for AI analysis (NOT stored on server - sent directly to Gemini)
+  const handleAnalyzeImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: 'Invalid file type',
+        description: 'Please upload a JPG, PNG, GIF, or WebP image',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Validate file size (max 1MB to keep costs low)
+    if (file.size > 1 * 1024 * 1024) {
+      toast({
+        title: 'File too large',
+        description: 'Please upload an image under 1MB for analysis',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Convert to base64 - sent directly to Gemini, not stored
+    const reader = new FileReader();
+    reader.onload = () => {
+      setAnalyzeImage(reader.result as string);
+      setAnalyzeImageName(file.name);
+      setInput(prev => prev || 'What can you tell me about this image?');
+      toast({
+        title: '🔍 Image ready for analysis',
+        description: 'Ask any question about this image',
+        duration: 3000
+      });
+    };
+    reader.readAsDataURL(file);
+    
+    // Reset input
+    if (analyzeImageInputRef.current) {
+      analyzeImageInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveAnalyzeImage = () => {
+    setAnalyzeImage(null);
+    setAnalyzeImageName('');
   };
 
   const handleCopy = (content: string) => {
@@ -1135,6 +1372,22 @@ export default function ChatInterface({
                           <button onClick={() => handleCopy(message.content)} className="p-1 sm:p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors" title="Copy">
                             <Icon icon="solar:copy-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
                           </button>
+                          {/* Read Aloud Button - FREE using browser TTS */}
+                          {ttsSupported && (
+                            <button 
+                              onClick={() => isSpeaking ? stopSpeaking() : speakText(message.content)} 
+                              className={cn(
+                                "p-1 sm:p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors",
+                                isSpeaking && "bg-blue-100 dark:bg-blue-900/30"
+                              )} 
+                              title={isSpeaking ? "Stop reading" : "Read aloud"}
+                            >
+                              <Icon 
+                                icon={isSpeaking ? "solar:stop-bold" : "solar:volume-loud-linear"} 
+                                className={cn("w-3 h-3 sm:w-3.5 sm:h-3.5", isSpeaking ? "text-blue-500" : "text-muted-foreground")} 
+                              />
+                            </button>
+                          )}
                           <button onClick={() => handleSaveClick(message)} disabled={isGeneratingImage} className="p-1 sm:p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors" title="Save">
                             <Icon icon="solar:download-linear" className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
                           </button>
@@ -1195,8 +1448,31 @@ export default function ChatInterface({
           {/* Input Area */}
           <div className="border-t border-stone-200 dark:border-stone-800 p-2.5 sm:p-3 md:p-4">
             <div className="max-w-3xl mx-auto">
-              {/* Reference Image Preview */}
-              {referenceImage && (
+              {/* Analyze Image Preview - for AI to analyze */}
+              {analyzeImage && (
+                <div className="mb-2 flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <img 
+                    src={analyzeImage} 
+                    alt="Analyze" 
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded object-cover"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] sm:text-xs font-medium truncate">{analyzeImageName}</p>
+                    <p className="text-[9px] sm:text-[10px] text-blue-600 dark:text-blue-400">🔍 Ask any question about this image</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleRemoveAnalyzeImage}
+                    className="h-6 w-6 sm:h-7 sm:w-7 flex-shrink-0"
+                  >
+                    <Icon icon="solar:close-circle-linear" className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  </Button>
+                </div>
+              )}
+
+              {/* Reference Image Preview - for branded image generation */}
+              {referenceImage && !analyzeImage && (
                 <div className="mb-2 flex items-center gap-2 p-2 bg-stone-100 dark:bg-stone-800 rounded-lg">
                   <img 
                     src={referenceImage} 
@@ -1218,8 +1494,30 @@ export default function ChatInterface({
                 </div>
               )}
               
-              <div className="flex gap-2 items-end">
-                {/* Image Upload Button */}
+              <div className="flex gap-1.5 sm:gap-2 items-end">
+                {/* Analyze Image Button - for AI to analyze uploaded images */}
+                <input
+                  ref={analyzeImageInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  onChange={handleAnalyzeImageUpload}
+                  className="hidden"
+                />
+                <Button
+                  variant={analyzeImage ? "default" : "outline"}
+                  size="icon"
+                  onClick={() => analyzeImageInputRef.current?.click()}
+                  disabled={isLoading}
+                  className={cn(
+                    "h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 rounded-lg",
+                    analyzeImage && "bg-blue-500 hover:bg-blue-600"
+                  )}
+                  title="Upload image for AI to analyze (max 1MB)"
+                >
+                  <Icon icon="solar:eye-scan-linear" className={cn("h-4 w-4 sm:h-5 sm:w-5", analyzeImage && "text-white")} />
+                </Button>
+
+                {/* Brand Image Button - for consistent image generation */}
                 <input
                   ref={imageInputRef}
                   type="file"
@@ -1232,24 +1530,53 @@ export default function ChatInterface({
                   size="icon"
                   onClick={() => imageInputRef.current?.click()}
                   disabled={isLoading}
-                  className="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 rounded-lg"
-                  title="Add brand logo/reference image for consistent image generation"
+                  className="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 rounded-lg hidden sm:flex"
+                  title="Add brand logo for image generation"
                 >
                   <Icon icon="solar:gallery-add-linear" className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
+                
+                {/* Voice Input Button */}
+                {speechSupported && (
+                  <Button
+                    variant={isListening ? "default" : "outline"}
+                    size="icon"
+                    onClick={toggleVoiceInput}
+                    disabled={isLoading}
+                    className={cn(
+                      "h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 rounded-lg transition-all",
+                      isListening && "bg-red-500 hover:bg-red-600 border-red-500 animate-pulse"
+                    )}
+                    title={isListening ? "Stop listening" : "Voice input (all languages)"}
+                  >
+                    <Icon 
+                      icon={isListening ? "solar:microphone-bold" : "solar:microphone-linear"} 
+                      className={cn("h-4 w-4 sm:h-5 sm:w-5", isListening && "text-white")} 
+                    />
+                  </Button>
+                )}
                 
                 <div className="flex-1 relative">
                   <Textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={referenceImage ? "Describe the image you want (your brand logo will be used)..." : "Ask anything, create anything..."}
-                    className="min-h-[40px] sm:min-h-[44px] max-h-[120px] sm:max-h-[160px] resize-none text-xs sm:text-sm border-stone-200 dark:border-stone-800 rounded-lg pr-9 sm:pr-10"
+                    placeholder={
+                      isListening ? "🎤 Listening... speak in any language" : 
+                      analyzeImage ? "Ask about this image..." : 
+                      referenceImage ? "Describe the image you want..." : 
+                      "Ask anything, create anything..."
+                    }
+                    className={cn(
+                      "min-h-[40px] sm:min-h-[44px] max-h-[120px] sm:max-h-[160px] resize-none text-xs sm:text-sm border-stone-200 dark:border-stone-800 rounded-lg pr-9 sm:pr-10",
+                      isListening && "border-red-300 dark:border-red-700",
+                      analyzeImage && "border-blue-300 dark:border-blue-700"
+                    )}
                     disabled={isLoading}
                   />
                   <Button
                     onClick={handleSend}
-                    disabled={!input.trim() || isLoading}
+                    disabled={(!input.trim() && !analyzeImage) || isLoading}
                     size="icon"
                     className="absolute right-1 sm:right-1.5 bottom-1 sm:bottom-1.5 h-6 w-6 sm:h-7 sm:w-7 rounded-md"
                   >

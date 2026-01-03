@@ -3,7 +3,8 @@ import { runAllAutomations } from '@/lib/automation-runner';
 import { runAllCampaignJobs } from '@/lib/campaign-job-processor';
 import { processScheduledPostsAction } from '@/app/actions/social-accounts-actions';
 import { processScheduledReminders } from '@/lib/appointment-reminders';
-import { processAllTaskReminders } from '@/lib/task-reminders';
+import { processMorningDigest, processEndOfDayDigest, processHourBeforeReminders } from '@/lib/daily-digest';
+import { generateRecurringInvoicesAction, processPaymentRemindersAction } from '@/app/actions/invoice-actions';
 import { adminDb } from '@/lib/firebase-admin';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { executeWorkflowNode } from '@/lib/workflow-executor';
@@ -13,6 +14,19 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 const CRON_SECRET = process.env.CRON_SECRET;
+
+// Data retention periods in days - SYSTEM data only
+// NOTE: Content Hub (socialPosts) is NOT auto-deleted - users paid AI credits for it
+const RETENTION_DAYS = {
+  notifications: 7,
+  aiUsageLogs: 30,
+  auditLogs: 90,
+  scheduledPosts: 30, // After posted/failed
+  workflowRunLogs: 14,
+};
+
+// Max items per user for SYSTEM data
+const MAX_CHAT_SESSIONS_PER_USER = 20;
 
 /**
  * UNIFIED CRON ENDPOINT
@@ -46,6 +60,9 @@ export async function GET(request: NextRequest) {
     socialPosts: { success: false, error: null as string | null, details: null as any },
     appointmentReminders: { success: false, error: null as string | null, details: null as any },
     taskReminders: { success: false, error: null as string | null, details: null as any },
+    recurringInvoices: { success: false, error: null as string | null, details: null as any },
+    paymentReminders: { success: false, error: null as string | null, details: null as any },
+    dataCleanup: { success: false, error: null as string | null, details: null as any },
   };
 
   // 1. Run Email Automations
@@ -137,34 +154,242 @@ export async function GET(request: NextRequest) {
     };
   }
 
-  // 6. Process Task Reminders (Daily digest - only run once per day)
-  // Check if it's between 7-9 AM to send daily task reminders
+  // 6. Process Daily Digest (Tasks + Appointments combined) - 3 types:
+  //    - Morning Digest: 8 AM (once daily) - Tasks + Appointments in ONE email
+  //    - 1-Hour Before: Every run - Staff AND Clients get reminders
+  //    - End of Day Report: 6 PM (once daily) - Summary + Tomorrow preview
   const currentHour = new Date().getHours();
-  if (currentHour >= 7 && currentHour <= 9) {
-    try {
-      const taskResult = await processAllTaskReminders();
-      results.taskReminders = {
-        success: taskResult.totalEmailsSent > 0 || taskResult.totalUsersProcessed === 0,
-        error: taskResult.errors.length > 0 ? taskResult.errors.slice(0, 5).join('; ') : null,
-        details: {
-          companiesProcessed: taskResult.companiesProcessed,
-          usersNotified: taskResult.totalUsersProcessed,
-          emailsSent: taskResult.totalEmailsSent,
-        },
-      };
-    } catch (error: any) {
-      console.error('[Cron] Task reminders error:', error);
-      results.taskReminders = {
-        success: false,
-        error: error.message,
-        details: null,
+  
+  const taskReminderDetails: any = {
+    morning: { skipped: true },
+    hourBefore: { skipped: true },
+    endOfDay: { skipped: true },
+  };
+  
+  try {
+    // Morning Digest - 8 AM window (7-9 AM to be safe)
+    // Sends ONE combined email with tasks + appointments
+    if (currentHour >= 7 && currentHour <= 9) {
+      const morningResult = await processMorningDigest();
+      taskReminderDetails.morning = {
+        emailsSent: morningResult.emailsSent,
+        companies: morningResult.companiesProcessed,
+        errors: morningResult.errors.length,
       };
     }
-  } else {
+    
+    // 1-Hour Before Reminders - runs every time
+    // Sends to STAFF (tasks + appointments) AND CLIENTS (appointments only)
+    const hourBeforeResult = await processHourBeforeReminders();
+    taskReminderDetails.hourBefore = {
+      staffEmailsSent: hourBeforeResult.staffEmailsSent,
+      clientEmailsSent: hourBeforeResult.clientEmailsSent,
+      errors: hourBeforeResult.errors.length,
+    };
+    
+    // End of Day Report - 6 PM window (5-7 PM to be safe)
+    // Sends ONE combined summary email
+    if (currentHour >= 17 && currentHour <= 19) {
+      const endOfDayResult = await processEndOfDayDigest();
+      taskReminderDetails.endOfDay = {
+        emailsSent: endOfDayResult.emailsSent,
+        companies: endOfDayResult.companiesProcessed,
+        errors: endOfDayResult.errors.length,
+      };
+    }
+    
+    const totalEmails = 
+      (taskReminderDetails.morning.emailsSent || 0) +
+      (taskReminderDetails.hourBefore.staffEmailsSent || 0) +
+      (taskReminderDetails.hourBefore.clientEmailsSent || 0) +
+      (taskReminderDetails.endOfDay.emailsSent || 0);
+    
     results.taskReminders = {
       success: true,
       error: null,
-      details: { skipped: true, reason: 'Outside daily reminder window (7-9 AM)' },
+      details: taskReminderDetails,
+    };
+  } catch (error: any) {
+    console.error('[Cron] Daily digest error:', error);
+    results.taskReminders = {
+      success: false,
+      error: error.message,
+      details: taskReminderDetails,
+    };
+  }
+
+  // 7. Process Recurring Invoices (generate invoices from templates)
+  // Run once daily at 6 AM
+  if (currentHour >= 5 && currentHour <= 7) {
+    const todayRecurring = new Date().toISOString().split('T')[0];
+    let alreadyProcessedRecurring = false;
+    
+    if (adminDb) {
+      try {
+        const recurringStateDoc = await adminDb.collection('cronState').doc('recurringInvoices').get();
+        if (recurringStateDoc.data()?.lastRunDate === todayRecurring) {
+          alreadyProcessedRecurring = true;
+        }
+      } catch (e) {
+        console.warn('[Cron] Could not check recurring invoices state:', e);
+      }
+    }
+    
+    if (alreadyProcessedRecurring) {
+      results.recurringInvoices = {
+        success: true,
+        error: null,
+        details: { skipped: true, reason: 'Already processed today' },
+      };
+    } else {
+      try {
+        const recurringResult = await generateRecurringInvoicesAction();
+        
+        if (adminDb) {
+          await adminDb.collection('cronState').doc('recurringInvoices').set({
+            lastRunDate: todayRecurring,
+            lastRunTime: new Date().toISOString(),
+            generated: recurringResult.generated,
+          });
+        }
+        
+        results.recurringInvoices = {
+          success: recurringResult.success,
+          error: recurringResult.errors.length > 0 ? recurringResult.errors.join('; ') : null,
+          details: { generated: recurringResult.generated },
+        };
+      } catch (error: any) {
+        console.error('[Cron] Recurring invoices error:', error);
+        results.recurringInvoices = {
+          success: false,
+          error: error.message,
+          details: null,
+        };
+      }
+    }
+  } else {
+    results.recurringInvoices = {
+      success: true,
+      error: null,
+      details: { skipped: true, reason: 'Outside processing window (5-7 AM)' },
+    };
+  }
+
+  // 8. Process Payment Reminders (send reminders for unpaid invoices)
+  // Run once daily at 10 AM
+  if (currentHour >= 9 && currentHour <= 11) {
+    const todayReminders = new Date().toISOString().split('T')[0];
+    let alreadyProcessedReminders = false;
+    
+    if (adminDb) {
+      try {
+        const reminderStateDoc = await adminDb.collection('cronState').doc('paymentReminders').get();
+        if (reminderStateDoc.data()?.lastRunDate === todayReminders) {
+          alreadyProcessedReminders = true;
+        }
+      } catch (e) {
+        console.warn('[Cron] Could not check payment reminders state:', e);
+      }
+    }
+    
+    if (alreadyProcessedReminders) {
+      results.paymentReminders = {
+        success: true,
+        error: null,
+        details: { skipped: true, reason: 'Already processed today' },
+      };
+    } else {
+      try {
+        const reminderResult = await processPaymentRemindersAction();
+        
+        if (adminDb) {
+          await adminDb.collection('cronState').doc('paymentReminders').set({
+            lastRunDate: todayReminders,
+            lastRunTime: new Date().toISOString(),
+            remindersSent: reminderResult.remindersSent,
+          });
+        }
+        
+        results.paymentReminders = {
+          success: reminderResult.success,
+          error: reminderResult.errors.length > 0 ? reminderResult.errors.join('; ') : null,
+          details: { remindersSent: reminderResult.remindersSent },
+        };
+      } catch (error: any) {
+        console.error('[Cron] Payment reminders error:', error);
+        results.paymentReminders = {
+          success: false,
+          error: error.message,
+          details: null,
+        };
+      }
+    }
+  } else {
+    results.paymentReminders = {
+      success: true,
+      error: null,
+      details: { skipped: true, reason: 'Outside processing window (9-11 AM)' },
+    };
+  }
+
+  // 9. Data Cleanup (run once daily at night - 2-4 AM)
+  // Cleans up old temporary data to keep Firebase costs low
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  
+  if (currentHour >= 2 && currentHour <= 4) {
+    // Check if we already ran cleanup today
+    let alreadyCleanedToday = false;
+    
+    if (adminDb) {
+      try {
+        const lastCleanupDoc = await adminDb.collection('cronState').doc('dataCleanup').get();
+        const lastCleanupData = lastCleanupDoc.data();
+        if (lastCleanupData?.lastRunDate === today) {
+          alreadyCleanedToday = true;
+        }
+      } catch (e) {
+        console.warn('[Cron] Could not check cleanup state:', e);
+      }
+    }
+    
+    if (alreadyCleanedToday) {
+      results.dataCleanup = {
+        success: true,
+        error: null,
+        details: { skipped: true, reason: 'Already ran cleanup today' },
+      };
+    } else {
+      try {
+        const cleanupResult = await runDataCleanup();
+        
+        // Mark as done for today
+        if (adminDb) {
+          await adminDb.collection('cronState').doc('dataCleanup').set({
+            lastRunDate: today,
+            lastRunTime: new Date().toISOString(),
+            totalDeleted: cleanupResult.totalDeleted || 0,
+          });
+        }
+        
+        results.dataCleanup = {
+          success: true,
+          error: null,
+          details: cleanupResult,
+        };
+      } catch (error: any) {
+        console.error('[Cron] Data cleanup error:', error);
+        results.dataCleanup = {
+          success: false,
+          error: error.message,
+          details: null,
+        };
+      }
+    }
+  } else {
+    results.dataCleanup = {
+      success: true,
+      error: null,
+      details: { skipped: true, reason: 'Outside cleanup window (2-4 AM)' },
     };
   }
 
@@ -343,4 +568,149 @@ async function processWorkflowsForCompany(companyId: string) {
   }
 
   return result;
+}
+
+
+/**
+ * Data Cleanup - Keeps Firebase costs low
+ * 
+ * ONLY deletes SYSTEM/temporary data:
+ * - Chat sessions: Keep last 20 per user (not time-based)
+ * - Notifications: 7 days (they've seen them)
+ * - Scheduled posts: 30 days after posted/failed
+ * - Workflow run logs: 14 days
+ * 
+ * NEVER deletes USER CONTENT:
+ * - Content Hub (socialPosts): Users paid AI credits for this!
+ * - CRM leads, appointments, transactions: Critical business data
+ * - Landing pages, blog posts: User-created content
+ * 
+ * Plan-based limits control user content quantity (already implemented)
+ */
+async function runDataCleanup() {
+  if (!adminDb) {
+    return { error: 'Database not initialized', totalDeleted: 0 };
+  }
+
+  const results: Record<string, number> = {};
+  const now = Date.now();
+
+  try {
+    const companiesSnapshot = await adminDb.collection('companies').limit(100).get();
+
+    // 1. Clean old chat sessions - Keep last N per user (not time-based)
+    let chatsDeleted = 0;
+    for (const companyDoc of companiesSnapshot.docs) {
+      const sessionsSnapshot = await companyDoc.ref
+        .collection('chatSessions')
+        .orderBy('updatedAt', 'desc')
+        .get();
+      
+      // Group by userId and keep only last N
+      const sessionsByUser: Record<string, any[]> = {};
+      sessionsSnapshot.docs.forEach(doc => {
+        const data = doc.data();
+        const odUserId = data.userId || 'unknown';
+        if (!sessionsByUser[odUserId]) sessionsByUser[odUserId] = [];
+        sessionsByUser[odUserId].push(doc);
+      });
+      
+      // Delete sessions beyond the limit for each user
+      for (const [, sessions] of Object.entries(sessionsByUser)) {
+        if (sessions.length > MAX_CHAT_SESSIONS_PER_USER) {
+          const toDelete = sessions.slice(MAX_CHAT_SESSIONS_PER_USER);
+          for (const sessionDoc of toDelete) {
+            // Delete messages first
+            const messages = await sessionDoc.ref.collection('messages').limit(100).get();
+            const msgBatch = adminDb.batch();
+            messages.docs.forEach((msg: any) => msgBatch.delete(msg.ref));
+            if (messages.size > 0) await msgBatch.commit();
+            
+            await sessionDoc.ref.delete();
+            chatsDeleted++;
+          }
+        }
+      }
+    }
+    results.chatSessions = chatsDeleted;
+
+    // 2. Clean old notifications - 7 days
+    const notifCutoff = Timestamp.fromMillis(now - RETENTION_DAYS.notifications * 24 * 60 * 60 * 1000);
+    let notifsDeleted = 0;
+    
+    for (const companyDoc of companiesSnapshot.docs) {
+      const oldNotifs = await companyDoc.ref
+        .collection('notifications')
+        .where('createdAt', '<', notifCutoff)
+        .limit(100)
+        .get();
+      
+      const notifBatch = adminDb.batch();
+      oldNotifs.docs.forEach(doc => {
+        notifBatch.delete(doc.ref);
+        notifsDeleted++;
+      });
+      if (oldNotifs.size > 0) await notifBatch.commit();
+    }
+    results.notifications = notifsDeleted;
+
+    // 3. Clean old scheduled posts that are done - 30 days after posted
+    const scheduledCutoff = Timestamp.fromMillis(now - RETENTION_DAYS.scheduledPosts * 24 * 60 * 60 * 1000);
+    let scheduledDeleted = 0;
+    
+    for (const companyDoc of companiesSnapshot.docs) {
+      const oldScheduled = await companyDoc.ref
+        .collection('scheduledPosts')
+        .where('status', 'in', ['Posted', 'Failed'])
+        .where('updatedAt', '<', scheduledCutoff)
+        .limit(50)
+        .get();
+      
+      const scheduledBatch = adminDb.batch();
+      oldScheduled.docs.forEach(doc => {
+        scheduledBatch.delete(doc.ref);
+        scheduledDeleted++;
+      });
+      if (oldScheduled.size > 0) await scheduledBatch.commit();
+    }
+    results.scheduledPosts = scheduledDeleted;
+
+    // 4. Clean old workflow run logs - 14 days
+    const workflowLogsCutoff = Timestamp.fromMillis(now - RETENTION_DAYS.workflowRunLogs * 24 * 60 * 60 * 1000);
+    let workflowLogsDeleted = 0;
+    
+    for (const companyDoc of companiesSnapshot.docs) {
+      const oldLogs = await companyDoc.ref
+        .collection('workflowRunLogs')
+        .where('executedAt', '<', workflowLogsCutoff)
+        .limit(100)
+        .get();
+      
+      const logsBatch = adminDb.batch();
+      oldLogs.docs.forEach(doc => {
+        logsBatch.delete(doc.ref);
+        workflowLogsDeleted++;
+      });
+      if (oldLogs.size > 0) await logsBatch.commit();
+    }
+    results.workflowRunLogs = workflowLogsDeleted;
+
+    const totalDeleted = Object.values(results).reduce((a, b) => a + b, 0);
+    
+    console.log(`[Data Cleanup] Deleted ${totalDeleted} old records:`, results);
+
+    return {
+      success: true,
+      totalDeleted,
+      details: results,
+    };
+
+  } catch (error: any) {
+    console.error('[Data Cleanup] Error:', error);
+    return {
+      success: false,
+      error: error.message,
+      totalDeleted: 0,
+    };
+  }
 }

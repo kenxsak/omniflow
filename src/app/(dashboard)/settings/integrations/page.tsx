@@ -329,6 +329,25 @@ const INTEGRATIONS: IntegrationDef[] = [
       { key: 'pageAccessToken', label: 'Page Access Token', placeholder: 'EAABsbCS1iHgBO...', type: 'password', help: 'Generate via Graph API Explorer with pages_read_engagement, leads_retrieval permissions' }
     ]
   },
+  // India Lead Sources
+  {
+    id: 'indiamart',
+    name: 'IndiaMART',
+    description: 'Auto-sync buyer inquiries from IndiaMART to your CRM',
+    category: 'CRM',
+    icon: 'simple-icons:indiamart',
+    docLink: '/settings/indiamart',
+    fields: []
+  },
+  {
+    id: 'justdial',
+    name: 'JustDial',
+    description: 'Auto-sync leads from JustDial business listing',
+    category: 'CRM',
+    icon: 'mdi:phone-search',
+    docLink: '/settings/justdial',
+    fields: []
+  },
 
   // Telephony - Voice Calling (Regular phone calls)
   {
@@ -403,12 +422,33 @@ function IntegrationCard({
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
   
-  const isConfigured = savedValues && Object.keys(savedValues).length > 0 && Object.values(savedValues).some(v => !!v);
+  // Check if configured - must have at least one non-empty value
+  // Handle cases where values might not be strings (e.g., from database)
+  const isConfigured = savedValues && Object.keys(savedValues).length > 0 && Object.values(savedValues).some(v => {
+    if (typeof v === 'string') return v.trim().length > 0;
+    if (v === true || v === 'true') return true; // Handle boolean flags like 'configured'
+    return !!v;
+  });
+  
+  // Check if all required fields are filled
+  const requiredFields = integration.fields.filter(f => !f.label.toLowerCase().includes('optional'));
+  const hasAllRequiredFields = isConfigured && requiredFields.every(f => {
+    const val = savedValues?.[f.key];
+    if (typeof val === 'string') return val.trim().length > 0;
+    return !!val;
+  });
 
   // Initialize form when dialog opens
   useEffect(() => {
     if (isOpen) {
-      setFormValues(savedValues || {});
+      // Ensure all values are strings for form inputs
+      const stringifiedValues: Record<string, string> = {};
+      if (savedValues) {
+        for (const [key, value] of Object.entries(savedValues)) {
+          stringifiedValues[key] = typeof value === 'string' ? value : String(value || '');
+        }
+      }
+      setFormValues(stringifiedValues);
     }
   }, [isOpen, savedValues]);
 
@@ -425,18 +465,34 @@ function IntegrationCard({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Card className="group relative overflow-hidden transition-all hover:shadow-md cursor-pointer border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950/50 hover:border-stone-300 dark:hover:border-stone-700 h-full flex flex-col">
+        <Card 
+          className="group relative overflow-hidden transition-all hover:shadow-md cursor-pointer border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950/50 hover:border-stone-300 dark:hover:border-stone-700 h-full flex flex-col"
+          onClick={(e) => {
+            // If no fields, navigate to docLink instead of opening dialog
+            if (integration.fields.length === 0 && integration.docLink.startsWith('/')) {
+              e.preventDefault();
+              window.location.href = integration.docLink;
+            }
+          }}
+        >
           <CardHeader className="p-5 flex-1">
             <div className="flex items-start justify-between">
               <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-stone-100 dark:bg-stone-900 shadow-sm border border-stone-100 dark:border-stone-800 text-stone-900 dark:text-stone-100 p-1.5">
                 <IntegrationIcon icon={integration.icon} className="w-full h-full" />
               </div>
-              {isConfigured && (
-                <div className="flex items-center gap-1.5 px-2 py-1 rounded-full text-green-600 dark:text-green-400 text-[10px] font-medium border border-green-500 dark:border-green-600">
-                  <Icon icon="solar:check-circle-bold" className="w-3 h-3" />
-                  <span>Active</span>
-                </div>
-              )}
+              {isConfigured ? (
+                hasAllRequiredFields ? (
+                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-full text-green-600 dark:text-green-400 text-[10px] font-medium border border-green-500 dark:border-green-600">
+                    <Icon icon="solar:check-circle-bold" className="w-3 h-3" />
+                    <span>Active</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-full text-amber-600 dark:text-amber-400 text-[10px] font-medium border border-amber-500 dark:border-amber-600">
+                    <Icon icon="solar:danger-triangle-linear" className="w-3 h-3" />
+                    <span>Incomplete</span>
+                  </div>
+                )
+              ) : null}
             </div>
             <div className="mt-4 space-y-1">
               <CardTitle className="text-base font-semibold text-stone-900 dark:text-stone-100">
@@ -457,7 +513,15 @@ function IntegrationCard({
               <IntegrationIcon icon={integration.icon} className="w-full h-full" />
             </div>
             <div className="flex-1 min-w-0 space-y-1">
-              <DialogTitle className="text-base sm:text-lg font-semibold truncate">{integration.name}</DialogTitle>
+              <div className="flex items-center gap-2">
+                <DialogTitle className="text-base sm:text-lg font-semibold truncate">{integration.name}</DialogTitle>
+                {isConfigured && hasAllRequiredFields && (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                    <Icon icon="solar:check-circle-bold" className="w-3 h-3" />
+                    Connected
+                  </span>
+                )}
+              </div>
               <DialogDescription className="text-xs sm:text-sm line-clamp-2">{integration.description}</DialogDescription>
               {integration.docLink && (
                 <a
@@ -477,11 +541,24 @@ function IntegrationCard({
         <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto flex-1">
           {/* Standard API Key Integration */}
           <div className="space-y-4">
-              {integration.fields.map((field) => (
+              {integration.fields.map((field) => {
+                const hasValue = formValues[field.key] && formValues[field.key].trim().length > 0;
+                const isRequired = !field.label.toLowerCase().includes('optional');
+                
+                return (
                 <div key={field.key} className="space-y-2">
-                  <label className="text-sm font-medium text-stone-700 dark:text-stone-300">
-                    {field.label}
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-stone-700 dark:text-stone-300">
+                      {field.label}
+                      {isRequired && <span className="text-red-500 ml-0.5">*</span>}
+                    </label>
+                    {hasValue && (
+                      <span className="text-[10px] text-green-600 dark:text-green-400 flex items-center gap-1">
+                        <Icon icon="solar:check-circle-bold" className="w-3 h-3" />
+                        Configured
+                      </span>
+                    )}
+                  </div>
                   <div className="relative">
                     {field.label.toLowerCase().includes('script') || field.label.toLowerCase().includes('webhook') ? (
                       <textarea
@@ -504,7 +581,7 @@ function IntegrationCard({
                     <p className="text-[12px] text-stone-500 leading-normal">{field.help}</p>
                   )}
                 </div>
-              ))}
+              )})}
             </div>
 
           <div className="rounded-lg bg-indigo-50 dark:bg-indigo-950/30 p-3 sm:p-4 flex gap-2 sm:gap-3 border border-indigo-100 dark:border-indigo-900/50">
@@ -535,7 +612,7 @@ function IntegrationCard({
                 Saving...
               </>
             ) : (
-              'Connect'
+              isConfigured ? 'Update' : 'Connect'
             )}
           </Button>
         </DialogFooter>
@@ -571,6 +648,8 @@ export default function IntegrationsPage() {
           getFacebookLeadsConfig(appUser.companyId),
         ]);
 
+        console.log('🔑 API Keys fetch result:', keysResult);
+
         let loadedKeys = keysResult.success && keysResult.apiKeys ? keysResult.apiKeys : {};
 
         // Merge voice chat config if exists
@@ -596,9 +675,10 @@ export default function IntegrationsPage() {
           };
         }
 
+        console.log('🔑 Final loaded keys:', Object.keys(loadedKeys), loadedKeys);
         setApiKeys(loadedKeys);
       } catch (e) {
-        console.error(e);
+        console.error('❌ Failed to load API keys:', e);
       } finally {
         setLoading(false);
       }
@@ -651,7 +731,15 @@ export default function IntegrationsPage() {
   };
 
   // Check which essential integrations are configured
-  const isConfigured = (id: string) => apiKeys[id] && Object.keys(apiKeys[id]).length > 0 && Object.values(apiKeys[id]).some(v => !!v);
+  const isConfigured = (id: string) => {
+    const keys = apiKeys[id];
+    if (!keys || Object.keys(keys).length === 0) return false;
+    return Object.values(keys).some(v => {
+      if (typeof v === 'string') return v.trim().length > 0;
+      if (v === true || v === 'true') return true;
+      return !!v;
+    });
+  };
   const hasEmailProvider = isConfigured('brevo') || isConfigured('smtp') || isConfigured('sender');
   const hasSmsProvider = isConfigured('twilio') || isConfigured('msg91') || isConfigured('fast2sms');
   const hasWhatsAppProvider = isConfigured('metaWhatsApp') || isConfigured('msg91WhatsApp') || isConfigured('gupshup') || isConfigured('aisensy') || isConfigured('authkey');

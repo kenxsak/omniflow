@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Icon } from '@iconify/react';
+import { useCurrency } from '@/contexts/currency-context';
 import type { PipelineStageConversion } from '@/app/actions/analytics-dashboard-actions';
 
 interface PipelineConversionChartProps {
@@ -37,17 +38,19 @@ const stageColors: Record<string, { bg: string; text: string; border: string; ba
   },
 };
 
-function formatCurrency(amount: number): string {
-  if (amount >= 1000000) {
-    return `$${(amount / 1000000).toFixed(1)}M`;
-  }
-  if (amount >= 1000) {
-    return `$${(amount / 1000).toFixed(1)}K`;
-  }
-  return `$${amount.toLocaleString()}`;
-}
-
 export function PipelineConversionChart({ data, loading }: PipelineConversionChartProps) {
+  const { getCurrencyCode } = useCurrency();
+
+  // Compact currency formatter
+  const formatCurrency = (amount: number): string => {
+    const symbol = getCurrencyCode() === 'INR' ? '₹' : 
+                   getCurrencyCode() === 'EUR' ? '€' : 
+                   getCurrencyCode() === 'GBP' ? '£' : 
+                   getCurrencyCode() === 'JPY' ? '¥' : '$';
+    if (amount >= 1000000) return `${symbol}${(amount / 1000000).toFixed(1)}M`;
+    if (amount >= 1000) return `${symbol}${(amount / 1000).toFixed(1)}K`;
+    return `${symbol}${amount.toLocaleString()}`;
+  };
   if (loading) {
     return (
       <div className="relative border border-stone-200 dark:border-stone-800 rounded-xl sm:rounded-2xl bg-white dark:bg-stone-950 overflow-hidden">

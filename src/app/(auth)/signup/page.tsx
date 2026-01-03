@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
@@ -10,15 +10,29 @@ import { lightweightSignup } from '@/lib/lightweight-auth';
 import { PublicNavbar } from '@/components/layout/public-navbar';
 import { LogoIcon } from '@/components/ui/logo';
 import { usePublicWhiteLabel } from '@/components/providers/public-white-label-provider';
+import { useGeoDetection } from '@/hooks/use-geo-detection';
+import { getSupportedCountries } from '@/lib/geo-detection';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
   const { brandName, privacyPolicyUrl, termsOfServiceUrl } = usePublicWhiteLabel();
+  const { geoData, isLoading: geoLoading } = useGeoDetection();
+  
+  const countries = useMemo(() => getSupportedCountries(), []);
+
+  // Auto-fill country from geo-detection
+  useEffect(() => {
+    if (geoData && !selectedCountry) {
+      setSelectedCountry(geoData.countryCode);
+    }
+  }, [geoData, selectedCountry]);
 
   const passwordChecks = useMemo(() => ({
     hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
@@ -41,13 +55,37 @@ export default function SignUpPage() {
       return;
     }
 
+    if (!selectedCountry) {
+      toast({
+        title: 'Error',
+        description: 'Please select your country.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
+      // Store country in sessionStorage for onboarding to pick up
+      const countryData = countries.find(c => c.code === selectedCountry);
+      if (countryData && geoData) {
+        sessionStorage.setItem('signup_geo_data', JSON.stringify({
+          countryCode: selectedCountry,
+          countryName: countryData.name,
+          callingCode: countryData.callingCode,
+          timezone: geoData.timezone,
+          currency: geoData.currency,
+        }));
+      }
+
       const result = await lightweightSignup(email, password);
       if (result.success) {
-        toast({ title: 'Account Created', description: 'Please sign in.' });
-        router.push('/login');
+        toast({ 
+          title: 'Account Created! 🎉', 
+          description: 'Please check your email to verify your account before logging in.',
+        });
+        router.push('/login?verify=pending');
       } else {
         toast({
           title: 'Sign Up Failed',
@@ -119,6 +157,60 @@ export default function SignUpPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={isLoading}
                     />
+                  </div>
+
+                  {/* Country Selector */}
+                  <div className="flex flex-col gap-1 group">
+                    <label htmlFor="country" className="text-xs sm:text-sm font-medium text-stone-800 dark:text-stone-200">
+                      Country<span className="text-rose-500">&nbsp;*</span>
+                    </label>
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                        className="w-full p-2 pl-3 pr-9 outline-none text-sm rounded-lg border h-9 sm:h-10 transition-all duration-100 border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-200 hover:border-stone-300 dark:hover:border-stone-600 focus:border-stone-400 dark:focus:border-stone-500 focus:ring-2 focus:ring-stone-200 dark:focus:ring-stone-800 text-left flex items-center justify-between"
+                        disabled={isLoading}
+                      >
+                        <span className={selectedCountry ? '' : 'text-stone-400'}>
+                          {geoLoading ? (
+                            <span className="flex items-center gap-2">
+                              <Icon icon="solar:refresh-linear" className="w-3 h-3 animate-spin" />
+                              Detecting...
+                            </span>
+                          ) : selectedCountry ? (
+                            countries.find(c => c.code === selectedCountry)?.name || 'Select country'
+                          ) : (
+                            'Select your country'
+                          )}
+                        </span>
+                        <Icon icon="solar:alt-arrow-down-linear" className="w-4 h-4 text-stone-400" />
+                      </button>
+                      {showCountryDropdown && (
+                        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                          {countries.map((country) => (
+                            <button
+                              key={country.code}
+                              type="button"
+                              onClick={() => {
+                                setSelectedCountry(country.code);
+                                setShowCountryDropdown(false);
+                              }}
+                              className={`w-full px-3 py-2 text-left text-sm hover:bg-stone-100 dark:hover:bg-stone-800 ${
+                                selectedCountry === country.code ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-stone-700 dark:text-stone-300'
+                              }`}
+                            >
+                              {country.name} ({country.callingCode})
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {geoData && selectedCountry && (
+                      <p className="text-[10px] sm:text-xs text-stone-400 flex items-center gap-1">
+                        <Icon icon="solar:map-point-linear" className="w-3 h-3" />
+                        Auto-detected from your location
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-2">

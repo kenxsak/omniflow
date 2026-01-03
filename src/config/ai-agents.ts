@@ -160,20 +160,27 @@ export const aiAgents: AIAgent[] = [
   },
   {
     id: 'general-assistant',
-    name: 'General AI Assistant',
+    name: 'AI Assistant',
     icon: Sparkles,
-    color: 'text-warning',
-    bgColor: 'bg-warning-muted',
-    description: 'Ask me anything about marketing and content',
-    longDescription: 'I can help with anything related to marketing, content creation, or business strategy.',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-900/20',
+    description: 'Your expert AI - any topic, any language',
+    longDescription: 'I work just like Google Gemini! Ask me anything in any language - research, business advice, analysis, comparisons, explanations, or create any content. I support Hindi, Tamil, Telugu, and 100+ languages.',
     capabilities: [
-      'General Advice',
-      'Strategy Discussions',
-      'Brainstorming',
-      'Any Marketing Questions'
+      'Expert Research & Analysis',
+      'Business Strategy & Advice',
+      'Multilingual (Hindi, Tamil, Telugu, etc.)',
+      'Voice Input Support',
+      'Content Creation (all types)',
+      'Industry-Specific Expertise'
     ],
-    introMessage: "Hi! I'm your General AI Assistant. Ask me anything about marketing, content, or business strategy!",
-    quickActions: [],
+    introMessage: "Hi! I'm your AI Assistant - think of me like Google Gemini. Ask me anything in any language (English, Hindi, Tamil, Telugu, etc.) - I'll give you expert-level answers. You can also use voice input! What can I help you with?",
+    quickActions: [
+      { label: '🔍 Research', prompt: 'Tell me about ', icon: 'Search' },
+      { label: '💡 Advice', prompt: 'What do you recommend for ', icon: 'Lightbulb' },
+      { label: '📊 Compare', prompt: 'Compare ', icon: 'BarChart' },
+      { label: '✨ Create', prompt: 'Create ', icon: 'Sparkles' }
+    ],
     category: 'general'
   }
 ];

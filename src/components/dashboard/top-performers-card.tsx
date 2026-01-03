@@ -5,17 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { AppIcon } from '@/components/ui/app-icon';
+import { useCurrency } from '@/contexts/currency-context';
 import type { TeamPerformer } from '@/app/actions/analytics-dashboard-actions';
 
 interface TopPerformersCardProps {
   performers: TeamPerformer[];
   loading?: boolean;
-}
-
-function formatCurrency(amount: number): string {
-  if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`;
-  if (amount >= 1000) return `$${(amount / 1000).toFixed(1)}K`;
-  return `$${amount.toLocaleString()}`;
 }
 
 function getInitials(name: string): string {
@@ -25,6 +20,18 @@ function getInitials(name: string): string {
 const rankIcons = ['trophy', 'medal', 'award'];
 
 export function TopPerformersCard({ performers, loading }: TopPerformersCardProps) {
+  const { getCurrencyCode } = useCurrency();
+
+  // Compact currency formatter
+  const formatCurrency = (amount: number): string => {
+    const symbol = getCurrencyCode() === 'INR' ? '₹' : 
+                   getCurrencyCode() === 'EUR' ? '€' : 
+                   getCurrencyCode() === 'GBP' ? '£' : 
+                   getCurrencyCode() === 'JPY' ? '¥' : '$';
+    if (amount >= 1000000) return `${symbol}${(amount / 1000000).toFixed(1)}M`;
+    if (amount >= 1000) return `${symbol}${(amount / 1000).toFixed(1)}K`;
+    return `${symbol}${amount.toLocaleString()}`;
+  };
   if (loading) {
     return (
       <Card>
@@ -137,8 +144,7 @@ export function TopPerformersCard({ performers, loading }: TopPerformersCardProp
                 </div>
                 
                 <div className="text-right">
-                  <div className="flex items-center gap-1 font-semibold">
-                    <AppIcon name="dollar" size={14} />
+                  <div className="font-semibold">
                     {formatCurrency(performer.revenueWon)}
                   </div>
                   <div className="text-xs text-muted-foreground">

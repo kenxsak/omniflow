@@ -111,7 +111,7 @@ export function ContactDeals({ contactId, contactName, companyId }: ContactDeals
         <div className="p-4 sm:p-5">
           {deals.length === 0 ? (
             <div className="text-center py-8">
-              <Icon icon="solar:dollar-linear" className="h-10 w-10 mx-auto text-muted-foreground/50 mb-2" />
+              <Icon icon="solar:hand-money-linear" className="h-10 w-10 mx-auto text-muted-foreground/50 mb-2" />
               <p className="text-sm text-muted-foreground">No deals yet</p>
               <p className="text-xs text-muted-foreground mt-1">Create a deal to track opportunities with this contact</p>
             </div>

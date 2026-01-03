@@ -267,6 +267,24 @@ service cloud.firestore {
     
     
     // ==========================================
+    // APPOINTMENT EVENT TYPES COLLECTION
+    // ==========================================
+    match /appointmentEventTypes/{eventTypeId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
+    // APPOINTMENT PAYMENTS COLLECTION
+    // ==========================================
+    match /appointmentPayments/{paymentId} {
+      allow read: if isAuthenticated();
+      // Write via Admin SDK (webhook handler)
+      allow write: if false;
+    }
+    
+    
+    // ==========================================
     // DEALS/PIPELINE COLLECTION
     // ==========================================
     match /deals/{dealId} {
@@ -320,6 +338,58 @@ service cloud.firestore {
     // SOCIAL ACCOUNTS COLLECTION
     // ==========================================
     match /socialAccounts/{accountId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
+    // INVOICES COLLECTION
+    // ==========================================
+    match /invoices/{invoiceId} {
+      // Anyone can read invoices (for public invoice view)
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
+    // INVOICE SETTINGS COLLECTION
+    // ==========================================
+    match /invoiceSettings/{settingsId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
+    // RECURRING INVOICES COLLECTION
+    // ==========================================
+    match /recurringInvoices/{recurringId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
+    // PAYMENT REMINDER SETTINGS COLLECTION
+    // ==========================================
+    match /paymentReminderSettings/{settingsId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    
+    // ==========================================
+    // INVOICE REMINDERS COLLECTION (tracking sent reminders)
+    // ==========================================
+    match /invoiceReminders/{reminderId} {
+      allow read: if isAuthenticated();
+      // Write via Admin SDK (cron job)
+      allow write: if false;
+    }
+    
+    
+    // ==========================================
+    // CRON STATE COLLECTION (for daily digest tracking)
+    // ==========================================
+    match /cronState/{stateId} {
       allow read, write: if isAuthenticated();
     }
     

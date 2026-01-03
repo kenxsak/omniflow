@@ -679,14 +679,34 @@ export async function updateUserProfile(uid: string, data: { name?: string, phon
     });
 }
 
-export async function updateCompanyProfile(companyId: string, data: { name?: string, website?: string, country?: string }): Promise<void> {
+export async function updateCompanyProfile(companyId: string, data: { 
+  name?: string;
+  website?: string;
+  country?: string;
+  countryCode?: string;
+  currencyCode?: string;
+  timezone?: string;
+  registeredEmail?: string;
+  adminEmail?: string;
+  phone?: string;
+  address?: string;
+}): Promise<void> {
     if (!getDb()) return;
     const companyRef = doc(getDb()!, "companies", companyId);
-    await updateDoc(companyRef, {
-        ...(data.name && { name: data.name }),
-        ...(data.website && { website: data.website }),
-        ...(data.country && { country: data.country }),
-    });
+    
+    const updateData: Record<string, any> = {};
+    if (data.name) updateData.name = data.name;
+    if (data.website !== undefined) updateData.website = data.website || null;
+    if (data.country) updateData.country = data.country;
+    if (data.countryCode) updateData.countryCode = data.countryCode;
+    if (data.currencyCode) updateData.currencyCode = data.currencyCode;
+    if (data.timezone) updateData.timezone = data.timezone;
+    if (data.registeredEmail !== undefined) updateData.registeredEmail = data.registeredEmail || null;
+    if (data.adminEmail !== undefined) updateData.adminEmail = data.adminEmail || null;
+    if (data.phone !== undefined) updateData.phone = data.phone || null;
+    if (data.address !== undefined) updateData.address = data.address || null;
+    
+    await updateDoc(companyRef, updateData);
 }
 
 export async function updateCompanyApiKeys(companyId: string, apiKeys: StoredApiKeys): Promise<void> {

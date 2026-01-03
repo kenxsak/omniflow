@@ -217,3 +217,172 @@ export async function getCompanyBrandingAction(params: {
     return { success: false, error: 'Failed to fetch branding' };
   }
 }
+
+
+/**
+ * Get a single quote by ID
+ */
+export async function getQuoteAction(params: {
+  idToken: string;
+  quoteId: string;
+}): Promise<{ success: boolean; quote?: QuoteDocument; error?: string }> {
+  if (!serverDb) {
+    return { success: false, error: 'Database not initialized' };
+  }
+
+  try {
+    const verification = await verifyAuthToken(params.idToken);
+    if (!verification.success) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const userRef = doc(serverDb, 'users', verification.uid);
+    const userDoc = await getDoc(userRef);
+    if (!userDoc.exists()) {
+      return { success: false, error: 'User not found' };
+    }
+
+    const quoteRef = doc(serverDb, 'quotes', params.quoteId);
+    const quoteDoc = await getDoc(quoteRef);
+    
+    if (!quoteDoc.exists()) {
+      return { success: false, error: 'Quote not found' };
+    }
+
+    const quoteData = quoteDoc.data() as QuoteDocument;
+    const userData = userDoc.data();
+    
+    if (quoteData.companyId !== userData.companyId) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    return { success: true, quote: quoteData };
+  } catch (error) {
+    console.error('Error fetching quote:', error);
+    return { success: false, error: 'Failed to fetch quote' };
+  }
+}
+
+/**
+ * Get all quotes for a company
+ */
+export async function getQuotesAction(params: {
+  idToken: string;
+  status?: QuoteDocument['status'];
+  limit?: number;
+}): Promise<{ success: boolean; quotes?: QuoteDocument[]; error?: string }> {
+  if (!serverDb) {
+    return { success: false, error: 'Database not initialized' };
+  }
+
+  try {
+    const verification = await verifyAuthToken(params.idToken);
+    if (!verification.success) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const userRef = doc(serverDb, 'users', verification.uid);
+    const userDoc = await getDoc(userRef);
+    if (!userDoc.exists()) {
+      return { success: false, error: 'User not found' };
+    }
+
+    const userData = userDoc.data();
+    const companyId = userData.companyId;
+
+    let quotesQuery = query(
+      collection(serverDb, 'quotes'),
+      where('companyId', '==', companyId),
+      orderBy('createdAt', 'desc'),
+      limit(params.limit || 100)
+    );
+
+    const snapshot = await getDocs(quotesQuery);
+    let quotes = snapshot.docs.map(doc => doc.data() as QuoteDocument);
+    
+    // Filter by status if provided
+    if (params.status) {
+      quotes = quotes.filter(q => q.status === params.status);
+    }
+
+    return { success: true, quotes };
+  } catch (error) {
+    console.error('Error fetching quotes:', error);
+    return { success: false, error: 'Failed to fetch quotes' };
+  }
+}
+
+/**
+ * Convert a quote to an invoice
+ */
+export async function convertQuoteToInvoiceAction(params: {
+  idToken: string;
+  quoteId: string;
+}): Promise<{ success: boolean; invoiceId?: string; invoiceNumber?: string; error?: string }> {
+  if (!serverDb) {
+    return { success: false, error: 'Database not initialized' };
+  }
+
+  try {
+    const verification = await verifyAuthToken(params.idToken);
+    if (!verification.success) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    // Get the quote
+    const quoteRef = doc(serverDb, 'quotes', params.quoteId);
+    const quoteDoc = await getDoc(quoteRef);
+    
+    if (!quoteDoc.exists()) {
+      return { success: false, error: 'Quote not found' };
+    }
+
+    const quote = quoteDoc.data() as QuoteDocument;
+
+    // Verify user has access
+    const userRef = doc(serverDb, 'users', verification.uid);
+    const userDoc = await getDoc(userRef);
+    if (!userDoc.exists()) {
+      return { success: false, error: 'User not found' };
+    }
+
+    const userData = userDoc.data();
+    if (quote.companyId !== userData.companyId) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    // Import and call the invoice action
+    const { createInvoiceAction } = await import('./invoice-actions');
+    
+    const result = await createInvoiceAction({
+      idToken: params.idToken,
+      invoice: {
+        clientId: quote.leadId,
+        clientName: quote.leadName,
+        clientEmail: quote.leadEmail,
+        items: quote.items.map(item => ({
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+        })),
+        discountPercent: quote.discountPercent || undefined,
+        notes: quote.notes,
+        quoteId: quote.id,
+      },
+    });
+
+    if (result.success) {
+      // Update quote status to accepted
+      await updateDoc(quoteRef, {
+        status: 'accepted',
+        respondedAt: new Date().toISOString(),
+        convertedToInvoiceId: result.invoiceId,
+      });
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error converting quote to invoice:', error);
+    return { success: false, error: 'Failed to convert quote to invoice' };
+  }
+}

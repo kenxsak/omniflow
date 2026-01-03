@@ -45,6 +45,7 @@ const getSuperAdminNav = (): NavGroup[] => [
       { href: '/settings/support-tickets', label: 'Support Tickets', icon: 'solar:chat-round-dots-bold', badge: 'NEW', badgeColor: 'bg-rose-500' },
       { href: '/transactions', label: 'Transactions', icon: 'solar:card-transfer-bold' },
       { href: '/super-admin-ai-costs', label: 'AI Costs', icon: 'solar:wallet-money-bold' },
+      { href: '/settings/invoices', label: 'Invoice & Payments', icon: 'solar:bill-list-linear', badge: 'NEW', badgeColor: 'bg-blue-500' },
     ],
   },
   {
@@ -125,6 +126,7 @@ const getUserNav = (): NavGroup[] => [
       { href: '/settings/integrations', label: 'Integrations', icon: 'solar:plug-circle-linear', adminOnly: true },
       { href: '/settings/webhooks', label: 'Webhooks', icon: 'solar:programming-linear', adminOnly: true },
       { href: '/settings/ai-calling', label: 'AI Calling', icon: 'solar:phone-calling-linear', adminOnly: true, badge: 'NEW', badgeColor: 'bg-emerald-500' },
+      { href: '/settings/invoices', label: 'Invoice & Payments', icon: 'solar:bill-list-linear', adminOnly: true, badge: 'NEW', badgeColor: 'bg-blue-500' },
     ],
   },
   {

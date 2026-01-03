@@ -1,6 +1,6 @@
 'use server';
 
-import { getOnboardingProgress, updateChecklistItem, skipOnboarding, completeOnboarding, type ChecklistItem, type OnboardingProgress } from './onboarding-actions';
+import { getOnboardingProgress, updateChecklistItem, skipOnboarding, completeOnboarding, setupCompanyLocale, type ChecklistItem, type OnboardingProgress } from './onboarding-actions';
 
 export async function getOnboardingProgressAction(companyId: string): Promise<OnboardingProgress | null> {
   return getOnboardingProgress(companyId);
@@ -20,6 +20,19 @@ export async function skipOnboardingAction(companyId: string): Promise<{ success
 
 export async function completeOnboardingAction(companyId: string): Promise<{ success: boolean; message: string }> {
   return completeOnboarding(companyId);
+}
+
+export async function setupCompanyLocaleAction(
+  companyId: string,
+  localeData: {
+    country?: string;
+    countryCode?: string;
+    timezone?: string;
+    currencyCode?: string;
+    callingCode?: string;
+  }
+): Promise<{ success: boolean; message: string }> {
+  return setupCompanyLocale(companyId, localeData);
 }
 
 // Import and re-export detection functions as async wrappers

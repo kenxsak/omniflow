@@ -213,6 +213,7 @@ export interface QuoteDocument {
     viewedAt?: string;                       // When lead viewed the quote
     respondedAt?: string;                    // When lead accepted/rejected
     createdBy: string;                       // User ID who created
+    convertedToInvoiceId?: string;           // Invoice ID if converted
 }
 
 /**
